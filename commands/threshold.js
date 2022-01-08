@@ -11,4 +11,4 @@ module.exports = {
       // let voteThreshold = 3;
       await interaction.reply(voteThreshold + " reactions required to tweet a message.");
    },
-};
+}; 
