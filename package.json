@@ -1,7 +1,7 @@
 {
-  "name": "nounsbot",
+  "name": "Nerman",
   "version": "1.0.0",
-  "description": "Nouns Community Bot",
+  "description": "A Great Listener",
   "main": "index.js",
   "engines": {
     "node": "16.x"
@@ -11,16 +11,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://joelcares@bitbucket.org/joelcares/nounsbot.git"
+    "url": "git+https://git.heroku.com/nerman.git"
   },
   "author": "Joel Cares",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/joelcares/nounsbot#readme",
+  "homepage": "https://nerman.wtf",
   "dependencies": {
     "@discordjs/builders": "^0.9.0",
     "@discordjs/rest": "^0.1.0-canary.0",
     "discord-api-types": "^0.25.2",
     "discord.js": "^13.3.1",
+    "dotenv": "^10.0.0",
     "mongodb": "^4.2.2",
     "twit": "^2.2.11"
   }

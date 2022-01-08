@@ -1,8 +1,8 @@
-// Require the necessary discord.js classes
+require('dotenv').config();
 
 const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
-const { token } = require("./config.json");
+const token = process.env.DISCORD_TOKEN;
 const intents = new Intents(8); //ADMIN - remove and replace with real permissions later
 let intentsALL = new Intents(Intents.ALL);
 const client = new Client({ intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MEMBERS", "GUILD_PRESENCES", "GUILD_EMOJIS_AND_STICKERS", "GUILD_MESSAGE_REACTIONS", "GUILD_WEBHOOKS"] });

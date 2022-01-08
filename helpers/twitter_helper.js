@@ -1,4 +1,11 @@
-const { twitter } = require('../config.json');
+const twitter = {
+  api_key: process.env.TWITTER_API_KEY,
+  api_key_secret: process.env.TWITTER_API_KEY_SECRET,
+  access_token: process.env.TWITTER_ACCESS_TOKEN,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
+}
+
+
 var request = require('request').defaults({ encoding: null });
 var Twit = require('twit');
 
