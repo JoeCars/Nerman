@@ -1,6 +1,5 @@
 //const NounsTweetTools = require(`../helpers/twitter_post_status.js`);
 const NounsTweetTools = require(`../helpers/twitter_helper.js`);
-const messageStorage = require(`../helpers/storage.js`);
 const MongoDB = require(`../helpers/mongodb.js`);
 const voteThreshold = 1;
 
