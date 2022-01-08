@@ -1,5 +1,9 @@
 require('dotenv').config();
 
+if(process.env.DISCORD_DEPLOY_COMMANDS == true) {
+   require('deploy-commands.js');
+}
+
 const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const token = process.env.DISCORD_TOKEN;
