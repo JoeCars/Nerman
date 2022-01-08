@@ -21,7 +21,7 @@ async function nermanTweet(content, media_ids) {
   // @todo format content - character count, emojis, username tagging
   // @todo ensure media ids are valid - how does this fail. Min, Max.
   let params = { status: content };
-  if(media){
+  if(media_ids){
     params.media_ids = media_ids;
   }
 
