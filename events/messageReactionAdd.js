@@ -40,7 +40,7 @@ module.exports = {
                   NounsTweetTools.uploadImage(messageAttachmentURL, tweetContent);
                }
 
-               await NounsTweetTools.tweetString(tweetContent);
+               await NounsTweetTools.nermanTweet(tweetContent);
                MongoDB.markMessageAsTweeted(messageId, messageUserId);
                await reaction.message.reply("Sent Tweet: " + tweetContent);
    
