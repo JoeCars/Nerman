@@ -10,6 +10,7 @@ var T = new Twit({
     strictSSL:            true,     // optional - requires SSL certificates to be valid.
 });
 
+// todo change all callbacks to async functions
 
 /**
  * Tell Nerman to Post a Tweet
@@ -29,32 +30,39 @@ async function nermanTweet(content, media_ids) {
     if(err){console.log(err)}
   });
 }
-  
-async function tweet_string_with_image(url, content) {
 
+async function getImageFromUrl(url, content, callback) {
   request.get(url, function (error, response, body) {
     if (!error && response.statusCode == 200) {
         data = "data:" + response.headers["content-type"] + ";base64," + Buffer.from(body).toString('base64');
-
-          T.post('media/upload', { "media_data": Buffer.from(body).toString('base64') }, function (err, data, response) {
-
-              var mediaIdStr = data.media_id_string
-              var altText = content;
-              var meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
-
-              T.post('media/metadata/create', meta_params, function (err, data, response) {
-
-                  if (!err) {
-
-                      nermanTweet(content, [mediaIdStr]);
-                  }
-              })
-          })
-
-
+        let media_data = Buffer.from(body).toString('base64');
+        uploadImageToTwitter(media_data, content);
     }
-});
+  });
+}
+  
+async function uploadImageToTwitter(media_data, content) {
 
+  T.post('media/upload', { "media_data": media_data }, function (err, data, response) {
+
+    var mediaIdStr = data.media_id_string
+    var altText = content;
+    var meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
+  
+    T.post('media/metadata/create', meta_params, function (err, data, response) {
+  
+        if (!err) {
+  
+            nermanTweet(content, [mediaIdStr]);
+        }
+    })
+  })
+
+}
+
+
+async function tweet_string_with_image(url, content) {
+  getImageFromUrl(url, content) 
 }
 
 
