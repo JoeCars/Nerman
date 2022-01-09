@@ -67,7 +67,7 @@ module.exports.nermanTweet = async function(content) {
 }
 
 module.exports.uploadImage = async function(url, content) {
-  await getImageFromUrl(url, function(){
+  await getImageFromUrl(url, function(media_data){
     uploadImageToTwitter(media_data, content);
   });
 }
