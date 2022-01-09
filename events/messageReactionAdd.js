@@ -11,7 +11,7 @@ module.exports = {
       let message = {
          content : reaction.message.content,
          id : reaction.message.id,
-         username : reaction.message.author.username,
+         user : reaction.message.author.username,
          user_id : reaction.message.author.id,
          emoji : reaction.emoji.name,
          attachments : reaction.message.attachments,
