@@ -1,13 +1,14 @@
 const nTwitter = require(`../helpers/twitter.js`);
 const MongoDB = require(`../helpers/mongodb.js`);
 const nDiscord = require(`../helpers/discord.js`);
-const voteThreshold = nDiscord.getThreshold();
 
 //@todo change attachment_url to plural, handle array and post multiple to Twitter
 
 module.exports = {
    name: 'messageReactionAdd',
    async execute(reaction, user) {
+
+      const voteThreshold = await nDiscord.getThreshold();
 
       let message = {
          content : reaction.message.content,
@@ -38,7 +39,7 @@ module.exports = {
          console.log("messageTweeted " + messageTweeted);
 
          if(reaction.count > voteThreshold - 1) {
-               //console.log("reaction count above threshold");
+               console.log("reaction count above threshold");
 
             if(!messageTweeted){
                console.log("message not already tweeted");
@@ -52,7 +53,7 @@ module.exports = {
                await reaction.message.reply("Sent Tweet: " + tweetContent);
    
             } else {
-               //console.log("message already tweeted, do nothing");
+               console.log("message already tweeted, do nothing");
             }
 
          }
