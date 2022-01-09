@@ -13,14 +13,17 @@ var T = new Twit({
 // todo change all callbacks to async functions
 
 /**
- * Tell Nerman to Post a Tweet
+ * Post a tweet with Nerman
  * @param  {String} content text content to include
- * @param  {Array} media array of strings with ids of media to include
+ * @param  {Array} media array of strings with ids of media to include (optional)
  */
 
-async function nermanTweet(content, media_ids) {
+async function post(content, media_ids) {
   // @todo format content - character count, emojis, username tagging
   // @todo ensure media ids are valid - how does this fail. Min, Max.
+
+  // take img URLS instead of media IDs
+
   let params = { status: content };
   if(media_ids){
     params.media_ids = media_ids;
@@ -31,7 +34,17 @@ async function nermanTweet(content, media_ids) {
   });
 }
 
+
+/**
+ * Get a base64 img string from the given url
+ * @param  {String} url text content to include
+ * @param  {function} callback will be called with img string
+ */
+
 async function getImageFromUrl(url, callback) {
+
+  //@todo check that url is valid image type
+  //@todo deal with error of invalid image
 
   request.get(url, function (error, response, body) {
 
@@ -45,29 +58,47 @@ async function getImageFromUrl(url, callback) {
   });
 }
   
+
+
+/**
+ * Uploads an image to Twitter and gets the Twitter media ID of it
+ * @param  {String} media_data base64 encoded img string
+ * @param  {function} callback will be called with img string
+ */
+
 async function uploadImageToTwitter(media_data, content, callback) {
 
   T.post('media/upload', { "media_data": media_data }, function (err, data, response) {
 
-    var mediaIdStr = data.media_id_string
-    var altText = content;
-    var meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
+    let mediaIdStr = data.media_id_string
+    let altText = content;
+    let meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
   
     T.post('media/metadata/create', meta_params, function (err, data, response) {
-  
         if (!err) {
-            nermanTweet(content, [mediaIdStr]);
+          callback(mediaIdStr);   
         }
     })
   })
 }
 
-module.exports.nermanTweet = async function(content) {
-  await nermanTweet(content);
+
+// @todo add media_urls array as second argument
+module.exports.post = async function(content) {
+  await post(content);
 }
 
-module.exports.uploadImage = async function(url, content) {
+//deprecated
+module.exports.uploadImageAndTweet = async function(url, content) {
+  let media_alt_text = content;
+
   await getImageFromUrl(url, function(media_data){
-    uploadImageToTwitter(media_data, content);
+
+    uploadImageToTwitter(media_data, media_alt_text, function(mediaIdStr){
+
+      post(content, [mediaIdStr]);
+
+    });
   });
 }
+

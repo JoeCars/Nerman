@@ -1,23 +1,34 @@
-//const NounsTweetTools = require(`../helpers/twitter_post_status.js`);
-const NounsTweetTools = require(`../helpers/twitter_helper.js`);
+const nTwitter = require(`../helpers/nTwitter.js`);
 const MongoDB = require(`../helpers/mongodb.js`);
 const voteThreshold = 1;
+
+//@todo change attachment_url to plural, handle array and post multiple to Twitter
 
 module.exports = {
    name: 'messageReactionAdd',
    async execute(reaction, user) {
-      let messageContent = reaction.message.content;
-      let messageId = reaction.message.id;
-      let messageUser = reaction.message.author.username;
-      let messageUserId = reaction.message.author.id;
-      let messageAttachments = reaction.message.attachments;
 
-      let tweetContent = messageContent + " - " + messageUser;
-      let messageAttachmentURL = '';
+      let message = {
+         content : reaction.message.content,
+         id : reaction.message.id,
+         username : reaction.message.author.username,
+         user_id : reaction.message.author.id,
+         emoji : reaction.emoji.name,
+         attachments : reaction.message.attachments,
+         attachment_url : ''
 
-      if(messageAttachments.size > 0) {
+      }
+      // let messageContent = reaction.message.content;
+      // let messageId = reaction.message.id;
+      // let messageUser = reaction.message.author.username;
+      // let messageUserId = reaction.message.author.id;
+      // let messageAttachments = reaction.message.attachments;
 
-         messageAttachmentURL = messageAttachments.first().url;
+      let tweetContent = message.content + " - " + message.user;
+
+      if(message.attachments.size > 0) {
+
+         message.attachment_url = message.attachments.first().url;
 
       }
 
@@ -25,9 +36,9 @@ module.exports = {
       // let voteThreshold = Math.floor(memberCount * 0.01);
       // maybe calculations based on online members would be better
 
-      if (reaction.emoji.name == 'TweetThis') {
+      if (message.emoji == 'TweetThis') {
 
-         let messageTweeted = await MongoDB.hasMessageBeenTweeted(reaction.message.id);
+         let messageTweeted = await MongoDB.hasMessageBeenTweeted(message.id);
          console.log("messageTweeted " + messageTweeted);
 
          if(reaction.count > voteThreshold - 1) {
@@ -36,12 +47,12 @@ module.exports = {
             if(!messageTweeted){
                console.log("message not already tweeted");
 
-               if(messageAttachmentURL.length > 0) {
-                  NounsTweetTools.uploadImage(messageAttachmentURL, tweetContent);
+               if(message.attachment_url.length > 0) {
+                  nTwitter.uploadImageAndTweet(message.attachment_url, tweetContent);
                }
 
-               await NounsTweetTools.nermanTweet(tweetContent);
-               MongoDB.markMessageAsTweeted(messageId, messageUserId);
+               await nTwitter.post(tweetContent);
+               MongoDB.markMessageAsTweeted(message.id, message.user_id);
                await reaction.message.reply("Sent Tweet: " + tweetContent);
    
             } else {
