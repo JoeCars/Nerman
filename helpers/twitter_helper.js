@@ -31,17 +31,21 @@ async function nermanTweet(content, media_ids) {
   });
 }
 
-async function getImageFromUrl(url, content, callback) {
+async function getImageFromUrl(url, callback) {
+
   request.get(url, function (error, response, body) {
+
     if (!error && response.statusCode == 200) {
-        data = "data:" + response.headers["content-type"] + ";base64," + Buffer.from(body).toString('base64');
-        let media_data = Buffer.from(body).toString('base64');
-        uploadImageToTwitter(media_data, content);
+
+      let media_data = Buffer.from(body).toString('base64');
+
+        callback(media_data);
+
     }
   });
 }
   
-async function uploadImageToTwitter(media_data, content) {
+async function uploadImageToTwitter(media_data, content, callback) {
 
   T.post('media/upload', { "media_data": media_data }, function (err, data, response) {
 
@@ -52,24 +56,18 @@ async function uploadImageToTwitter(media_data, content) {
     T.post('media/metadata/create', meta_params, function (err, data, response) {
   
         if (!err) {
-  
             nermanTweet(content, [mediaIdStr]);
         }
     })
   })
-
 }
-
-
-async function tweet_string_with_image(url, content) {
-  getImageFromUrl(url, content) 
-}
-
 
 module.exports.nermanTweet = async function(content) {
   await nermanTweet(content);
 }
 
 module.exports.uploadImage = async function(url, content) {
-  await tweet_string_with_image(url, content);
+  await getImageFromUr(url, function(){
+    uploadImageToTwitter(media_data, content);
+  });
 }
