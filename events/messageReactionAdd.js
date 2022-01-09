@@ -1,6 +1,7 @@
-const nTwitter = require(`../helpers/nTwitter.js`);
+const nTwitter = require(`../helpers/twitter.js`);
 const MongoDB = require(`../helpers/mongodb.js`);
-const voteThreshold = 1;
+const nDiscord = require(`../helpers/discord.js`);
+const voteThreshold = nDiscord.getThreshold();
 
 //@todo change attachment_url to plural, handle array and post multiple to Twitter
 
@@ -18,11 +19,6 @@ module.exports = {
          attachment_url : ''
 
       }
-      // let messageContent = reaction.message.content;
-      // let messageId = reaction.message.id;
-      // let messageUser = reaction.message.author.username;
-      // let messageUserId = reaction.message.author.id;
-      // let messageAttachments = reaction.message.attachments;
 
       let tweetContent = message.content + " - " + message.user;
 
