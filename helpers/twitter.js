@@ -38,8 +38,8 @@ async function post(content, media_urls) {
 
     console.log("2");
     uploadImageToTwitter(media_data0, media_alt_text, function(mediaIdStr){
-      console.log("3 "+mediaIdString);
-      params.media_ids = [mediaIdString];    
+      console.log("3 "+mediaIdStr);
+      params.media_ids = [mediaIdStr];    
 
       T.post('statuses/update', params, function (err, data, response) {  
         if(err){console.log(err)}
