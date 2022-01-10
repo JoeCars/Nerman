@@ -1,4 +1,5 @@
 var request = require('request').defaults({ encoding: null });
+const got = require('got');
 var Twit = require('twit');
 
 var T = new Twit({
@@ -28,8 +29,8 @@ async function post(content, media_urls) {
 
     //need to turn media_urls into media_ids
     let media_alt_text = content;
-    console.log("1 "+media_urls);
-    let media_data0 = await getImageFromUrl(media_urls[0]);
+    let media_data0 = await getBase64ImageFromURLGot(media_urls[0]);
+
     console.log("2 "+media_data0);
     let mediaIdString0 = await uploadImageToTwitter(media_data0, media_alt_text);
     console.log("3 "+mediaIdString0);
@@ -44,6 +45,17 @@ async function post(content, media_urls) {
 }
 
 
+/**
+ * Get a base64 img string from the given url
+ * @param  {String} url text content to include
+ */
+
+async function getBase64ImageFromURLGot(url) {
+
+  const {headers, body} = await got(url).json();
+  return Buffer.from(body).toString('base64');
+  
+}
 
 
 /**
