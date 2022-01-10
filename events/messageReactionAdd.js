@@ -1,5 +1,5 @@
 const nTwitter = require(`../helpers/twitter.js`);
-const MongoDB = require(`../helpers/mongodb.js`);
+const nMongoDB = require(`../helpers/mongodb.js`);
 const nDiscord = require(`../helpers/discord.js`);
 
 //@todo change attachment_url to plural, handle array and post multiple to Twitter
@@ -35,7 +35,7 @@ module.exports = {
 
       if (message.emoji == 'TweetThis') {
 
-         let messageTweeted = await MongoDB.hasMessageBeenTweeted(message.id);
+         let messageTweeted = await nMongoDB.hasMessageBeenTweeted(message.id);
          console.log("messageTweeted " + messageTweeted);
 
          if(reaction.count > voteThreshold - 1) {
@@ -49,7 +49,7 @@ module.exports = {
                }
 
                await nTwitter.post(tweetContent);
-               MongoDB.markMessageAsTweeted(message.id, message.user_id);
+               nMongoDB.markMessageAsTweeted(message.id, message.user_id);
                await reaction.message.reply("Sent Tweet: " + tweetContent);
    
             } else {

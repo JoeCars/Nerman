@@ -10,7 +10,10 @@ var T = new Twit({
     strictSSL:            true,     // optional - requires SSL certificates to be valid.
 });
 
+
+
 // todo change all callbacks to async functions
+
 
 /**
  * Post a tweet with Nerman
@@ -33,6 +36,8 @@ async function post(content, media_ids) {
     if(err){console.log(err)}
   });
 }
+
+
 
 
 /**
@@ -60,6 +65,7 @@ async function getImageFromUrl(url, callback) {
   
 
 
+
 /**
  * Uploads an image to Twitter and gets the Twitter media ID of it
  * @param  {String} media_data base64 encoded img string
@@ -83,6 +89,8 @@ async function uploadImageToTwitter(media_data, content, callback) {
 }
 
 
+
+
 // @todo add media_urls array as second argument
 module.exports.post = async function(content) {
   await post(content);
@@ -93,12 +101,13 @@ module.exports.uploadImageAndTweet = async function(url, content) {
   let media_alt_text = content;
 
   await getImageFromUrl(url, function(media_data){
+    let mediaIdStringTemp = '';
 
-    uploadImageToTwitter(media_data, media_alt_text, function(mediaIdStr){
-
-      post(content, [mediaIdStr]);
-
+    await uploadImageToTwitter(media_data, media_alt_text, function(mediaIdStr){
+      mediaIdStringTemp = mediaIdStr;
     });
+
+    post(content, [mediaIdStr]);
   });
 }
 
