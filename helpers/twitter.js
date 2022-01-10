@@ -59,7 +59,7 @@ async function getBase64ImageFromURLFetch(url) {
 
   const response = await fetch(url);
   const buffer = await response.buffer();
-  let media_data = Buffer.from(buffer).toString('base64');
+  let media_data = buffer.toString('base64');
   
   return media_data;  
   //console.log(body);
