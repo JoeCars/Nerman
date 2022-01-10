@@ -3,10 +3,6 @@ var request = require('request').defaults({ encoding: null });
 const Twit = require('twit');
 const fetch = require('node-fetch');
 
-
-// @todo - switch to ES6 imports
-// @todo - maybe change all to TypeScript
-
 var T = new Twit({
     consumer_key:         process.env.TWITTER_API_KEY,
     consumer_secret:      process.env.TWITTER_API_KEY_SECRET,
@@ -34,11 +30,10 @@ async function post(content, media_urls) {
 
     //need to turn media_urls into media_ids
     let media_alt_text = content;
-    let media_data0 = await getBase64ImageFromURLFetch(media_urls[0]);
+    let media_data0 = await getImgString(media_urls[0]);
 
-    console.log("2");
     uploadImageToTwitter(media_data0, media_alt_text, function(mediaIdStr){
-      console.log("3 "+mediaIdStr);
+
       params.media_ids = [mediaIdStr];    
 
       T.post('statuses/update', params, function (err, data, response) {  
@@ -53,10 +48,14 @@ async function post(content, media_urls) {
 
 /**
  * Get a base64 img string from the given url
- * @param  {String} url text content to include
+ * @param  {String} url address of image
  */
 
-async function getBase64ImageFromURLFetch(url) {
+async function getImgString(url) {
+
+  //check error status and response code
+  //check file types
+  //check header for appropriate image types
 
   console.log(url);
   const response = await fetch(url);
@@ -66,34 +65,6 @@ async function getBase64ImageFromURLFetch(url) {
   return media_data;  
   
 }
-
-
-/**
- * Get a base64 img string from the given url
- * @param  {String} url text content to include
- * @param  {function} callback will be called with img string
- */
-
-async function getImageFromUrl(url) {
-
-  //@todo check that url is valid image type
-  //@todo deal with error of invalid image
-
-  let media_data_temp = '';
-
-  await request.get(url, function (error, response, body) {
-
-    if (!error && response.statusCode == 200) {
-      let media_data = Buffer.from(body).toString('base64');
-      media_data_temp = media_data;
-    }
-
-  });
-
-  return media_data_temp;
-}
-  
-
 
 
 /**
