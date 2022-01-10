@@ -46,21 +46,23 @@ async function post(content, media_ids) {
  * @param  {function} callback will be called with img string
  */
 
-async function getImageFromUrl(url, callback) {
+async function getImageFromUrl(url) {
 
   //@todo check that url is valid image type
   //@todo deal with error of invalid image
-
-  request.get(url, function (error, response, body) {
+  let media_data_temp = '';
+  await request.get(url, function (error, response, body) {
 
     if (!error && response.statusCode == 200) {
 
       let media_data = Buffer.from(body).toString('base64');
 
-        callback(media_data);
+      media_data_temp = media_data;
 
     }
   });
+
+  return media_data_temp;
 }
   
 
@@ -72,7 +74,7 @@ async function getImageFromUrl(url, callback) {
  * @param  {function} callback will be called with img string
  */
 
-async function uploadImageToTwitter(media_data, content, callback) {
+async function uploadImageToTwitter(media_data, content) {
 
   T.post('media/upload', { "media_data": media_data }, function (err, data, response) {
 
@@ -100,13 +102,12 @@ module.exports.post = async function(content) {
 //deprecated
 module.exports.uploadImageAndTweet = async function(url, content) {
   let media_alt_text = content;
+  
+  let media_data_temp = '';
 
-  await getImageFromUrl(url, async function(media_data){
-    let mediaIdStringTemp = await uploadImageToTwitter(media_data, media_alt_text, function(mediaIdStr){
-      mediaIdStringTemp = mediaIdStr;
-    });
+  let media_data = await getImageFromUrl(url);
 
-    post(content, [mediaIdStringTemp]);
-  });
+  let mediaIdString = await uploadImageToTwitter(media_data, media_alt_text);
+  post(content, [mediaIdString]);
 }
 
