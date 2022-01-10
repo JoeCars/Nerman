@@ -1,5 +1,5 @@
 var request = require('request').defaults({ encoding: null });
-const got = require('got');
+import got from 'got';
 var Twit = require('twit');
 
 var T = new Twit({
