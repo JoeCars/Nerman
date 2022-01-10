@@ -28,11 +28,14 @@ async function post(content, media_urls) {
 
     //need to turn media_urls into media_ids
     let media_alt_text = content;
+    console.log("1 "+media_urls);
     let media_data0 = await getImageFromUrl(media_urls[0]);
+    console.log("2 "+media_data0);
     let mediaIdString0 = await uploadImageToTwitter(media_data0, media_alt_text);
+    console.log("3 "+mediaIdString0);
 
     params.media_ids = [mediaIdString0];
-    
+
   }
 
   T.post('statuses/update', params, function (err, data, response) {  
