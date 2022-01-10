@@ -1,6 +1,11 @@
 var request = require('request').defaults({ encoding: null });
-import got from 'got';
-var Twit = require('twit');
+//import got from 'got';
+const Twit = require('twit');
+const fetch = require('node-fetch@2');
+
+
+// @todo - switch to ES6 imports
+// @todo - maybe change all to TypeScript
 
 var T = new Twit({
     consumer_key:         process.env.TWITTER_API_KEY,
@@ -29,7 +34,7 @@ async function post(content, media_urls) {
 
     //need to turn media_urls into media_ids
     let media_alt_text = content;
-    let media_data0 = await getBase64ImageFromURLGot(media_urls[0]);
+    let media_data0 = await getBase64ImageFromURLFetch(media_urls[0]);
 
     console.log("2 "+media_data0);
     let mediaIdString0 = await uploadImageToTwitter(media_data0, media_alt_text);
@@ -50,10 +55,18 @@ async function post(content, media_urls) {
  * @param  {String} url text content to include
  */
 
-async function getBase64ImageFromURLGot(url) {
+async function getBase64ImageFromURLFetch(url) {
 
-  const {headers, body} = await got(url).json();
-  return Buffer.from(body).toString('base64');
+
+  const response = await fetch('url');
+  const data = await response.json();
+
+  console.log(data);
+  
+  //console.log(body);
+
+  // const {headers, body} = await got(url).json();
+  // return Buffer.from(body).toString('base64');
   
 }
 
