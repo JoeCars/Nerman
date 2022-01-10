@@ -1,7 +1,7 @@
 var request = require('request').defaults({ encoding: null });
 //import got from 'got';
 const Twit = require('twit');
-const fetch = require('node-fetch@2');
+const fetch = require('node-fetch');
 
 
 // @todo - switch to ES6 imports
