@@ -2,15 +2,28 @@ var request = require('request').defaults({ encoding: null });
 //import got from 'got';
 const Twit = require('twit');
 const fetch = require('node-fetch');
+let keys_valid = false;
 
-var T = new Twit({
-    consumer_key:         process.env.TWITTER_API_KEY,
-    consumer_secret:      process.env.TWITTER_API_KEY_SECRET,
-    access_token:         process.env.TWITTER_ACCESS_TOKEN,
-    access_token_secret:  process.env.TWITTER_ACCESS_TOKEN_SECRET,
-    timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
-    strictSSL:            true,     // optional - requires SSL certificates to be valid.
-});
+try {
+
+  var T = new Twit({
+      consumer_key:         process.env.TWITTER_API_KEY,
+      consumer_secret:      process.env.TWITTER_API_KEY_SECRET,
+      access_token:         process.env.TWITTER_ACCESS_TOKEN,
+      access_token_secret:  process.env.TWITTER_ACCESS_TOKEN_SECRET,
+      timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
+      strictSSL:            true,     // optional - requires SSL certificates to be valid.
+  });
+
+  keys_valid = true;
+
+} catch (e) {
+
+  console.log(e);
+
+  keys_valid = false;
+
+}
 
 
 /**
@@ -99,16 +112,22 @@ function uploadImageToTwitter(media_data, content, callback) {
 // @todo add media_urls array as second argument
 
 module.exports.post = async function(content, media_urls) {
+  if(keys_valid){
+    
+    await post(content, media_urls);
 
-  await post(content, media_urls);
+  }
 
 }
 
 //deprecated
 module.exports.uploadImageAndTweet = async function(url, content) {
 
+  if(keys_valid){ 
 
-  post(content, [mediaIdString]);
+    post(content, [mediaIdString]);
+    
+   }
 
 }
 
