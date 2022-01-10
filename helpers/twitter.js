@@ -82,7 +82,8 @@ async function uploadImageToTwitter(media_data, content, callback) {
   
     T.post('media/metadata/create', meta_params, function (err, data, response) {
         if (!err) {
-          callback(mediaIdStr);   
+          return mediaIdStr;
+          //callback(mediaIdStr);   
         }
     })
   })
@@ -101,9 +102,7 @@ module.exports.uploadImageAndTweet = async function(url, content) {
   let media_alt_text = content;
 
   await getImageFromUrl(url, async function(media_data){
-    let mediaIdStringTemp = '';
-
-    await uploadImageToTwitter(media_data, media_alt_text, function(mediaIdStr){
+    let mediaIdStringTemp = await uploadImageToTwitter(media_data, media_alt_text, function(mediaIdStr){
       mediaIdStringTemp = mediaIdStr;
     });
 
