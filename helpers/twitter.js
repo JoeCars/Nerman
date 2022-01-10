@@ -58,9 +58,11 @@ async function post(content, media_urls) {
 async function getBase64ImageFromURLFetch(url) {
 
   const response = await fetch(url);
-  const data = await response.json();
+  const media_data = await response.buffer().toString('base64');
+  //let media_data = Buffer.from(buffer).toString('base64');
+  
 
-  console.log(data);
+  console.log(media_data);
   
   //console.log(body);
 
