@@ -11,25 +11,28 @@ var T = new Twit({
 });
 
 
-
-// todo change all callbacks to async functions
-
-
 /**
  * Post a tweet with Nerman
  * @param  {String} content text content to include
  * @param  {Array} media array of strings with ids of media to include (optional)
  */
 
-async function post(content, media_ids) {
+async function post(content, media_urls) {
   // @todo format content - character count, emojis, username tagging
   // @todo ensure media ids are valid - how does this fail. Min, Max.
-
   // take img URLS instead of media IDs
 
   let params = { status: content };
-  if(media_ids){
-    params.media_ids = media_ids;
+
+  if(media_urls){
+
+    //need to turn media_urls into media_ids
+    let media_alt_text = content;
+    let media_data0 = await getImageFromUrl(media_urls[0]);
+    let mediaIdString0 = await uploadImageToTwitter(media_data0, media_alt_text);
+
+    params.media_ids = [mediaIdString0];
+    
   }
 
   T.post('statuses/update', params, function (err, data, response) {  
@@ -50,16 +53,16 @@ async function getImageFromUrl(url) {
 
   //@todo check that url is valid image type
   //@todo deal with error of invalid image
+
   let media_data_temp = '';
+
   await request.get(url, function (error, response, body) {
 
     if (!error && response.statusCode == 200) {
-
       let media_data = Buffer.from(body).toString('base64');
-
       media_data_temp = media_data;
-
     }
+
   });
 
   return media_data_temp;
@@ -81,33 +84,37 @@ async function uploadImageToTwitter(media_data, content) {
     let mediaIdStr = data.media_id_string
     let altText = content;
     let meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
-  
+
     T.post('media/metadata/create', meta_params, function (err, data, response) {
+
         if (!err) {
           return mediaIdStr;
-          //callback(mediaIdStr);   
+        } else {
+          return false;
         }
+
     })
+
   })
+
 }
 
 
 
 
 // @todo add media_urls array as second argument
-module.exports.post = async function(content) {
-  await post(content);
+
+module.exports.post = async function(content, media_urls) {
+
+  await post(content, media_urls);
+
 }
 
 //deprecated
 module.exports.uploadImageAndTweet = async function(url, content) {
-  let media_alt_text = content;
-  
-  let media_data_temp = '';
 
-  let media_data = await getImageFromUrl(url);
 
-  let mediaIdString = await uploadImageToTwitter(media_data, media_alt_text);
   post(content, [mediaIdString]);
+
 }
 

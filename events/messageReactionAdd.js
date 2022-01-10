@@ -45,7 +45,8 @@ module.exports = {
                console.log("message not already tweeted");
 
                if(message.attachment_url.length > 0) {
-                  nTwitter.uploadImageAndTweet(message.attachment_url, tweetContent);
+                  //nTwitter.uploadImageAndTweet(message.attachment_url, tweetContent);
+                  nTwitter.post(tweetContent, [message.attachment_url]);
                }
 
                await nTwitter.post(tweetContent);
