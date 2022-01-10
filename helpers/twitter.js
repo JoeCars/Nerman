@@ -36,17 +36,18 @@ async function post(content, media_urls) {
     let media_alt_text = content;
     let media_data0 = await getBase64ImageFromURLFetch(media_urls[0]);
 
-    console.log("2 "+media_data0);
-    let mediaIdString0 = await uploadImageToTwitter(media_data0, media_alt_text);
-    console.log("3 "+mediaIdString0);
+    console.log("2");
+    let mediaIdString0 = await uploadImageToTwitter(media_data0, media_alt_text, function(mediaIdStr){
+      console.log("3 "+mediaIdString0);
+      params.media_ids = [mediaIdString0];    
 
-    params.media_ids = [mediaIdString0];
+      T.post('statuses/update', params, function (err, data, response) {  
+        if(err){console.log(err)}
+      });
+
+    });
 
   }
-
-  T.post('statuses/update', params, function (err, data, response) {  
-    if(err){console.log(err)}
-  });
 }
 
 
@@ -57,15 +58,12 @@ async function post(content, media_urls) {
 
 async function getBase64ImageFromURLFetch(url) {
 
+  console.log(url);
   const response = await fetch(url);
   const buffer = await response.buffer();
   let media_data = buffer.toString('base64');
   
   return media_data;  
-  //console.log(body);
-
-  // const {headers, body} = await got(url).json();
-  // return Buffer.from(body).toString('base64');
   
 }
 
@@ -104,20 +102,18 @@ async function getImageFromUrl(url) {
  * @param  {function} callback will be called with img string
  */
 
-async function uploadImageToTwitter(media_data, content) {
+function uploadImageToTwitter(media_data, content, callback) {
 
-  await T.post('media/upload', { "media_data": media_data }, async function (err, data, response) {
+  T.post('media/upload', { "media_data": media_data }, async function (err, data, response) {
 
     let mediaIdStr = data.media_id_string
     let altText = content;
     let meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
 
-    await T.post('media/metadata/create', meta_params, function (err, data, response) {
+    T.post('media/metadata/create', meta_params, function (err, data, response) {
 
         if (!err) {
-          return mediaIdStr;
-        } else {
-          return false;
+          callback(mediaIdStr);
         }
 
     })
