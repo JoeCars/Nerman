@@ -37,9 +37,9 @@ async function post(content, media_urls) {
     let media_data0 = await getBase64ImageFromURLFetch(media_urls[0]);
 
     console.log("2");
-    let mediaIdString0 = await uploadImageToTwitter(media_data0, media_alt_text, function(mediaIdStr){
-      console.log("3 "+mediaIdString0);
-      params.media_ids = [mediaIdString0];    
+    uploadImageToTwitter(media_data0, media_alt_text, function(mediaIdStr){
+      console.log("3 "+mediaIdString);
+      params.media_ids = [mediaIdString];    
 
       T.post('statuses/update', params, function (err, data, response) {  
         if(err){console.log(err)}
