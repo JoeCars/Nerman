@@ -82,7 +82,7 @@ async function getImageFromUrl(url) {
 
 async function uploadImageToTwitter(media_data, content) {
 
-  await T.post('media/upload', { "media_data": media_data }, function (err, data, response) {
+  await T.post('media/upload', { "media_data": media_data }, async function (err, data, response) {
 
     let mediaIdStr = data.media_id_string
     let altText = content;
