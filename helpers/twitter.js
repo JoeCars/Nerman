@@ -50,9 +50,14 @@ async function post(content, media_urls) {
     uploadImageToTwitter(media_data0, media_alt_text, function(mediaIdStr){
 
       params.media_ids = [mediaIdStr];    
-
+      console.log("posting to twitter");
+      console.log(JSON.stringify(params));
       T.post('statuses/update', params, function (err, data, response) {  
-        if(err){console.log(err)}
+        console.log("in Twitter callback");
+        if(err){
+          console.log("in err handler");
+          console.log(err);
+        }
       });
 
     });
