@@ -1,5 +1,3 @@
-var request = require('request').defaults({ encoding: null });
-//import got from 'got';
 const Twit = require('twit');
 const fetch = require('node-fetch');
 let keys_valid = true;
@@ -8,6 +6,7 @@ let logging = false;
 
 try {
 
+  console.log("creating Twit");
   var T = new Twit({
       consumer_key:         process.env.TWITTER_API_KEY,
       consumer_secret:      process.env.TWITTER_API_KEY_SECRET,
@@ -21,6 +20,7 @@ try {
 
 } catch (e) {
 
+  console.log("catching error");
   console.log(e);
 
   keys_valid = false;
