@@ -2,7 +2,7 @@ var request = require('request').defaults({ encoding: null });
 //import got from 'got';
 const Twit = require('twit');
 const fetch = require('node-fetch');
-let keys_valid = false;
+let keys_valid = true;
 
 try {
 
@@ -126,7 +126,7 @@ module.exports.uploadImageAndTweet = async function(url, content) {
   if(keys_valid){ 
 
     post(content, [mediaIdString]);
-    
+
    }
 
 }
