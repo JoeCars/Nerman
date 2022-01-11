@@ -5,7 +5,7 @@ const dbUri = process.env.MONGODB_URI;
 
 module.exports.init = async function(){
     return await init(); 
-}
+} 
 
 module.exports.hasMessageBeenTweeted = async function(id){
     return await hasMessageBeenTweeted(id);
