@@ -119,6 +119,7 @@ function uploadImageToTwitter(media_data, content, callback) {
 // @todo add media_urls array as second argument
 
 module.exports.post = async function(content, media_urls) {
+  console.log(keys_valid + "in post function");
   if(keys_valid){
     
     await post(content, media_urls);
@@ -129,6 +130,7 @@ module.exports.post = async function(content, media_urls) {
 
 //deprecated
 module.exports.uploadImageAndTweet = async function(url, content) {
+  console.log(keys_valid + "in uploadImageAndTweet function");
 
   if(keys_valid){  
 
