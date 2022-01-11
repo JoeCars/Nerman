@@ -3,6 +3,8 @@ var request = require('request').defaults({ encoding: null });
 const Twit = require('twit');
 const fetch = require('node-fetch');
 let keys_valid = true;
+ 
+let logging = false;
 
 try {
 
@@ -123,7 +125,7 @@ module.exports.post = async function(content, media_urls) {
 //deprecated
 module.exports.uploadImageAndTweet = async function(url, content) {
 
-  if(keys_valid){ 
+  if(keys_valid){  
 
     post(content, [mediaIdString]);
 
