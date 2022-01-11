@@ -62,6 +62,14 @@ async function post(content, media_urls) {
 
     });
 
+  } else {
+    T.post('statuses/update', params, function (err, data, response) {  
+      console.log("in Twitter callback");
+      if(err){
+        console.log("in err handler");
+        console.log(err);
+      }
+    });
   }
 }
 
