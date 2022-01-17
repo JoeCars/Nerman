@@ -1,31 +1,65 @@
 const Twit = require('twit');
 const fetch = require('node-fetch');
-let keys_valid = true;
- 
-let logging = false;
+const { UserManager } = require('discord.js');
+let twitEnabled = true;
+
+var T = new Twit({
+    consumer_key:         process.env.TWITTER_API_KEY,
+    consumer_secret:      process.env.TWITTER_API_KEY_SECRET,
+    access_token:         process.env.TWITTER_ACCESS_TOKEN,
+    access_token_secret:  process.env.TWITTER_ACCESS_TOKEN_SECRET,
+    timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
+    strictSSL:            true,     // optional - requires SSL certificates to be valid.
+});
+
 
 try {
-
-  console.log("creating Twit");
-  var T = new Twit({
-      consumer_key:         process.env.TWITTER_API_KEY,
-      consumer_secret:      process.env.TWITTER_API_KEY_SECRET,
-      access_token:         process.env.TWITTER_ACCESS_TOKEN,
-      access_token_secret:  process.env.TWITTER_ACCESS_TOKEN_SECRET,
-      timeout_ms:           60*1000,  // optional HTTP request timeout to apply to all requests.
-      strictSSL:            true,     // optional - requires SSL certificates to be valid.
-  });
-
-  keys_valid = true;
-
+  T.get('account/verify_credentials', { skip_status: true })
+    .catch(function (err) { twitEnabled = false; });
 } catch (e) {
+  twitEnabled = false;
+}
 
-  console.log("catching error");
-  console.log(e);
 
-  keys_valid = false;
+/**
+ * Formats Discord message content into Twitter friendly string.
+ * @param  {String} content text content to include
+ * 
+ * // @todo check username for associated Twitter handle
+ * // @todo check message for usernames to replace, else remove @ sign
+ * // maybe - if message truncated link to Discord thread
+ */
+
+async function formatTweet(content, user) {
+
+  const lineBreak = "\r\n\r\n";
+  const hash = "#nouns";
+  const messageLimit = 280 - user.length - lineBreak.length - 1 - hash.length;
+
+  content = formatCustomEmojis(content).substring(0, messageLimit) + lineBreak + user + " " + hash;
+
+  return content;
 
 }
+
+
+/**
+ * Discord exports custom emojis in content like this:  <a:custom_emoji:34232342343>
+ * This will replace all custom emoji text with the name, like (custom_emoji)
+ * @param  {String} str discord message content to format
+ */
+function formatCustomEmojis(str){
+  let regex =  /\s*<\w*:(\w+):\w*>\s*/gi;
+  let matched = str.matchAll(regex);
+
+  for (const match of matched) {
+    str = str.replace(match[0], " (" + match[1]+ ") ");
+  }
+
+  return str;
+}
+
+
 
 
 /**
@@ -34,52 +68,64 @@ try {
  * @param  {Array} media array of strings with ids of media to include (optional)
  */
 
-async function post(content, media_urls) {
   // @todo format content - character count, emojis, username tagging
-  // @todo ensure media ids are valid - how does this fail. Min, Max.
-  // take img URLS instead of media IDs
+  // @todo test media type. All images. All videos. Look up what Discord and Twitter Support.
+  //      right now tested with 0-4 images (png, jpg, GIF). animated gifs work
 
+  // from twitter Tweet with media must have exactly 1 gif or video or up to 4 photos.
+async function post(content, mediaUrls) {
+  let mediaData = [];
   let params = { status: content };
 
-  if(media_urls){
+  // formatting content - Emojis, Custom Emojis, unicode symbols
 
-    //need to turn media_urls into media_ids
-    let media_alt_text = content;
-    let media_data0 = await getImgString(media_urls[0]);
+  if(mediaUrls){
 
-    uploadImageToTwitter(media_data0, media_alt_text, function(mediaIdStr){
+    mediaUrls = mediaUrls.slice(0, 4);
+    for (const url of mediaUrls) { mediaData.push(await getBase64ImgString(url)); }
 
-      params.media_ids = [mediaIdStr];    
-      console.log("posting to twitter");
-      console.log(JSON.stringify(params));
-      T.post('statuses/update', params, function (err, data, response) {  
-        console.log("in Twitter callback");
-        if(err){
-          console.log("in err handler");
-          console.log(err);
-        }
-      });
+    uploadImagesToTwitter(mediaData, [], function(mediaIdArray){
+
+      params.media_ids = mediaIdArray;    
+      tPost(params);
 
     });
 
   } else {
-    T.post('statuses/update', params, function (err, data, response) {  
-      console.log("in Twitter callback");
-      if(err){
-        console.log("in err handler");
-        console.log(err);
-      }
-    });
+
+    tPost(params);
+
   }
 }
 
+
+/**
+ * Internal method - posts the tweet using Twit.js
+ * @param  {Array} params twitter params
+ */
+
+function tPost(params, callback){
+
+  T.post('statuses/update', params, function (err, data, response) {  
+
+    if(err){ 
+      console.log(err);
+    }
+
+    if(typeof callback === "function") {
+      callback();
+    }
+
+  });
+
+}
 
 /**
  * Get a base64 img string from the given url
  * @param  {String} url address of image
  */
 
-async function getImgString(url) {
+async function getBase64ImgString(url) {
 
   //check error status and response code
   //check file types
@@ -96,55 +142,55 @@ async function getImgString(url) {
 
 
 /**
- * Uploads an image to Twitter and gets the Twitter media ID of it
+ * Uploads an image to Twitter, callsback with the associated Twitter media ID
  * @param  {String} media_data base64 encoded img string
  * @param  {function} callback will be called with img string
  */
 
-function uploadImageToTwitter(media_data, content, callback) {
+function uploadImagesToTwitter(mediaDataArray, mediaIdArray, callback_final){
 
-  T.post('media/upload', { "media_data": media_data }, async function (err, data, response) {
+  if(mediaDataArray === undefined || mediaDataArray == 0) {
 
-    let mediaIdStr = data.media_id_string
-    let altText = content;
-    let meta_params = { media_id: mediaIdStr, alt_text: { text: altText } }
+    callback_final(mediaIdArray);
 
-    T.post('media/metadata/create', meta_params, function (err, data, response) {
+  } else {
 
-        if (!err) {
-          callback(mediaIdStr);
-        }
+    T.post('media/upload', { "media_data": mediaDataArray.shift() }, function (err, data, response) {
 
+      let meta_params = { media_id: data.media_id_string }
+  
+      T.post('media/metadata/create', meta_params, function (err, data, response) {
+  
+          if (!err) {
+
+            mediaIdArray.push(meta_params["media_id"]);
+
+            uploadImagesToTwitter(mediaDataArray, mediaIdArray, callback_final);
+
+          }
+  
+      })
+  
     })
-
-  })
-
-}
-
-
-
-
-// @todo add media_urls array as second argument
-
-module.exports.post = async function(content, media_urls) {
-  console.log(keys_valid + "in post function");
-  if(keys_valid){
-    
-    await post(content, media_urls);
 
   }
 
 }
 
-//deprecated
-module.exports.uploadImageAndTweet = async function(url, content) {
-  console.log(keys_valid + "in uploadImageAndTweet function");
 
-  if(keys_valid){  
+module.exports.post = async function(content, mediaUrls) {
 
-    post(content, [mediaIdString]);
+  if(twitEnabled){
 
-   }
+      await post(content, mediaUrls);
+
+    }
 
 }
 
+
+module.exports.formatTweet = async function(content, user) {
+    
+    return await formatTweet(content, user);
+
+}

@@ -1,63 +1,40 @@
 const nTwitter = require(`../helpers/twitter.js`);
 const nMongoDB = require(`../helpers/mongodb.js`);
-const nDiscord = require(`../helpers/discord.js`);
-
-//@todo change attachment_url to plural, handle array and post multiple to Twitter
+const nThreshold = require(`../helpers/nThreshold.js`);
 
 module.exports = {
    name: 'messageReactionAdd',
    async execute(reaction, user) {
 
-      const voteThreshold = await nDiscord.getThreshold();
+      //reaction.message.guild.roles.cache.forEach(role => console.log(role.name, role.id)) //prints all rolls
+      //"@everyone" is default role
 
-      let message = {
-         content : reaction.message.content,
-         id : reaction.message.id,
-         user : reaction.message.author.username,
-         user_id : reaction.message.author.id,
-         emoji : reaction.emoji.name,
-         attachments : reaction.message.attachments,
-         attachment_url : ''
+      // below code to calculate voteThreshold should be refactored with threshold.js code into nThreshold.js
+      const Role = reaction.message.guild.roles.cache.find(role => role.name == "Voters");
+      let votersOnline = reaction.message.guild.members.cache.filter(member => member.presence?.status == "online")
+      .filter(member => member.roles.cache.find(role => role == Role)).size;
 
-      }
+      let voteThreshold = nThreshold.getThreshold(votersOnline);
 
-      let tweetContent = message.content + " - " + message.user;
+      let msgAttachmentUrls = [];
 
-      if(message.attachments.size > 0) {
+      let tweetContent = await nTwitter.formatTweet(reaction.message.content, reaction.message.author.username);
+      let messageTweeted = await reaction.message.reactions.cache.get('931919315010220112'); //check for NermanBlast
 
-         message.attachment_url = message.attachments.first().url;
+      if(reaction.message.attachments.size > 0) {
 
-      }
-
-      // let memberCount = reaction.message.guild.memberCount;
-      // let voteThreshold = Math.floor(memberCount * 0.01);
-      // maybe calculations based on online members would be better
-
-      if (message.emoji == 'TweetThis') {
-
-         let messageTweeted = await nMongoDB.hasMessageBeenTweeted(message.id);
-         console.log("messageTweeted " + messageTweeted);
-
-         if(reaction.count > voteThreshold - 1) {
-               console.log("reaction count above threshold");
-
-            if(!messageTweeted){
-               console.log("message not already tweeted");
-
-               if(message.attachment_url.length > 0) {
-                  //nTwitter.uploadImageAndTweet(message.attachment_url, tweetContent);
-                  nTwitter.post(tweetContent, [message.attachment_url]);
-               }
-
-               await nTwitter.post(tweetContent);
-               nMongoDB.markMessageAsTweeted(message.id, message.user_id);
-               await reaction.message.reply("Sent Tweet: " + tweetContent);
-   
-            } else {
-               console.log("message already tweeted, do nothing");
-            }
-
+         for (const attachment of reaction.message.attachments) {
+            msgAttachmentUrls.push(attachment[1].url);
          }
+
+      }
+
+      if (!messageTweeted && reaction.emoji.name == 'Nerman' && reaction.count > voteThreshold - 1) {
+
+               nTwitter.post(tweetContent, msgAttachmentUrls);
+
+               // mark message with NermanBlast emoji
+               await reaction.message.react('932664888642400276');
 
       }
 

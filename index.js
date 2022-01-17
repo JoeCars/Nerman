@@ -9,8 +9,9 @@ const events = {
 	MESSAGE_REACTION_REMOVE: 'messageReactionRemove',
 };
 
-if(process.env.DISCORD_DEPLOY_COMMANDS == true) {
-   require('deploy-commands.js');
+if(process.env.DISCORD_DEPLOY_COMMANDS == "true") {
+   require('./deploy-commands.js');
+   console.log("hello");
 }
 
 client.commands = new Collection();
