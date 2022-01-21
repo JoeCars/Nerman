@@ -26,7 +26,6 @@ module.exports = {
 
 	async execute(interaction) {
 		const queryTarget = interaction.options.getString('target');
-		cl('BOOLEAN??', interaction.options.getBoolean('delegates'));
 		const includeDelegates =
 			interaction.options.getBoolean('delegates') ?? false;
 		const msgAttach = await nounpic.fetchNouner(queryTarget, includeDelegates);
