@@ -4,3 +4,4 @@ config.json
 npm-debug.log
 .DS_Store
 helpers/mongodb.js
+commands/check.js
