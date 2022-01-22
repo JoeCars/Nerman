@@ -9,9 +9,14 @@ const events = {
 	MESSAGE_REACTION_REMOVE: 'messageReactionRemove',
 };
 
+cl = input => console.log(input)
+
 if(process.env.DISCORD_DEPLOY_COMMANDS == "true") {
    require('./deploy-commands.js');
    console.log("hello");
+   cl(process.env.DISCORD_CLIENT_ID)
+   cl(process.env.DISCORD_GUILD_ID)
+   cl(process.env.DISCORD_TOKEN)
 }
 
 client.commands = new Collection();
@@ -27,7 +32,7 @@ client.on('interactionCreate', async interaction => {
    if (!interaction.isCommand()) return;
 
    const command = client.commands.get(interaction.commandName);
-   
+
    if (!command) return;
 
    try {
