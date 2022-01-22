@@ -33,7 +33,7 @@ module.exports = {
 		await interaction.reply({
 			content: `Retrieving tile of nouns belonging to ${queryTarget}`,
 			files: [msgAttach],
-			ephemeral: true,
+			ephemeral: false,
 		});
 	},
 };
