@@ -15,6 +15,7 @@ function calcThreshold(x) {
 	let y = 0.25 * x * (1 - x / (x + 2500));
 
     // for testing purposes
+	return 1;
 	return 2;
 	return Math.ceil(y);
 }
