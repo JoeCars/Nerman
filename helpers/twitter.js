@@ -43,10 +43,10 @@ async function formatTweet(content, user) {
 	// 	' ' +
 	// 	hash;
 	content = `
-  ${user} ${lineBreak}
+  ${user}${lineBreak}
   ${formatCustomEmojis(content).substring(0, messageLimit)} ${lineBreak}
-   ${hash}
-   `;
+  ${hash}
+  `;
 
 	return content;
 }
