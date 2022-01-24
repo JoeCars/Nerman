@@ -36,16 +36,21 @@ async function formatTweet(content, user) {
 	const hash = '#nouns';
 	const messageLimit = 280 - user.length - lineBreak.length - 1 - hash.length;
 
+	// Regex : remove any @ characters which are followed by non-space characters,
+	// and either preceded by a space, or are the beginning of the string.
+	const regex = /(?<=\s|^)@(?=\S)/g;
+	let formattedContent = content.replaceAll(regex, '');
+
+	// remove occurence of @mentions
+
 	// content =
-	// 	formatCustomEmojis(content).substring(0, messageLimit) +
-	// 	lineBreak +
-	// 	user +
-	// 	' ' +
-	// 	hash;
+	// 	`${user}${lineBreak}` +
+	// 	`${formatCustomEmojis(content).substring(0, messageLimit)} ${lineBreak}` +
+	//   `${hash}`;
 
 	content =
 		`${user}${lineBreak}` +
-		`${formatCustomEmojis(content).substring(0, messageLimit)} ${lineBreak}` +
+		`${formatCustomEmojis(formattedContent).substring(0, messageLimit)} ${lineBreak}` +
 		`${hash}`;
 
 	return content;
