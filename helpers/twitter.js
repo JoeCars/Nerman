@@ -36,17 +36,15 @@ async function formatTweet(content, user) {
 	const hash = '#nouns';
 	const messageLimit = 280 - user.length - lineBreak.length - 1 - hash.length;
 
-	// Regex : remove any @ characters which are followed by non-space characters,
+  const userIdRegex = /(<!\d{18}>)/g;
+
+	// Regex : @ characters which are followed by non-space characters,
 	// and either preceded by a space, or are the beginning of the string.
-	const regex = /(?<=\s|^)@(?=\S)/g;
-	let formattedContent = content.replaceAll(regex, '');
-
+	const mentionRegex = /(?<=\s|^)@(?=\S)/g;
 	// remove occurence of @mentions
+  let formattedContent = content.replaceAll(mentionRegex, '');
 
-	// content =
-	// 	`${user}${lineBreak}` +
-	// 	`${formatCustomEmojis(content).substring(0, messageLimit)} ${lineBreak}` +
-	//   `${hash}`;
+  formattedContent.search(userIdRegex)
 
 	content =
 		`${user}${lineBreak}` +
@@ -70,6 +68,19 @@ function formatCustomEmojis(str) {
 	}
 
 	return str;
+}
+
+const replaceTagId = (content) => {
+  const userIdRegex = /(<!\d{18}>)/g;
+  const tags = content.replaceAll(userIdRegex);
+
+  // if (tags) {
+
+  //   console.log('Tags found');
+  //   console.log(tags);
+  //   let users = tags.forEach()
+
+  // }
 }
 
 /**
