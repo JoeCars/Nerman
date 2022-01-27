@@ -31,24 +31,32 @@ try {
  * // maybe - if message truncated link to Discord thread
  */
 
-async function formatTweet(content, user) {
+async function formatTweet(content, user, mentions) {
 	const lineBreak = '\r\n\r\n';
 	const hash = '#nouns';
 	const messageLimit = 280 - user.length - lineBreak.length - 1 - hash.length;
 
-  const userIdRegex = /(<!\d{18}>)/g;
+	// REGEX: { string start || space character }{ @ }{ non-space character }
+	const atRegex = /(?<=\s|^)@(?=\S)/g;
+	//REGEX:{ <@&&||! }{ 18 digits }{ > }
+	const mentionRegex = /<@!?(\d{18})>/g;
 
-	// Regex : @ characters which are followed by non-space characters,
-	// and either preceded by a space, or are the beginning of the string.
-	const mentionRegex = /(?<=\s|^)@(?=\S)/g;
-	// remove occurence of @mentions
-  let formattedContent = content.replaceAll(mentionRegex, '');
 
-  formattedContent.search(userIdRegex)
+	// remove occurence of @string
+	let formattedContent = content.replaceAll(atRegex, '');
+
+	formattedContent = formattedContent.replaceAll(mentionRegex, match => {
+		match = match.replaceAll(/[<@!?|>]/g, '');
+		match = mentions[match];
+		return match;
+	});
 
 	content =
 		`${user}${lineBreak}` +
-		`${formatCustomEmojis(formattedContent).substring(0, messageLimit)} ${lineBreak}` +
+		`${formatCustomEmojis(formattedContent).substring(
+			0,
+			messageLimit
+		)} ${lineBreak}` +
 		`${hash}`;
 
 	return content;
@@ -68,19 +76,6 @@ function formatCustomEmojis(str) {
 	}
 
 	return str;
-}
-
-const replaceTagId = (content) => {
-  const userIdRegex = /(<!\d{18}>)/g;
-  const tags = content.replaceAll(userIdRegex);
-
-  // if (tags) {
-
-  //   console.log('Tags found');
-  //   console.log(tags);
-  //   let users = tags.forEach()
-
-  // }
 }
 
 /**
@@ -192,6 +187,6 @@ module.exports.post = async function (content, mediaUrls) {
 	}
 };
 
-module.exports.formatTweet = async function (content, user) {
-	return await formatTweet(content, user);
+module.exports.formatTweet = async function (content, user, mentions) {
+	return await formatTweet(content, user, mentions);
 };

@@ -12,11 +12,11 @@ const commandFiles = fs
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
-	console.log('desploy command:', command);
 	commands.push(command.data.toJSON());
 }
 
 const rest = new REST({ version: '9' }).setToken(token);
+
 
 rest
 	.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands })

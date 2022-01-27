@@ -5,3 +5,4 @@ npm-debug.log
 .DS_Store
 helpers/mongodb.js
 commands/check.js
+events/testReact.js
