@@ -1,6 +1,9 @@
 const nTwitter = require(`../helpers/twitter.js`);
 const nMongoDB = require(`../helpers/mongodb.js`);
 const nThreshold = require(`../helpers/nThreshold.js`);
+const tenor = require(`../helpers/tenor.js`);
+
+const cl = (label, data = '') => console.log(`${label.toUpperCase()}\n`, data);
 
 module.exports = {
 	name: 'messageReactionAdd',
@@ -23,6 +26,7 @@ module.exports = {
 
 		let {
 			content,
+			embeds,
 			author: { username },
 		} = reaction.message;
 
@@ -40,7 +44,7 @@ module.exports = {
 			username,
 			mappedMentions
 		);
-		
+
 		let messageTweeted = await reaction.message.reactions.cache.get(
 			'931919315010220112'
 		); //check for NermanBlast
@@ -49,6 +53,17 @@ module.exports = {
 			for (const attachment of reaction.message.attachments) {
 				msgAttachmentUrls.push(attachment[1].url);
 			}
+		}
+
+		if (
+			embeds.length &&
+			embeds[0].provider.name === 'Tenor' &&
+			content === embeds[0].url
+		) {
+			const tenorURL = await tenor.getUrl(embeds);
+
+			tweetContent = tweetContent.replace(embeds[0].url, '');
+			msgAttachmentUrls.push(tenorURL);
 		}
 
 		if (

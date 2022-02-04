@@ -1,6 +1,7 @@
 const Twit = require('twit');
 const fetch = require('node-fetch');
 const { UserManager } = require('discord.js');
+const mime = require('mime');
 let twitEnabled = true;
 
 var T = new Twit({
@@ -38,15 +39,14 @@ async function formatTweet(content, user, mentions) {
 
 	// REGEX: { string start || space character }{ @ }{ non-space character }
 	const atRegex = /(?<=\s|^)@(?=\S)/g;
-	//REGEX:{ <@&&||! }{ 18 digits }{ > }
-	const mentionRegex = /<@!?(\d{18})>/g;
+	const mentionRegex = /<@!?(\d{18})>/g; // Matches user mention string
 
 
 	// remove occurence of @string
 	let formattedContent = content.replaceAll(atRegex, '');
 
 	formattedContent = formattedContent.replaceAll(mentionRegex, match => {
-		match = match.replaceAll(/[<@!?|>]/g, '');
+		match = match.replaceAll(/[<@!?|>]/g, ''); // replace <@!> characters surrounding userId
 		match = mentions[match];
 		return match;
 	});
@@ -97,6 +97,7 @@ async function post(content, mediaUrls) {
 
 	if (mediaUrls) {
 		mediaUrls = mediaUrls.slice(0, 4);
+		
 		for (const url of mediaUrls) {
 			mediaData.push(await getBase64ImgString(url));
 		}
@@ -137,7 +138,6 @@ async function getBase64ImgString(url) {
 	//check file types
 	//check header for appropriate image types
 
-	console.log(url);
 	const response = await fetch(url);
 	const buffer = await response.buffer();
 	let media_data = buffer.toString('base64');
