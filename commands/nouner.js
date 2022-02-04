@@ -1,9 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const nounpic = require(`../helpers/nounpic.js`);
 
-// typing console.log is exhausting
-const cl = string => console.log(string);
-
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('nouner')
@@ -33,7 +30,7 @@ module.exports = {
 		await interaction.reply({
 			content: `Retrieving tile of nouns belonging to ${queryTarget}`,
 			files: [msgAttach],
-			ephemeral: false,
+			ephemeral: true,
 		});
 	},
 };

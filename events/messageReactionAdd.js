@@ -3,8 +3,6 @@ const nMongoDB = require(`../helpers/mongodb.js`);
 const nThreshold = require(`../helpers/nThreshold.js`);
 const tenor = require(`../helpers/tenor.js`);
 
-const cl = (label, data = '') => console.log(`${label.toUpperCase()}\n`, data);
-
 module.exports = {
 	name: 'messageReactionAdd',
 	async execute(reaction, user) {

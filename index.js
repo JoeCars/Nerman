@@ -20,11 +20,10 @@ const events = {
 	MESSAGE_REACTION_REMOVE: 'messageReactionRemove',
 };
 
-cl = input => console.log(input);
 
 if (process.env.DISCORD_DEPLOY_COMMANDS == 'true') {
 	require('./deploy-commands.js');
-	console.log('hello');
+	console.log('Hello!');
 }
 
 client.commands = new Collection();
@@ -35,8 +34,6 @@ for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.data.name, command);
 }
-
-// client.on('debug', console.log)
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
