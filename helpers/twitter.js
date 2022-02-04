@@ -41,7 +41,6 @@ async function formatTweet(content, user, mentions) {
 	const atRegex = /(?<=\s|^)@(?=\S)/g;
 	const mentionRegex = /<@!?(\d{18})>/g; // Matches user mention string
 
-
 	// remove occurence of @string
 	let formattedContent = content.replaceAll(atRegex, '');
 
@@ -97,7 +96,7 @@ async function post(content, mediaUrls) {
 
 	if (mediaUrls) {
 		mediaUrls = mediaUrls.slice(0, 4);
-		
+
 		for (const url of mediaUrls) {
 			mediaData.push(await getBase64ImgString(url));
 		}
