@@ -59,7 +59,6 @@ module.exports = {
 			content === embeds[0].url
 		) {
 			const tenorURL = await tenor.getUrl(embeds);
-
 			tweetContent = tweetContent.replace(embeds[0].url, '');
 			msgAttachmentUrls.push(tenorURL);
 		}
