@@ -28,7 +28,7 @@ module.exports = {
       await interaction.reply({
          content: `Noun ${nounNum}`,
          files: [msgAttach],
-         ephemeral: true,
+         ephemeral: false,
       });
    },
 };

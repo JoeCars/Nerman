@@ -9,7 +9,7 @@ async function fetchNouner(endpoint, includeDelegates) {
 
    const data = {
       content_type: `image/png`,
-      ephemeral: true,
+      ephemeral: false,
    };
 
    const attachment = new MessageAttachment(
