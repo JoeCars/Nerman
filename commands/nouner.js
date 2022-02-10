@@ -27,6 +27,8 @@ module.exports = {
       const includeDelegates =
          interaction.options.getBoolean('delegates') ?? false;
 
+      interaction.deferReply();
+
       const resp = await fetch(
          `https://noun.pics/${queryTarget}?includeDelegates=${includeDelegates}`
       );
@@ -42,7 +44,7 @@ module.exports = {
          includeDelegates
       );
 
-      await interaction.reply({
+      await interaction.editReply({
          content: `Retrieving tile of nouns belonging to ${queryTarget}`,
          files: [msgAttach],
          ephemeral: false,
