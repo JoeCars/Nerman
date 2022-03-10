@@ -13,7 +13,7 @@ module.exports = {
       // const nounRegex = /^\d{1,6}$/; // 1 to 6 digits. This may need to go higher as new ones are created daily.
       const nounNum = interaction.options.getInteger('int');
       // await interaction.deferReply({ ephemeral: true });
-      await interaction.deferReply();
+      // await interaction.deferReply();
 
       //Opensea Link, Owner, previous auction info. Integrate Open Sea API
 
@@ -29,8 +29,8 @@ module.exports = {
          `https://noun.pics/${nounNum}.png`
       );
 
-      // await interaction.reply({
-      await interaction.editReply({
+      await interaction.reply({
+      // await interaction.editReply({
          content: `Noun ${nounNum}`,
          files: [msgAttach],
          // ephermeral: false,
