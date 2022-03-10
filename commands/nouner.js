@@ -23,11 +23,21 @@ module.exports = {
       ),
 
    async execute(interaction) {
+      const walletRegex = /^0x[a-fA-F0-9]{40}$/;
+      const ensRegex = /^.*\.eth$/;
+
       const queryTarget = interaction.options.getString('target');
       const includeDelegates =
          interaction.options.getBoolean('delegates') ?? false;
 
-      interaction.deferReply();
+      // await interaction.deferReply({ ephemeral: true });
+      await interaction.deferReply();
+
+      if (!walletRegex.test(queryTarget) && !ensRegex.test(queryTarget)) {
+         throw new Error(
+            `${queryTarget} is not a valid ENS name or wallet address format.\nWallet format: 0x<40 alphanumeric characters>\nENS example: <ensname>.eth`
+         );
+      }
 
       const resp = await fetch(
          `https://noun.pics/${queryTarget}?includeDelegates=${includeDelegates}`
@@ -44,10 +54,11 @@ module.exports = {
          includeDelegates
       );
 
+      // await interaction.reply({
       await interaction.editReply({
          content: `Retrieving tile of nouns belonging to ${queryTarget}`,
          files: [msgAttach],
-         ephemeral: false,
+         // ephemeral: true,
       });
    },
 };

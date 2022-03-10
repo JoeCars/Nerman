@@ -8,16 +8,27 @@ module.exports = {
       if (!command) return;
 
       try {
+         console.time('Interaction Timer');
+
          await command.execute(interaction);
       } catch (error) {
          console.error(error);
 
-         return interaction.reply({
-            content:
-               error.message ||
-               'There was an error while executing this command!',
-            ephemeral: true,
-         });
+         if (interaction.deferred) {
+            await interaction.editReply({
+               content:
+                  error.message ||
+                  'There was an error while executing this command!',
+               ephemeral: true,
+            });
+         } else {
+            await interaction.reply({
+               content:
+                  error.message ||
+                  'There was an error while executing this command!',
+               ephemeral: true,
+            });
+         }
       }
    },
 };

@@ -5,14 +5,18 @@ const fetch = require('node-fetch');
 module.exports = {
    data: new SlashCommandBuilder()
       .setName('noun')
-      .setDescription('Get the SVG of specified Noun:  /noun 3')
+      .setDescription('Get the PNG of specified Noun:  /noun 3')
       .addIntegerOption(option =>
-         option.setName('int').setDescription('Enter an integer')
+         option.setName('int').setDescription('Enter noun id')
       ),
    async execute(interaction) {
+      // const nounRegex = /^\d{1,6}$/; // 1 to 6 digits. This may need to go higher as new ones are created daily.
       const nounNum = interaction.options.getInteger('int');
+      // await interaction.deferReply({ ephemeral: true });
+      await interaction.deferReply();
 
       //Opensea Link, Owner, previous auction info. Integrate Open Sea API
+
       const resp = await fetch(`https://noun.pics/${nounNum}.png`);
 
       if (!resp.ok) {
@@ -25,10 +29,11 @@ module.exports = {
          `https://noun.pics/${nounNum}.png`
       );
 
-      await interaction.reply({
+      // await interaction.reply({
+      await interaction.editReply({
          content: `Noun ${nounNum}`,
          files: [msgAttach],
-         ephemeral: false,
+         // ephermeral: false,
       });
    },
 };

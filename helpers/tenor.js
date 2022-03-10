@@ -8,6 +8,7 @@ const getUrl = async embeds => {
    const gifURL = data.results[0].media[0].gif.url;
    return gifURL;
 };
+
 module.exports.getUrl = async embeds => {
    return await getUrl(embeds);
 };
