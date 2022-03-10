@@ -53,7 +53,10 @@ module.exports = {
       );
 
       // let messageTweeted = await reactionsCache.get('931919315010220112'); //check for NermanBlast
-      let messageTweeted = await reactionsCache.get('932664888642400276'); //check for NermanBlast
+      // let messageTweeted = await reactionsCache.get('932664888642400276'); //check for NermanBlast
+      let messageTweeted =
+         (await reactionsCache.get('932664888642400276')) ||
+         (await reactionsCache.get('951602647767584798'));
 
       // console.log(
       //    'Which is Nerman,',
@@ -88,7 +91,8 @@ module.exports = {
          nTwitter.post(tweetContent, msgAttachmentUrls);
 
          // mark message with NermanBlast emoji
-         await reaction.message.react('932664888642400276');
+         // await reaction.message.react('932664888642400276');
+         await reaction.message.react('951602647767584798');
       }
    },
 };
