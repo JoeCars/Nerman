@@ -8,8 +8,6 @@ module.exports = {
       if (!command) return;
 
       try {
-         console.time('Interaction Timer');
-
          await command.execute(interaction);
       } catch (error) {
          console.error(error);

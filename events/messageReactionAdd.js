@@ -23,15 +23,6 @@ module.exports = {
 
       const authorName = membersCache.get(id).nickname ?? username;
 
-      // console.log(reaction.message.reactions);
-      // console.log(reactionsCache);
-      // console.groupCollapsed('REACTION');
-      // console.log(reaction);
-      // console.groupEnd('REACTION');
-      console.groupCollapsed('REACTION CACHE GET');
-      console.log(await reactionsCache.get());
-      console.groupEnd('REACTION CACHE GET');
-
       // below code to calculate voteThreshold should be refactored with threshold.js code into nThreshold.js
       const Role = rolesCache.find(role => role.name == 'Voters');
 
@@ -44,7 +35,6 @@ module.exports = {
       let msgAttachmentUrls = [];
 
       let mappedMentions = {};
-      // let mentions = reaction.message.mentions.members;
 
       mentionsMembers.forEach(mention => {
          mappedMentions[mention.user.id] =
@@ -59,18 +49,6 @@ module.exports = {
 
       // let messageTweeted = await reactionsCache.get('931919315010220112'); //check for NermanBlast
       let messageTweeted = await reactionsCache.get('932664888642400276'); //check for NermanBlast
-      // let messageTweeted =
-      //    (await reactionsCache.get('932664888642400276')) ||
-      //    (await reactionsCache.get('951602647767584798'));
-
-      // console.log(
-      //    'Which is Nerman,',
-      //    await reactionsCache.get('931919315010220112') // THis is nothing, apparently?
-      // );
-      console.log(
-         'and which is Blast?',
-         await reactionsCache.get('932664888642400276')
-      );
 
       if (attachments.size > 0) {
          for (const attachment of attachments) {
@@ -97,7 +75,6 @@ module.exports = {
 
          // mark message with NermanBlast emoji
          await reaction.message.react('932664888642400276');
-         // await reaction.message.react('951602647767584798');
       }
    },
 };
