@@ -31,7 +31,7 @@ module.exports = {
          interaction.options.getBoolean('delegates') ?? false;
 
       // await interaction.deferReply({ ephemeral: true });
-      await interaction.deferReply();
+      // await interaction.deferReply();
 
       if (!walletRegex.test(queryTarget) && !ensRegex.test(queryTarget)) {
          throw new Error(
@@ -54,8 +54,8 @@ module.exports = {
          includeDelegates
       );
 
-      // await interaction.reply({
-      await interaction.editReply({
+      await interaction.reply({
+      // await interaction.editReply({
          content: `Retrieving tile of nouns belonging to ${queryTarget}`,
          files: [msgAttach],
          // ephemeral: true,
