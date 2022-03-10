@@ -23,9 +23,14 @@ module.exports = {
 
       const authorName = membersCache.get(id).nickname ?? username;
 
-      console.log(reaction.message.reactions);
-      console.log(reactionsCache);
+      // console.log(reaction.message.reactions);
+      // console.log(reactionsCache);
+      // console.groupCollapsed('REACTION');
+      // console.log(reaction);
+      // console.groupEnd('REACTION');
+      console.groupCollapsed('REACTION CACHE GET');
       console.log(await reactionsCache.get());
+      console.groupEnd('REACTION CACHE GET');
 
       // below code to calculate voteThreshold should be refactored with threshold.js code into nThreshold.js
       const Role = rolesCache.find(role => role.name == 'Voters');
@@ -53,10 +58,10 @@ module.exports = {
       );
 
       // let messageTweeted = await reactionsCache.get('931919315010220112'); //check for NermanBlast
-      // let messageTweeted = await reactionsCache.get('932664888642400276'); //check for NermanBlast
-      let messageTweeted =
-         (await reactionsCache.get('932664888642400276')) ||
-         (await reactionsCache.get('951602647767584798'));
+      let messageTweeted = await reactionsCache.get('932664888642400276'); //check for NermanBlast
+      // let messageTweeted =
+      //    (await reactionsCache.get('932664888642400276')) ||
+      //    (await reactionsCache.get('951602647767584798'));
 
       // console.log(
       //    'Which is Nerman,',
@@ -91,8 +96,8 @@ module.exports = {
          nTwitter.post(tweetContent, msgAttachmentUrls);
 
          // mark message with NermanBlast emoji
-         // await reaction.message.react('932664888642400276');
-         await reaction.message.react('951602647767584798');
+         await reaction.message.react('932664888642400276');
+         // await reaction.message.react('951602647767584798');
       }
    },
 };
