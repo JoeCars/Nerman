@@ -5,3 +5,7 @@ npm-debug.log
 .DS_Store
 helpers/mongodb.js
 commands/check.js
+commands/reload-test.js
+events/testReact.js
+events/react-test.js
+scratchcode/*

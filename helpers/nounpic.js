@@ -1,26 +1,26 @@
 const { MessageAttachment } = require('discord.js');
 
 async function fetchNouner(endpoint, includeDelegates) {
-	let address = `https://noun.pics/${endpoint}`;
+   let address = `https://noun.pics/${endpoint}`;
 
-	if (includeDelegates) {
-		address += `?includeDelegates=${includeDelegates}`;
-	}
+   if (includeDelegates) {
+      address += `?includeDelegates=${includeDelegates}`;
+   }
 
-	const data = {
-		content_type: `image/png`,
-		ephemeral: true,
-	};
+   const data = {
+      content_type: `image/png`,
+      ephemeral: false,
+   };
 
-	const attachment = new MessageAttachment(
-		address,
-		`nouner-tile-${endpoint}.png`,
-		data
-	);
+   const attachment = new MessageAttachment(
+      address,
+      `nouner-tile-${endpoint}.png`,
+      data
+   );
 
-	return attachment;
+   return attachment;
 }
 
 module.exports.fetchNouner = async function (endpoint, includeDelegates) {
-	return fetchNouner(endpoint, includeDelegates);
+   return fetchNouner(endpoint, includeDelegates);
 };
