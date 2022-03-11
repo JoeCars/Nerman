@@ -30,10 +30,10 @@ module.exports = {
       );
 
       await interaction.reply({
-      // await interaction.editReply({
+         // await interaction.editReply({
          content: `Noun ${nounNum}`,
          files: [msgAttach],
-         // ephermeral: false,
+         ephermeral: true,
       });
    },
 };
