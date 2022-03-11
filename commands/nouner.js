@@ -30,9 +30,6 @@ module.exports = {
       const includeDelegates =
          interaction.options.getBoolean('delegates') ?? false;
 
-      // await interaction.deferReply({ ephemeral: true });
-      // await interaction.deferReply();
-
       if (!walletRegex.test(queryTarget) && !ensRegex.test(queryTarget)) {
          throw new Error(
             `${queryTarget} is not a valid ENS name or wallet address format.\nWallet format: 0x<40 alphanumeric characters>\nENS example: <ensname>.eth`
@@ -55,10 +52,9 @@ module.exports = {
       );
 
       await interaction.reply({
-      // await interaction.editReply({
          content: `Retrieving tile of nouns belonging to ${queryTarget}`,
          files: [msgAttach],
-         // ephemeral: true,
+         ephemeral: true,
       });
    },
 };
