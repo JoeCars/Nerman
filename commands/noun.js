@@ -12,8 +12,6 @@ module.exports = {
    async execute(interaction) {
       // const nounRegex = /^\d{1,6}$/; // 1 to 6 digits. This may need to go higher as new ones are created daily.
       const nounNum = interaction.options.getInteger('int');
-      // await interaction.deferReply({ ephemeral: true });
-      // await interaction.deferReply();
 
       //Opensea Link, Owner, previous auction info. Integrate Open Sea API
 
