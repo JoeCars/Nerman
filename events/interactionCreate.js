@@ -11,6 +11,7 @@ module.exports = {
          console.time('Interaction Timer');
 
          await command.execute(interaction);
+         console.timeEnd('Interaction Timer');
       } catch (error) {
          console.error(error);
 
@@ -29,6 +30,7 @@ module.exports = {
                ephemeral: true,
             });
          }
+         console.timeEnd('Interaction Timer');
       }
    },
 };
