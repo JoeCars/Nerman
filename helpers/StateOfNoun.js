@@ -21,7 +21,7 @@ setInterval(() => {
 function tick() {
 
     await getLatestProposalData();
-    for(events.length > 0){
+    while(events.length > 0){
         let curEvent = events.pop();
         if (curEvent == "new-proposal") {
             // POST VOTE TO DISCORD
