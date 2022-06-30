@@ -20,7 +20,7 @@ try {
    console.error(error);
 }
 
-const newUser = User.create({
-   username: 'Test User Creation',
-   discordId: '47yhlkjgfdnsfk',
-});
+// const newUser = User.create({
+//    username: 'Test User Creation',
+//    discordId: '47yhlkjgfdnsfk',
+// });

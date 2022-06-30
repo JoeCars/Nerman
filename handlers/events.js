@@ -1,9 +1,15 @@
 const { Collection } = require('discord.js');
+// can use for cvlaidation later on, not right now though
+const { Events } = require('../validation/eventNames');
 const { getFiles } = require('../utils/functions');
 
-module.exports = (client, reload) => {
+module.exports = async (client, reload) => {
    // const { client } = nerman;
    client.events = new Collection();
+
+   // console.log('LOGGING EVENTS')
+   // console.log(Events)
+
    let eventFiles = getFiles('./events', '.js');
 
    if (eventFiles.length === 0) {
@@ -15,11 +21,14 @@ module.exports = (client, reload) => {
       if (reload) delete require.cache[require.resolve(`../events/${file}`)];
 
       const event = require(`../events/${file}`);
-      client.events.set(event.name, event);
+
+      // if (!Events.includes)
+      // client.events.set(event.name, event);
 
       //    if (!reload)
       //       console.log(`The event: ${file} loaded`)
       //       initEvents(nerman);
+
 
       if (event.name && typeof event.name === 'string') {
          client.events.set(event.name, event);

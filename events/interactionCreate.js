@@ -1,3 +1,5 @@
+const { logToObject } = require('../utils/functions');
+
 module.exports = {
    name: 'interactionCreate',
    async execute(interaction) {
