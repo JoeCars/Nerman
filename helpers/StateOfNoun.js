@@ -2,13 +2,14 @@ const TimeStuff = require('../helpers/timestuff.js');
 const NounsDAO = require('../helpers/nounsdao.js');
 
 const tickInterval = 10000;
-let latestProposal = {
+var latestProposal = {
     "id":-1
 };
-let listenForNewProposals = false;
-let listenForNewProposalsCallBack = null;
 
-let events = [];
+var listenForNewProposals = false;
+var listenForNewProposalsCallBack = null;
+
+var events = [];
 
 tick();
 
@@ -36,13 +37,25 @@ function logTick(){
 }
 
 async function getLatestProposalData() {
-    const data = await NounsDAO.getLatestProposal();
+    const data = await NounsDAO.getLatestProposals(1);
 
     if (latestProposal.id < 0) { latestProposal = data.proposals[0] }
     else if (latestProposal.id != data.proposals[0].id) {
-        latestProposal = data.proposals[0];
-        events.push("new-proposal"); // NEW DISCORD PROPOSAL - might have missed one if submitted exactly same time
-        //calc difference between proposals, fire off getLatestNProposals(n)
+        let diffID = latestProposal.id - data.proposals[0].id;
+        let proposals = data.proposals;
+        if( diffID > 1 ){
+            proposals = await NounsDAO.getLatestProposals(diffID).proposals;
+        }
+
+        proposals.forEach(function (prop, i) {
+
+            events.push({
+                'type':'new-proposal',
+                'data':prop
+            }); 
+            latestProposal = prop; // Is this correct? Needs to be one with highest number. Possibly sort proposals first
+        });
+
     }
         
 }

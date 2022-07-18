@@ -26,13 +26,13 @@ async function getLatestAuctions(){
 
 }
 
-async function getLatestProposal(){
+async function getLatestProposals(n){
 
     const endpoint = 'https://api.thegraph.com/subgraphs/name/nounsdao/nouns-subgraph'
 
     const query = gql`
     {
-        proposals(first:1, orderBy: startBlock, orderDirection: desc) {
+        proposals(first:`+n+`, orderBy: startBlock, orderDirection: desc) {
           id
           description
           status
