@@ -4,6 +4,13 @@ const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const token = process.env.DISCORD_TOKEN;
 
+// Initialize StateOfNouns, Add Event Listeners
+const StateOfNouns = require('./helpers/StateOfNoun.js');
+StateOfNouns.addEventListener( "new-proposal", function(prop) {
+   console.log("New Proposal event fired - in callback with data: ");
+   console.log(JSON.stringify(prop));
+});
+
 const client = new Client({
    intents: [
       Intents.FLAGS.GUILDS,
