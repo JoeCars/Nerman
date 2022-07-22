@@ -49,6 +49,6 @@ module.exports.getLatestAuctions = async function() {
     return getLatestAuctions();
 }
 
-module.exports.getLatestProposal = async function() {
-    return getLatestProposal();
+module.exports.getLatestProposals = async function(n) {
+    return getLatestProposals(n);
 }
