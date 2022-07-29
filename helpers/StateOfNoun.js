@@ -1,7 +1,7 @@
 const TimeStuff = require('../helpers/timestuff.js');
 const NounsDAO = require('../helpers/nounsdao.js');
 
-const tickInterval = 10000;
+const tickInterval = 1800000;
 var latestProposal = {
     "id":-1
 };
@@ -14,7 +14,7 @@ var activeEventListeners = [];
 //   callbacks   
 // }
 
-var eventStack = [];
+var eventQueue = [];
 // event {
 //   type
 //   data
@@ -28,20 +28,61 @@ setInterval(() => {
   tick();
 }, tickInterval); 
 
-
-
 async function tick() {
-    if(logs){logTick()};
+    
+    if(logs){logTick("start")};
 
     await getLatestProposalData();
-    await processEventStack();
+
+    if(logs){logTick("mid")};
+
+    await processEventQueue();
+
+    if(logs){logTick("end")};
 
 }
 
-async function logTick(){   
+async function logTick(state){   
+    let seperator = "";  
+    switch(state) {
+        case "start":
 
-    // Show Active Event Listeners
-    console.log("activeEventListeners"+activeEventListeners);
+            var date = new Date();
+
+            console.log("\n");
+            console.log("StateOfNoun.js --- " + date.toUTCString()); 
+
+            let listenerString = ""; 
+            activeEventListeners.forEach(function (eventListener) {
+        
+                listenerString += seperator + eventListener.type;
+                seperator = ',';
+        
+            });
+            console.log("------------------------------------------------");
+            console.log("| EVENT LISTENERS - POLL NOUNS DATA");
+            console.log("------------------------------------------------");
+            console.log("| activeEventListeners: ["+ listenerString +"]");
+            console.log("|");
+          break;
+        case "mid":
+            let eventString = "";
+            eventQueue.forEach(function (event) {
+        
+                eventString += seperator + event.type;
+                seperator = ',';
+        
+            });
+            console.log("| ");
+            console.log("------------------------------------------------");
+            console.log("| EVENTS - PROCESS QUEUE");
+            console.log("------------------------------------------------");
+            console.log("| eventQueue ["+ eventString +"]");
+            console.log("| ");
+          break;
+        case "end":
+            console.log("------------------------------------------------");
+      }
 
 }
 
@@ -49,28 +90,38 @@ async function getLatestProposalData() {
 
     if(isEventListeningActive("new-proposal")){
 
-        const data = await NounsDAO.getLatestProposals(1);
+        const data = await NounsDAO.getLatestProposals(1, "desc");
 
         if (latestProposal.id < 0) { 
+
             latestProposal = data.proposals[0];
 
-            console.log("setting initial proposal to PROP " + data.proposals[0].id);
+            // TEMP CODE, FORCES NEXT ONE TO BE VIEWED AS NEW PROPOSAL
+            // latestProposal.id = latestProposal.id - 2;
+
+            console.log("| new-proposal init - setting latest prop to " + data.proposals[0].id);
 
         } else if (latestProposal.id != data.proposals[0].id) {
-            let diffID = latestProposal.id - data.proposals[0].id;
-            let proposals = data.proposals;
-            
-            if( diffID > 1 ){
-                proposals = await NounsDAO.getLatestProposals(diffID).proposals;
-                proposals.reverse();
-            }
-    
-            proposals.forEach(function (prop) {
-    
-                scheduleEvent("new-proposal", prop)
-                latestProposal = prop;
 
-            });
+            let newProposalCount = data.proposals[0].id - latestProposal.id;
+            let proposals = data.proposals;
+
+            console.log("| new proposal(s): "+newProposalCount);
+            if( newProposalCount > 1 ){
+
+                const dataNew = await NounsDAO.getLatestProposals(newProposalCount, "desc");
+                proposals = dataNew.proposals;
+
+            }
+
+            for (let i = proposals.length - 1; i >= 0; i--) {
+
+                const prop = proposals[i];
+                scheduleEvent("new-proposal", prop)
+                
+            }
+
+            latestProposal = proposals[0];
     
         }
 
@@ -80,25 +131,26 @@ async function getLatestProposalData() {
 
 function scheduleEvent(eventType, data){
 
-    eventStack.push({
-        'type':'eventType',
+    eventQueue.push({
+        'type': eventType,
         'data': data
     }); 
 
-    console.log("scheduling event "+ eventType + " with " + JSON.stringify(data));
+    console.log("| scheduling event "+ eventType + " " + data.id);
 
 }
 
 
-function processEventStack(){
+function processEventQueue(){
 
-    while(eventStack.length > 0){
-        let curEvent = eventStack.shift();
-        if (curEvent.type == "new-proposal") {
+    while(eventQueue.length > 0){
+        const curEvent = eventQueue.shift();
+        const callbacks = activeEventListeners.find(e => e.type == curEvent.type).callbacks;
 
+        callbacks.forEach(function (callback) {
+            callback(curEvent.data);
+        });
 
-            // POST VOTE TO DISCORD
-        }
     }
 
 }
@@ -134,7 +186,7 @@ function addEventListener(eventType, callback){
         const i = activeEventListeners.findIndex(x => x.type === eventType);
         activeEventListeners[i].callbacks.push(callback);
 
-        console.log("addEventListener: " + eventType);
+        console.log("| addEventListener: " + eventType);
     }
 }
 
