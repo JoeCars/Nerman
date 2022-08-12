@@ -8,7 +8,7 @@ module.exports = {
    execute(interaction) {
       if (!interaction.isButton()) return;
 
-      console.log('BUTTON INTERACTION')
+      console.log('buttonInteraction.js -- BUTTON INTERACTION');
 
       const {
          client,
@@ -16,13 +16,14 @@ module.exports = {
          member: { permissions },
       } = interaction;
 
-      console.log({ customId });
+      console.log('buttonInteraction.js -- customId', { customId });
+      console.log('buttonInteraction.js -- permissions', { permissions });
       // console.log(client.buttons);
       // console.log(client.buttons.get(customId));
 
       const button = client.buttons.get(customId);
 
-      console.log({ button });
+      console.log('buttonInteraction.js -- button', { button });
 
       if (button.permission && !permissions.has(button.permission)) {
          return interaction.reply({

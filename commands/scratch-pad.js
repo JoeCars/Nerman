@@ -30,7 +30,9 @@ module.exports = {
 
    async execute(interaction) {
       let btnAmount = interaction.options.getInteger('amount') ?? 2;
-      const duration = interaction.options.getInteger('duration') ? interaction.options.getInteger('duration') * 1000 * 60 : 5000;
+      const duration = interaction.options.getInteger('duration')
+         ? interaction.options.getInteger('duration') * 1000 * 60
+         : 5000;
       let rows = [];
       const {
          member: { nickname, user },
@@ -100,6 +102,8 @@ module.exports = {
          btnAmount -= 5;
          rows.push(row);
       }
+
+      console.log(options);
 
       // rows.forEach(row => console.table(row.components));
 

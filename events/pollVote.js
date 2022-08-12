@@ -1,67 +1,121 @@
-const { ButtonInteraction } = require('discord.js');
-const DB = require('../db/schemas/PollSchema');
+const { Modal } = require('discord-modals');
+const {
+   ButtonInteraction,
+   ModalSubmitInteraction,
+   MessageEmbed,
+} = require('discord.js');
+// const DB = require('../db/schemas/PollSchema');
+const { Types } = require('mongoose');
+const { findOneAndUpdate } = require('../scratchcode/db/schema/Poll');
+const Poll = require('../scratchcode/db/schema/Poll');
+const Vote = require('../scratchcode/db/schema/Vote');
 
 module.exports = {
-   name: 'interactionCreate',
+   name: 'modalSubmit',
    /**
-    * @param {ButtonInteraction} interaction
+    * @param {ModalSubmitInteraction} interaction
     */
-   async execute(interaction) {
-      if (!interaction.isButton()) return;
-      if (!interaction.member.permissions.has('ADMINISTRATOR')) {
-         return interaction.reply({
-            content: 'You do not have permission to use this button.',
-            ephemeral: true,
+   async execute(modal) {
+      if (modal.customId !== 'vote-modal') return;
+      await modal.deferReply({ ephemeral: true });
+      // async execute(interaction) {
+      // console.log({ modal });
+
+      // return;
+      // if (!interaction.isCommand() && customId !== 'vote-modal') return;
+
+      console.log('CUSTOM ID: \n', modal.customId);
+
+      console.log('pollVote.js -- modal', { modal });
+      // {
+      const {
+         client,
+         guildId,
+         customId,
+         channelId,
+         member: {
+            user: { id: userId },
+         },
+         message: { id: messageId },
+      } = modal;
+
+      const voteArray = modal.getSelectMenuValues('votingSelect');
+      const voteReason = modal.getTextInputValue('votingReason');
+
+      const pollStatus = await Poll.findOne({ messageId }, 'status');
+
+      console.log({ pollStatus });
+
+      if (pollStatus.status === 'closed') {
+         return modal.editReply({
+            content: 'Unable to register your vote, this poll has closed.',
+            ephermeral: true,
          });
       }
 
-      const { guildId, customId, message } = interaction;
+      const userVote = await Vote.create({
+         _id: new Types.ObjectId(),
+         // poll: targetPoll._id,
+         poll: pollStatus._id,
+         user: userId,
+         choices: voteArray,
+         reason: voteReason || undefined,
+      });
 
-      DB.findOne(
-         { GuildID: guildId, MessageID: message.id },
-         async (err, data) => {
-            if (err) throw err;
-            if (!data)
-               return interaction.reply({
-                  content: 'No data found in the DB',
-                  ephemeral: true,
-               });
+      // await targetPoll.allowedUsers.set(userId, true);
 
-            const embed = message.embeds[0];
-            if (!embed) return;
+      const updatedPoll = await Poll.findOneAndUpdate(
+         { messageId },
+         { $set: { [`allowedUsers.${userId}`]: true } },
+         { new: true }
+      ).populate([
+         // { path: 'results' },
+         { path: 'countVoters' },
+         { path: 'getVotes', select: 'choices -poll -_id' },
+      ]);
 
-            switch (customId) {
-               case 'yes': {
-                  embed.fields[2] = { name: 'Status:', value: 'Accepted' };
-                  message.edit({ embeds: [embed.setColor('GREEN')] });
-                  return interaction.reply({
-                     content: 'Prop Accepted',
-                     ephemeral: true,
-                  });
-                  break;
-               }
-               case 'no': {
-                  embed.fields[2] = { name: 'Status:', value: 'Declined' };
-                  message.edit({ embeds: [embed.setColor('RED')] });
-                  return interaction.reply({
-                     content: 'Prop Declined',
-                     ephemeral: true,
-                  });
+      let message = await client.channels.cache
+         .get(channelId)
+         .messages.fetch(messageId);
 
-                  break;
-               }
-               case 'abstain': {
-                  embed.fields[2] = { name: 'Status:', value: 'Abstained' };
-                  message.edit({ embeds: [embed.setColor('YELLOW')] });
-                  return interaction.reply({
-                     content: 'Prop Abstained',
-                     ephemeral: true,
-                  });
+      const updateEmbed = new MessageEmbed(message.embeds[0]);
 
-                  break;
-               }
-            }
+      updateEmbed.spliceFields(
+         updateEmbed.fields.findIndex(({ name }) => name === 'Voters'),
+         1,
+         {
+            name: 'Voters',
+            value: `${updatedPoll.countVoters}`,
+            inline: true,
          }
       );
+
+
+      message.edit({ embeds: [updateEmbed] });
+
+      // await targetPoll
+      //    .save()
+      //    .then(savedDoc => {
+      //       console.log('targetPoll === savedDoc', targetPoll === savedDoc);
+      //       console.log({ savedDoc });
+      //       console.log('savedDoc.allowedUsers', savedDoc.allowedUsers);
+      //    })
+      //    .catch(err => console.error(err));
+      // await targetPoll
+      //    .save()
+      //    .then(savedDoc => {
+      //       console.log('targetPoll === savedDoc', targetPoll === savedDoc);
+      //       console.log({ savedDoc });
+      //       console.log('savedDoc.allowedUsers', savedDoc.allowedUsers);
+      //    })
+      //    .catch(err => console.error(err));
+
+      // console.log('pollVote.js -- modal', { modal });
+      console.log('pollVote.js -- userVote', { userVote });
+
+      return modal.editReply({
+         content: 'Your vote has been submitted',
+         ephemeral: true,
+      });
    },
 };

@@ -18,6 +18,7 @@ module.exports = {
          console.error(error);
 
          if (interaction.deferred) {
+            console.log('INTERACTION CREATE DEFERRED');
             await interaction.editReply({
                content:
                   error.message ||

@@ -3,8 +3,12 @@ const {
    Modal,
    TextInputComponent,
    SelectMenuComponent,
+   CommandInteraction,
    showModal,
 } = require('discord-modals');
+
+const Poll = require('../scratchcode/db/schema/Poll');
+const PollChannel = require('../scratchcode/db/schema/PollChannel');
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -14,39 +18,105 @@ module.exports = {
          subcommand
             .setName('create-poll')
             .setDescription('Create a Yes/No/Abstain Poll')
+      )
+      .addSubcommand(subcommand =>
+         subcommand
+            .setName('create-poll-channel')
+            .setDescription('Create voting channel configuration.')
       ),
+   /**
+    *
+    * @param {CommandInteraction} interaction
+    */
    async execute(interaction) {
       console.log(
-         'interaction.options._subcommand',
-         interaction.options._subcommand
+         'interaction.options.getSubcommand',
+         interaction.options.getSubcommand()
       );
+      // console.log('INTERACTION', interaction);
+      // console.log('ROLE CACHE', roleCache);
+      // console.log('ROLE CACHE HAS??', roleCache.has(process.env.VOTER_DEV_ID));
+
+      // console.log(foundPolls);
+
+      // console.log('USER CREATED POLL AND IN THIS CHANNEL');
       // console.log('INTERACTION.CLIENT', interaction.client);
 
-      if (interaction.options._subcommand === 'create-poll') {
-         const modal = new Modal().setCustomId('modal-create-poll').setTitle('Create Poll');
+      if (interaction.options.getSubcommand() === 'create-poll') {
+         const {
+            channelId,
+            user: { id: userId },
+            member: {
+               roles: { cache: roleCache },
+            },
+         } = interaction;
 
-         // const pollType = new TextInputComponent()
+         if (!(await PollChannel.countDocuments({ channelId }))) {
+            return interaction.reply({
+               content:
+                  'There are no configurations registered to this channel. You may only register from a channel in which polling has been configured.',
+               ephemeral: true,
+            });
+         }
+
+         const channelConfig = await PollChannel.findOne(
+            { channelId },
+            'maxUserProposal voteAllowance'
+         ).exec();
+
+         // return interaction.reply({
+         //    content: 'canceling this for testing purposes',
+         //    ephemeral: true,
+         // });
+
+         console.log({ channelConfig });
+
+         const foundPolls = await Poll.countDocuments({
+            channelId,
+            creatorId: userId,
+            status: 'open',
+         });
+
+         if (foundPolls > channelConfig.maxUserProposal) {
+            return interaction.reply({
+               content:
+                  'You have exceeded the amount of allowed polls in this channel. You must wait until your current poll is closed.',
+               ephemeral: true,
+            });
+         }
+
+         // return interaction.reply({
+         //    content: 'canceling this for testing purposes',
+         //    ephemeral: true,
+         // });
+
+         const modal = new Modal()
+            .setCustomId('modal-create-poll')
+            .setTitle('Create Poll');
+
+         // const channelOptions = channelConfigs.map(
+         //    ({ channelId, channelName }) => ({
+         //       label: channelName,
+         //       value: channelId,
+         //    })
+         // );
+
+         // console.log(channelOptions);
+
+         // const pollType = new SelectMenuComponent()
          //    .setCustomId('pollType')
-         //    .setLabel('Poll type')
-         //    .setPlaceholder('nouncil / nouns')
-         //    .setRequired(true)
-         //    .setStyle('SHORT');
+         //    .setPlaceholder('Select Poll Channel')
+         //    .addOptions(channelOptions)
+         //    .setMinValues(1)
+         //    .setMaxValues(1);
 
-         const pollType = new SelectMenuComponent()
-            .setCustomId('pollType')
-            .setPlaceholder('Nouncil / Nouns')
-            .addOptions(
-               {
-                  label: 'Nouncil',
-                  description: 'Create a poll for nouncillors',
-                  value: 'nouncil',
-               },
-               {
-                  label: 'Nouns',
-                  description: 'Create a poll for nouners',
-                  value: 'nouns',
-               }
-            );
+         // console.log(pollType);
+
+         // return interaction.reply({
+         //    content: 'canceling this for testing purposes',
+         //    ephemeral: true,
+         // });
+         const createPollComponents = [];
 
          const pollTitle = new TextInputComponent()
             .setCustomId('pollTitle')
@@ -65,19 +135,35 @@ module.exports = {
          const pollChoices = new TextInputComponent()
             .setCustomId('pollChoices')
             .setLabel('Choices')
-            .setPlaceholder('Comma separated choices eg)Yes, No, Abstain')
+            .setPlaceholder(
+               'Comma separated values. Minimum two options. eg) Yes, No, Abstain'
+            )
             .setDefaultValue('Yes, No, Abstain')
             .setRequired(true)
             .setStyle('SHORT');
 
-         modal.addComponents(
-            pollType,
-            pollTitle,
-            pollDescription,
-            pollChoices,
-         );
+         createPollComponents.push(pollTitle, pollDescription, pollChoices);
 
-         console.log({ modal });
+         console.log(channelConfig.voteAllowance);
+
+         if (channelConfig.voteAllowance) {
+            const pollAllowance = new TextInputComponent()
+               .setCustomId('voteAllowance')
+               .setLabel('Votes Per User')
+               .setPlaceholder('# of votes is a single user allowed.')
+               .setDefaultValue('1')
+               .setRequired(true)
+               .setStyle('SHORT');
+
+            createPollComponents.push(pollAllowance);
+         }
+
+         console.log({ createPollComponents });
+
+         // modal.addComponents(pollType, pollTitle, pollDescription, pollChoices);
+         modal.addComponents(createPollComponents);
+
+         // console.log({ modal });
          // console.log(modal.components[1], modal.components[1].components[0]);
 
          await showModal(modal, {
@@ -85,9 +171,205 @@ module.exports = {
             interaction: interaction,
          });
       }
-      // await interaction.reply({
-      //    content: `Testing poll create maybe?`,
-      //    ephemeral: true,
-      // });
+
+      // ///////////////////////////////////////////////////////////
+      // CREATE POLL CHANNEL
+      // ///////////////////////////////////////////////////////////
+      if (interaction.options.getSubcommand() === 'create-poll-channel') {
+         // console.time('destruct');
+         const {
+            channelId,
+            channel,
+            guild: {
+               channels,
+               roles: {
+                  cache: guildRoleCache,
+                  everyone: { id: everyoneId },
+               },
+            },
+            user: { id: userId },
+            member: {
+               roles,
+               roles: { cache: roleCache },
+            },
+         } = interaction;
+         // console.timeEnd('destruct')
+
+         // console.log({ interaction });
+         console.log('commandInteraction -- create-poll', { channelId });
+         // console.log('isTextBased', channel.isText());
+         // console.log('isDMBased', channel.isDM());
+
+         if (!channel.isText())
+            return interaction.reply({
+               content:
+                  'Polling can only be configured within text based channels.',
+               ephemeral: true,
+            });
+
+         const configCheck = await PollChannel.countDocuments({
+            channelId,
+         });
+         console.log({ configCheck });
+
+         console.log(!!configCheck);
+         console.log(await PollChannel.countDocuments({ channelId }));
+
+         // return interaction.reply({
+         //    content: 'Aborted',
+         //    ephemeral: true,
+         // });
+
+         if (!!configCheck)
+            return interaction.reply({
+               content:
+                  'There already exists a configuration for this channel.',
+               ephemeral: true,
+            });
+
+         // const channelConfigs = await PollChannel.find(
+         //    {},
+         //    'channelId channelName maxUserProposal'
+         // );
+
+         // console.log({ guildRoleCache });
+         // console.log({ roleCache });
+
+         // Fetch all guild channels that are text channels and don't have an existing configuration
+         // const guildChannels = await channels
+         //    .fetch()
+         //    .then(allChannels =>
+         //       allChannels.filter(
+         //          ({ type, id }) =>
+         //             type === 'GUILD_TEXT' &&
+         //             !channelConfigs.some(config => id === config.channelId)
+         //       )
+         //    )
+         //    .catch(err => console.error(err));
+
+         // console.log({ roles });
+         // console.log({ roleCache });
+         // console.log({ guild });
+         // console.log({ channels });
+         // console.log({ guildChannels });
+         // console.log(channels.cache.get());
+         // console.log({ interaction });
+         // console.log({ channelConfigs });
+
+         // if (!guildChannels) {
+         //    return interaction.reply({
+         //       content:
+         //          'There are no available channels to create a new configuration for. Either there are no existing text channels, or they all have existing configurations. Existing configurations can be edited through context menu, but not overwritten by <Nerman create-poll-channel> command.',
+         //       ephemeral: true,
+         //    });
+         // }
+
+         // const channelOptions = guildChannels.map(({ id, name }) => ({
+         //    label: name,
+         //    value: id,
+         // }));
+
+         // console.log({ channelOptions });
+
+         const roleOptions = roleCache.map(({ id, name }) => ({
+            label: name,
+            value: id,
+         }));
+         // const roleOptions = roleCache
+         //    .filter(({ id }) => id !== everyoneId)
+         //    .map(({ id, name }) => ({ label: name, value: id }));
+
+         // console.log({ roleOptions });
+
+         if (!roleOptions.length) {
+            return interaction.reply({
+               content:
+                  'You must have at least one guild role in order to assign a voting role.',
+               ephemeral: true,
+            });
+         }
+
+         const modal = new Modal()
+            .setCustomId('modal-create-poll-channel')
+            .setTitle('Create Polling Channel');
+
+         // const pollChannel = new SelectMenuComponent()
+         //    .setCustomId('pollChannel')
+         //    .setPlaceholder('Select Polling Channel')
+         //    .addOptions(channelOptions)
+         //    .setMinValues(1)
+         //    .setMaxValues(1);
+
+         // console.log({ pollChannel });
+
+         console.log(roleOptions.length);
+
+         const votingRoles = new SelectMenuComponent()
+            .setCustomId('votingRoles')
+            .setPlaceholder('Allowed Voting Roles')
+            .addOptions(roleOptions)
+            .setMinValues(1)
+            .setMaxValues(roleOptions.length);
+
+         console.log({ votingRoles });
+
+         const pollDuration = new TextInputComponent()
+            .setCustomId('pollDuration')
+            .setLabel('Poll Duration (hours)')
+            .setPlaceholder('Eg) 60')
+            .setStyle('SHORT')
+            .setRequired(true);
+
+         const maxProposals = new TextInputComponent()
+            .setCustomId('maxProposals')
+            .setLabel('Max Active Polls Per User')
+            .setPlaceholder(
+               'Choose maximum number of active polls allowed per user with voting role.'
+            )
+            .setStyle('SHORT')
+            .setRequired(true);
+
+         // DURATION REGEX THEN PARSE
+         // DURATION MAX OUT 999 hours
+         const pollChannelOptions = new SelectMenuComponent()
+            .setCustomId('pollChannelOptions')
+            .setPlaceholder('Select Channel Options (if any)')
+            .addOptions(
+               {
+                  label: 'Anonymous Voting',
+                  value: 'anonymous-voting',
+                  description:
+                     'Only participation is recorded, results are anonymous.',
+               },
+               {
+                  label: 'Live Results',
+                  value: 'live-results',
+                  description:
+                     'Display visual feed of results as polling occurs.',
+               },
+               {
+                  label: 'Vote Allowance',
+                  value: 'vote-allowance',
+                  description:
+                     'Enables custom vote allowance # on create-poll command.',
+               }
+            )
+
+            .setMinValues(0)
+            .setMaxValues(3);
+
+         modal.addComponents(
+            // pollChannel,
+            votingRoles,
+            pollDuration,
+            maxProposals,
+            pollChannelOptions
+         );
+
+         await showModal(modal, {
+            client: interaction.client,
+            interaction: interaction,
+         });
+      }
    },
 };

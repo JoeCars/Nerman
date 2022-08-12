@@ -5,4 +5,4 @@ const UserSchema = new Schema({
    discordId: { type: SchemaTypes.String, required: true },
 });
 
-module.exports = model('user', UserSchema);
+module.exports = model('User', UserSchema);

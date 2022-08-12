@@ -3,8 +3,8 @@ const { Collection } = require('discord.js');
 const { getFiles } = require('../utils/functions');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-// use for permissions validation later on
-const { Perms } = require('../validation/permissions');
+// todo use for permissions validation later on
+// const { Perms } = require('../validation/permissions');
 const clientId = process.env.DISCORD_CLIENT_ID;
 const guildId = process.env.DISCORD_GUILD_ID;
 const token = process.env.DISCORD_TOKEN;

@@ -79,10 +79,77 @@ const encodeURI = string => {
    // );
 };
 
+const formatDate = (date, format) => {
+   // Implement format options later
+   // Use full months when  format parameter is programmed, for now just going to shorten months array values to 3-letter values
+   // const months = [
+   //    'January',
+   //    'February',
+   //    'March',
+   //    'April',
+   //    'May',
+   //    'June',
+   //    'July',
+   //    'August',
+   //    'September',
+   //    'October',
+   //    'November',
+   //    'December',
+   // ];
+
+   const months = [
+      'Jan',
+      'Febr',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+   ];
+
+   const days = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+   ];
+
+   // console.log('getYear', date.getFullYear());
+   // console.log('getDate', date.getDate());
+   const year = date.getFullYear();
+   const calendarDay = date.getDate();
+   const month = months[date.getMonth()];
+   // const day = days[date.getDay()];
+   // const timezoneOffset = date.getTimezoneOffset();
+   // const timeAbbrUTC = `UTC`;
+   const tzAbbr = date
+      .toLocaleTimeString('en-us', { timeZoneName: 'short' })
+      .split(' ')[2];
+   const hours = date.getHours();
+   const minutes = date.getMinutes();
+   const seconds = date.getSeconds();
+   const amPm = hours >= 12 ? 'pm' : 'am';
+   const time = `${
+      hours !== 12 ? hours % 12 : 0
+   }:${minutes.toString().padStart(2,'0')} ${amPm}`;
+   const formatted = `${time} ${tzAbbr} ${month} ${calendarDay}, ${year}`;
+   // Return format: 5:00 am/pm Timezone(EST) Dec 26, 2022
+   return formatted;
+};
+
 // encodeURI();
 
 module.exports = {
    getFiles,
    logToObject,
    encodeURI,
+   formatDate,
 };

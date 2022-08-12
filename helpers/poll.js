@@ -12,7 +12,7 @@ const barEnd = '▕';
 
 // Functions:
 const drawBlock = (fracIndex, completeBlocks) => {
-// const drawBlock = function (fracIndex, completeBlocks) {
+   // const drawBlock = function (fracIndex, completeBlocks) {
    let blocks = '';
 
    for (let i = 0; i < completeBlocks; i++) {
@@ -25,7 +25,7 @@ const drawBlock = (fracIndex, completeBlocks) => {
 };
 
 const drawSpace = emptySpace => {
-// const drawSpace = function (emptySpace) {
+   // const drawSpace = function (emptySpace) {
    let spaces = '';
 
    for (let i = 0; i < emptySpace; i++) {
@@ -53,8 +53,22 @@ const drawBar = function (maxLength, portion) {
 // console.log(drawBar(maxLength, portion));
 // drawBar();
 
+const longestString = array => {
+   let longest = array[0];
+   const length = array.length;
+
+   for (let i = 0; i < length; i++) {
+      if (longest.length < array[i].length) {
+         longest = array[i];
+      }
+   }
+
+   return longest;
+};
+
 const randomNumber = async limit => Math.floor(Math.random() * limit);
 
 module.exports = {
    drawBar,
+   longestString,
 };
