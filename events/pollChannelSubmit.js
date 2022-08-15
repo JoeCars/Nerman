@@ -1,6 +1,6 @@
 const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
-const PollChannel = require('../scratchcode/db/schema/PollChannel');
+const PollChannel = require('../db/schemas/PollChannel');
 const { logToObject } = require('../utils/functions');
 
 module.exports = {
@@ -10,12 +10,12 @@ module.exports = {
     */
    async execute(modal) {
       if (modal.customId !== 'modal-create-poll-channel') return;
-      
+
       await modal.deferReply({ ephemeral: true });
 
       const { channelId } = modal;
 
-      const configCheck = await PollChannel.countDocuments({ channelId });
+      const configCheck = await PollChannel.countDocuments( channelId );
       if (!!configCheck)
          return modal.editReply({
             content:

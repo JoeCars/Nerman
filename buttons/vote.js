@@ -5,7 +5,7 @@ const {
    showModal,
 } = require('discord-modals');
 const { ButtonInteraction } = require('discord.js');
-const Poll = require('../scratchcode/db/schema/Poll');
+const Poll = require('../db/schemas/Poll');
 
 module.exports = {
    id: 'vote',

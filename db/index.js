@@ -5,8 +5,7 @@ const mongoose = require('mongoose');
 // Personal Imports
 const { drawBar, longestString } = require('../helpers/poll');
 const { encodeURI } = require('../utils/functions');
-const User = require('./schemas/UserSchema');
-const Poll = require('../scratchcode/db/schema/Poll');
+const Poll = require('../db/schemas/Poll');
 
 // const {
 //    createPollTest,

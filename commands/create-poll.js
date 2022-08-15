@@ -7,8 +7,8 @@ const {
    showModal,
 } = require('discord-modals');
 
-const Poll = require('../scratchcode/db/schema/Poll');
-const PollChannel = require('../scratchcode/db/schema/PollChannel');
+const Poll = require('../db/schemas/Poll');
+const PollChannel = require('../db/schemas/PollChannel');
 
 module.exports = {
    data: new SlashCommandBuilder()

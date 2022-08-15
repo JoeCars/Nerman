@@ -4,11 +4,9 @@ const {
    ModalSubmitInteraction,
    MessageEmbed,
 } = require('discord.js');
-// const DB = require('../db/schemas/PollSchema');
 const { Types } = require('mongoose');
-const { findOneAndUpdate } = require('../scratchcode/db/schema/Poll');
-const Poll = require('../scratchcode/db/schema/Poll');
-const Vote = require('../scratchcode/db/schema/Vote');
+const Poll = require('../db/schemas/Poll');
+const Vote = require('../db/schemas/Vote');
 
 module.exports = {
    name: 'modalSubmit',
@@ -89,7 +87,6 @@ module.exports = {
             inline: true,
          }
       );
-
 
       message.edit({ embeds: [updateEmbed] });
 

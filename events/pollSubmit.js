@@ -2,8 +2,8 @@ const { drawBar, longestString } = require('../helpers/poll');
 const { Modal } = require('discord-modals');
 const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 const { Types } = require('mongoose');
-const Poll = require('../scratchcode/db/schema/Poll');
-const PollChannel = require('../scratchcode/db/schema/PollChannel');
+const Poll = require('../db/schemas/Poll');
+const PollChannel = require('../db/schemas/PollChannel');
 const { logToObject, formatDate } = require('../utils/functions');
 
 // const { create}
