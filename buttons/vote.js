@@ -6,6 +6,7 @@ const {
 } = require('discord-modals');
 const { ButtonInteraction } = require('discord.js');
 const Poll = require('../db/schemas/Poll');
+const PollChannel = require('../db/schemas/PollChannel');
 
 module.exports = {
    id: 'vote',
@@ -24,6 +25,7 @@ module.exports = {
       );
 
       const {
+         channelId,
          message: { id: messageId },
          user: { id: userId },
          member: {
@@ -31,8 +33,14 @@ module.exports = {
          },
       } = interaction;
 
-      // TODO Implement env variables for allowed roles
-      if (!roleCache.has('919784986641575946')) {
+      const { allowedRoles } = await PollChannel.findOne(
+         { channelId },
+         'allowedRoles'
+      ).exec();
+
+      console.log({ allowedRoles });
+
+      if (!roleCache.hasAny(...allowedRoles)) {
          console.log('USER DOES NOT HAS ROLE');
          return interaction.reply({
             content: 'You do not have the role, dummy',
@@ -40,25 +48,9 @@ module.exports = {
          });
       }
 
-      // !testing population of votes via virtuals on vote modal instantiation, remove later and use this for live results and for closed poll data
       const attachedPoll = await Poll.findOne({ messageId })
-         .populate([
-            { path: 'config' },
-            { path: 'countVoters' },
-            { path: 'getVotes', select: 'choices -poll -_id' },
-         ])
+         .populate([{ path: 'config' }])
          .exec();
-      // .populate('countVoters')
-      // .populate('getVotes')
-
-      // const countVoters = await attachedPoll.populate('countVoters').exec();
-
-      // console.log({ countVoters });
-
-      console.log({ attachedPoll });
-      console.log(attachedPoll.countVoters);
-      console.log(attachedPoll.getVotes);
-      console.log(attachedPoll.results);
 
       if (!attachedPoll.allowedUsers.has(userId)) {
          return interaction.reply({
@@ -75,23 +67,31 @@ module.exports = {
       //    });
       // }
 
-      const optionsMap = attachedPoll.pollData.choices.map(choice => ({
-         label: choice,
-         value: choice,
-      }));
+      const optionsString = attachedPoll.pollData.choices.join(', ');
+      // disabled until DJS SELECT MENU Modal supported
+      // const optionsMap = attachedPoll.pollData.choices.map(choice => ({
+      //    label: choice,
+      //    value: choice,
+      // }));
 
       // console.log({ attachedPoll });
 
       const modal = new Modal().setCustomId('vote-modal').setTitle('Vote');
 
-      // const
-
-      const selectOptions = new SelectMenuComponent()
+      const selectOptions = new TextInputComponent()
          .setCustomId('votingSelect')
-         .setPlaceholder('Make your selection(s)')
-         .addOptions(optionsMap)
-         .setMinValues(attachedPoll.config.voteAllowance)
-         .setMaxValues(attachedPoll.config.voteAllowance);
+         .setLabel(`Type ${attachedPoll.voteAllowance} Choice(s)`)
+         .setPlaceholder(optionsString)
+         .setDefaultValue(optionsString)
+         .setStyle('LONG');
+
+      // disabled until DJS supports SELECT MENU Modal
+      // const selectOptions = new SelectMenuComponent()
+      //    .setCustomId('votingSelect')
+      //    .setPlaceholder('Make your selection(s)')
+      //    .addOptions(optionsMap)
+      //    .setMinValues(attachedPoll.config.voteAllowance)
+      //    .setMaxValues(attachedPoll.config.voteAllowance);
 
       const reason = new TextInputComponent()
          .setCustomId('voteReason')
@@ -100,6 +100,11 @@ module.exports = {
          .setStyle('LONG');
 
       modal.addComponents(selectOptions, reason);
+
+      console.log(modal.components);
+      console.log(modal.components[0]);
+      console.log(modal.components[0].components[0]);
+      // console.log({modal)
 
       try {
          await showModal(modal, {

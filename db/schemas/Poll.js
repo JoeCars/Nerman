@@ -86,8 +86,12 @@ PollSchema.virtual('countAbstains').get(function () {
 
 PollSchema.virtual('participation').get(function () {
    return parseFloat(
-      ((this.countVoters / this.allowedUsers.size) * 100).toFixed(2)
+      ((this.countVoters ?? 0 / this.allowedUsers.size) * 100).toFixed(2)
    );
+});
+
+PollSchema.virtual('voterQuorum').get(function () {
+   return Math.floor(this.allowedUsers.size / this.config.quorum);
 });
 
 PollSchema.virtual('results').get(function () {
@@ -136,6 +140,5 @@ PollSchema.virtual('results').get(function () {
    }
    return resultsObject;
 });
-
 
 module.exports = model('Poll', PollSchema);

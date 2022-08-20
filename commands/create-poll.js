@@ -6,6 +6,7 @@ const {
    CommandInteraction,
    showModal,
 } = require('discord-modals');
+const { isRequiredArgument } = require('graphql');
 
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
@@ -195,7 +196,7 @@ module.exports = {
          } = interaction;
          // console.timeEnd('destruct')
 
-         // console.log({ interaction });
+         console.log({ interaction });
          console.log('commandInteraction -- create-poll', { channelId });
          // console.log('isTextBased', channel.isText());
          // console.log('isDMBased', channel.isDM());
@@ -289,6 +290,15 @@ module.exports = {
             });
          }
 
+         let placeholder = [];
+         console.log({ placeholder });
+
+         roleOptions.forEach(({ label }) => placeholder.push(label));
+         console.log({ placeholder });
+
+         placeholder = placeholder.join(', ');
+         console.log({ placeholder });
+
          const modal = new Modal()
             .setCustomId('modal-create-poll-channel')
             .setTitle('Create Polling Channel');
@@ -304,15 +314,24 @@ module.exports = {
 
          console.log(roleOptions.length);
 
-         const votingRoles = new SelectMenuComponent()
+         const votingRoles = new TextInputComponent()
             .setCustomId('votingRoles')
-            .setPlaceholder('Allowed Voting Roles')
-            .addOptions(roleOptions)
-            .setMinValues(1)
-            .setMaxValues(roleOptions.length);
+            .setLabel('Choose Voting Roles')
+            .setPlaceholder(placeholder)
+            .setDefaultValue(placeholder)
+            .setStyle('SHORT')
+            .setRequired(true);
+         //disabled until modals are supported
+         // const votingRoles = new SelectMenuComponent()
+         //    .setCustomId('votingRoles')
+         //    .setPlaceholder('Allowed Voting Roles')
+         //    .addOptions(roleOptions)
+         //    .setMinValues(1)
+         //    .setMaxValues(roleOptions.length);
 
          console.log({ votingRoles });
 
+         // todo DURATION REGEX THEN PARSE- DURATION MAX OUT 999 hours
          const pollDuration = new TextInputComponent()
             .setCustomId('pollDuration')
             .setLabel('Poll Duration (hours)')
@@ -329,40 +348,53 @@ module.exports = {
             .setStyle('SHORT')
             .setRequired(true);
 
-         // DURATION REGEX THEN PARSE
-         // DURATION MAX OUT 999 hours
-         const pollChannelOptions = new SelectMenuComponent()
-            .setCustomId('pollChannelOptions')
-            .setPlaceholder('Select Channel Options (if any)')
-            .addOptions(
-               {
-                  label: 'Anonymous Voting',
-                  value: 'anonymous-voting',
-                  description:
-                     'Only participation is recorded, results are anonymous.',
-               },
-               {
-                  label: 'Live Results',
-                  value: 'live-results',
-                  description:
-                     'Display visual feed of results as polling occurs.',
-               },
-               {
-                  label: 'Vote Allowance',
-                  value: 'vote-allowance',
-                  description:
-                     'Enables custom vote allowance # on create-poll command.',
-               }
-            )
+         const pollQuorum = new TextInputComponent()
+            .setCustomId('pollQuorum')
+            .setLabel('Choose Quorum %')
+            .setPlaceholder('10%')
+            .setStyle('SHORT')
+            .setRequired(true);
 
-            .setMinValues(0)
-            .setMaxValues(3);
+         const pollChannelOptions = new TextInputComponent()
+            .setCustomId('pollChannelOptions')
+            .setLabel('Choose Channel Options (if any)')
+            .setPlaceholder('anonymous-voting, live-results, vote-allowance')
+            .setDefaultValue('anonymous-voting, live-results, vote-allowance')
+            .setStyle('SHORT');
+
+         // disabled until DJS add back support for SelectMenus in Modals
+         // const pollChannelOptions = new SelectMenuComponent()
+         //    .setCustomId('pollChannelOptions')
+         //    .setPlaceholder('Select Channel Options (if any)')
+         //    .addOptions(
+         //       {
+         //          label: 'Anonymous Voting',
+         //          value: 'anonymous-voting',
+         //          description:
+         //             'Only participation is recorded, results are anonymous.',
+         //       },
+         //       {
+         //          label: 'Live Results',
+         //          value: 'live-results',
+         //          description:
+         //             'Display visual feed of results as polling occurs.',
+         //       },
+         //       {
+         //          label: 'Vote Allowance',
+         //          value: 'vote-allowance',
+         //          description:
+         //             'Enables custom vote allowance # on create-poll command.',
+         //       }
+         //    )
+         //    .setMinValues(0)
+         //    .setMaxValues(3);
 
          modal.addComponents(
             // pollChannel,
             votingRoles,
             pollDuration,
             maxProposals,
+            pollQuorum,
             pollChannelOptions
          );
 

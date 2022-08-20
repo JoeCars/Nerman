@@ -136,7 +136,10 @@ module.exports = async client => {
 
                      if ('winner' in results) {
                         console.log(results.winner);
-                        winningResult = results.winner !== null ? `${results.winner} - Wins` : 'Literally nobody voted on this :<';
+                        winningResult =
+                           results.winner !== null
+                              ? `${results.winner} - Wins`
+                              : 'Literally nobody voted on this :<';
                      }
 
                      if ('tied' in results) {
@@ -171,10 +174,7 @@ module.exports = async client => {
                         ['maxLength', barWidth],
                         ['totalVotes', totalVotes],
                      ]);
-                     // enabled
                      for (const key in results.distribution) {
-                        // disabled options.forEach(option => {
-                        // const label = option;
                         const label = key;
                         let optionObj = {
                            label,
@@ -214,8 +214,6 @@ module.exports = async client => {
 
                         votesMap.set(label, optionObj);
                         resultsArray.splice(-1, 0, optionObj.completeBar);
-                        // disabled });
-                        //enabled
                      }
 
                      // console.log(votesMap);
@@ -240,9 +238,7 @@ module.exports = async client => {
                         {
                            name: 'Voters',
                            value: codeBlock(
-                              `Quorum: ${closingPoll.config.quorum}\n
-                              Eligible Voters: ${eligibleVoters}\nSubmitted a Vote: ${closingPoll.countVoters}\nAbstains: ${closingPoll.countAbstains}\n
-                              Participation Rate: ${closingPoll.participation}%`
+                              `Quorum: ${closingPoll.voterQuorum}\n\nEligible Voters: ${eligibleVoters}\nSubmitted a Vote: ${closingPoll.countVoters}\nAbstains: ${closingPoll.countAbstains}\n\nParticipation Rate: ${closingPoll.participation}%`
                            ),
                            inline: false,
                         },
@@ -266,6 +262,7 @@ module.exports = async client => {
                      console.log(closedEmbed.fields);
 
                      message.edit({
+                        content: 'Poll closed.',
                         embeds: [closedEmbed],
                         components: [],
                      });

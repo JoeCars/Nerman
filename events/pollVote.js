@@ -37,16 +37,35 @@ module.exports = {
          message: { id: messageId },
       } = modal;
 
-      const voteArray = modal.getSelectMenuValues('votingSelect');
-      const voteReason = modal.getTextInputValue('votingReason');
-
-      const pollStatus = await Poll.findOne({ messageId }, 'status');
-
+      const pollStatus = await Poll.findOne(
+         { messageId },
+         'status pollData.voteAllowance pollData.choices'
+      );
       console.log({ pollStatus });
+
+      const voteArray = modal
+         .getTextInputValue('votingSelect')
+         .split(',')
+         .map(x => x.trim())
+         .filter(v => v !== '');
+
+      console.log({ voteArray });
+
+      // disabled until DJS SELECT MENUS Modal supported
+      // const voteArray = modal.getSelectMenuValues('votingSelect');
+      const voteReason = modal.getTextInputValue('votingReason');
 
       if (pollStatus.status === 'closed') {
          return modal.editReply({
             content: 'Unable to register your vote, this poll has closed.',
+            ephermeral: true,
+         });
+      }
+
+      //todo include an evaluation for choosing the same option twice
+      if (pollStatus.pollData.voteAllowance !== voteArray.length) {
+         return modal.editReply({
+            content: `You need to choose ${pollStatus.pollData.voteAllowance} option(s)`,
             ephermeral: true,
          });
       }

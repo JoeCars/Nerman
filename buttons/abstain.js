@@ -1,5 +1,6 @@
 const { ButtonInteraction, MessageEmbed } = require('discord.js');
 const Poll = require('../db/schemas/Poll');
+const PollChannel = require('../db/schemas/PollChannel');
 
 module.exports = {
    id: 'abstain',
@@ -22,8 +23,12 @@ module.exports = {
          },
       } = interaction;
 
-      // TODO Implement env variables for allowed roles
-      if (!roleCache.has('919784986641575946')) {
+      const { allowedRoles } = await PollChannel.findOne(
+         { channelId },
+         'allowedRoles'
+      ).exec();
+
+      if (!roleCache.hasAny(...allowedRoles)) {
          console.log('USER DOES NOT HAS ROLE');
          return interaction.editReply({
             content: 'You do not have the role, dummy',
@@ -35,7 +40,6 @@ module.exports = {
          { messageId },
          'status allowedUsers'
       );
-
 
       // if (!attachedPoll.allowedUsers.has(userId)) {
       if (!pollStatus.allowedUsers.has(userId)) {
@@ -53,7 +57,6 @@ module.exports = {
       //       ephemeral: true,
       //    });
       // }
-
 
       const updatedPoll = await Poll.findOneAndUpdate(
          { messageId },

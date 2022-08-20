@@ -16,7 +16,7 @@ module.exports = {
    async execute(modal) {
       if (modal.customId !== 'modal-create-poll') return;
 
-      console.log('pollSubmit.js -- modal', { modal });
+      // console.log('pollSubmit.js -- modal', { modal });
 
       await modal.deferReply({ ephemeral: true });
 
@@ -27,12 +27,14 @@ module.exports = {
          member: { nickname, user },
       } = modal;
 
-      // console.log({ user });
-      // console.log({ modal });
+      const channelConfig = await PollChannel.findOne(
+         {
+            channelId,
+         },
+         'allowedRoles'
+      );
 
-      // console.log({ client, modal });
       // extract data from submitted modal
-      // const type = modal.getSelectMenuValues('pollType');
       const title = modal.getTextInputValue('pollTitle');
       const description = modal.getTextInputValue('pollDescription') ?? '';
       const options = modal
@@ -40,23 +42,23 @@ module.exports = {
          .split(',')
          .map(x => x.trim())
          .filter(v => v !== '');
-      const voteAllowance =
-         parseInt(modal.getTextInputValue('voteAllowance')) ?? 1;
+      const voteAllowance = parseInt(
+         modal.getTextInputValue('voteAllowance') ?? 1
+      );
+
+      // console.log({ voteAllowance });
+      // console.log(typeof voteAllowance);
 
       // ,, , Yes, No,Abstain,,, ,, , // <---- testing format string
 
-      // console.log('OPTIONS.LENGTH ERROR');
       if (options.length < 2) {
          return modal.editReply({
-            // return modal.update({
-            // return modal.followUp({
             content:
                'You require a minimum of two options to vote. Use comma separated values to input choices. Eg) Yes, No, Abstain',
             ephemeral: true,
          });
       }
 
-      // console.log('VOTEALLOWANCE > OPTIONS.LENGTH ERROR');
       if (voteAllowance > options.length) {
          return modal.editReply({
             content:
@@ -65,12 +67,7 @@ module.exports = {
          });
       }
 
-      console.log({ options });
-
-      // return modal.editReply({
-      //    content: 'Aborting early for testing',
-      //    ephemeral: true,
-      // });
+      // console.log({ options });
 
       // console.log(type);
       // This will change when I implement it in the actual nNouns Discord
@@ -87,56 +84,58 @@ module.exports = {
       // const channel = client.channels.cache.get(pollingChannelID);
       const channel = client.channels.cache.get(channelId);
 
-      const longestOption = longestString(options).length;
-      let resultsArray = ['```', '```'];
-      let resultsOutput = [];
+      //disabled vvvvvv disabling this bar output for the live voting until we decide how best to manage this later
+      // const longestOption = longestString(options).length;
+      // let resultsArray = ['```', '```'];
+      // let resultsOutput = [];
 
-      const barWidth = 8;
-      let totalVotes = 0;
+      // const barWidth = 8;
+      // let totalVotes = 0;
 
-      let votesMap = new Map([
-         ['maxLength', barWidth],
-         ['totalVotes', totalVotes],
-      ]);
+      // let votesMap = new Map([
+      //    ['maxLength', barWidth],
+      //    ['totalVotes', totalVotes],
+      // ]);
 
-      options.forEach(option => {
-         const label = option;
-         let optionObj = {
-            label,
-            votes: 0,
-            room: longestOption - label.length,
-            get spacer() {
-               return this.room !== 0
-                  ? Array.from({ length: this.room }, () => '\u200b ').join('')
-                  : '';
-            },
-            get portion() {
-               return votesMap.get('totalVotes') !== 0
-                  ? this.votes / votesMap.get('totalVotes')
-                  : 0;
-            },
-            get portionOutput() {
-               return ` ${(this.portion * 100).toFixed(1)}%`;
-            },
-            get bar() {
-               return drawBar(votesMap.get('maxLength'), this.portion);
-            },
-            get completeBar() {
-               return [
-                  `${this.label}${this.spacer} `,
-                  this.bar,
-                  this.portionOutput,
-               ].join('');
-            },
-         };
+      // options.forEach(option => {
+      //    const label = option;
+      //    let optionObj = {
+      //       label,
+      //       votes: 0,
+      //       room: longestOption - label.length,
+      //       get spacer() {
+      //          return this.room !== 0
+      //             ? Array.from({ length: this.room }, () => '\u200b ').join('')
+      //             : '';
+      //       },
+      //       get portion() {
+      //          return votesMap.get('totalVotes') !== 0
+      //             ? this.votes / votesMap.get('totalVotes')
+      //             : 0;
+      //       },
+      //       get portionOutput() {
+      //          return ` ${(this.portion * 100).toFixed(1)}%`;
+      //       },
+      //       get bar() {
+      //          return drawBar(votesMap.get('maxLength'), this.portion);
+      //       },
+      //       get completeBar() {
+      //          return [
+      //             `${this.label}${this.spacer} `,
+      //             this.bar,
+      //             this.portionOutput,
+      //          ].join('');
+      //       },
+      //    };
 
-         votesMap.set(label, optionObj);
-         resultsArray.splice(-1, 0, optionObj.completeBar);
-      });
+      //    votesMap.set(label, optionObj);
+      //    resultsArray.splice(-1, 0, optionObj.completeBar);
+      // });
 
       // console.log(votesMap);
+      // resultsOutput = resultsArray.join('\n');
 
-      resultsOutput = resultsArray.join('\n');
+      // disabled ^^^^^^^^^^
 
       const voteActionRow = new MessageActionRow();
       const voteBtn = new MessageButton()
@@ -151,22 +150,12 @@ module.exports = {
 
       voteActionRow.addComponents(voteBtn, abstainBtn);
 
-      // Nerman
-      // @member
-      // VOTE:
-      // title
-      // description
-      // voting closes in x time
-      // RESULTS
-      // historgram
-      // maybe a timestamp?
-
       const embed = new MessageEmbed()
          .setColor('#ffffff')
          .setTitle(`VOTE \n${title}`)
          .setDescription(description)
          .addField('\u200B', '\u200B')
-         .addField('Quorum', '1', true)
+         .addField('Quorum', '...', true)
          .addField('Voters', '0', true)
          .addField('Abstains', '0', true)
          .addField('Voting Closes', '...', true)
@@ -174,36 +163,22 @@ module.exports = {
          // .setTimestamp()
          .setFooter('Submitted by ...');
 
-      console.log(embed.fields[4].value);
+      const mentions = channelConfig.allowedRoles
+         .map(role => `<@&${role}>`)
+         .join(' ');
 
-      // const testDate = new Date().toISOString();
-      // const testDate = new Date();
-      // console.log({ testDate });
-
-      // console.log(formatDate(testDate));
-      // embed.fields[4].value = 'Hypothetical new time';
-      // console.log(embed.fields[4].value);
-
-      // console.log(modal.options);
-
-      // return modal.editReply({
-      //    content: 'Aborting early for testing',
-      //    ephemeral: true,
-      // });
+      console.log({ mentions });
 
       let message = await channel.send({
+         content: mentions,
          embeds: [embed],
          components: [voteActionRow],
       });
 
-      // console.log('HI THERRRRRREEEEEEE______________________________', {
-      //    message,
-      // });
-
       const { id } = message;
       // const { channelId, guildId, id } = message;
 
-      console.log({ message });
+      // console.log({ message });
 
       const pollData = {
          title,
@@ -215,7 +190,7 @@ module.exports = {
       const snapshotMap = new Map();
 
       // todo try to implement env for the allowed roles so that we can do this dynamically when hosting and using in other servers
-
+      // todo also this should be done via fetching the config
       try {
          const allowedUsers = await message.guild.members
             .fetch({
@@ -225,26 +200,22 @@ module.exports = {
                return fetchedMembers.filter(
                   member =>
                      member.presence?.status === 'online' &&
-                     member?.roles.cache.get('919784986641575946')
+                     member?.roles.cache.hasAny(...channelConfig.allowedRoles)
                );
             });
-
-         // console.log({ allowedUsers });
 
          for (const key of allowedUsers.keys()) {
             snapshotMap.set(key, false);
          }
-
-         // console.log({ snapshotMap });
-
-         // allowedUsers.forEach(user => )
       } catch (error) {
          console.error({ error });
       }
 
+      // todo decide if I really need this or can just stick with the use-case below
       const config = await PollChannel.findOne({ channelId }).exec();
 
-      const { _id, durationMs } = await PollChannel.findOne({
+      //
+      const { _id, durationMs, quorum } = await PollChannel.findOne({
          channelId,
       }).exec();
 
@@ -254,6 +225,7 @@ module.exports = {
 
       // console.timeLog({ duration });
 
+      // todo refactor this to use {new: true} and return the document perhaps, rather than this two part operation?
       const newPoll = await Poll.create({
          _id: new Types.ObjectId(),
          guildId,
@@ -267,10 +239,8 @@ module.exports = {
          status: 'open',
       })
          .then(savedPoll => {
-            // let updateEmbed = new MessageEmbed(message.embeds[0]);
             let updateEmbed = new MessageEmbed(embed);
-            // console.log(savedPoll.timeCreated);
-            // console.log(savedPoll.timeEnd);
+            console.log(savedPoll);
 
             const timeEndMilli = new Date(
                // !testing switching the time for testing purposes
@@ -280,28 +250,22 @@ module.exports = {
             );
 
             savedPoll.timeEnd = timeEndMilli.toISOString();
-            console.log({ savedPoll });
-            // console.log(formatDate(savedPoll.timeEnd));
 
             updateEmbed.setFooter(
                `Submitted by ${message.author.username}#${message.author.discriminator}`
             );
 
-            // updateEmbed.setTimestamp(savedPoll.timeCreated);
-            updateEmbed.fields[4].value = formatDate(savedPoll.timeEnd);
+            updateEmbed.fields[1].value = Math.floor(
+               savedPoll.allowedUsers.size / quorum
+            ).toString(); // quorum
+            updateEmbed.fields[4].value = formatDate(savedPoll.timeEnd); // timeEnd
 
-            console.log({ message });
-            // console.log('post-calc', savedPoll.timeEnd instanceof Date);
-
-            // console.log(savedPoll.timeCreated);
-            // console.log(savedPoll.timeEnd);
             message.edit({ embeds: [updateEmbed] });
             return savedPoll.save();
-
-            // Emit an event to trigger adding a new poll to the db poll interval queue
          })
          .catch(err => console.error(err));
 
+      // Emit an event to trigger adding a new poll to the db poll interval queue
       client.emit('queuePoll', await newPoll);
 
       return modal.editReply({
