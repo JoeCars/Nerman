@@ -125,9 +125,32 @@ module.exports = async client => {
                      console.log(
                         '*******************************************************'
                      );
+                     console.log(closingPoll.allowedUsers);
                      console.log(closingPoll.allowedUsers.size);
                      console.log(closingPoll.countVoters);
                      console.log(closingPoll.participation);
+                     console.log(
+                        closingPoll.countVoters / closingPoll.allowedUsers.size
+                     );
+                     console.log(
+                        (closingPoll.countVoters /
+                           closingPoll.allowedUsers.size) *
+                           100
+                     );
+                     console.log(
+                        (
+                           (closingPoll.countVoters /
+                              closingPoll.allowedUsers.size) *
+                           100
+                        ).toFixed(2)
+                     );
+                     console.log(
+                        parseFloat(
+                           (closingPoll.countVoters /
+                              closingPoll.allowedUsers.size) *
+                              100
+                        ).toFixed(2)
+                     );
                      console.log(
                         '*******************************************************'
                      );
