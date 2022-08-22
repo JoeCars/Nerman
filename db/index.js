@@ -4,7 +4,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 // Personal Imports
 const { drawBar, longestString } = require('../helpers/poll');
-const { encodeURI } = require('../utils/functions');
+// const { encodeURI } = require('../utils/functions');
 const Poll = require('../db/schemas/Poll');
 
 // const {
@@ -12,12 +12,12 @@ const Poll = require('../db/schemas/Poll');
 // } = require('../scratchcode/db/schema/testExecutions/createPoll');
 
 module.exports = async client => {
-   const usernameSegment = encodeURI(process.env.MONGODB_DEV_USER);
-   const passwordSegment = encodeURI(process.env.MONGODB_DEV_PASSWORD);
-   const mongoCloudURI = process.env.MONGODB_URI_BASE.replace(
-      /<username>/,
-      usernameSegment
-   ).replace(/<password>/, passwordSegment);
+   // const usernameSegment = encodeURI(process.env.MONGODB_DEV_USER);
+   // const passwordSegment = encodeURI(process.env.MONGODB_DEV_PASSWORD);
+   // const mongoCloudURI = process.env.MONGODB_URI_BASE.replace(
+   //    /<username>/,
+   //    usernameSegment
+   // ).replace(/<password>/, passwordSegment);
 
 
    // disabled Nerman-Dev-Jr stuff
