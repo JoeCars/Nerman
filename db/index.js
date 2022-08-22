@@ -121,40 +121,6 @@ module.exports = async client => {
                            { path: 'getVotes' },
                         ])
                         .exec();
-                     console.group('closingPoll');
-                     console.log(
-                        '*******************************************************'
-                     );
-                     console.log(closingPoll.allowedUsers);
-                     console.log(closingPoll.allowedUsers.size);
-                     console.log(closingPoll.countVoters);
-                     console.log(closingPoll.participation);
-                     console.log(
-                        closingPoll.countVoters / closingPoll.allowedUsers.size
-                     );
-                     console.log(
-                        (closingPoll.countVoters /
-                           closingPoll.allowedUsers.size) *
-                           100
-                     );
-                     console.log(
-                        (
-                           (closingPoll.countVoters /
-                              closingPoll.allowedUsers.size) *
-                           100
-                        ).toFixed(2)
-                     );
-                     console.log(
-                        parseFloat(
-                           (closingPoll.countVoters /
-                              closingPoll.allowedUsers.size) *
-                              100
-                        ).toFixed(2)
-                     );
-                     console.log(
-                        '*******************************************************'
-                     );
-                     console.groupEnd('closingPoll');
 
                      const message = await client.channels.cache
                         .get(closingPoll.config.channelId)
@@ -169,12 +135,6 @@ module.exports = async client => {
                      const results = await closingPoll.results;
 
                      console.log({ results });
-                     // console.log(results.hasOwnProperty('winner'));
-                     // console.log('winner' in results);
-                     // console.log('tied' in results);
-                     // console.log(results.hasOwn('tied'));
-                     // console.log(results.getOwnPropertyNames());
-                     // console.log(results.keys());
 
                      if ('winner' in results) {
                         console.log(results.winner);
