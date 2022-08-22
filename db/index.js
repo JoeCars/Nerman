@@ -19,13 +19,11 @@ module.exports = async client => {
    //    usernameSegment
    // ).replace(/<password>/, passwordSegment);
 
-
    // disabled Nerman-Dev-Jr stuff
    // const mongoURI =
    //    process.env.DB_ENV === 'Cloud'
    //       ? mongoCloudURI
    //       : 'mongodb://localhost:27017/polls-test';
-
 
    const mongoURI =
       process.env.NODE_ENV === 'production'
@@ -58,6 +56,18 @@ module.exports = async client => {
 
          DB.on('connected', () => {
             console.log('Connected to DB');
+
+            console.group('connectTest');
+            console.log(
+               '*******************************************************'
+            );
+            console.log('closingPoll.allowedUsers.size');
+            console.log('closingPoll.countVoters');
+            console.log('closingPoll.participation');
+            console.log(
+               '*******************************************************'
+            );
+            console.groupEnd('connectTest');
          });
          DB.on('open', async () => {
             console.log('Connection open');
@@ -111,6 +121,17 @@ module.exports = async client => {
                            { path: 'getVotes' },
                         ])
                         .exec();
+                     console.group('closingPoll');
+                     console.log(
+                        '*******************************************************'
+                     );
+                     console.log(closingPoll.allowedUsers.size);
+                     console.log(closingPoll.countVoters);
+                     console.log(closingPoll.participation);
+                     console.log(
+                        '*******************************************************'
+                     );
+                     console.groupEnd('closingPoll');
 
                      const message = await client.channels.cache
                         .get(closingPoll.config.channelId)
@@ -256,7 +277,7 @@ module.exports = async client => {
                      ];
 
                      closedEmbed.spliceFields(0, 4, closedFields);
-                     // console.log(testClosedFields);
+                     console.log('closedEmbed.fields');
                      console.log(closedEmbed.fields);
 
                      message.edit({
