@@ -15,6 +15,7 @@ module.exports = {
 
       const {
          channelId,
+         guild: { roles: gRoleCache },
          member: {
             roles: { cache: roleCache },
          },
@@ -69,9 +70,18 @@ module.exports = {
       console.log({ pollChannelOptions });
 
       // map the ids of the guild channels that match the names of the user submitted roles
-      const allowedRoles = roleCache
-         .filter(({ name }) => votingRoles.includes(name))
-         .map(({ id }) => id);
+      // const allowedRoles = roleCache
+      //    .filter(({ name }) => votingRoles.includes(name))
+      //    .map(({ id }) => id);
+      const allowedRoles = await gRoleCache
+         .fetch()
+         .then(fetchedRoles =>
+            fetchedRoles
+               .filter(
+                  ({ name, managed }) => !managed && votingRoles.includes(name)
+               )
+               .map(({ id }) => id)
+         );
 
       console.log({ allowedRoles });
 
@@ -86,7 +96,6 @@ module.exports = {
             ephermeral: true,
          });
       }
-
 
       //disabled until DJS supports Modal SelectMenus
       // const pollChannelOptions =

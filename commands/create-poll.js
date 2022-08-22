@@ -181,8 +181,10 @@ module.exports = {
          const {
             channelId,
             channel,
+            guild,
             guild: {
                channels,
+               roles: gRoles,
                roles: {
                   cache: guildRoleCache,
                   everyone: { id: everyoneId },
@@ -220,6 +222,12 @@ module.exports = {
          //    content: 'Aborted',
          //    ephemeral: true,
          // });
+         // console.log({ guild });
+         // console.log({ gRoles });
+         // console.log({ guildRoleCache });
+         // console.log(await guildRoleCache.values());
+         // console.log(await gRoles.fetch());
+         // console.log({ roleCache });
 
          if (!!configCheck)
             return interaction.reply({
@@ -232,9 +240,6 @@ module.exports = {
          //    {},
          //    'channelId channelName maxUserProposal'
          // );
-
-         // console.log({ guildRoleCache });
-         // console.log({ roleCache });
 
          // Fetch all guild channels that are text channels and don't have an existing configuration
          // const guildChannels = await channels
@@ -272,10 +277,21 @@ module.exports = {
 
          // console.log({ channelOptions });
 
-         const roleOptions = roleCache.map(({ id, name }) => ({
-            label: name,
-            value: id,
-         }));
+         // const roleOptions = roleCache.map(({ id, name }) => ({
+         //    label: name,
+         //    value: id,
+         // }));
+         const roleOptions = await gRoles
+            .fetch()
+            .then(fetchedRoles =>
+               fetchedRoles
+                  .filter(({ managed }) => !managed)
+                  .map(({ id, name }) => ({
+                     label: name,
+                     value: id,
+                  }))
+            )
+            .catch(err => console.error(err));
          // const roleOptions = roleCache
          //    .filter(({ id }) => id !== everyoneId)
          //    .map(({ id, name }) => ({ label: name, value: id }));
