@@ -12,11 +12,6 @@ const Poll = require('../db/schemas/Poll');
 // } = require('../scratchcode/db/schema/testExecutions/createPoll');
 
 module.exports = async client => {
-   console.log({ client });
-   const {
-      createChannelTest,
-   } = require('../scratchcode/db/schema/testExecutions/createChannel');
-
    const usernameSegment = encodeURI(process.env.MONGODB_DEV_USER);
    const passwordSegment = encodeURI(process.env.MONGODB_DEV_PASSWORD);
    const mongoCloudURI = process.env.MONGODB_URI_BASE.replace(
@@ -24,14 +19,17 @@ module.exports = async client => {
       usernameSegment
    ).replace(/<password>/, passwordSegment);
 
+
+   // disabled Nerman-Dev-Jr stuff
    // const mongoURI =
    //    process.env.DB_ENV === 'Cloud'
-   //       ? `mongodb+srv://${usernameSegment}:${passwordSegment}@clusterman.cx1ad.mongodb.net/test`
-   //       : 'mongodb://localhost/polls-test';
+   //       ? mongoCloudURI
+   //       : 'mongodb://localhost:27017/polls-test';
+
 
    const mongoURI =
-      process.env.DB_ENV === 'Cloud'
-         ? mongoCloudURI
+      process.env.NODE_ENV === 'production'
+         ? process.env.MONGODB_URI
          : 'mongodb://localhost:27017/polls-test';
 
    // create empty options object
