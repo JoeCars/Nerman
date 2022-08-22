@@ -52,7 +52,7 @@ module.exports = async client => {
          const DB = mongoose.connection;
 
          DB.on('error', err => {
-            logError(err);
+            // logError(err);
             console.error({ err });
          });
 
