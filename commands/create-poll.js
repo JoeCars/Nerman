@@ -18,7 +18,7 @@ module.exports = {
       .addSubcommand(subcommand =>
          subcommand
             .setName('create-poll')
-            .setDescription('Create a Yes/No/Abstain Poll')
+            .setDescription('Create a poll in the current channel.')
       )
       .addSubcommand(subcommand =>
          subcommand
@@ -114,22 +114,24 @@ module.exports = {
          // console.log(pollType);
 
          // return interaction.reply({
-         //    content: 'canceling this for testing purposes',
-         //    ephemeral: true,
+            // content: 'canceling this for testing purposes',
+            // ephemeral: true,
          // });
          const createPollComponents = [];
 
          const pollTitle = new TextInputComponent()
             .setCustomId('pollTitle')
             .setLabel('Title')
-            .setPlaceholder('Prop #: Prop Title')
+            .setPlaceholder('Poll title, or your main question.')
             .setRequired(true)
             .setStyle('SHORT');
 
          const pollDescription = new TextInputComponent()
             .setCustomId('pollDescription')
             .setLabel('Description')
-            .setPlaceholder('- Total: 15,0 ETH \n- https://nouns.wtf/vote/#')
+            .setPlaceholder(
+               'Descriptive text, links, and any supporting details needed for users to decide on your poll.'
+            )
             .setRequired(false)
             .setStyle('LONG');
 
@@ -206,8 +208,7 @@ module.exports = {
 
          if (!memberPermissions.has('MANAGE_GUILD')) {
             return interaction.reply({
-               content:
-                  'Only guild managers have access to this.',
+               content: 'Only guild managers have access to this.',
                ephemeral: true,
             });
          }
@@ -226,7 +227,6 @@ module.exports = {
 
          // console.log(!!configCheck);
          // console.log(await PollChannel.countDocuments({ channelId }));
-
 
          if (!!configCheck)
             return interaction.reply({

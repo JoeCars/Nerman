@@ -10,10 +10,7 @@ module.exports = {
       if (!command) return;
 
       try {
-         // console.time('Interaction Timer');
-
          await command.execute(interaction);
-         // console.timeEnd('Interaction Timer');
       } catch (error) {
          console.error(error);
 
@@ -21,12 +18,12 @@ module.exports = {
             console.log('INTERACTION CREATE DEFERRED');
             await interaction.editReply({
                content:
-               error.message ||
-               'There was an error while executing this command!',
+                  error.message ||
+                  'There was an error while executing this command!',
                ephemeral: true,
             });
          } else {
-            console.log('INTERACTION CREATE NOT DEFERRED');
+            console.log('INTERACTION CREATE NOTDEFERRED');
             await interaction.reply({
                content:
                   error.message ||

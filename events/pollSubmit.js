@@ -1,9 +1,16 @@
-const { drawBar, longestString } = require('../helpers/poll');
+const {
+   MessageEmbed,
+   MessageButton,
+   MessageActionRow,
+   // roleMention,
+} = require('discord.js');
 const { Modal } = require('discord-modals');
-const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 const { Types } = require('mongoose');
+const { roleMention } = require('@discordjs/builders');
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
+
+const { drawBar, longestString } = require('../helpers/poll');
 const { logToObject, formatDate } = require('../utils/functions');
 
 // const { create}
@@ -24,7 +31,16 @@ module.exports = {
          client,
          channelId,
          guildId,
-         member: { nickname, user },
+         guild: {
+            roles: {
+               everyone: { id: everyoneId },
+            },
+         },
+         member: {
+            nickname,
+            user,
+            user: { username, discriminator },
+         },
       } = modal;
 
       const channelConfig = await PollChannel.findOne(
@@ -33,6 +49,15 @@ module.exports = {
          },
          'allowedRoles'
       );
+
+
+      console.log({ everyoneId });
+      console.log(channelConfig.allowedRoles);
+
+      // return modal.editReply({
+      //    content: 'ABORT',
+      //    ephemeral: true,
+      // });
 
       // extract data from submitted modal
       const title = modal.getTextInputValue('pollTitle');
@@ -152,7 +177,7 @@ module.exports = {
 
       const embed = new MessageEmbed()
          .setColor('#ffffff')
-         .setTitle(`VOTE \n${title}`)
+         .setTitle(`${title}`)
          .setDescription(description)
          .addField('\u200B', '\u200B')
          .addField('Quorum', '...', true)
@@ -164,7 +189,7 @@ module.exports = {
          .setFooter('Submitted by ...');
 
       const mentions = channelConfig.allowedRoles
-         .map(role => `<@&${role}>`)
+         .map(role => (role !== everyoneId ? roleMention(role) : '@everyone'))
          .join(' ');
 
       console.log({ mentions });
@@ -252,7 +277,8 @@ module.exports = {
             savedPoll.timeEnd = timeEndMilli.toISOString();
 
             updateEmbed.setFooter(
-               `Submitted by ${message.author.username}#${message.author.discriminator}`
+               `Submitted by ${nickname ?? username}#${discriminator}`
+               // `Submitted by ${message.author.username}#${message.author.discriminator}`
             );
 
             updateEmbed.fields[1].value = Math.floor(

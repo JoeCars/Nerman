@@ -56,18 +56,6 @@ module.exports = async client => {
 
          DB.on('connected', () => {
             console.log('Connected to DB');
-
-            console.group('connectTest');
-            console.log(
-               '*******************************************************'
-            );
-            console.log('closingPoll.allowedUsers.size');
-            console.log('closingPoll.countVoters');
-            console.log('closingPoll.participation');
-            console.log(
-               '*******************************************************'
-            );
-            console.groupEnd('connectTest');
          });
          DB.on('open', async () => {
             console.log('Connection open');
@@ -235,36 +223,41 @@ module.exports = async client => {
                      //
 
                      let closedEmbed = message.embeds[0];
+                     console.log({ closedEmbed });
+
+                     closedEmbed.setTitle(`VOTING CLOSED\n${closedEmbed.title}`);
+
+                     console.log({ closedEmbed });
 
                      const closedFields = [
                         {
-                           name: 'Voters',
+                           name: 'RESULTS',
+                           value: codeBlock(winningResult),
+                           inline: false,
+                        },
+                        {
+                           name: 'VOTERS',
                            value: codeBlock(
-                              `Quorum: ${closingPoll.voterQuorum}\n\nEligible Voters: ${eligibleVoters}\nSubmitted a Vote: ${closingPoll.countVoters}\nAbstains: ${closingPoll.countAbstains}\n\nParticipation Rate: ${closingPoll.participation}%`
+                              `Quorum: ${closingPoll.voterQuorum}\n\nEligible: ${eligibleVoters}\nSubmitted: ${closingPoll.countVoters}\nAbstained: ${closingPoll.countAbstains}\n\nParticipation Rate: ${closingPoll.participation}%`
                            ),
                            inline: false,
                         },
                         {
-                           name: 'Votes',
+                           name: 'VOTES',
                            value: resultsOutput,
                            // value: codeBlock(
                            //    `Imagine some bars here\n --------`
                            // ),
                            inline: false,
                         },
-                        {
-                           name: 'Result',
-                           value: codeBlock(winningResult),
-                           inline: false,
-                        },
                      ];
 
-                     closedEmbed.spliceFields(0, 4, closedFields);
+                     closedEmbed.spliceFields(1, 4, closedFields);
                      console.log('closedEmbed.fields');
                      console.log(closedEmbed.fields);
 
                      message.edit({
-                        content: 'Poll closed.',
+                        content: null,
                         embeds: [closedEmbed],
                         components: [],
                      });
