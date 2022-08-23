@@ -50,7 +50,6 @@ module.exports = {
          'allowedRoles'
       );
 
-
       console.log({ everyoneId });
       console.log(channelConfig.allowedRoles);
 
@@ -222,11 +221,15 @@ module.exports = {
                withPresences: true,
             })
             .then(fetchedMembers => {
-               return fetchedMembers.filter(
-                  member =>
+               // console.log(fetchedMembers);
+               return fetchedMembers.filter(member => {
+                  // console.log(member);
+                  return (
                      member.presence?.status === 'online' &&
+                     !member.user.bot &&
                      member?.roles.cache.hasAny(...channelConfig.allowedRoles)
-               );
+                  );
+               });
             });
 
          for (const key of allowedUsers.keys()) {
