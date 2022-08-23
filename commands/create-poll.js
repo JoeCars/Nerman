@@ -192,16 +192,25 @@ module.exports = {
             },
             user: { id: userId },
             member: {
-               roles,
+               permissions,
                roles: { cache: roleCache },
             },
+            memberPermissions,
          } = interaction;
-         // console.timeEnd('destruct')
+         // console.timeEnd('destruct')'
 
-         console.log({ interaction });
+         console.log(memberPermissions.has('MANAGE_GUILD'));
          console.log('commandInteraction -- create-poll', { channelId });
          // console.log('isTextBased', channel.isText());
          // console.log('isDMBased', channel.isDM());
+
+         if (!memberPermissions.has('MANAGE_GUILD')) {
+            return interaction.reply({
+               content:
+                  'Only guild managers have access to this.',
+               ephemeral: true,
+            });
+         }
 
          if (!channel.isText())
             return interaction.reply({
@@ -213,21 +222,11 @@ module.exports = {
          const configCheck = await PollChannel.countDocuments({
             channelId,
          });
-         console.log({ configCheck });
+         // console.log({ configCheck });
 
-         console.log(!!configCheck);
-         console.log(await PollChannel.countDocuments({ channelId }));
+         // console.log(!!configCheck);
+         // console.log(await PollChannel.countDocuments({ channelId }));
 
-         // return interaction.reply({
-         //    content: 'Aborted',
-         //    ephemeral: true,
-         // });
-         // console.log({ guild });
-         // console.log({ gRoles });
-         // console.log({ guildRoleCache });
-         // console.log(await guildRoleCache.values());
-         // console.log(await gRoles.fetch());
-         // console.log({ roleCache });
 
          if (!!configCheck)
             return interaction.reply({
@@ -307,13 +306,10 @@ module.exports = {
          }
 
          let placeholder = [];
-         console.log({ placeholder });
 
          roleOptions.forEach(({ label }) => placeholder.push(label));
-         console.log({ placeholder });
 
          placeholder = placeholder.join(', ');
-         console.log({ placeholder });
 
          const modal = new Modal()
             .setCustomId('modal-create-poll-channel')
