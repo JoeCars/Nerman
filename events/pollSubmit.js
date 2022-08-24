@@ -287,7 +287,10 @@ module.exports = {
             updateEmbed.fields[1].value = Math.floor(
                savedPoll.allowedUsers.size / quorum
             ).toString(); // quorum
-            updateEmbed.fields[4].value = formatDate(savedPoll.timeEnd); // timeEnd
+            // updateEmbed.fields[4].value = formatDate(savedPoll.timeEnd); // timeEnd
+            updateEmbed.fields[4].value = `<t:${Math.floor(
+               savedPoll.timeEnd.getTime() / 1000
+            )}:f>`; // timeEnd
 
             message.edit({ embeds: [updateEmbed] });
             return savedPoll.save();
