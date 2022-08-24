@@ -225,7 +225,9 @@ module.exports = async client => {
                      let closedEmbed = message.embeds[0];
                      console.log({ closedEmbed });
 
-                     closedEmbed.setTitle(`VOTING CLOSED\n${closedEmbed.title}`);
+                     closedEmbed.setTitle(
+                        `VOTING CLOSED\n${closedEmbed.title}`
+                     );
 
                      console.log({ closedEmbed });
 
@@ -236,18 +238,15 @@ module.exports = async client => {
                            inline: false,
                         },
                         {
+                           name: 'VOTES',
+                           value: resultsOutput,
+                           inline: false,
+                        },
+                        {
                            name: 'VOTERS',
                            value: codeBlock(
                               `Quorum: ${closingPoll.voterQuorum}\n\nEligible: ${eligibleVoters}\nSubmitted: ${closingPoll.countVoters}\nAbstained: ${closingPoll.countAbstains}\n\nParticipation Rate: ${closingPoll.participation}%`
                            ),
-                           inline: false,
-                        },
-                        {
-                           name: 'VOTES',
-                           value: resultsOutput,
-                           // value: codeBlock(
-                           //    `Imagine some bars here\n --------`
-                           // ),
                            inline: false,
                         },
                      ];
