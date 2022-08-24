@@ -2,7 +2,6 @@ const {
    MessageEmbed,
    MessageButton,
    MessageActionRow,
-   // roleMention,
 } = require('discord.js');
 const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
@@ -271,10 +270,10 @@ module.exports = {
             console.log(savedPoll);
 
             const timeEndMilli = new Date(
-               // !testing switching the time for testing purposes
-               // savedPoll.timeCreated.getTime() + durationMs
+               savedPoll.timeCreated.getTime() + durationMs
 
-               savedPoll.timeCreated.getTime() + 30000
+               // !testing switching the time for testing purposes
+               // savedPoll.timeCreated.getTime() + 30000
             );
 
             savedPoll.timeEnd = timeEndMilli.toISOString();
