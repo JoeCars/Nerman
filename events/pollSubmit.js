@@ -1,8 +1,4 @@
-const {
-   MessageEmbed,
-   MessageButton,
-   MessageActionRow,
-} = require('discord.js');
+const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
 const { roleMention } = require('@discordjs/builders');
@@ -49,6 +45,8 @@ module.exports = {
          'allowedRoles'
       );
 
+      const intRegex = new RegExp(/^\d*$/);
+
       console.log({ everyoneId });
       console.log(channelConfig.allowedRoles);
 
@@ -65,9 +63,18 @@ module.exports = {
          .split(',')
          .map(x => x.trim())
          .filter(v => v !== '');
-      const voteAllowance = parseInt(
-         modal.getTextInputValue('voteAllowance') ?? 1
-      );
+      let voteAllowance = modal.getTextInputValue('voteAllowance') ?? 1;
+
+      if (!intRegex.test(voteAllowance)) {
+         return modal.editReply({
+            content: `${voteAllowance} - is not a valid vote allowance number.\nPlease choose a whole number.`,
+            ephemeral: true,
+         });
+      }
+
+      // let voteAllowance = parseInt(
+      //    modal.getTextInputValue('voteAllowance') ?? 1
+      // );
 
       // console.log({ voteAllowance });
       // console.log(typeof voteAllowance);

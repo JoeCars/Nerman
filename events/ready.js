@@ -10,6 +10,7 @@ module.exports = {
       require('../db/index.js')(client);
       // Initialize StateOfNouns, Add Event Listeners
       const StateOfNouns = require('../helpers/StateOfNoun.js');
+      
       StateOfNouns.addEventListener( "new-proposal", function(data) {
          console.log("| ready.js - callback - new-proposal - Prop "+ data.id);
       });

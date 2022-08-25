@@ -52,6 +52,7 @@ module.exports = {
          .populate([{ path: 'config' }])
          .exec();
 
+
       if (!attachedPoll.allowedUsers.has(userId)) {
          return interaction.reply({
             content: 'You are not eligible to participate in this poll, square',
@@ -80,7 +81,7 @@ module.exports = {
 
       const selectOptions = new TextInputComponent()
          .setCustomId('votingSelect')
-         .setLabel(`Type ${attachedPoll.voteAllowance} Choice(s)`)
+         .setLabel(`Type ${attachedPoll.pollData.voteAllowance} Choice(s)`)
          .setPlaceholder(optionsString)
          .setDefaultValue(optionsString)
          .setStyle('LONG');
@@ -96,7 +97,7 @@ module.exports = {
       const reason = new TextInputComponent()
          .setCustomId('voteReason')
          .setLabel('Reason')
-         .setPlaceholder('Real talk, which Spice Girl is the cutest?')
+         .setPlaceholder('Explain your vote.')
          .setStyle('LONG');
 
       modal.addComponents(selectOptions, reason);

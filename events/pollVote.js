@@ -43,13 +43,36 @@ module.exports = {
       );
       console.log({ pollStatus });
 
-      const voteArray = modal
-         .getTextInputValue('votingSelect')
-         .split(',')
-         .map(x => x.trim())
-         .filter(v => v !== '');
+      let voteArray = modal.getTextInputValue('votingSelect');
 
-      console.log({ voteArray });
+      if (voteArray !== null) {
+         voteArray = voteArray
+            .split(',')
+            .map(x => x.trim())
+            .filter(v => v !== '');
+      } else {
+         return modal.editReply({
+            content:
+               'Make sure that you submit a vote, an empty string is not sufficient.',
+            ephermeral: true,
+         });
+      }
+
+      let incorrectOptions = voteArray.filter(
+         vote => !pollStatus.pollData.choices.includes(vote)
+      );
+
+      console.log({ incorrectOptions });
+
+      if (incorrectOptions.length) {
+         return modal.editReply({
+            content: `Invalid choice(s):\n\n${incorrectOptions.join(
+               ' '
+            )}\n\nPlease check you spelling when selecting your options.`,
+            ephermeral: true,
+         });
+      }
+
 
       // disabled until DJS SELECT MENUS Modal supported
       // const voteArray = modal.getSelectMenuValues('votingSelect');
