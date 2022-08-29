@@ -73,7 +73,13 @@ module.exports = {
          });
       }
 
-      if (voteArray.length === pollStatus.pollData.voteAllowance) {
+      console.log('voteArray.length', voteArray.length);
+      console.log(
+         'pollStatus.pollData.voteAllowance',
+         pollStatus.pollData.voteAllowance
+      );
+
+      if (voteArray.length !== pollStatus.pollData.voteAllowance) {
          return modal.editReply({
             content: `You are required to select ${pollStatus.pollData.voteAllowance} choice(s)`,
             ephermeral: true,

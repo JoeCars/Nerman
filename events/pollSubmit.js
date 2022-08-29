@@ -65,6 +65,8 @@ module.exports = {
          .filter(v => v !== '');
       let voteAllowance = parseInt(modal.getTextInputValue('voteAllowance') ?? 1);
 
+      console.log({voteAllowance})
+
       if (!intRegex.test(voteAllowance)) {
          return modal.editReply({
             content: `${voteAllowance} - is not a valid vote allowance number.\nPlease choose a whole number.`,
