@@ -63,7 +63,7 @@ module.exports = {
          .split(',')
          .map(x => x.trim())
          .filter(v => v !== '');
-      let voteAllowance = modal.getTextInputValue('voteAllowance') ?? 1;
+      let voteAllowance = parseInt(modal.getTextInputValue('voteAllowance') ?? 1);
 
       if (!intRegex.test(voteAllowance)) {
          return modal.editReply({
