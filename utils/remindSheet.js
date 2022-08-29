@@ -37,12 +37,15 @@ module.exports = async client => {
       todayEnd = todayEnd.toLocaleString('en-US', {
          timezone: 'America/Edmonton',
       });
+
+      l({ cuurentTime, todayStart, todayEnd });
       // hourFromStart = hourFromStart.toLocaleString('en-US', {
       //    timezone: 'America/Edmonton',
       // });
 
       const timeoutMs =
-         Math.abs(Date.parse(todayStart) - Date.parse(currentTime)) % tenSeconds;
+         Math.abs(Date.parse(todayStart) - Date.parse(currentTime)) %
+         tenSeconds;
 
       l({ timeoutMs });
       // return all in case I change this later
@@ -77,6 +80,6 @@ module.exports = async client => {
             default:
                break;
          }
-      }, 3000);
+      }, 30000);
    }, timeoutMs);
 };
