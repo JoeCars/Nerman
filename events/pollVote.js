@@ -73,9 +73,9 @@ module.exports = {
          });
       }
 
-      if (voteArray.length === pollData.voteAllowance) {
+      if (voteArray.length === pollStatus.pollData.voteAllowance) {
          return modal.editReply({
-            content: `You are required to select ${pollData.voteAllowance} choice(s)`,
+            content: `You are required to select ${pollStatus.pollData.voteAllowance} choice(s)`,
             ephermeral: true,
          });
       }
