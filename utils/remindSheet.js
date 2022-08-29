@@ -38,7 +38,7 @@ module.exports = async client => {
          timezone: 'America/Edmonton',
       });
 
-      l({ cuurentTime, todayStart, todayEnd });
+      l({ currentTime, todayStart, todayEnd });
       // hourFromStart = hourFromStart.toLocaleString('en-US', {
       //    timezone: 'America/Edmonton',
       // });
