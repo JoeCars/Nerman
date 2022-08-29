@@ -95,6 +95,7 @@ PollSchema.virtual('participation').get(function () {
 });
 
 PollSchema.virtual('voterQuorum').get(function () {
+   // Add in an evaluation for a quroum of zero and make it use a %
    return Math.floor(this.allowedUsers.size / this.config.quorum);
 });
 

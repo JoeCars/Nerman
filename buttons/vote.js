@@ -19,10 +19,10 @@ module.exports = {
          console.log('VOTE BUTTON -- isButton: false', { interaction });
          return;
       }
-      console.log(
-         'VOTE BUTTON -- isButton: true -- interaction',
-         interaction.isButton()
-      );
+      // console.log(
+      //    'VOTE BUTTON -- isButton: true -- interaction',
+      //    interaction.isButton()
+      // );
 
       const {
          channelId,
@@ -38,7 +38,7 @@ module.exports = {
          'allowedRoles'
       ).exec();
 
-      console.log({ allowedRoles });
+      // console.log({ allowedRoles });
 
       if (!roleCache.hasAny(...allowedRoles)) {
          console.log('USER DOES NOT HAS ROLE');
