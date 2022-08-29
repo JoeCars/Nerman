@@ -1,5 +1,6 @@
 const TimeStuff = require('../helpers/timestuff.js');
 const NounsDAO = require('../helpers/nounsdao.js');
+const { logToObject} = require('../utils/functions.js')
 
 const tickInterval = 1800000;
 var latestProposal = {
@@ -96,7 +97,9 @@ async function getLatestProposalData() {
             '| new-proposal init - setting latest prop to ' +
                data.proposals[0].id
          );
-         console.log('| Logging Data ' + data.proposals[0]);
+         console.log('| Logging Data ' + JSON.stringify(data.proposals[0]));
+         console.log('| Logging Data ' + JSON.parse(data.proposals[0]));
+         console.log('| Logging Data ' + logToObject(data.proposals[0]));
       } else if (latestProposal.id != data.proposals[0].id) {
          let newProposalCount = data.proposals[0].id - latestProposal.id;
          let proposals = data.proposals;
