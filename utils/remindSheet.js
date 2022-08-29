@@ -17,11 +17,9 @@ module.exports = async client => {
    const generateTimeout = async () => {
       const tenSeconds = 10 * 1000;
       const oneHour = 60 * 60 * 1000;
-      let offset = 360 * 60 * 1000 // just a temp fix, nothing special
-      // l({ currentTime });
+      let offset = 360 * 60 * 1000; // just a temp fix, nothing special
       l(Date.now());
       l(Date.parse(new Date()) - offset);
-      // l(new Date(Date - offset))
       // let hourFromStart = new Date(todayStart);
 
       let currentTime = getTimeWithOffset();
@@ -38,6 +36,7 @@ module.exports = async client => {
       todayEnd.setMinutes(0);
       todayEnd.setSeconds(0);
 
+      // disabled this is for dev
       // currentTime = currentTime.toLocaleString('en-US', {
       //    timezone: 'America/Edmonton',
       // });
@@ -53,14 +52,13 @@ module.exports = async client => {
       //    timezone: 'America/Edmonton',
       // });
 
+      // disabled this is for dev
       // const timeoutMs =
       //    Math.abs(Date.parse(todayStart) - Date.parse(currentTime)) %
       //    tenSeconds;
       const timeoutMs =
-         Math.abs(Date.parse(todayStart) - currentTime) %
-         tenSeconds;
+         Math.abs(Date.parse(todayStart) - currentTime) % tenSeconds;
 
-      l({ timeoutMs });
       // return all in case I change this later
       // return { timeoutMs, todayStart, todayEnd };
       return timeoutMs;
@@ -70,15 +68,13 @@ module.exports = async client => {
 
    setTimeout(() => {
       setInterval(() => {
+         // disabled this is for dev
          // const nowTimezone = new Date().toLocaleString('en-US', {
          //    timezone: 'America/Edmonton',
          // });
-         let nowTimezone = new Date(getTimeWithOffset());
-         // nowTimezone = nowTimezone.toISOString()
-         l({ nowTimezone });
          // const hour = new Date(nowTimezone).getHours();
+         let nowTimezone = new Date(getTimeWithOffset());
          const hour = nowTimezone.getHours();
-         l({ hour });
          const seconds = new Date(nowTimezone).getSeconds();
 
          l({ seconds });
@@ -96,6 +92,6 @@ module.exports = async client => {
             default:
                break;
          }
-      }, 3000);
+      }, 360000);
    }, timeoutMs);
 };
