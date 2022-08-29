@@ -86,3 +86,6 @@ module.exports = async client => {
       }, 360000);
    }, timeoutMs);
 };
+
+// 6 Nouns 
+// token,

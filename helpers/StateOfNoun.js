@@ -98,7 +98,6 @@ async function getLatestProposalData() {
                data.proposals[0].id
          );
          console.log('| Logging Data ' + JSON.stringify(data.proposals[0]));
-         console.log('| Logging Data ' + JSON.parse(data.proposals[0]));
          console.log('| Logging Data ' + logToObject(data.proposals[0]));
       } else if (latestProposal.id != data.proposals[0].id) {
          let newProposalCount = data.proposals[0].id - latestProposal.id;
