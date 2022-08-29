@@ -57,7 +57,9 @@ module.exports = async client => {
          const nowTimezone = new Date().toLocaleString('en-US', {
             timezone: 'America/Edmonton',
          });
+         l({ nowTimezone });
          const hour = new Date(nowTimezone).getHours();
+         l({ hour });
          const seconds = new Date(nowTimezone).getSeconds();
 
          l({ seconds });
