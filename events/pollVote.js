@@ -73,6 +73,12 @@ module.exports = {
          });
       }
 
+      if (voteArray.length === pollData.voteAllowance) {
+         return modal.editReply({
+            content: `You are required to select ${pollData.voteAllowance} choice(s)`,
+            ephermeral: true,
+         });
+      }
 
       // disabled until DJS SELECT MENUS Modal supported
       // const voteArray = modal.getSelectMenuValues('votingSelect');
