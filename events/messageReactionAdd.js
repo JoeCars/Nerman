@@ -8,6 +8,9 @@ module.exports = {
    async execute(reaction, user) {
       //reaction.message.guild.roles.cache.forEach(role => console.log(role.name, role.id)) //prints all rolls
       //"@everyone" is default role
+
+      console.log('HI MOM');
+      console.log('HI MOM');
       const {
          attachments,
          content,
