@@ -15,11 +15,7 @@ module.exports = async client => {
    };
 
    const generateTimeout = async () => {
-      const tenSeconds = 10 * 1000;
       const oneHour = 60 * 60 * 1000;
-      let offset = 360 * 60 * 1000; // just a temp fix, nothing special
-      l(Date.now());
-      l(Date.parse(new Date()) - offset);
       // let hourFromStart = new Date(todayStart);
 
       let currentTime = getTimeWithOffset();
@@ -28,9 +24,6 @@ module.exports = async client => {
       todayStart.setHours(10);
       todayStart.setMinutes(0);
       todayStart.setSeconds(0);
-      // hourFromStart.setHours(11);
-      // hourFromStart.setMinutes(0);
-      // hourFromStart.setSeconds(0);
       todayEnd.setDate(todayStart.getDate() + 1);
       todayEnd.setHours(0);
       todayEnd.setMinutes(0);
@@ -47,7 +40,6 @@ module.exports = async client => {
          timezone: 'America/Edmonton',
       });
 
-      l({ currentTime, todayStart, todayEnd });
       // hourFromStart = hourFromStart.toLocaleString('en-US', {
       //    timezone: 'America/Edmonton',
       // });
@@ -77,7 +69,6 @@ module.exports = async client => {
          const hour = nowTimezone.getHours();
          const seconds = new Date(nowTimezone).getSeconds();
 
-         l({ seconds });
          switch (true) {
             case hour > 10:
                muhBOI.send({
