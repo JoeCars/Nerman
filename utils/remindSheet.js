@@ -57,7 +57,7 @@ module.exports = async client => {
       //    Math.abs(Date.parse(todayStart) - Date.parse(currentTime)) %
       //    tenSeconds;
       const timeoutMs =
-         Math.abs(Date.parse(todayStart) - currentTime) % tenSeconds;
+         Math.abs(Date.parse(todayStart) - currentTime) % oneHour;
 
       // return all in case I change this later
       // return { timeoutMs, todayStart, todayEnd };
