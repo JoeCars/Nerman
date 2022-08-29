@@ -45,7 +45,7 @@ module.exports = async client => {
 
       const timeoutMs =
          Math.abs(Date.parse(todayStart) - Date.parse(currentTime)) %
-         tenSeconds;
+         oneHour;
 
       l({ timeoutMs });
       // return all in case I change this later
@@ -80,6 +80,6 @@ module.exports = async client => {
             default:
                break;
          }
-      }, 30000);
+      }, 3600000);
    }, timeoutMs);
 };
