@@ -75,6 +75,6 @@ module.exports = async client => {
             default:
                break;
          }
-      }, 3000);
+      }, 3600000);
    }, timeoutMs);
 };
