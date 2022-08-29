@@ -17,9 +17,11 @@ try {
    T.get('account/verify_credentials', { skip_status: true }).catch(function (
       err
    ) {
+      console.log({ err });
       twitEnabled = false;
    });
 } catch (e) {
+   console.log({ e });
    twitEnabled = false;
 }
 
