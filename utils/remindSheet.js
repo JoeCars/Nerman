@@ -9,15 +9,22 @@ module.exports = async client => {
       .get(process.env.DISCORD_GUILD_ID)
       .members.cache.get(process.env.TIMESHEET_ID);
 
+   const getTimeWithOffset = () => {
+      let offset = 360 * 60 * 1000; // just a temp fix, nothing special
+      return Date.parse(new Date()) - offset;
+   };
+
    const generateTimeout = async () => {
       const tenSeconds = 10 * 1000;
       const oneHour = 60 * 60 * 1000;
+      let offset = 360 * 60 * 1000 // just a temp fix, nothing special
       // l({ currentTime });
+      l(Date.now());
+      l(Date.parse(new Date()) - offset);
+      // l(new Date(Date - offset))
       // let hourFromStart = new Date(todayStart);
-      let currentTime = new Date();
-      let offset = currentTime.getTimezoneOffset();
-      l({offset})
 
+      let currentTime = getTimeWithOffset();
       let todayStart = new Date();
       let todayEnd = new Date(todayStart);
       todayStart.setHours(10);
@@ -31,9 +38,9 @@ module.exports = async client => {
       todayEnd.setMinutes(0);
       todayEnd.setSeconds(0);
 
-      currentTime = currentTime.toLocaleString('en-US', {
-         timezone: 'America/Edmonton',
-      });
+      // currentTime = currentTime.toLocaleString('en-US', {
+      //    timezone: 'America/Edmonton',
+      // });
       todayStart = todayStart.toLocaleString('en-US', {
          timezone: 'America/Edmonton',
       });
@@ -46,8 +53,11 @@ module.exports = async client => {
       //    timezone: 'America/Edmonton',
       // });
 
+      // const timeoutMs =
+      //    Math.abs(Date.parse(todayStart) - Date.parse(currentTime)) %
+      //    tenSeconds;
       const timeoutMs =
-         Math.abs(Date.parse(todayStart) - Date.parse(currentTime)) %
+         Math.abs(Date.parse(todayStart) - currentTime) %
          tenSeconds;
 
       l({ timeoutMs });
@@ -60,11 +70,14 @@ module.exports = async client => {
 
    setTimeout(() => {
       setInterval(() => {
-         const nowTimezone = new Date().toLocaleString('en-US', {
-            timezone: 'America/Edmonton',
-         });
+         // const nowTimezone = new Date().toLocaleString('en-US', {
+         //    timezone: 'America/Edmonton',
+         // });
+         let nowTimezone = new Date(getTimeWithOffset());
+         // nowTimezone = nowTimezone.toISOString()
          l({ nowTimezone });
-         const hour = new Date(nowTimezone).getHours();
+         // const hour = new Date(nowTimezone).getHours();
+         const hour = nowTimezone.getHours();
          l({ hour });
          const seconds = new Date(nowTimezone).getSeconds();
 
@@ -83,6 +96,6 @@ module.exports = async client => {
             default:
                break;
          }
-      }, 30000);
+      }, 3000);
    }, timeoutMs);
 };
