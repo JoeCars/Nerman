@@ -60,13 +60,13 @@ module.exports = {
          });
       }
 
-      // disabled disabled for testing
-      // if (attachedPoll.allowedUsers.get(userId) === true) {
-      //    return interaction.reply({
-      //       content: 'You have already cast your vote, you political glutton',
-      //       ephemeral: true,
-      //    });
-      // }
+      // enabled disabled for testing
+      if (attachedPoll.allowedUsers.get(userId) === true) {
+         return interaction.reply({
+            content: 'You have already cast your vote, you political glutton',
+            ephemeral: true,
+         });
+      }
 
       const optionsString = attachedPoll.pollData.choices.join(', ');
       // disabled until DJS SELECT MENU Modal supported
