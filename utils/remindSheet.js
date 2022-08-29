@@ -15,6 +15,9 @@ module.exports = async client => {
       // l({ currentTime });
       // let hourFromStart = new Date(todayStart);
       let currentTime = new Date();
+      let offset = currentTime.getTimezoneOffset();
+      l({offset})
+
       let todayStart = new Date();
       let todayEnd = new Date(todayStart);
       todayStart.setHours(10);
@@ -45,7 +48,7 @@ module.exports = async client => {
 
       const timeoutMs =
          Math.abs(Date.parse(todayStart) - Date.parse(currentTime)) %
-         oneHour;
+         tenSeconds;
 
       l({ timeoutMs });
       // return all in case I change this later
@@ -80,6 +83,6 @@ module.exports = async client => {
             default:
                break;
          }
-      }, 3600000);
+      }, 30000);
    }, timeoutMs);
 };
