@@ -78,7 +78,9 @@ module.exports = {
             status: 'open',
          });
 
-         if (foundPolls > channelConfig.maxUserProposal) {
+         console.log({ foundPolls });
+
+         if (foundPolls >= channelConfig.maxUserProposal) {
             return interaction.reply({
                content:
                   'You have exceeded the amount of allowed polls in this channel. You must wait until your current poll is closed.',
@@ -114,8 +116,8 @@ module.exports = {
          // console.log(pollType);
 
          // return interaction.reply({
-            // content: 'canceling this for testing purposes',
-            // ephemeral: true,
+         // content: 'canceling this for testing purposes',
+         // ephemeral: true,
          // });
          const createPollComponents = [];
 
