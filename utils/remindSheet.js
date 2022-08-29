@@ -28,7 +28,6 @@ module.exports = async client => {
       todayEnd.setMinutes(0);
       todayEnd.setSeconds(0);
 
-
       currentTime = currentTime.toLocaleString('en-US', {
          timezone: 'America/Edmonton',
       });
@@ -43,8 +42,7 @@ module.exports = async client => {
       // });
 
       const timeoutMs =
-         Math.abs(Date.parse(todayStart) - Date.parse(currentTime)) %
-         tenSeconds;
+         Math.abs(Date.parse(todayStart) - Date.parse(currentTime)) % oneHour;
 
       l({ timeoutMs });
       // return all in case I change this later
@@ -55,7 +53,6 @@ module.exports = async client => {
    const timeoutMs = await generateTimeout();
 
    setTimeout(() => {
-      console.log('ROUND TEN SECONDS');
       setInterval(() => {
          const nowTimezone = new Date().toLocaleString('en-US', {
             timezone: 'America/Edmonton',
@@ -65,8 +62,7 @@ module.exports = async client => {
 
          l({ seconds });
          switch (true) {
-            // case hour > 10:
-            case seconds % 10 === 0:
+            case hour > 10:
                muhBOI.send({
                   content: `It's me, ya boi. Reminding you to log what you have done the past hour.`,
                });
@@ -79,7 +75,6 @@ module.exports = async client => {
             default:
                break;
          }
-
       }, 3000);
    }, timeoutMs);
 };
