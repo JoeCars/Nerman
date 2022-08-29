@@ -83,9 +83,9 @@ module.exports = async client => {
             default:
                break;
          }
-      }, 360000);
+      }, 3600000);
    }, timeoutMs);
 };
 
-// 6 Nouns 
+// 6 Nouns
 // token,
