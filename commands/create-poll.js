@@ -65,10 +65,6 @@ module.exports = {
             'maxUserProposal voteAllowance'
          ).exec();
 
-         // console.log({ channelConfig });
-         // console.log({ channelId });
-
-         // todo find out a faster way to accomplish counting the documents based on the embedded config object's channeId, for now we're using a find because it works, but it's slower
          const countedPolls = await Poll.countDocuments({
             config: channelConfig._id,
             creatorId: userId,

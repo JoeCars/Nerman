@@ -63,9 +63,11 @@ module.exports = {
          .split(',')
          .map(x => x.trim())
          .filter(v => v !== '');
-      let voteAllowance = parseInt(modal.getTextInputValue('voteAllowance') ?? 1);
+      let voteAllowance = parseInt(
+         modal.getTextInputValue('voteAllowance') ?? 1
+      );
 
-      console.log({voteAllowance})
+      console.log({ voteAllowance });
 
       if (!intRegex.test(voteAllowance)) {
          return modal.editReply({
@@ -233,10 +235,15 @@ module.exports = {
                return fetchedMembers.filter(member => {
                   // console.log(member);
                   return (
-                     member.presence?.status === 'online' &&
                      !member.user.bot &&
                      member?.roles.cache.hasAny(...channelConfig.allowedRoles)
                   );
+                  //disabled not worrying about the 
+                  // return (
+                  //    member.presence?.status === 'online' &&
+                  //    !member.user.bot &&
+                  //    member?.roles.cache.hasAny(...channelConfig.allowedRoles)
+                  // );
                });
             });
 
