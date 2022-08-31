@@ -124,8 +124,10 @@ module.exports = {
          });
       }
 
+      console.log({ pollQuorum });
       pollDuration = parseFloat(pollDuration);
-      pollQuorum = parseFloat(pollQuorum);
+      pollQuorum = parseFloat(pollQuorum) > 1 ? parseFloat(pollQuorum) : 1;
+      console.log({ pollQuorum });
 
       try {
          const newPollChannel = await PollChannel.create({

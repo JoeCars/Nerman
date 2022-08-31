@@ -238,7 +238,7 @@ module.exports = {
                      !member.user.bot &&
                      member?.roles.cache.hasAny(...channelConfig.allowedRoles)
                   );
-                  //disabled not worrying about the 
+                  //disabled not worrying about the
                   // return (
                   //    member.presence?.status === 'online' &&
                   //    !member.user.bot &&
@@ -282,8 +282,9 @@ module.exports = {
          status: 'open',
       })
          .then(savedPoll => {
+            // savedPoll = savedPoll.populate('config').exec();
             let updateEmbed = new MessageEmbed(embed);
-            console.log(savedPoll);
+            console.log({ savedPoll });
 
             const timeEndMilli = new Date(
                savedPoll.timeCreated.getTime() + durationMs
@@ -299,9 +300,17 @@ module.exports = {
                // `Submitted by ${message.author.username}#${message.author.discriminator}`
             );
 
-            updateEmbed.fields[1].value = Math.floor(
-               savedPoll.allowedUsers.size / quorum
-            ).toString(); // quorum
+            // updateEmbed.fields[1].value = savedPoll.voterQuorum; // quorum
+            let embedQuorum = Math.floor(
+               savedPoll.allowedUsers.size * (quorum / 100)
+            );
+
+            embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
+
+            updateEmbed.fields[1].value = embedQuorum.toString(); // quorum
+            // updateEmbed.fields[1].value = Math.floor(
+            //    savedPoll.allowedUsers.size * (quorum / 100)
+            // ).toString(); // quorum
             // updateEmbed.fields[4].value = formatDate(savedPoll.timeEnd); // timeEnd
             updateEmbed.fields[4].value = `<t:${Math.floor(
                savedPoll.timeEnd.getTime() / 1000

@@ -96,7 +96,15 @@ PollSchema.virtual('participation').get(function () {
 
 PollSchema.virtual('voterQuorum').get(function () {
    // Add in an evaluation for a quroum of zero and make it use a %
-   return Math.floor(this.allowedUsers.size / this.config.quorum);
+   const voterQuorum = Math.floor(
+      this.allowedUsers.size * (this.config.quorum / 100)
+   );
+
+   console.log(
+      '--------------------------------------\nFROM GETTER\n---------------------------',
+      { voterQuorum }
+   );
+   return voterQuorum > 1 ? voterQuorum : 1;
 });
 
 PollSchema.virtual('results').get(function () {
