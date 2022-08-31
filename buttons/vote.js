@@ -29,9 +29,14 @@ module.exports = {
          message: { id: messageId },
          user: { id: userId },
          member: {
+            joinedTimestamp,
             roles: { cache: roleCache },
          },
       } = interaction;
+
+      console.log({ interaction });
+      console.log({ joinedTimestamp });
+      console.log(new Date(joinedTimestamp));
 
       const { allowedRoles } = await PollChannel.findOne(
          { channelId },
@@ -43,7 +48,7 @@ module.exports = {
       if (!roleCache.hasAny(...allowedRoles)) {
          console.log('USER DOES NOT HAS ROLE');
          return interaction.reply({
-            content: 'You do not have the role, dummy',
+            content: 'You do not have a role eligible to vote on this poll.',
             ephemeral: true,
          });
       }
@@ -52,14 +57,6 @@ module.exports = {
          .populate([{ path: 'config' }])
          .exec();
 
-
-      if (!attachedPoll.allowedUsers.has(userId)) {
-         return interaction.reply({
-            content: 'You are not eligible to participate in this poll, square',
-            ephemeral: true,
-         });
-      }
-
       // enabled disabled for testing
       if (attachedPoll.allowedUsers.get(userId) === true) {
          return interaction.reply({
@@ -67,6 +64,20 @@ module.exports = {
             ephemeral: true,
          });
       }
+
+      if (!attachedPoll.allowedUsers.has(userId)) {
+         return interaction.reply({
+            content: `You are not eligible to participate in polls posted before your arrival:\nPoll posted on: <t:${Math.round(
+               Date.parse(attachedPoll.timeCreated) / 1000
+            )}:F>\nDate you joined: <t:${Math.round(joinedTimestamp / 1000)}>`,
+            ephemeral: true,
+         });
+      }
+
+      // return await interaction.reply({
+      //    content: 'Ending early for testing',
+      //    ephemeral: true,
+      // });
 
       const optionsString = attachedPoll.pollData.choices.join(', ');
       // disabled until DJS SELECT MENU Modal supported
