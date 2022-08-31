@@ -65,22 +65,18 @@ module.exports = {
             'maxUserProposal voteAllowance'
          ).exec();
 
-         // return interaction.reply({
-         //    content: 'canceling this for testing purposes',
-         //    ephemeral: true,
-         // });
+         // console.log({ channelConfig });
+         // console.log({ channelId });
 
-         console.log({ channelConfig });
-
-         const foundPolls = await Poll.countDocuments({
-            channelId,
+         // todo find out a faster way to accomplish counting the documents based on the embedded config object's channeId, for now we're using a find because it works, but it's slower
+         const countedPolls = await Poll.countDocuments({
+            config: channelConfig._id,
             creatorId: userId,
             status: 'open',
          });
 
-         console.log({ foundPolls });
 
-         if (foundPolls >= channelConfig.maxUserProposal) {
+         if (countedPolls >= channelConfig.maxUserProposal) {
             return interaction.reply({
                content:
                   'You have exceeded the amount of allowed polls in this channel. You must wait until your current poll is closed.',
@@ -88,6 +84,10 @@ module.exports = {
             });
          }
 
+         // return interaction.reply({
+         //    content: 'canceling this for testing purposes',
+         //    ephemeral: true,
+         // });
          // return interaction.reply({
          //    content: 'canceling this for testing purposes',
          //    ephemeral: true,

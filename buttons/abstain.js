@@ -52,7 +52,7 @@ module.exports = {
       // enabled disabled for testing
       // if (attachedPoll.allowedUsers.get(userId) === true) {
       if (pollStatus.allowedUsers.get(userId) === true) {
-         return interaction.reply({
+         return interaction.editReply({
             content: 'You have already cast your vote, you political glutton',
             ephemeral: true,
          });
@@ -87,7 +87,7 @@ module.exports = {
 
       message.edit({ embeds: [updateEmbed] });
 
-      return await interaction.editReply({
+      await interaction.editReply({
          content: 'You have chosen to abstain from this poll',
          ephemeral: true,
       });
