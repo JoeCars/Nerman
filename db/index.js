@@ -67,6 +67,8 @@ module.exports = async client => {
                   return foundPolls.sort((a, b) => a.timeEnd - b.timeEnd);
                })
                .catch(err => console.error(err));
+
+            console.log({ openPolls });
             // createTest();
             // createChannelTest();
 
