@@ -76,6 +76,8 @@ module.exports = {
          });
       }
 
+      console.log('merp');
+
       // let voteAllowance = parseInt(
       //    modal.getTextInputValue('voteAllowance') ?? 1
       // );
