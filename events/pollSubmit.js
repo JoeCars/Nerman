@@ -324,7 +324,7 @@ module.exports = {
          .catch(err => console.error(err));
 
       // Emit an event to trigger adding a new poll to the db poll interval queue
-      client.emit('queuePoll', await newPoll);
+      client.emit('enqueuePoll', await newPoll);
 
       return modal.editReply({
          content: 'Poll has been created!',

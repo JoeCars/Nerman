@@ -72,13 +72,26 @@ module.exports = async client => {
             // createTest();
             // createChannelTest();
 
-            client.on('queuePoll', newPoll => {
+            client.on('enqueuePoll', newPoll => {
                console.log('PRE PUSH AND SORT', { openPolls });
                openPolls.push(newPoll);
                openPolls.sort((a, b) => a.timeEnd - b.timeEnd);
                console.log('POST PUSH AND SORT', { openPolls });
                intervalFunction();
             });
+
+            client.on('dequeuePoll', oldPoll => {
+               console.log({ oldPoll });
+               const idx = openPolls.findIndex(({ _id }) =>
+                  _id.equals(oldPoll._id)
+               );
+
+               console.log({ idx });
+
+               openPolls.splice(idx, 1);
+               console.log('POST REMOVAL OF POLL', { openPolls });
+            });
+
             let intervalId;
 
             // if (openPolls.length) {
@@ -227,9 +240,7 @@ module.exports = async client => {
                      let closedEmbed = message.embeds[0];
                      console.log({ closedEmbed });
 
-                     closedEmbed.setTitle(
-                        `${closedEmbed.title}`
-                     );
+                     closedEmbed.setTitle(`${closedEmbed.title}`);
 
                      console.log({ closedEmbed });
 

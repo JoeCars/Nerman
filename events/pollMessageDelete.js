@@ -6,7 +6,7 @@ const { log: l, time: t, timeEnd: te } = console;
 module.exports = {
    name: 'messageDelete',
    async execute(message) {
-      const { channelId, id: messageId } = message;
+      const { client, channelId, id: messageId } = message;
 
       if (
          !PollChannel.countDocuments({ channelId }) ||
@@ -19,5 +19,7 @@ module.exports = {
       l({ messagePoll });
 
       l(await Poll.countDocuments({ messageId }));
+
+      client.emit('dequeuePoll', await messagePoll);
    },
 };
