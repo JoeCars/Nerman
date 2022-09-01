@@ -228,7 +228,7 @@ module.exports = async client => {
                      console.log({ closedEmbed });
 
                      closedEmbed.setTitle(
-                        `VOTING CLOSED\n${closedEmbed.title}`
+                        `${closedEmbed.title}`
                      );
 
                      console.log({ closedEmbed });
