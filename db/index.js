@@ -68,7 +68,7 @@ module.exports = async client => {
                })
                .catch(err => console.error(err));
 
-            console.log({ openPolls });
+            // console.log({ openPolls });
             // createTest();
             // createChannelTest();
 
