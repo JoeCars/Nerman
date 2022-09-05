@@ -58,15 +58,20 @@ module.exports = {
       // extract data from submitted modal
       const title = modal.getTextInputValue('pollTitle');
       const description = modal.getTextInputValue('pollDescription') ?? '';
-      const options = modal
-         .getTextInputValue('pollChoices')
-         .split(',')
-         .map(x => x.trim())
-         .filter(v => v !== '');
+      const options = [
+         ...new Set(
+            modal
+               .getTextInputValue('pollChoices')
+               .split(',')
+               .map(x => x.trim())
+               .filter(v => v !== '')
+         ),
+      ];
       let voteAllowance = parseInt(
          modal.getTextInputValue('voteAllowance') ?? 1
       );
 
+      console.log({ options });
       console.log({ voteAllowance });
 
       if (!intRegex.test(voteAllowance)) {
@@ -257,7 +262,7 @@ module.exports = {
       }
 
       // todo decide if I really need this or can just stick with the use-case below
-      const config = await PollChannel.findOne({ channelId }).exec();
+      // const config = await PollChannel.findOne({ channelId }).exec();
 
       //
       const { _id, durationMs, quorum } = await PollChannel.findOne({
@@ -276,7 +281,8 @@ module.exports = {
          guildId,
          creatorId: user.id,
          messageId: id,
-         config: config._id,
+         // config: config._id,
+         config: _id,
          pollData,
          votes: undefined,
          abstains: undefined,
@@ -314,6 +320,8 @@ module.exports = {
             //    savedPoll.allowedUsers.size * (quorum / 100)
             // ).toString(); // quorum
             // updateEmbed.fields[4].value = formatDate(savedPoll.timeEnd); // timeEnd
+
+            //todo Maybe switch this to a Poll.create({...},{new: true}) then modify approach
             updateEmbed.fields[4].value = `<t:${Math.floor(
                savedPoll.timeEnd.getTime() / 1000
             )}:f>`; // timeEnd
