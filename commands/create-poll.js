@@ -332,6 +332,7 @@ module.exports = {
             .setPlaceholder(placeholder)
             .setDefaultValue(placeholder)
             .setStyle('SHORT')
+            .setMaxLength(100)
             .setRequired(true);
          //disabled until modals are supported
          // const votingRoles = new SelectMenuComponent()
@@ -349,6 +350,7 @@ module.exports = {
             .setLabel('Poll Duration (hours)')
             .setPlaceholder('Eg) 60')
             .setStyle('SHORT')
+            .setMaxLength(4)
             .setRequired(true);
 
          const maxProposals = new TextInputComponent()
@@ -358,6 +360,7 @@ module.exports = {
                'Choose maximum number of active polls allowed per user with voting role.'
             )
             .setStyle('SHORT')
+            .setMaxLength(3)
             .setRequired(true);
 
          const pollQuorum = new TextInputComponent()
@@ -365,6 +368,7 @@ module.exports = {
             .setLabel('Choose Quorum %')
             .setPlaceholder('10%')
             .setStyle('SHORT')
+            .setMaxLength(6)
             .setRequired(true);
 
          const pollChannelOptions = new TextInputComponent()
@@ -372,7 +376,8 @@ module.exports = {
             .setLabel('Choose Channel Options (if any)')
             .setPlaceholder('anonymous-voting, live-results, vote-allowance')
             .setDefaultValue('anonymous-voting, live-results, vote-allowance')
-            .setStyle('SHORT');
+            .setStyle('SHORT')
+            .setMaxLength(50);
 
          // disabled until DJS add back support for SelectMenus in Modals
          // const pollChannelOptions = new SelectMenuComponent()
