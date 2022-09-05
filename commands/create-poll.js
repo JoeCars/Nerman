@@ -130,8 +130,9 @@ module.exports = {
             .setPlaceholder(
                'Descriptive text, links, and any supporting details needed for users to decide on your poll.'
             )
-            .setRequired(false)
-            .setStyle('LONG');
+            .setStyle('LONG')
+            .setMaxLength(2000)
+            .setRequired(false);
 
          const pollChoices = new TextInputComponent()
             .setCustomId('pollChoices')
@@ -140,8 +141,9 @@ module.exports = {
                'Comma separated values. Minimum two options. eg) Yes, No, Abstain'
             )
             .setDefaultValue('Yes, No, Abstain')
-            .setRequired(true)
-            .setStyle('SHORT');
+            .setStyle('SHORT')
+            .setMaxLength(100)
+            .setRequired(true);
 
          createPollComponents.push(pollTitle, pollDescription, pollChoices);
 
