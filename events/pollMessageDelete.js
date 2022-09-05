@@ -14,7 +14,11 @@ module.exports = {
       )
          return;
 
-      const messagePoll = await Poll.findOneAndDelete({ messageId });
+      // const messagePoll = await Poll.findOneAndDelete({ messageId });
+      const messagePoll = await Poll.findOneAndUpdate(
+         { messageId },
+         { status: 'closed' }
+      );
 
       l({ messagePoll });
 
