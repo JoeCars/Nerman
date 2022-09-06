@@ -79,7 +79,11 @@ module.exports = {
       //    ephemeral: true,
       // });
 
-      const optionsString = attachedPoll.pollData.choices.join(', ');
+
+      const capitalizedOptions = attachedPoll.pollData.choices.map(choice => choice[0].toUpperCase() + choice.substring(1))
+
+      // const optionsString = attachedPoll.pollData.choices.join(', ');
+      const optionsString = capitalizedOptions.join(', ');
       // disabled until DJS SELECT MENU Modal supported
       // const optionsMap = attachedPoll.pollData.choices.map(choice => ({
       //    label: choice,
