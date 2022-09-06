@@ -63,7 +63,7 @@ module.exports = {
             modal
                .getTextInputValue('pollChoices')
                .split(',')
-               .map(x => x.trim())
+               .map(x => x.trim().toLowerCase())
                .filter(v => v !== '')
          ),
       ];
@@ -73,6 +73,8 @@ module.exports = {
 
       console.log({ options });
       console.log({ voteAllowance });
+
+      // return modal.editReply({ content: 'Return early', ephemeral: true });
 
       if (!intRegex.test(voteAllowance)) {
          return modal.editReply({
