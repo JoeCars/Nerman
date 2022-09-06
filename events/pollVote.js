@@ -48,7 +48,7 @@ module.exports = {
       if (voteArray !== null) {
          voteArray = voteArray
             .split(',')
-            .map(x => x.trim())
+            .map(x => x.trim().toLowerCase())
             .filter(v => v !== '');
       } else {
          return modal.editReply({
