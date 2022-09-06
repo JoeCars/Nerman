@@ -113,7 +113,7 @@ module.exports = async client => {
                      // return;
 
                      if (!openPolls[0]) {
-                       return clearInterval(intervalId);
+                        return clearInterval(intervalId);
                      }
 
                      console.log(openPolls[0]);
@@ -155,13 +155,20 @@ module.exports = async client => {
                            console.log(results.winner);
                            winningResult =
                               results.winner !== null
-                                 ? `${results.winner} - Wins`
+                                 ? `${
+                                      results.winner[0].toUpperCase() +
+                                      results.winner.substring(1)
+                                   } - Wins`
                                  : 'Literally nobody voted on this :<';
                         }
 
                         if ('tied' in results) {
                            winningResult = `${results.tied
-                              .flatMap(arr => arr[0])
+                              .flatMap(
+                                 arr =>
+                                    arr[0][0].toUpperCase() +
+                                    arr[0].substring(1)
+                              )
                               .join(', ')} - Tied`;
                         }
 
@@ -192,7 +199,8 @@ module.exports = async client => {
                            ['totalVotes', totalVotes],
                         ]);
                         for (const key in results.distribution) {
-                           const label = key;
+                           const label =
+                              key[0].toUpperCase() + key.substring(1);
                            let optionObj = {
                               label,
                               votes: results.distribution[key],
