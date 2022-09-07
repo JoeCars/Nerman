@@ -71,7 +71,6 @@ module.exports = {
             status: 'open',
          });
 
-
          if (countedPolls >= channelConfig.maxUserProposal) {
             return interaction.reply({
                content:
@@ -121,8 +120,9 @@ module.exports = {
             .setCustomId('pollTitle')
             .setLabel('Title')
             .setPlaceholder('Poll title, or your main question.')
-            .setRequired(true)
-            .setStyle('SHORT');
+            .setStyle('SHORT')
+            .setMaxLength(100)
+            .setRequired(true);
 
          const pollDescription = new TextInputComponent()
             .setCustomId('pollDescription')
