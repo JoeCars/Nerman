@@ -6,7 +6,14 @@ const { log: l, time: t, timeEnd: te } = console;
 module.exports = {
    name: 'messageDelete',
    async execute(message) {
-      const { client, channelId, id: messageId } = message;
+      const {
+         client,
+         channelId,
+         author: { bot },
+         id: messageId,
+      } = message;
+
+      if (bot === true) return;
 
       if (
          !PollChannel.countDocuments({ channelId }) ||
