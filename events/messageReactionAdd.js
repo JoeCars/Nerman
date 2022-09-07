@@ -3,6 +3,14 @@ const nMongoDB = require(`../helpers/mongodb.js`);
 const nThreshold = require(`../helpers/nThreshold.js`);
 const tenor = require(`../helpers/tenor.js`);
 
+// role allowed for nerman tweet functions - for now env based on DEPLOY_STAGE
+const allowedRoles =
+   process.env.DEPLOY_STAGE === 'staging'
+      ? process.env.TESTNERMAN_VOTER_ID
+      : process.env.DEVNERMAN_VOTER_ID;
+
+
+// nerman emoji ID - for now env based on DEPLOY_STAGE
 const nermanEmojiId =
    process.env.DEPLOY_STAGE === 'staging'
       ? process.env.TESTNERMAN_EMOJI_ID
@@ -38,7 +46,7 @@ module.exports = {
       l({ nermanEmojiId });
       l({ emojiId });
 
-      if (process.env.DEPLOY_STAGE === 'staging') return;
+      // if (process.env.DEPLOY_STAGE === 'staging') return;
       if (emojiId !== nermanEmojiId) {
          l(`This is not MY nerman --- ${process.env.DEPLOY_STAGE}`);
          return;
@@ -62,7 +70,9 @@ module.exports = {
       // return;
 
       // below code to calculate voteThreshold should be refactored with threshold.js code into nThreshold.js
-      const Role = rolesCache.find(role => role.name == 'Voters');
+
+      // const Role = rolesCache.find(role => role.name == 'Voters');
+      const Role = rolesCache.find(role => role.id === allowedRoles);
 
       let votersOnline = membersCache
          .filter(member => member.presence?.status == 'online')
