@@ -134,8 +134,7 @@ module.exports = {
          emojiId === nermanEmojiId &&
          reaction.count >= voteThreshold
       ) {
-         // disabled because I don't want to keep erasing twitter messages
-         // nTwitter.post(tweetContent, msgAttachmentUrls);
+         nTwitter.post(tweetContent, msgAttachmentUrls);
 
          // mark message with NermanBlast emoji
          await reaction.message.react('932664888642400276');
