@@ -20,7 +20,7 @@ module.exports = {
 
       // console.log('pollSubmit.js -- modal', { modal });
 
-      await modal.deferReply({ ephemeral: true });
+      await modal.deferReply();
 
       const {
          client,
@@ -336,9 +336,10 @@ module.exports = {
       // Emit an event to trigger adding a new poll to the db poll interval queue
       client.emit('enqueuePoll', await newPoll);
 
-      return modal.editReply({
-         content: 'Poll has been created!',
-         ephemeral: true,
+      // const reply = await modal.editReply({
+      return await modal.deleteReply({
+         content: 'Poll Submitted!',
       });
+
    },
 };
