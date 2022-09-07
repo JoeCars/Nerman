@@ -16,8 +16,8 @@ module.exports = {
       if (bot === true) return;
 
       if (
-         !PollChannel.countDocuments({ channelId }) ||
-         !Poll.countDocuments({ messageId })
+         !(await PollChannel.countDocuments({ channelId })) ||
+         !(await Poll.countDocuments({ messageId }))
       )
          return;
 
