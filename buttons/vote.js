@@ -79,8 +79,9 @@ module.exports = {
       //    ephemeral: true,
       // });
 
-
-      const capitalizedOptions = attachedPoll.pollData.choices.map(choice => choice[0].toUpperCase() + choice.substring(1))
+      const capitalizedOptions = attachedPoll.pollData.choices.map(
+         choice => choice[0].toUpperCase() + choice.substring(1)
+      );
 
       // const optionsString = attachedPoll.pollData.choices.join(', ');
       const optionsString = capitalizedOptions.join(', ');
@@ -99,7 +100,9 @@ module.exports = {
          .setLabel(`Type ${attachedPoll.pollData.voteAllowance} Choice(s)`)
          .setPlaceholder(optionsString)
          .setDefaultValue(optionsString)
-         .setStyle('LONG');
+         .setStyle('SHORT')
+         .setMaxLength(100)
+         .setRequired(true);
 
       // disabled until DJS supports SELECT MENU Modal
       // const selectOptions = new SelectMenuComponent()
