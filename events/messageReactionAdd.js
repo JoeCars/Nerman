@@ -3,32 +3,63 @@ const nMongoDB = require(`../helpers/mongodb.js`);
 const nThreshold = require(`../helpers/nThreshold.js`);
 const tenor = require(`../helpers/tenor.js`);
 
+const nermanEmojiId =
+   process.env.DEPLOY_STAGE === 'staging'
+      ? process.env.TESTNERMAN_EMOJI_ID
+      : process.env.DEVNERMAN_EMOJI_ID;
+
+// ez loggins
+const { log: l, time: t, timeEnd: te } = console;
+
 module.exports = {
    name: 'messageReactionAdd',
    async execute(reaction, user) {
       //reaction.message.guild.roles.cache.forEach(role => console.log(role.name, role.id)) //prints all rolls
       //"@everyone" is default role
 
-      console.log('HI MOM');
-      console.log('HI MOM');
       const {
-         attachments,
-         content,
-         embeds,
-         author: { username, id },
-         guild: {
-            members: { cache: membersCache },
-            roles: { cache: rolesCache },
+         emoji,
+         emoji: { id: emojiId },
+         message: {
+            attachments,
+            content,
+            embeds,
+            author: { username, id },
+            guild: {
+               members: { cache: membersCache },
+               roles: { cache: rolesCache },
+            },
+            mentions: { members: mentionsMembers },
+            reactions: { cache: reactionsCache },
          },
-         mentions: { members: mentionsMembers },
-         reactions: { cache: reactionsCache },
-      } = reaction.message;
+      } = reaction;
+
+      l(process.env.DEPLOY_STAGE);
+      l({ nermanEmojiId });
+      l({ emojiId });
+
+      if (process.env.DEPLOY_STAGE === 'staging') return;
+      if (emojiId !== nermanEmojiId) {
+         l(`This is not MY nerman --- ${process.env.DEPLOY_STAGE}`);
+         return;
+      } else {
+         l(`MY BABY NERMAN --- ${process.env.DEPLOY_STAGE}`);
+      }
 
       const authorName = membersCache.get(id).nickname ?? username;
 
-      console.log(reaction.message.reactions);
-      console.log(reactionsCache);
-      console.log(await reactionsCache.get());
+      // console.log({ reaction });
+      console.log({ emoji });
+      console.log(emoji.name);
+      console.log(emoji.id); // yus
+      console.log(emoji.identifier); // maybe yus
+      // console.log(await emoji.toString());
+      // console.log(await reaction.fetch());
+      // console.log(reaction.message.reactions);
+      // console.log(reactionsCache);
+      // console.log(await reactionsCache.get());
+
+      // return;
 
       // below code to calculate voteThreshold should be refactored with threshold.js code into nThreshold.js
       const Role = rolesCache.find(role => role.name == 'Voters');
@@ -62,10 +93,10 @@ module.exports = {
       //    'Which is Nerman,',
       //    await reactionsCache.get('931919315010220112') // THis is nothing, apparently?
       // );
-      console.log(
-         'and which is Blast?',
-         await reactionsCache.get('932664888642400276')
-      );
+      // console.log(
+      //    'and which is Blast?',
+      //    await reactionsCache.get('932664888642400276')
+      // );
 
       if (attachments.size > 0) {
          for (const attachment of attachments) {
@@ -83,12 +114,18 @@ module.exports = {
          msgAttachmentUrls.push(tenorURL);
       }
 
+      // if (
+      //    !messageTweeted &&
+      //    reaction.emoji.name == 'Nerman' &&
+      //    reaction.count > voteThreshold - 1
+      // ) {
       if (
          !messageTweeted &&
-         reaction.emoji.name == 'Nerman' &&
-         reaction.count > voteThreshold - 1
+         emojiId === nermanEmojiId &&
+         reaction.count >= voteThreshold
       ) {
-         nTwitter.post(tweetContent, msgAttachmentUrls);
+         // disabled because I don't want to keep erasing twitter messages
+         // nTwitter.post(tweetContent, msgAttachmentUrls);
 
          // mark message with NermanBlast emoji
          await reaction.message.react('932664888642400276');
