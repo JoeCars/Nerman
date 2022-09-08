@@ -12,8 +12,6 @@ const PollChannelSchema = new Schema({
    quorum: { type: Number, default: 1 }, // leaving default as 1 for testuing purposes
 });
 
-
-
 // const PollChannelSchema = new Schema({
 //    _id: Schema.Types.ObjectId,
 //    channelId: { type: String, required: true, unique: true },
@@ -33,6 +31,7 @@ const PollChannelSchema = new Schema({
 // });
 
 PollChannelSchema.virtual('durationMs').get(function () {
+   console.log('DURATIONNNNNNNNN', this.duration);
    return this.duration * 60 * 60 * 1000;
 });
 

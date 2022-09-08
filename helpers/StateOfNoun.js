@@ -97,14 +97,24 @@ async function getLatestProposalData() {
             '| new-proposal init - setting latest prop to ' +
                data.proposals[0].id
          );
-         console.log('| Logging Data ' + JSON.stringify(data.proposals[0]));
-         console.log('| Logging Data ' + logToObject(data.proposals[0]));
+         console.log(
+            '| Logging Data JSON.stringify(data.proposals[0])\n' +
+               JSON.stringify(data.proposals[0])
+         );
+         console.log(
+            '| Logging Data logToObject(data.proposals[0])\n' +
+               logToObject(data.proposals[0])
+         );
+         console.log(
+            '| Logging Data JSON.parse(data.proposals[0])\n' +
+               JSON.parse(data.proposals[0])
+         );
       } else if (latestProposal.id != data.proposals[0].id) {
          let newProposalCount = data.proposals[0].id - latestProposal.id;
          let proposals = data.proposals;
 
          console.log('| new proposal(s): ' + newProposalCount);
-         console.log({ data });
+         console.log('NEW PROPOSAL DATA \n',{ data });
          if (newProposalCount > 1) {
             const dataNew = await NounsDAO.getLatestProposals(
                newProposalCount,
