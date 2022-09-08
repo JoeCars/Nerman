@@ -38,7 +38,10 @@ module.exports = {
          });
 
       const durRegex = new RegExp(/^\d{1,3}(\.\d{1,2})?$/, 'g');
-      const quorRegex = new RegExp(/^\d{1,2}(\.\d{1,2})?$/, 'g');
+      // const quorRegex = new RegExp(/^\d{1,2}(\.\d{1,2})?$/, 'g');
+
+      // /^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/;
+      const quorRegex = new RegExp(/^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/);
       const optionRegex = new RegExp(
          /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?$/
       );
