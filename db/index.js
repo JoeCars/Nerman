@@ -132,17 +132,28 @@ module.exports = async client => {
                            ])
                            .exec()) ?? null;
 
+                     // todo Maybe try evaluating for whether or not this poll is already closed instead of trying to check for the presence of an existing message and checking if null
                      console.log('LOOKING FOR DELETED POLL THIS BE IT', {
                         closingPoll,
                      });
 
                      if (closingPoll !== null && closingPoll.config !== null) {
-                        const message = await client.channels.cache
-                           .get(closingPoll.config.channelId)
-                           .messages.fetch(closingPoll.messageId);
+
+                        // todo consider whether or not this is better than using a channel messages.fetch()? perhaps using the fetch instead of the get() will affect this operation if the bot goes offline and this somehow clears the cache
+                        const message =
+                           (await client.channels.cache
+                              .get(closingPoll.config.channelId)
+                              .messages.cache.get(closingPoll.messageId)) ??
+                           null;
+
+                        console.log({ message });
                         // const message = await client.channels.cache
                         //    .get(foundPoll.config.channelId)
                         //    .messages.fetch(foundPoll.messageId);
+
+                        if (message === null) {
+                           return openPolls.shift();
+                        }
 
                         const eligibleVoters = closingPoll.allowedUsers.size;
 
