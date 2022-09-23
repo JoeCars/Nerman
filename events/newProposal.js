@@ -13,7 +13,7 @@ const propChannelId =
 
 module.exports = {
    name: 'newProposal',
-   async execute(interaction, testProposal) {
+   async execute(interaction, proposal) {
       const {
          client,
          guildId,
@@ -28,19 +28,25 @@ module.exports = {
             user,
             user: { username, discriminator },
          },
+         // } = interaction;
       } = interaction;
 
       const propChannel = await cache.get(propChannelId);
-      const configExists = !!(await PollChannel.countDocuments({
-         channelId: propChannel.id,
-      }).exec());
+      // const testConExists = await PollChannel.configExists(propChannel.id);
+      // console.log({ testConExists });
+      const configExists = await PollChannel.configExists(propChannel.id);
+      console.log({ configExists });
       if (!configExists) {
          l('NO CHANNEL CONFIG ---- RETURNING');
          return;
       }
+
       // l({ title });
 
-      const { id: propId, description: desc } = testProposal.data.proposals[0];
+      l({ interaction });
+      l({ proposal });
+
+      const { id: propId, description: desc } = proposal;
       const titleRegex = new RegExp(/^(\#\s(\w+\s)+--\s(\w+\s)+(\w+\s+\n?))/);
       const title = desc.match(titleRegex)[0].replaceAll(/^(#\s)|(\n+)$/g, '');
       const description = `https://nouns.wtf/vote/${propId}`;
@@ -138,11 +144,11 @@ module.exports = {
 
       console.log({ mentions });
 
-      let message = await propChannel.send({
-         content: mentions,
-         embeds: [embed],
-         components: [voteActionRow],
-      });
+      // let message = await propChannel.send({
+      // content: mentions,
+      // embeds: [embed],
+      // components: [voteActionRow],
+      // });
 
       const pollData = {
          title,
@@ -156,7 +162,8 @@ module.exports = {
       // todo try to implement env for the allowed roles so that we can do this dynamically when hosting and using in other servers
       // todo also this should be done via fetching the config
       try {
-         const allowedUsers = await message.guild.members
+         // const allowedUsers = await message.guild.members
+         const allowedUsers = await interaction.guild.members
             .fetch({
                withPresences: true,
             })
@@ -203,7 +210,8 @@ module.exports = {
          _id: new Types.ObjectId(),
          guildId,
          creatorId: user.id,
-         messageId: message.id,
+         // messageId: message.id,
+         messageId: interaction.id,
          // config: config._id,
          config: channelConfig._id,
          pollData,
@@ -220,8 +228,6 @@ module.exports = {
             l({ channelConfig });
             l(channelConfig.duration);
             l(channelConfig.durationMs);
-
-
 
             const timeEndMilli = new Date(
                savedPoll.timeCreated.getTime() + channelConfig.durationMs
@@ -257,21 +263,26 @@ module.exports = {
                savedPoll.timeEnd.getTime() / 1000
             )}:f>`; // timeEnd
 
-            message.edit({ embeds: [updateEmbed] });
+            // message.edit({ embeds: [updateEmbed] });
+            interaction.edit({
+               content: mentions,
+               embeds: [updateEmbed],
+               components: [voteActionRow],
+            });
             return savedPoll.save();
          })
          .catch(err => console.error(err));
 
       // Emit an event to trigger adding a new poll to the db poll interval queue
-      client.emit('enqueuePoll', await newPoll);
+      client.emit('enqueuePoll', newPoll);
 
       // propChannel.send({
       //    content: 'This emission of an artifical prop has been received!',
       // });
 
-      return interaction.editReply({
-         content: 'Event newProposal processed',
-         ephemeral: true,
-      });
+      // return interaction.edit({
+      //    content: 'Event newProposal processed',
+      //    // ephemeral: true,
+      // });
    },
 };
