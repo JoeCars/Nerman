@@ -1,16 +1,27 @@
 const { model, Schema, SchemaTypes } = require('mongoose');
 
-const PollChannelSchema = new Schema({
-   _id: Schema.Types.ObjectId,
-   channelId: { type: String, required: true, unique: true },
-   allowedRoles: [{ type: String, required: true, default: {} }],
-   duration: { type: Number, required: true },
-   maxUserProposal: { type: Number, default: 1 },
-   anonymous: { type: Boolean, default: false },
-   liveVisualFeed: { type: Boolean, default: false },
-   voteAllowance: { type: Boolean, required: true, default: false },
-   quorum: { type: Number, default: 1 }, // leaving default as 1 for testuing purposes
-});
+const PollChannelSchema = new Schema(
+   {
+      _id: Schema.Types.ObjectId,
+      channelId: { type: String, required: true, unique: true },
+      allowedRoles: [{ type: String, required: true, default: {} }],
+      duration: { type: Number, required: true },
+      maxUserProposal: { type: Number, default: 1 },
+      anonymous: { type: Boolean, default: false },
+      liveVisualFeed: { type: Boolean, default: false },
+      voteAllowance: { type: Boolean, required: true, default: false },
+      quorum: { type: Number, default: 1 }, // leaving default as 1 for testuing purposes
+   },
+   {
+      statics: {
+         async configExists(channelId) {
+            return !!this.countDocuments({
+               channelId: new RegExp(channelId, 'i'),
+            }).exec();
+         },
+      },
+   }
+);
 
 // const PollChannelSchema = new Schema({
 //    _id: Schema.Types.ObjectId,
@@ -32,7 +43,7 @@ const PollChannelSchema = new Schema({
 
 PollChannelSchema.virtual('durationMs').get(function () {
    console.log('DURATIONNNNNNNNN', this.duration);
-   return this.duration * 60 * 60 * 1000;
+   return Math.round(this.duration * 60 * 60 * 1000);
 });
 
 // Should look into:
