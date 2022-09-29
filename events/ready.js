@@ -91,8 +91,11 @@ module.exports = {
             console.log('ready.js -- desc', { desc });
 
             const titleRegex = new RegExp(
-               /^(\#\s(\w+\s)+--\s(\w+\s)+(\w+\s+\n?))/
+               /^(\#\s((\w|[0-9_\-.,\|])+\s+)+(\w+\s?\n?))/
             );
+            // const titleRegex = new RegExp(
+            //    /^(\#\s(\w+\s)+\s(\w+\s)+(\w+\s+\n?))/
+            // );
             const title = desc
                .match(titleRegex)[0]
                .replaceAll(/^(#\s)|(\n+)$/g, '');

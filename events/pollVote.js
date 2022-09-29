@@ -116,15 +116,7 @@ module.exports = {
 
       // await targetPoll.allowedUsers.set(userId, true);
 
-      const updatedPoll = await Poll.findOneAndUpdate(
-         { messageId },
-         { $set: { [`allowedUsers.${userId}`]: true } },
-         { new: true }
-      ).populate([
-         // { path: 'results' },
-         { path: 'countVoters' },
-         { path: 'getVotes', select: 'choices -poll -_id' },
-      ]);
+      const updatedPoll = await Poll.findAndSetVoted(messageId, userId);
 
       let message = await client.channels.cache
          .get(channelId)

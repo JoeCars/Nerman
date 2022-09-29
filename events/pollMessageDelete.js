@@ -13,10 +13,21 @@ module.exports = {
          id: messageId,
       } = message;
 
-      if (bot === true) return;
+      l({ message });
+      l({ bot });
+
+      if (bot === false) return;
+
+      l(!(await PollChannel.configExists(channelId)));
+      l(!(await Poll.countDocuments({ messageId })));
+
+      l(
+         !(await PollChannel.configExists(channelId)) ||
+            !(await Poll.countDocuments({ messageId }))
+      );
 
       if (
-         !(await PollChannel.countDocuments({ channelId })) ||
+         !(await PollChannel.configExists(channelId)) ||
          !(await Poll.countDocuments({ messageId }))
       )
          return;
@@ -31,6 +42,6 @@ module.exports = {
 
       l(await Poll.countDocuments({ messageId }));
 
-      client.emit('dequeuePoll', await messagePoll);
+      client.emit('dequeuePoll', messagePoll);
    },
 };

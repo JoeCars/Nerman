@@ -15,9 +15,14 @@ const PollChannelSchema = new Schema(
    {
       statics: {
          async configExists(channelId) {
-            return !!this.countDocuments({
+            const configExists = await this.countDocuments({
                channelId: new RegExp(channelId, 'i'),
             }).exec();
+
+            console.log('STATIC',{ configExists });
+            console.log('STATIC',!configExists);
+            console.log('STATIC',!!configExists);
+            return !!configExists;
          },
       },
    }

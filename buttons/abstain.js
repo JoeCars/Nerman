@@ -58,16 +58,10 @@ module.exports = {
          });
       }
 
-      const updatedPoll = await Poll.findOneAndUpdate(
-         { messageId },
-         {
-            $set: {
-               [`allowedUsers.${userId}`]: true,
-               [`abstains.${userId}`]: true,
-            },
-         },
-         { new: true }
-      ).exec();
+
+
+      const updatedPoll = await Poll.findAndSetAbstained(messageId, userId);
+
 
       let message = await client.channels.cache
          .get(channelId)

@@ -38,6 +38,8 @@ module.exports = {
          },
       } = modal;
 
+      console.log({ modal });
+
       const channelConfig = await PollChannel.findOne(
          {
             channelId,
@@ -277,69 +279,149 @@ module.exports = {
 
       // console.timeLog({ duration });
 
-      // todo refactor this to use {new: true} and return the document perhaps, rather than this two part operation?
-      const newPoll = await Poll.create({
-         _id: new Types.ObjectId(),
-         guildId,
-         creatorId: user.id,
-         messageId: id,
-         // config: config._id,
-         config: _id,
-         pollData,
-         votes: undefined,
-         abstains: undefined,
-         allowedUsers: snapshotMap,
-         status: 'open',
-      })
-         .then(savedPoll => {
-            // savedPoll = savedPoll.populate('config').exec();
-            let updateEmbed = new MessageEmbed(embed);
-            console.log({ savedPoll });
+      try {
+         // todo refactor this to use {new: true} and return the document perhaps, rather than this two part operation?
+         console.group('Create Poll Attributes');
+         console.log({ guildId });
+         console.log(user.id);
+         console.log({ _id });
+         console.log({ id });
+         console.log({ pollData });
+         console.groupEnd('Create Poll Attributes');
 
-            const timeEndMilli = new Date(
-               savedPoll.timeCreated.getTime() + durationMs
+         const data = {
+            _id: new Types.ObjectId(),
+            guildId,
+            creatorId: user.id,
+            messageId: id,
+            // config: config._id,
+            config: _id,
+            pollData,
+            votes: undefined,
+            abstains: undefined,
+            allowedUsers: snapshotMap,
+            status: 'open',
+         };
 
-               // !testing switching the time for testing purposes
-               // savedPoll.timeCreated.getTime() + 30000
-            );
+         const newPoll = await Poll.createNewPoll(data, durationMs);
+         // const newPoll = await Poll.create(
+         //    [
+         //       {
+         //          _id: new Types.ObjectId(),
+         //          guildId,
+         //          creatorId: user.id,
+         //          messageId: id,
+         //          // config: config._id,
+         //          config: _id,
+         //          pollData,
+         //          votes: undefined,
+         //          abstains: undefined,
+         //          allowedUsers: snapshotMap,
+         //          status: 'open',
+         //       },
+         //    ],
 
-            savedPoll.timeEnd = timeEndMilli.toISOString();
+         //    { new: true }
+         // ).then(docArray => docArray[0]);
 
-            updateEmbed.setFooter(
-               `Submitted by ${nickname ?? username}#${discriminator}`
-               // `Submitted by ${message.author.username}#${message.author.discriminator}`
-            );
+         console.log({ newPoll });
+         let updatedEmbed = new MessageEmbed(embed);
 
-            // updateEmbed.fields[1].value = savedPoll.voterQuorum; // quorum
-            let embedQuorum = Math.floor(
-               savedPoll.allowedUsers.size * (quorum / 100)
-            );
+         console.log(newPoll);
+         console.log(newPoll.timeCreated);
 
-            embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
+         // const timeEndMilli = new Date(
+         //    newPoll.timeCreated.getTime() + durationMs
 
-            updateEmbed.fields[1].value = embedQuorum.toString(); // quorum
-            // updateEmbed.fields[1].value = Math.floor(
-            //    savedPoll.allowedUsers.size * (quorum / 100)
-            // ).toString(); // quorum
-            // updateEmbed.fields[4].value = formatDate(savedPoll.timeEnd); // timeEnd
+         //    // !testing switching the time for testing purposes
+         //    // savedPoll.timeCreated.getTime() + 30000
+         // );
+         // newPoll.timeEnd = timeEndMilli.toISOString();
+         // await newPoll.save();
 
-            //todo Maybe switch this to a Poll.create({...},{new: true}) then modify approach
-            updateEmbed.fields[4].value = `<t:${Math.floor(
-               savedPoll.timeEnd.getTime() / 1000
-            )}:f>`; // timeEnd
+         updatedEmbed.setFooter(
+            `Submitted by ${nickname ?? username}#${discriminator}`
+         );
 
-            message.edit({ embeds: [updateEmbed] });
-            return savedPoll.save();
-         })
-         .catch(err => console.error(err));
+         let embedQuorum = Math.floor(
+            newPoll.allowedUsers.size * (quorum / 100)
+         );
+
+         embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
+
+         updatedEmbed.fields[1].value = embedQuorum.toString(); // quorum
+
+         updatedEmbed.fields[4].value = `<t:${Math.floor(
+            newPoll.timeEnd.getTime() / 1000
+         )}:f>`; // timeEnd
+
+         client.emit('enqueuePoll', await newPoll);
+         message.edit({ embeds: [updatedEmbed] });
+      } catch (error) {
+         console.log('BIG FAT FUCKN ERROR, BRUH');
+         console.error(error);
+      }
+
+      // const newPoll = await Poll.create({
+      //    _id: new Types.ObjectId(),
+      //    guildId,
+      //    creatorId: user.id,
+      //    messageId: id,
+      //    // config: config._id,
+      //    config: _id,
+      //    pollData,
+      //    votes: undefined,
+      //    abstains: undefined,
+      //    allowedUsers: snapshotMap,
+      //    status: 'open',
+      // })
+      //    .then(savedPoll => {
+      //       // savedPoll = savedPoll.populate('config').exec();
+      //       let updateEmbed = new MessageEmbed(embed);
+      //       console.log({ savedPoll });
+
+      //       const timeEndMilli = new Date(
+      //          savedPoll.timeCreated.getTime() + durationMs
+
+      //          // !testing switching the time for testing purposes
+      //          // savedPoll.timeCreated.getTime() + 30000
+      //       );
+
+      //       savedPoll.timeEnd = timeEndMilli.toISOString();
+
+      //       updateEmbed.setFooter(
+      //          `Submitted by ${nickname ?? username}#${discriminator}`
+      //          // `Submitted by ${message.author.username}#${message.author.discriminator}`
+      //       );
+
+      //       // updateEmbed.fields[1].value = savedPoll.voterQuorum; // quorum
+      //       let embedQuorum = Math.floor(
+      //          savedPoll.allowedUsers.size * (quorum / 100)
+      //       );
+
+      //       embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
+
+      //       updateEmbed.fields[1].value = embedQuorum.toString(); // quorum
+      //       // updateEmbed.fields[1].value = Math.floor(
+      //       //    savedPoll.allowedUsers.size * (quorum / 100)
+      //       // ).toString(); // quorum
+      //       // updateEmbed.fields[4].value = formatDate(savedPoll.timeEnd); // timeEnd
+
+      //       //todo Maybe switch this to a Poll.create({...},{new: true}) then modify approach
+      //       updateEmbed.fields[4].value = `<t:${Math.floor(
+      //          savedPoll.timeEnd.getTime() / 1000
+      //       )}:f>`; // timeEnd
+
+      //       message.edit({ embeds: [updateEmbed] });
+      //       return savedPoll.save();
+      //    })
+      //    .catch(err => console.error(err));
 
       // Emit an event to trigger adding a new poll to the db poll interval queue
-      client.emit('enqueuePoll', await newPoll);
 
       // const reply = await modal.editReply({
       return await modal.deleteReply({
          content: 'Poll Submitted!',
       });
-
    },
 };

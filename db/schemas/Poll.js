@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { model, Schema, Types } = require('mongoose');
+const { PollChannel } = require('../schemas/PollChannel');
 
 // Building Up, start basic
 const PollSchema = new Schema(
@@ -61,6 +62,57 @@ const PollSchema = new Schema(
    },
    {
       timestamps: { createdAt: 'timeCreated', updatedAt: 'modified' },
+      query: {
+         byMessageId(messageId) {
+            return this.where({ messsageId: new RegExp(messageId, 'i') });
+         },
+      },
+      statics: {
+         async findAndSetAbstained(messageId, userId) {
+            const updatedPoll = await this.findOneAndUpdate(
+               { messageId },
+               {
+                  $set: {
+                     [`allowedUsers.${userId}`]: true,
+                     [`abstains.${userId}`]: true,
+                  },
+               },
+               { new: true }
+            ).exec();
+            return updatedPoll;
+         },
+         async findAndSetVoted(messageId, userId) {
+            const updatedPoll = await this.findOneAndUpdate(
+               { messageId },
+               {
+                  $set: {
+                     [`allowedUsers.${userId}`]: true,
+                  },
+               },
+               { new: true }
+            )
+               .populate([
+                  // { path: 'results' },
+                  { path: 'countVoters' },
+                  { path: 'getVotes', select: 'choices -poll -_id' },
+               ])
+               .exec();
+            return updatedPoll;
+         },
+         async createNewPoll(data, duration) {
+            const newPoll = await this.create([data], { new: true }).then(
+               docArray => docArray[0]
+            );
+
+            const timeEndMilli = new Date(
+               newPoll.timeCreated.getTime() + duration
+            );
+
+            newPoll.timeEnd = timeEndMilli.toISOString();
+
+            return await newPoll.save();
+         },
+      },
    }
 );
 

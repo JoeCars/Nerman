@@ -82,9 +82,15 @@ module.exports = async client => {
 
             client.on('dequeuePoll', oldPoll => {
                console.log({ oldPoll });
-               const idx = openPolls.findIndex(({ _id }) =>
-                  _id.equals(oldPoll._id)
-               );
+               // const idx = openPolls.findIndex(({ _id }) => {
+               const idx = openPolls.findIndex(({ _id }) => {
+                  console.log('_id', _id);
+                  console.log('oldPoll ID', oldPoll._id);
+                  // console.log('oldPoll', oldPoll);
+                  // console.log('poll', poll);
+                  return _id.equals(oldPoll._id);
+                  // return poll._id.equals(oldPoll._id);
+               });
 
                console.log({ idx });
 
@@ -138,8 +144,16 @@ module.exports = async client => {
                      });
 
                      if (closingPoll !== null && closingPoll.config !== null) {
-
                         // todo consider whether or not this is better than using a channel messages.fetch()? perhaps using the fetch instead of the get() will affect this operation if the bot goes offline and this somehow clears the cache
+
+                        console.log(
+                           'closingPoll !== null && closingPoll.config !== null',
+                           { closingPoll }
+                        );
+                        console.log(
+                           'closingPoll !== null && closingPoll.config !== null',
+                           closingPoll.config
+                        );
                         const message =
                            (await client.channels.cache
                               .get(closingPoll.config.channelId)

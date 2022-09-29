@@ -52,7 +52,14 @@ module.exports = {
             },
          } = interaction;
 
-         if (!(await PollChannel.countDocuments({ channelId }))) {
+         // if (!(await PollChannel.countDocuments({ channelId }))) {
+
+         const configExists = await PollChannel.configExists(channelId);
+
+         console.log('CREATE',{ configExists });
+
+         // Test existence of channel configuration
+         if (!configExists) {
             return interaction.reply({
                content:
                   'There are no configurations registered to this channel. You may only register from a channel in which polling has been configured.',
@@ -60,11 +67,13 @@ module.exports = {
             });
          }
 
+         // Actually retrieve configuration
          const channelConfig = await PollChannel.findOne(
             { channelId },
             'maxUserProposal voteAllowance'
          ).exec();
 
+         
          const countedPolls = await Poll.countDocuments({
             config: channelConfig._id,
             creatorId: userId,
@@ -220,15 +229,15 @@ module.exports = {
                ephemeral: true,
             });
 
-         const configCheck = await PollChannel.countDocuments({
-            channelId,
-         });
+         // const configCheck = await PollChannel.countDocuments({
+         //    channelId,
+         // });
+         const configCheck = await PollChannel.configExists(channelId);
          // console.log({ configCheck });
 
-         // console.log(!!configCheck);
-         // console.log(await PollChannel.countDocuments({ channelId }));
 
-         if (!!configCheck)
+
+         if (configCheck)
             return interaction.reply({
                content:
                   'There already exists a configuration for this channel.',
