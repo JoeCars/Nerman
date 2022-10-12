@@ -59,6 +59,9 @@ const PollSchema = new Schema(
          default: 'closed',
          enum: ['open', 'closed'],
       },
+      pollNumber: {
+         type: Number,
+      },
    },
    {
       timestamps: { createdAt: 'timeCreated', updatedAt: 'modified' },
