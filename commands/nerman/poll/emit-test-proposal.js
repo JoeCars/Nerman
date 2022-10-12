@@ -8,6 +8,8 @@ const propChannelId =
       ? process.env.TESTNERMAN_NOUNCIL_CHAN_ID
       : process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
 
+const adminId = process.env.NERMAN_G_ADMIN_ID;
+
 module.exports = {
    data: new SlashCommandBuilder()
       .setName('emit-test-proposal')
@@ -28,7 +30,7 @@ module.exports = {
 
       await interaction.deferReply({ ephemeral: true });
 
-      if (!roleCache.has('919784986641575946')) return;
+      if (!roleCache.has(adminId)) return;
 
       const propChannel = await channelCache.get(propChannelId);
 
