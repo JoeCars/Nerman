@@ -44,6 +44,14 @@ Nice
    <dd>Needed for nerman to reply to interactions with messages.</dd>
    <br />
 
+   <dt><strong>Create Public Threads:</strong></dt>
+   <dd>Needed for nerman to instantiate a thread attached to the Polls he generates.</dd>
+   <br />
+
+   <dt><strong>Manage Messages:</strong></dt>
+   <dd>Needed for nerman to delete messages out of the nouncil-votes channel, or whichever one harbors the generation of newProposal based polls.</dd>
+   <br />
+
    <dt><strong>Embed Links:</strong></dt>
    <dd>Nerman includes this so that the link returned from the */noun* and */nouner* commands will have a small preview available rather than requiring the user to folow the hyperlink to see it.</dd>
    <br />
@@ -70,4 +78,6 @@ Nice
 
 ### **OAuth2 - Template URL:**
 
-https://discord.com/api/oauth2/authorize?client_id=xxxxxxxxxxxxxxxxxx&permissions=2147797056&redirect_uri=https%3A%2F%2Fwww.google.com&response_type=code&scope=applications.commands%20bot%20messages.read%20guilds.members.read%20guilds
+
+
+https://discord.com/api/oauth2/authorize?client_id=932714300148178946&permissions=36507543616&redirect_uri=https%3A%2F%2Fgoogle.com&response_type=code&scope=bot%20applications.commands%20guilds%20guilds.members.read%20messages.read
