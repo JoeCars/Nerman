@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const testProposal = require('../../../scratchcode/testGraphSample.json');
+const testProposal = require('../../../dummyData/testGraphSample.json');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const { log: l, time: t, timeEnd: te } = console;
 
