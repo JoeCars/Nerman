@@ -1,8 +1,10 @@
 const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 const { roleMention } = require('@discordjs/builders');
 
-const initPollMessage = (title, description, channelConfig) => {
-   const mentions = channelConfig.allowedRoles
+const initPollMessage = async data => {
+   const { title, description, channelConfig, everyoneId } = data;
+
+   const mentions = await channelConfig.allowedRoles
       .map(role => (role !== everyoneId ? roleMention(role) : '@everyone'))
       .join(' ');
 
@@ -39,3 +41,5 @@ const initPollMessage = (title, description, channelConfig) => {
       components: [voteActionRow],
    };
 };
+
+module.exports = { initPollMessage };
