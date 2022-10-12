@@ -1,4 +1,4 @@
-const nTwitter = require(`../helpers/twitter.js`);
+// const nTwitter = require(`../helpers/twitter.js`);
 const nMongoDB = require(`../helpers/mongodb.js`);
 const nThreshold = require(`../helpers/nThreshold.js`);
 const tenor = require(`../helpers/tenor.js`);
