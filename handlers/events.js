@@ -10,7 +10,8 @@ module.exports = async (client, reload) => {
    // console.log('LOGGING EVENTS')
    // console.log(Events)
 
-   let eventFiles = getFiles('./events', '.js');
+   let eventFiles = await getFiles('events', '.js');
+   // let eventFiles = await getFiles('../events', '.js');
 
    if (eventFiles.length === 0) {
       console.log(`No event files to load.`);
@@ -18,9 +19,12 @@ module.exports = async (client, reload) => {
    }
 
    eventFiles.forEach(file => {
-      if (reload) delete require.cache[require.resolve(`../events/${file}`)];
+      console.log({ file });
+      if (reload) delete require.cache[require.resolve(file)];
+      // if (reload) delete require.cache[require.resolve(`../events/${file}`)];
 
-      const event = require(`../events/${file}`);
+      // const event = require(`../events/${file}`);
+      const event = require(`../${file}`);
 
       // if (!Events.includes)
       // client.events.set(event.name, event);
@@ -28,7 +32,6 @@ module.exports = async (client, reload) => {
       //    if (!reload)
       //       console.log(`The event: ${file} loaded`)
       //       initEvents(nerman);
-
 
       if (event.name && typeof event.name === 'string') {
          client.events.set(event.name, event);
