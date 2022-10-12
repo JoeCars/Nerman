@@ -12,13 +12,32 @@ module.exports = async client => {
    const commandsArr = [];
 
    client.commands = new Collection();
+   client.subCommands = new Collection();
 
-   const commands = getFiles('./commands', '.js');
+   const commands = await getFiles('commands', '.js');
+
+   console.log({ commands });
 
    if (commands.length === 0) throw 'No slash commands provided';
 
    commands.forEach(commandFile => {
-      const command = require(`../commands/${commandFile}`);
+      // const command = require(`../commands/${commandFile}`);
+      console.log({ commandFile });
+
+      if (
+         process.env.DEPLOY_STAGE !== 'development' &&
+         commandFile === 'commands/reload-test.js'
+      ) {
+         console.log('RELOAD TEST', { commandFile });
+         return;
+      }
+      const command = require(`../${commandFile}`);
+
+      if (command.subCommand) {
+         return client.subCommands.set(command.subCommand, command);
+      }
+
+      console.log({ command });
 
       if (command.data.name && typeof command.data.name === 'string') {
          commandsArr.push(command.data.toJSON());
@@ -31,7 +50,6 @@ module.exports = async client => {
             ].join(' ')
          );
       }
-
    });
 
    const rest = new REST({ version: '9' }).setToken(token);
