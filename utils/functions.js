@@ -1,7 +1,28 @@
-const fs = require('fs');
+const { readdir } = require('fs').promises;
 
-const getFiles = (path, ending) => {
-   return fs.readdirSync(path).filter(file => file.endsWith(ending));
+const getFiles = async (path, ending) => {
+   let fileList = [];
+
+   const files = await readdir(path, { withFileTypes: true });
+
+   for (const file of files) {
+      if (file.isDirectory()) {
+
+         fileList = [
+            ...fileList,
+            ...(await getFiles(`${path}/${file.name}`, '.js')),
+         ];
+
+         
+      } else {
+         if (file.name.endsWith(ending)) {
+            fileList.push(`${path}/${file.name}`);
+         }
+      }
+   }
+   console.log({ fileList });
+
+   return fileList;
 };
 
 const logToObject = async target => {
@@ -137,9 +158,9 @@ const formatDate = (date, format) => {
    const minutes = date.getMinutes();
    const seconds = date.getSeconds();
    const amPm = hours >= 12 ? 'pm' : 'am';
-   const time = `${
-      hours !== 12 ? hours % 12 : 0
-   }:${minutes.toString().padStart(2,'0')} ${amPm}`;
+   const time = `${hours !== 12 ? hours % 12 : 0}:${minutes
+      .toString()
+      .padStart(2, '0')} ${amPm}`;
    const formatted = `${time} ${tzAbbr} ${month} ${calendarDay}, ${year}`;
    // Return format: 5:00 am/pm Timezone(EST) Dec 26, 2022
    return formatted;
