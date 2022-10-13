@@ -1,27 +1,13 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { CommandInteraction } = require('discord.js');
 const fetch = require('node-fetch');
-const nounpic = require(`../helpers/nounpic.js`);
+const nounpic = require(`../../../helpers/nounpic.js`);
 
 module.exports = {
-   data: new SlashCommandBuilder()
-      .setName('nouner')
-      .setDescription(
-         'Retrieve a tile of Nouns owned by a nouner.  Command Structure: /nouner <ETH Address || ENS Name>'
-      )
-      .addStringOption(option =>
-         option
-            .setName('target')
-            .setDescription('Enter a ENS name or wallet address')
-            .setRequired(true)
-      )
-      .addBooleanOption(option =>
-         option
-            .setName('delegates')
-            .setDescription(
-               'Include Nouns delegated to this address? (This is false if left blank)'
-            )
-      ),
-
+   subCommand: 'nerman.nouner',
+   /**
+    *
+    * @param {CommandInteraction} interaction
+    */
    async execute(interaction) {
       const walletRegex = /^0x[a-fA-F0-9]{40}$/;
       const ensRegex = /^.*\.eth$/;

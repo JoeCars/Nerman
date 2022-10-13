@@ -6,6 +6,11 @@ npm-debug.log
 helpers/mongodb.js
 commands/check.js
 commands/reload-test.js
+commands/scratch-pad.js
+commands/test-poll.js
 events/testReact.js
 events/react-test.js
+scratchcode/
 scratchcode/*
+validation/
+utils/remindSheet.js
