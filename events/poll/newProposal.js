@@ -58,6 +58,7 @@ module.exports = {
 
       const { id: propId, description: desc } = proposal;
       const titleRegex = new RegExp(/^#+\s+.+\n/);
+      // const prop = `Prop ${propId}: `;
       // const titleRegex = new RegExp(
       //    /^(\#\s((\w|[0-9_\-.,\|])+\s+)+(\w+\s?\n?))/
       // );
@@ -128,6 +129,7 @@ module.exports = {
       // }
 
       const messageObject = await initPollMessage({
+         propId,
          title,
          description,
          channelConfig,

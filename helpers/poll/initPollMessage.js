@@ -1,8 +1,26 @@
 const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 const { roleMention } = require('@discordjs/builders');
 
-const initPollMessage = async data => {
-   const { title, description, channelConfig, everyoneId } = data;
+const initPollMessage = async ({
+   propId,
+   title,
+   description,
+   channelConfig,
+   everyoneId,
+}) => {
+   // const { propId, title, description, channelConfig, everyoneId } = data;
+
+   if (propId) {
+      title = `Prop ${propId}: ${title}`
+   }
+
+   // console.log('LOGGING PROP NUMBER', { propIdT });
+   console.log('LOGGING PROP DATA', {
+      title,
+      description,
+      channelConfig,
+      everyoneId,
+   });
 
    const mentions = await channelConfig.allowedRoles
       .map(role => (role !== everyoneId ? roleMention(role) : '@everyone'))
@@ -24,7 +42,7 @@ const initPollMessage = async data => {
 
    const embed = new MessageEmbed()
       .setColor('#ffffff')
-      .setTitle(`${title}`)
+      .setTitle(title)
       .setDescription(description)
       .addField('\u200B', '\u200B')
       .addField('Quorum', '...', true)
