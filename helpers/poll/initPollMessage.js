@@ -2,7 +2,7 @@ const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 const { roleMention } = require('@discordjs/builders');
 
 const initPollMessage = async ({
-   propId,
+   // propId,
    title,
    description,
    channelConfig,
@@ -10,9 +10,9 @@ const initPollMessage = async ({
 }) => {
    // const { propId, title, description, channelConfig, everyoneId } = data;
 
-   if (propId) {
-      title = `Prop ${propId}: ${title}`
-   }
+   // if (propId) {
+   //    title = `Prop ${propId}: ${title}`
+   // }
 
    // console.log('LOGGING PROP NUMBER', { propIdT });
    console.log('LOGGING PROP DATA', {
