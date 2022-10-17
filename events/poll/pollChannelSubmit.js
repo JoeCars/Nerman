@@ -63,11 +63,13 @@ module.exports = {
       let pollDuration = modal.getTextInputValue('pollDuration');
       const maxProposals = parseInt(modal.getTextInputValue('maxProposals'));
       let pollQuorum = modal.getTextInputValue('pollQuorum');
-      const pollChannelOptions = modal
-         .getTextInputValue('pollChannelOptions')
-         .split(',')
-         .map(x => x.trim())
-         .filter(v => v !== '');
+      const pollChannelOptions = modal.getTextInputValue('pollChannelOptions')
+         ? modal
+              .getTextInputValue('pollChannelOptions')
+              .split(',')
+              .map(x => x.trim())
+              .filter(v => v !== '')
+         : [];
 
       console.log({ votingRoles });
       console.log({ pollChannelOptions });
@@ -119,7 +121,10 @@ module.exports = {
             ephermeral: true,
          });
       }
-      if (pollChannelOptions.some(option => !optionRegex.test(option))) {
+      if (
+         pollChannelOptions.length &&
+         pollChannelOptions.some(option => !optionRegex.test(option))
+      ) {
          return modal.editReply({
             content:
                'One or more of the Poll Channel Options you have entered does not match.\nYour options are: vote-allowance, live-results, anonymous-voting',
