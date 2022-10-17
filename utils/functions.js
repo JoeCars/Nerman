@@ -1,4 +1,5 @@
 const { readdir } = require('fs').promises;
+// const { log: l, error: lerr, info: inf, trace: tr, table: tbl} = console;
 
 const getFiles = async (path, ending) => {
    let fileList = [];
@@ -7,13 +8,10 @@ const getFiles = async (path, ending) => {
 
    for (const file of files) {
       if (file.isDirectory()) {
-
          fileList = [
             ...fileList,
             ...(await getFiles(`${path}/${file.name}`, '.js')),
          ];
-
-         
       } else {
          if (file.name.endsWith(ending)) {
             fileList.push(`${path}/${file.name}`);
@@ -168,7 +166,13 @@ const formatDate = (date, format) => {
 
 // encodeURI();
 
+const lc = (label, bg, data) => {
+
+   console.log(`${label}\n\x1b[48;5;${bg}m${data}\x1b[0m]`)
+};
+
 module.exports = {
+   lc,
    getFiles,
    logToObject,
    encodeURI,

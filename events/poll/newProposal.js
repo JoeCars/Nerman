@@ -223,7 +223,7 @@ module.exports = {
 
          interaction.edit(messageObject);
          interaction.startThread({
-            name: 'Discussion',
+            name: title,
             autoArchiveDuration: 60,
          });
 

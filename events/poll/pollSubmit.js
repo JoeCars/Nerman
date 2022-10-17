@@ -417,7 +417,7 @@ module.exports = {
          client.emit('enqueuePoll', newPoll);
          message.edit({ embeds: [updatedEmbed] });
          await message.startThread({
-            name: 'Discussion',
+            name: title,
             autoArchiveDuration: 60,
          });
       } catch (error) {

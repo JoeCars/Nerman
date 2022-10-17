@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const { drawBar, longestString } = require('../helpers/poll');
 // const { encodeURI } = require('../utils/functions');
 const Poll = require('../db/schemas/Poll');
+const { lc } = require('../utils/functions');
 
 // const {
 //    createPollTest,
@@ -63,7 +64,7 @@ module.exports = async client => {
             const openPolls = await Poll.find({ status: 'open' })
                .populate('config', 'channelId')
                .then(foundPolls => {
-                  console.log({ foundPolls });
+                  lc('foundPolls', '131', foundPolls);
                   return foundPolls.sort((a, b) => a.timeEnd - b.timeEnd);
                })
                .catch(err => console.error(err));
@@ -73,15 +74,19 @@ module.exports = async client => {
             // createChannelTest();
 
             client.on('enqueuePoll', newPoll => {
-               console.log('PRE PUSH AND SORT', { openPolls });
+               // console.log('PRE PUSH AND SORT', { openPolls });
+                  lc('PRE PUSH AND SORT\nopenPolls', '131', openPolls);
+
                openPolls.push(newPoll);
                openPolls.sort((a, b) => a.timeEnd - b.timeEnd);
-               console.log('POST PUSH AND SORT', { openPolls });
+               // console.log('POST PUSH AND SORT', { openPolls });
+                  lc('POST PUSH AND SORT\nopenPolls', '132', openPolls);
+
                intervalFunction();
             });
 
             client.on('dequeuePoll', oldPoll => {
-               console.log({ oldPoll });
+               lc('oldPoll','131', oldPoll );
                // const idx = openPolls.findIndex(({ _id }) => {
                const idx = openPolls.findIndex(({ _id }) => {
                   console.log('_id', _id);
@@ -92,10 +97,10 @@ module.exports = async client => {
                   // return poll._id.equals(oldPoll._id);
                });
 
-               console.log({ idx });
+               console.log('idx','132',idx);
 
                openPolls.splice(idx, 1);
-               console.log('POST REMOVAL OF POLL', { openPolls });
+               lc('POST REMOVAL OF POLL\nopenPolls', '133', openPolls );
             });
 
             let intervalId;
@@ -121,8 +126,9 @@ module.exports = async client => {
                      if (!openPolls[0]) {
                         return clearInterval(intervalId);
                      }
-
-                     console.log(openPolls[0]);
+                     console.log('\x1b[33m Welcome to the app! \x1b[0m');
+                     console.log('NERPPPPROPRPR');
+                     console.log(`\x1b[43m${openPolls[0]}\x1b[0m`);
                      const closingPoll =
                         (await Poll.findByIdAndUpdate(
                            openPolls[0]._id,
@@ -354,8 +360,9 @@ module.exports = async client => {
             if (openPolls.length) {
                intervalFunction();
             }
-
-            console.log({ openPolls });
+            // background: ESC[48;5;#m
+            console.log(`openPolls\n\x1b[48;5;162m${openPolls}\x1b[0m`);
+            console.log(`openPolls\n\x1b[46m${openPolls}\x1b[0m`);
          });
          await mongoose.connect(mongoURI, options);
 
