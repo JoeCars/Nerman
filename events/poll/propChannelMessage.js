@@ -1,4 +1,5 @@
 const { Message } = require('discord.js');
+const PollChannel = require('../../db/schemas/PollChannel');
 const propChannelId =
    process.env.DEPLOY_STAGE === 'development'
       ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
@@ -12,6 +13,7 @@ module.exports = {
     * @param {Message} message
     */
    async execute(message) {
+      l({ message });
       const {
          client: {
             user: { id: botId },
@@ -20,9 +22,10 @@ module.exports = {
          author: { id: authorId },
       } = message;
 
-      l({ message });
+      const configExists = await PollChannel.configExists(channelId);
 
-      if (channelId !== propChannelId || botId === authorId) return;
+      // if (channelId !== propChannelId || botId === authorId) return;
+      if (!configExists || botId === authorId) return;
 
       try {
          await message.delete();
