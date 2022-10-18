@@ -319,9 +319,9 @@ module.exports = {
          pollNumber = await PollCount.findOne({ channelId }).exec();
       }
 
-      console.log({ pollNumber });
+      // console.log({ pollNumber });
 
-      console.log({ durationMs });
+      // console.log({ durationMs });
 
       try {
          // todo refactor this to use {new: true} and return the document perhaps, rather than this two part operation?
@@ -415,7 +415,7 @@ module.exports = {
          )}:f>`; // timeEnd
 
          client.emit('enqueuePoll', newPoll);
-         message.edit({ embeds: [updatedEmbed] });
+         await message.edit({ embeds: [updatedEmbed] });
          await message.startThread({
             name: title,
             autoArchiveDuration: 60,
