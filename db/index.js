@@ -75,18 +75,18 @@ module.exports = async client => {
 
             client.on('enqueuePoll', newPoll => {
                // console.log('PRE PUSH AND SORT', { openPolls });
-                  lc('PRE PUSH AND SORT\nopenPolls', '131', openPolls);
+               lc('PRE PUSH AND SORT\nopenPolls', '131', openPolls);
 
                openPolls.push(newPoll);
                openPolls.sort((a, b) => a.timeEnd - b.timeEnd);
                // console.log('POST PUSH AND SORT', { openPolls });
-                  lc('POST PUSH AND SORT\nopenPolls', '132', openPolls);
+               lc('POST PUSH AND SORT\nopenPolls', '132', openPolls);
 
                intervalFunction();
             });
 
             client.on('dequeuePoll', oldPoll => {
-               lc('oldPoll','131', oldPoll );
+               lc('oldPoll', '131', oldPoll);
                // const idx = openPolls.findIndex(({ _id }) => {
                const idx = openPolls.findIndex(({ _id }) => {
                   console.log('_id', _id);
@@ -97,10 +97,10 @@ module.exports = async client => {
                   // return poll._id.equals(oldPoll._id);
                });
 
-               console.log('idx','132',idx);
+               console.log('idx', '132', idx);
 
                openPolls.splice(idx, 1);
-               lc('POST REMOVAL OF POLL\nopenPolls', '133', openPolls );
+               lc('POST REMOVAL OF POLL\nopenPolls', '133', openPolls);
             });
 
             let intervalId;
