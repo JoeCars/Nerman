@@ -30,8 +30,6 @@ module.exports = {
       try {
          await message.delete();
       } catch (error) {
-         console.error('ERROR\n', { error });
-         console.info('INFO\n', { error });
          console.trace('TRACE\n', { error });
       }
    },
