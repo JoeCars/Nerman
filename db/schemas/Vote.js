@@ -13,6 +13,12 @@ const voteSchema = new Schema({
       type: String,
       required: true,
    },
+   // userNested: {
+   //    type: Schema.Types.ObjectId,
+   //    ref: 'User',
+   //    // type: String,
+   //    required: true,
+   // },
    choices: {
       type: [String],
       required: true,
@@ -23,7 +29,6 @@ const voteSchema = new Schema({
       default: '',
    },
 });
-
 
 //Export the model
 module.exports = model('Vote', voteSchema);
