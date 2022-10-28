@@ -19,9 +19,9 @@ const PollChannelSchema = new Schema(
                channelId: new RegExp(channelId, 'i'),
             }).exec();
 
-            console.log('STATIC',{ configExists });
-            console.log('STATIC',!configExists);
-            console.log('STATIC',!!configExists);
+            console.log('STATIC', { configExists });
+            console.log('STATIC', !configExists);
+            console.log('STATIC', !!configExists);
             return !!configExists;
          },
       },
@@ -50,6 +50,8 @@ PollChannelSchema.virtual('durationMs').get(function () {
    console.log('DURATIONNNNNNNNN', this.duration);
    return Math.round(this.duration * 60 * 60 * 1000);
 });
+// PollChannelSchema.virtual('polls',{ref: 'Poll', localField: '_id', foreignField: 'config'});
+// });
 
 // Should look into:
 // Optimistic Concurrency => https://mongoosejs.com/docs/5.x/docs/guide.html#optimisticConcurrency
