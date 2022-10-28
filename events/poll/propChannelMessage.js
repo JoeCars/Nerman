@@ -5,6 +5,7 @@ const propChannelId =
       ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
       : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 const { log: l } = console;
+const { lc } = require('../../utils/functions');
 
 module.exports = {
    name: 'messageCreate',
@@ -15,12 +16,17 @@ module.exports = {
    async execute(message) {
       l({ message });
       const {
+         client,
          client: {
+            user,
             user: { id: botId },
          },
          channelId,
          author: { id: authorId },
       } = message;
+
+      lc('client', '79', client);
+      lc('user', '85', user);
 
       const configExists = await PollChannel.configExists(channelId);
 
