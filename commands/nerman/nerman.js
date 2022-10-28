@@ -47,6 +47,17 @@ module.exports = {
          subcommand
             .setName('threshold')
             .setDescription('Displays # of reactions required to tweet message')
+      )
+      .addSubcommand(subcommand =>
+         subcommand
+            .setName('check-participation')
+            .setDescription('Check user voting participation in given channel')
+            .addStringOption(option =>
+               option
+                  .setName('discord-id')
+                  .setDescription("Enter user's Discord ID")
+                  .setRequired(true)
+            )
       ),
    /**
     *
@@ -54,7 +65,7 @@ module.exports = {
     */
    async execute(interaction) {
       console.log(
-         'interaction.options.getSubcommand',
+         'interaction.options.getSubcommand:\n',
          interaction.options.getSubcommand()
       );
    },
