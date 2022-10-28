@@ -97,7 +97,7 @@ module.exports = async client => {
                   // return poll._id.equals(oldPoll._id);
                });
 
-               console.log('idx', '132', idx);
+               lc('idx', '132', idx);
 
                openPolls.splice(idx, 1);
                lc('POST REMOVAL OF POLL\nopenPolls', '133', openPolls);
@@ -128,7 +128,8 @@ module.exports = async client => {
                      }
                      console.log('\x1b[33m Welcome to the app! \x1b[0m');
                      console.log('NERPPPPROPRPR');
-                     console.log(`\x1b[43m${openPolls[0]}\x1b[0m`);
+                     // console.log(`\x1b[43m${openPolls[0]}\x1b[0m`);
+                     lc('openPolls[0]', '116', openPolls[0]);
                      const closingPoll =
                         (await Poll.findByIdAndUpdate(
                            openPolls[0]._id,
