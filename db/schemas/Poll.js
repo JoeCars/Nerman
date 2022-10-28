@@ -38,6 +38,7 @@ const PollSchema = new Schema(
             required: true,
          },
       },
+      // todo Should maybe peak at this to check on whether or not I'm actually using this votes array. It would be more efficient and follow the Principles of Least Cardinality if I were to eleiminate this field entirely and then rely on the populate virtual to maintain these votes?
       votes: [
          {
             type: Schema.Types.ObjectId,
@@ -53,6 +54,7 @@ const PollSchema = new Schema(
       allowedUsers: {
          type: Map,
          of: Boolean,
+         default: new Map(),
       },
       status: {
          type: String,
