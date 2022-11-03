@@ -36,72 +36,70 @@ module.exports = {
       // l({ mCache });
 
       const voterId = interaction.options.getString('discord-id');
-      const voterDoc = await User.find().byDiscordId(voterId).exec();
+      const voterDoc = await User.findOne().byDiscordId(voterId).exec();
       const {
          roles: { cache: memberRoles },
       } = await mCache.get(voterId);
 
-      if (!voterDoc.length) {
+      if (!voterDoc) {
          l([...memberRoles.keys()]);
 
-         // todo see if I can add this into one of the Schemas to make it reusable
-         const hasVotingRole = await PollChannel.countDocuments({
-            allowedRoles: { $in: [...memberRoles.keys()] },
-         }).exec();
+         const hasVotingRole = await User.checkVotingRoles(memberRoles);
+
+         console.log({ hasVotingRole });
 
          if (!hasVotingRole)
             throw new Error(
                'This member has no voting roles. Their participation can not be gauged, because they are unable to participate.'
             );
 
-         const eligibleChannels = await PollChannel.find({
-            allowedRoles: { $in: [...memberRoles.keys()] },
-         });
+         const eligibleChannels = await User.findEligibleChannels(memberRoles);
 
-         l({ eligibleChannels });
+         //disabled
+         // const eligibleChannels = await PollChannel.find({
+         //    allowedRoles: { $in: [...memberRoles.keys()] },
+         // });
 
-         let channelData = [];
-         let allPolls = [];
-         const channelMap = new Map();
+         l('CHUNGA', { eligibleChannels });
 
-         for (const channel of eligibleChannels) {
-            // l({ channel });
-            // l({ value });
-            const polls = await Poll.aggregate([
-               {
-                  // config: channel._id,
-                  $match: {
-                     [`config`]: channel._id,
-                     [`allowedUsers.${voterId}`]: { $exists: true },
-                  },
-               },
-            ]).exec();
+         // const channelMap = new Map();
 
-            const statsObject = {
-               eligiblePolls: polls.length,
-               participatedPolls: polls.filter(
-                  ({ allowedUsers }) => allowedUsers[voterId] === true
-               ).length,
-            };
+         // for (const channel of eligibleChannels) {
+         //    const polls = await Poll.aggregate([
+         //       {
+         //          $match: {
+         //             [`config`]: channel._id,
+         //             [`allowedUsers.${voterId}`]: { $exists: true },
+         //          },
+         //       },
+         //    ]).exec();
 
-            l({ statsObject });
+         //    const statsObject = {
+         //       eligiblePolls: polls.length,
+         //       participatedPolls: polls.filter(
+         //          ({ allowedUsers }) => allowedUsers[voterId] === true
+         //       ).length,
+         //    };
 
-            channelMap.set(channel.channelId, statsObject);
-            // const polls = await Poll.find({
-            //    config: channel._id,
-            //    allowedUsers: {$in}
-            // }).exec();
+         //    l({ statsObject });
 
-            // allPolls = allPolls.concat(polls);
-         }
+         //    channelMap.set(channel.channelId, statsObject);
+         //    // const polls = await Poll.find({
+         //    //    config: channel._id,
+         //    //    allowedUsers: {$in}
+         //    // }).exec();
 
-         l({ channelMap });
+         //    // allPolls = allPolls.concat(polls);
+         // }
 
-         const newUser = await new User({
-            _id: new Types.ObjectId(),
-            discordId: voterId,
-            eligibleChannels: channelMap,
-         }).save();
+         // l({ channelMap });
+
+         const newUser = await User.createUser(voterId, eligibleChannels);
+         // const newUser = await new User({
+         //    _id: new Types.ObjectId(),
+         //    discordId: voterId,
+         //    eligibleChannels: channelMap,
+         // }).save();
 
          l({ newUser });
 
@@ -116,7 +114,7 @@ module.exports = {
             ephemeral: true,
          });
       } else {
-         const participation = await voterDoc[0].participation(channelId);
+         const participation = await voterDoc.participation(channelId);
 
          interaction.reply({ content: participation, ephemeral: true });
       }

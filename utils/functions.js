@@ -167,8 +167,9 @@ const formatDate = (date, format) => {
 // encodeURI();
 
 const lc = (label, bg, data) => {
-
-   console.log(`${label}\n\x1b[48;5;${bg}m${data}\x1b[0m]`)
+   console.log(
+      `${label}\n\x1b[48;5;${bg}m${data}\x1b[0m]`
+   );
 };
 
 module.exports = {

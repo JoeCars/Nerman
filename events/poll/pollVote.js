@@ -6,6 +6,7 @@ const {
 } = require('discord.js');
 const { Types } = require('mongoose');
 const Poll = require('../../db/schemas/Poll');
+const User = require('../../db/schemas/User');
 const Vote = require('../../db/schemas/Vote');
 
 module.exports = {
@@ -32,6 +33,7 @@ module.exports = {
          customId,
          channelId,
          member: {
+            roles: { cache: memberRoleCache },
             user: { id: userId },
          },
          message: { id: messageId },
@@ -116,7 +118,21 @@ module.exports = {
 
       // await targetPoll.allowedUsers.set(userId, true);
 
+      let votingUser = await User.findOne().byDiscordId(userId).exec();
+
+      if (!votingUser) {
+         const eligibleChannels = await User.findEligibleChannels(
+            memberRoleCache
+         );
+
+         votingUser = await User.createUser(userId, eligibleChannels);
+      }
+
       const updatedPoll = await Poll.findAndSetVoted(messageId, userId);
+
+      console.log({ channelId });
+      console.log('OUTSIDE IF', { votingUser });
+      votingUser.incParticipation(channelId);
 
       let message = await client.channels.cache
          .get(channelId)

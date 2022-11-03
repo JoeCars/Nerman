@@ -1,6 +1,8 @@
-const { model, Schema } = require('mongoose');
+const { model, Schema, Types } = require('mongoose');
+const PollChannel = require('./PollChannel');
+const Poll = require('./Poll');
+const { log: l } = console;
 
-// Declare the Schema of the Mongo model
 const userSchema = new Schema(
    {
       _id: Schema.Types.ObjectId,
@@ -16,7 +18,62 @@ const userSchema = new Schema(
       },
    },
    {
-      statics: {},
+      statics: {
+         async createUser(voterId, eligibleChannels) {
+            const eligibleMap = new Map();
+
+            for (const channel of eligibleChannels) {
+               const polls = await Poll.aggregate([
+                  {
+                     $match: {
+                        [`config`]: channel._id,
+                        [`allowedUsers.${voterId}`]: { $exists: true },
+                     },
+                  },
+               ]).exec();
+
+               const statsObject = {
+                  eligiblePolls: polls.length,
+                  participatedPolls: polls.filter(
+                     ({ allowedUsers }) => allowedUsers[voterId] === true
+                  ).length,
+               };
+
+               l({ statsObject });
+
+               eligibleMap.set(channel.channelId, statsObject);
+            }
+
+            return await this.create({
+               _id: new Types.ObjectId(),
+               discordId: voterId,
+               eligibleChannels: eligibleMap,
+            });
+         },
+         async checkVotingRoles(memberRoles) {
+            const hasVotingRoles = await PollChannel.countDocuments({
+               allowedRoles: { $in: [...memberRoles.keys()] },
+            }).exec();
+
+            return !!hasVotingRoles;
+         },
+         async findEligibleChannels(memberRoles) {
+            const eligibleChannels = await PollChannel.find({
+               allowedRoles: { $in: [...memberRoles.keys()] },
+            });
+
+            // l('Bunga', { eligibleChannels });
+
+            if (!eligibleChannels) throw new Error('User is not eligible to vote in any channels.');
+
+            return eligibleChannels;
+         },
+         async logAttr() {
+            l(this.schema.statics)
+            l(this.schema.methods)
+            l(this.schema.query)
+         }
+      },
       methods: {
          async participation(channelId) {
             const { eligibleChannels } = this;
@@ -52,6 +109,15 @@ const userSchema = new Schema(
             return `${Math.round(
                (participatedPolls / eligiblePolls) * 100
             ).toFixed(2)}%`;
+         },
+         incParticipation(channelId) {
+            const newParticipation = this.eligibleChannels.get(channelId);
+
+            newParticipation.participatedPolls++;
+
+            // mark modified because Mixed SchemaType loses Mongoose's ability to detect changes to the data
+            this.markModified('eligibleChannels');
+            this.save();
          },
       },
       query: {

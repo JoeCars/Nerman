@@ -1,4 +1,5 @@
 const { ButtonInteraction, MessageEmbed } = require('discord.js');
+const User = require('../db/schemas/User');
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
 
@@ -58,10 +59,17 @@ module.exports = {
          });
       }
 
+      let abstainingUser = await User.findOne().byDiscordId(userId).exec();
 
+      if (!abstainingUser) {
+         const eligibleChannels = await User.findEligibleChannels(roleCache);
+
+         abstainingUser = await User.createUser(userId, eligibleChannels);
+      }
 
       const updatedPoll = await Poll.findAndSetAbstained(messageId, userId);
 
+      abstainingUser.incParticipation(channelId);
 
       let message = await client.channels.cache
          .get(channelId)

@@ -1,4 +1,5 @@
-const nTwitter = require(`../helpers/twitter.js`);
+// disabled
+// const nTwitter = require(`../helpers/twitter.js`);
 const nMongoDB = require(`../helpers/mongodb.js`);
 const nThreshold = require(`../helpers/nThreshold.js`);
 const tenor = require(`../helpers/tenor.js`);
@@ -90,11 +91,12 @@ module.exports = {
             mention.nickname ?? mention.user.username;
       });
 
-      let tweetContent = await nTwitter.formatTweet(
-         content,
-         authorName,
-         mappedMentions
-      );
+      // disabled
+      // let tweetContent = await nTwitter.formatTweet(
+      //    content,
+      //    authorName,
+      //    mappedMentions
+      // );
 
       // let messageTweeted = await reactionsCache.get('931919315010220112'); //check for NermanBlast
       let messageTweeted = await reactionsCache.get('932664888642400276'); //check for NermanBlast
@@ -129,15 +131,16 @@ module.exports = {
       //    reaction.emoji.name == 'Nerman' &&
       //    reaction.count > voteThreshold - 1
       // ) {
-      if (
-         !messageTweeted &&
-         emojiId === nermanEmojiId &&
-         reaction.count >= voteThreshold
-      ) {
-         nTwitter.post(tweetContent, msgAttachmentUrls);
+      // disabled
+      // if (
+      //    !messageTweeted &&
+      //    emojiId === nermanEmojiId &&
+      //    reaction.count >= voteThreshold
+      // ) {
+      //    nTwitter.post(tweetContent, msgAttachmentUrls);
 
-         // mark message with NermanBlast emoji
-         await reaction.message.react('932664888642400276');
-      }
+      //    // mark message with NermanBlast emoji
+      //    await reaction.message.react('932664888642400276');
+      // }
    },
 };

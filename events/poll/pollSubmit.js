@@ -265,6 +265,7 @@ module.exports = {
       };
 
       const snapshotMap = new Map();
+      const eligibleKeys = [];
 
       // todo try to implement env for the allowed roles so that we can do this dynamically when hosting and using in other servers
       // todo also this should be done via fetching the config
@@ -292,10 +293,15 @@ module.exports = {
 
          for (const key of allowedUsers.keys()) {
             snapshotMap.set(key, false);
+            eligibleKeys.push(key);
          }
       } catch (error) {
          console.error({ error });
       }
+
+      console.log({ eligibleKeys });
+
+      
 
       // todo decide if I really need this or can just stick with the use-case below
       // const config = await PollChannel.findOne({ channelId }).exec();
