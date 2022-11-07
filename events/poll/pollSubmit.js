@@ -295,13 +295,13 @@ module.exports = {
             snapshotMap.set(key, false);
             eligibleKeys.push(key);
          }
+
+         console.log({ eligibleKeys });
       } catch (error) {
          console.error({ error });
       }
 
       console.log({ eligibleKeys });
-
-      
 
       // todo decide if I really need this or can just stick with the use-case below
       // const config = await PollChannel.findOne({ channelId }).exec();
