@@ -64,6 +64,7 @@ module.exports = async client => {
             const openPolls = await Poll.find({ status: 'open' })
                .populate('config', 'channelId')
                .then(foundPolls => {
+                  console.log('TESTING FOUND POLLS');
                   lc('foundPolls', '131', foundPolls);
                   return foundPolls.sort((a, b) => a.timeEnd - b.timeEnd);
                })
@@ -86,6 +87,8 @@ module.exports = async client => {
             });
 
             client.on('dequeuePoll', oldPoll => {
+               console.log('TESTING OLD POLLS');
+
                lc('oldPoll', '131', oldPoll);
                // const idx = openPolls.findIndex(({ _id }) => {
                const idx = openPolls.findIndex(({ _id }) => {
@@ -100,6 +103,8 @@ module.exports = async client => {
                lc('idx', '132', idx);
 
                openPolls.splice(idx, 1);
+               console.log('TESTING POST REMOVED POLLS');
+
                lc('POST REMOVAL OF POLL\nopenPolls', '133', openPolls);
             });
 
