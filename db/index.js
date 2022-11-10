@@ -171,86 +171,15 @@ module.exports = async client => {
                            `closingPoll.messageId\n\n${closingPoll.messageId}`
                         );
 
-                        const testChanCache = await client.channels.cache;
-
-                        const testChanCacheGet =
-                           await client.channels.cache.get(
-                              closingPoll.config.channelId
-                           );
-
-                        const testChanCacheMsgGet =
-                           (await client.channels.cache
+                        const message = await (client.channels.cache
+                           .get(closingPoll.config.channelId)
+                           .messages.cache.get(closingPoll.messageId) ??
+                           client.channels.cache
                               .get(closingPoll.config.channelId)
-                              .messages.cache.get(closingPoll.messageId)) ??
-                           null;
-
-                        const testChanCacheMsgGetNull =
-                           (await client.channels.cache
-                              .get(closingPoll.config.channelId)
-                              .messages.cache.get(closingPoll.messageId)) ??
-                           null;
-
-                        const testChanCacheMsgFetch =
-                           await client.channels.cache
-                              .get(closingPoll.config.channelId)
-                              .messages.fetch(closingPoll.messageId);
-
-                        // const testChanCacheMsgGetNull =
-                        //    (await client.channels.cache
-                        //       .get(closingPoll.config.channelId)
-                        //       .messages.cache.get(closingPoll.messageId)) ??
-                        //    null;
-
-                        const message =
-                           (await client.channels.cache
-                              .get(closingPoll.config.channelId)
-                              .messages.cache.get(closingPoll.messageId)) ??
-                           null;
-
-                        // console.log(
-                        //    `client.channels.cache:\n ${testChanCache}\n\n\nclient.channels.cache.get(closingPoll.config.channelId):\n${testChanCacheGet}\n\n\nawait client.channels.cache
-                        //       .get(closingPoll.config.channelId)
-                        //       .messages.cache.get(closingPoll.messageId):\n${testChanCacheMsgGet}`
-                        // );
-
-                        console.log('client.channels.cache:\n', {
-                           testChanCache,
-                        });
-
-                        console.log(
-                           'channels.cache.get(closingPoll.config.channelId):\n',
-                           { testChanCacheGet }
-                        );
-
-                        console.log(
-                           'await client.channels.cache.get(closingPoll.config.channelId).messages.cache.get(closingPoll.messageId):\n',
-                           { testChanCacheMsgGet }
-                        );
-
-                        console.log(
-                           '(await client.channels.cache.get(closingPoll.config.channelId).messages.cache.get(closingPoll.messageId)) ?? null:\n',
-                           { testChanCacheMsgGetNull }
-                        );
-
-                        console.log(
-                           '(await client.channels.cache.get(closingPoll.config.channelId).messages.fetch(closingPoll.messageId)):\n',
-                           { testChanCacheMsgFetch }
-                        );
-                        // console.log(
-                        //    `client.channels.cache:\n ${await client.channels
-                        //       .cache}\n\n\nclient.channels.cache.get(closingPoll.config.channelId):\n${await client.channels.cache.get(
-                        //       closingPoll.config.channelId
-                        //    )}\n\n\nawait client.channels.cache
-                        //       .get(closingPoll.config.channelId)
-                        //       .messages.cache.get(closingPoll.messageId):\n${await client.channels.cache
-                        //          .get(closingPoll.config.channelId)
-                        //          .messages.cache.get(closingPoll.messageId)}`
-                        // );
+                              .messages.fetch(closingPoll.messageId));
 
                         console.log({ message });
-                        // const message = await client.channels.cache
-                        //    .get(foundPoll.config.channelId)
-                        //    .messages.fetch(foundPoll.messageId);
+ 
 
                         if (message === null) {
                            return openPolls.shift();
