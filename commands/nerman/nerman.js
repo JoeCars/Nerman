@@ -58,6 +58,19 @@ module.exports = {
                   .setDescription("Enter user's Discord ID")
                   .setRequired(true)
             )
+      )
+      .addSubcommand(subcommand =>
+         subcommand
+            .setName('admin-check-voters')
+            .setDescription(
+               'Admin only and temporary, for gathering the names of the voting role members'
+            )
+            .addStringOption(option =>
+               option
+                  .setName('role-name')
+                  .setDescription("Enter name of the role you wish to check")
+                  .setRequired(false)
+            )
       ),
    /**
     *
