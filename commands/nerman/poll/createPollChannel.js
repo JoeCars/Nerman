@@ -139,7 +139,7 @@ module.exports = {
       placeholder = placeholder.join(', ');
 
       if (placeholder.length > 100) {
-         placeholder = placeholder.subtring(0, 99);
+         placeholder = placeholder.substring(0, 99);
       }
 
       const modal = new Modal()
