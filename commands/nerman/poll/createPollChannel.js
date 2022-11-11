@@ -133,10 +133,14 @@ module.exports = {
       }
 
       let placeholder = [];
-
+      // todo cut off the placeholder text at 100ch
       roleOptions.forEach(({ label }) => placeholder.push(label));
 
       placeholder = placeholder.join(', ');
+
+      if (placeholder.length > 100) {
+         placeholder = placeholder.subtring(0, 99);
+      }
 
       const modal = new Modal()
          .setCustomId('modal-create-poll-channel')
