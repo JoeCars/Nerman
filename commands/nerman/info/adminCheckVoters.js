@@ -80,6 +80,7 @@ module.exports = {
                   nickname !== null
                      ? `${nickname}#${discriminator}`
                      : `${username}#${discriminator}`,
+               fullUsername: `${username}#${discriminator}`,
             };
          }
       );
