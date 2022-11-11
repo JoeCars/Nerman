@@ -46,13 +46,13 @@ module.exports = {
       // l({ userRoleCache });
 
       // l({ mCache });
-      l({ fetchedMembers });
+      // l({ fetchedMembers });
 
       let userArray = [];
 
       fetchedMembers.forEach(
          ({ id, nickname, user: { username, discriminator } }) => {
-            l(id, nickname, username, discriminator);
+            // l(id, nickname, username, discriminator);
 
             userArray.push({
                id,
@@ -67,7 +67,7 @@ module.exports = {
          }
       );
 
-      l({ userArray });
+      l(JSON.stringify(userArray, null, 4));
 
       interaction.editReply({ content: 'Logging information to console.' });
    },
