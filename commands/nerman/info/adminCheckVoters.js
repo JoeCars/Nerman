@@ -87,6 +87,7 @@ module.exports = {
       const userArray = await Promise.all(promises);
 
       l(JSON.stringify(userArray, null, 4));
+      l('userArray.length', userArray.length);
 
       l('PROMISES MAP END');
       await interaction.editReply({
