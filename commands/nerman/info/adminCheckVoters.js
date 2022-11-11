@@ -1,5 +1,6 @@
 const { CommandInteraction } = require('discord.js');
 const { log: l } = console;
+const guildAdminId = process.env.NERMAN_G_ADMIN_ID;
 // const { lc } = require('../../../utils/functions');
 module.exports = {
    subCommand: 'nerman.admin-check-voters',
@@ -21,7 +22,7 @@ module.exports = {
 
       await interaction.deferReply({ ephemeral: true });
 
-      if (!userRoleCache.has('919784986641575946'))
+      if (!userRoleCache.has(guildAdminId))
          throw new Error('This is an admin-only command');
 
       const checkingRole = interaction.options.getString('role-name');
@@ -68,6 +69,6 @@ module.exports = {
 
       l({ userArray });
 
-      interaction.editReply({ content: 'Done.' });
+      interaction.editReply({ content: 'Logging information to console.' });
    },
 };
