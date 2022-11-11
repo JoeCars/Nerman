@@ -29,16 +29,22 @@ module.exports = {
 
       let fetchedMembers = await guildMembers.fetch();
 
-      if (checkingRole !== null) {
-         fetchedMembers = fetchedMembers.filter(member => {
-            // l('HOIYA');
-            // l(member.roles.cache);
-            // l(member.roles.cache.name);
+      l(fetchedMembers.length);
 
-            // l(member.roles.cache.find(role => role.name === checkingRole));
+      if (checkingRole !== null) {
+         l('ROLE FILTER START');
+
+         fetchedMembers = fetchedMembers.filter(member => {
+            l('Member:');
+            l(member.user.username);
+            // l(member.roles.cache);
+            l(!!member.roles.cache.find(role => role.name === checkingRole));
+            // l(member.roles.cache.name);
 
             return member.roles.cache.find(role => role.name === checkingRole);
          });
+
+         l('ROLE FILTER END');
       }
 
       // l({ interaction });
@@ -48,13 +54,24 @@ module.exports = {
       // l({ mCache });
       // l({ fetchedMembers });
 
-      let userArray = [];
+      // let userArray = [];
 
-      fetchedMembers.forEach(
+      // fetchedMembers.forEach(
+      l('PROMISES MAP START');
+      const promises = await fetchedMembers.map(
          ({ id, nickname, user: { username, discriminator } }) => {
-            // l(id, nickname, username, discriminator);
+            // l({
+            //    id,
+            //    nickname,
+            //    username,
+            //    discriminator,
+            //    fullName:
+            //       nickname !== null
+            //          ? `${nickname}#${discriminator}`
+            //          : `${username}#${discriminator}`,
+            // });
 
-            userArray.push({
+            return {
                id,
                nickname,
                username,
@@ -63,12 +80,17 @@ module.exports = {
                   nickname !== null
                      ? `${nickname}#${discriminator}`
                      : `${username}#${discriminator}`,
-            });
+            };
          }
       );
 
+      const userArray = await Promise.all(promises);
+
       l(JSON.stringify(userArray, null, 4));
 
-      interaction.editReply({ content: 'Logging information to console.' });
+      l('PROMISES MAP END');
+      await interaction.editReply({
+         content: 'Logging information to console.',
+      });
    },
 };
