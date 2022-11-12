@@ -72,15 +72,15 @@ module.exports = {
             // });
 
             return {
-               id,
-               nickname,
-               username,
-               discriminator,
-               fullName:
+               discordId: id,
+               fullNickname:
                   nickname !== null
                      ? `${nickname}#${discriminator}`
                      : `${username}#${discriminator}`,
                fullUsername: `${username}#${discriminator}`,
+               // nickname,
+               // username,
+               // discriminator,
             };
          }
       );
