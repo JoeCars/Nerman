@@ -11,13 +11,22 @@ const userSchema = new Schema(
          required: true,
          unique: true,
       },
+      nameHistory: {
+         type: [String],
+      },
       eligibleChannels: {
          type: Map,
          of: Schema.Types.Mixed,
          default: new Map(),
       },
+      status: {
+         type: String,
+         enum: ['active', 'inactive', 'warning'],
+         default: 'active',
+      },
    },
    {
+      timestamps: { createdAt: 'timeCreated', updatedAt: 'modified' },
       statics: {
          async createUser(voterId, eligibleChannels) {
             const eligibleMap = new Map();
@@ -64,15 +73,16 @@ const userSchema = new Schema(
 
             // l('Bunga', { eligibleChannels });
 
-            if (!eligibleChannels) throw new Error('User is not eligible to vote in any channels.');
+            if (!eligibleChannels)
+               throw new Error('User is not eligible to vote in any channels.');
 
             return eligibleChannels;
          },
          async logAttr() {
-            l(this.schema.statics)
-            l(this.schema.methods)
-            l(this.schema.query)
-         }
+            l(this.schema.statics);
+            l(this.schema.methods);
+            l(this.schema.query);
+         },
       },
       methods: {
          async participation(channelId) {
