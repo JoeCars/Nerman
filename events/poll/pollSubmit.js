@@ -3,10 +3,12 @@ const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
 const { roleMention } = require('@discordjs/builders');
 const { initPollMessage } = require('../../helpers/poll/initPollMessage');
+const User = require('../../db/schemas/User');
 const Poll = require('../../db/schemas/Poll');
 const PollChannel = require('../../db/schemas/PollChannel');
 const PollCount = require('../../db/schemas/ChannelPollCount');
 
+const { log: l } = console;
 const { drawBar, longestString } = require('../../helpers/poll');
 const { logToObject, formatDate } = require('../../utils/functions');
 
@@ -354,38 +356,33 @@ module.exports = {
             pollNumber: undefined,
          };
 
-         const newPoll = await Poll.createNewPoll(data, durationMs).then(
-            async poll => {
+         const newPoll = await (await Poll.createNewPoll(data, durationMs))
+            .populate('config')
+            .then(async poll => {
                console.log('WITHIN THE THEN', { poll });
                await pollNumber.increment();
                poll.pollNumber = pollNumber.pollsCreated;
                return await poll.save();
-            }
-         );
+            });
 
          // await newPoll.populate('pollNumber');
          console.log('OUTSIDE THE THEN', { newPoll });
-         // newPoll.pollNumber.increment();
 
-         // const newPoll = await Poll.create(
-         //    [
-         //       {
-         //          _id: new Types.ObjectId(),
-         //          guildId,
-         //          creatorId: user.id,
-         //          messageId: id,
-         //          // config: config._id,
-         //          config: _id,
-         //          pollData,
-         //          votes: undefined,
-         //          abstains: undefined,
-         //          allowedUsers: snapshotMap,
-         //          status: 'open',
-         //       },
-         //    ],
+         // todo Make this updating eligible users channel map into a reusable function
 
-         //    { new: true }
-         // ).then(docArray => docArray[0]);
+         const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
+            async key => {
+               l({ key });
+               const user = await User.findOne({ discordId: key }).exec();
+               user.eligibleChannels.get(newPoll.config.channelId)
+                  .eligiblePolls++;
+               user.markModified('eligibleChannels');
+               return await user.save();
+               // l({ participation });
+            }
+         );
+
+         await Promise.all(updateVoterPromise);
 
          console.log({ newPoll });
          let updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
