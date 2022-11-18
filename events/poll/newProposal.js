@@ -176,15 +176,30 @@ module.exports = {
             status: 'open',
          };
 
-         const newPoll = await Poll.createNewPoll(
-            data,
-            channelConfig.durationMs
-         ).then(async poll => {
-            console.log('WITHIN THE THEN', { poll });
-            await pollNumber.increment();
-            poll.pollNumber = pollNumber.pollsCreated;
-            return await poll.save();
-         });
+         const newPoll = await (
+            await Poll.createNewPoll(data, channelConfig.durationMs)
+         )
+            .populate('config')
+            .then(async poll => {
+               console.log('WITHIN THE THEN', { poll });
+               await pollNumber.increment();
+               poll.pollNumber = pollNumber.pollsCreated;
+               return await poll.save();
+            });
+
+         const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
+            async key => {
+               l({ key });
+               const user = await User.findOne({ discordId: key }).exec();
+               user.eligibleChannels.get(newPoll.config.channelId)
+                  .eligiblePolls++;
+               user.markModified('eligibleChannels');
+               return await user.save();
+               // l({ participation });
+            }
+         );
+
+         await Promise.all(updateVoterPromise);
 
          console.log({ newPoll });
          let updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
