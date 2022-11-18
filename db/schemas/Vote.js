@@ -28,6 +28,8 @@ const voteSchema = new Schema({
       type: String,
       default: '',
    },
+}, {
+   timestamps: { createdAt: 'timeCreated', updatedAt: 'modified' },
 });
 
 //Export the model
