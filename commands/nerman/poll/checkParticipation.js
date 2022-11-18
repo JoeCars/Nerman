@@ -6,7 +6,7 @@ const PollChannel = require('../../../db/schemas/PollChannel');
 const { log: l } = console;
 // const { lc } = require('../../../utils/functions');
 module.exports = {
-   subCommand: 'nerman.check-participation',
+   subCommand: 'nerman.participation',
    /**
     *
     * @param {CommandInteraction} interaction
@@ -42,7 +42,7 @@ module.exports = {
       } = await mCache.get(voterId);
 
       if (!voterDoc) {
-         l([...memberRoles.keys()]);
+         l('[...memberRoles.keys()]', [...memberRoles.keys()]);
 
          const hasVotingRole = await User.checkVotingRoles(memberRoles);
 
