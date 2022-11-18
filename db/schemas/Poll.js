@@ -118,6 +118,18 @@ const PollSchema = new Schema(
             return await newPoll.save();
          },
       },
+      methods: {
+         async clearProperty(property) {
+            const normalizedArgument = property.toLowerCase().trim();
+            switch (true) {
+               case normalizedArgument === 'allowedusers':
+                  this.allowedUsers.clear();
+                  break;
+               case normalizedArgument === 'abstains':
+                  this.abstains.clear();
+            }
+         }
+      }
    }
 );
 
