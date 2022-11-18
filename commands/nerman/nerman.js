@@ -50,7 +50,7 @@ module.exports = {
       )
       .addSubcommand(subcommand =>
          subcommand
-            .setName('check-participation')
+            .setName('participation')
             .setDescription('Check user voting participation in given channel')
             .addStringOption(option =>
                option
