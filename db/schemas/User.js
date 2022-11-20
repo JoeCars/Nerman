@@ -26,6 +26,7 @@ const userSchema = new Schema(
       },
    },
    {
+      // comment
       timestamps: { createdAt: 'timeCreated', updatedAt: 'modified' },
       statics: {
          async createUser(voterId, eligibleChannels) {
