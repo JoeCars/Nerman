@@ -10,9 +10,11 @@ const { initPollMessage } = require('../../helpers/poll/initPollMessage');
 const PollChannel = require('../../db/schemas/PollChannel');
 const PollCount = require('../../db/schemas/ChannelPollCount');
 const Poll = require('../../db/schemas/Poll');
+const User = require('../../db/schemas/User');
 const { logToObject } = require('../../utils/functions');
 const { log: l } = console;
 
+// todo I will need to change this to the new Nouncil channel once Joel gives the go-ahead
 const propChannelId =
    process.env.DEPLOY_STAGE === 'staging'
       ? process.env.TESTNERMAN_NOUNCIL_CHAN_ID
