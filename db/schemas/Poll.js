@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { model, Schema, Types } = require('mongoose');
 const { PollChannel } = require('../schemas/PollChannel');
+const { log: l } = console;
 
 // Building Up, start basic
 const PollSchema = new Schema(
@@ -69,7 +70,8 @@ const PollSchema = new Schema(
       timestamps: { createdAt: 'timeCreated', updatedAt: 'modified' },
       query: {
          byMessageId(messageId) {
-            return this.where({ messsageId: new RegExp(messageId, 'i') });
+            l('FROM QUERY HELPER', { messageId });
+            return this.where({ messageId: new RegExp(messageId, 'i') });
          },
       },
       statics: {
@@ -128,8 +130,8 @@ const PollSchema = new Schema(
                case normalizedArgument === 'abstains':
                   this.abstains.clear();
             }
-         }
-      }
+         },
+      },
    }
 );
 
