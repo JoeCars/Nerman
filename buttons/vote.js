@@ -60,7 +60,7 @@ module.exports = {
       // enabled disabled for testing
       if (attachedPoll.allowedUsers.get(userId) === true) {
          return interaction.reply({
-            content: 'You have already cast your vote, you political glutton',
+            content: 'You have already used up your vote allowance.',
             ephemeral: true,
          });
       }
