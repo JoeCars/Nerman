@@ -71,6 +71,19 @@ module.exports = {
                   .setDescription("Enter name of the role you wish to check")
                   .setRequired(false)
             )
+      )
+      .addSubcommand(subcommand =>
+         subcommand
+            .setName('regenerate-poll-message')
+            .setDescription(
+               'ADMIN ONLY, regenerate poll message.'
+            )
+            .addStringOption(option =>
+               option
+                  .setName('message-id')
+                  .setDescription("Add the ID of the poll message you want to regenerate")
+                  .setRequired(true)
+            )
       ),
    /**
     *
