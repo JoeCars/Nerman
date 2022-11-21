@@ -14,13 +14,16 @@ module.exports = {
    async execute(interaction) {
       const {
          channelId,
+         channel: { name: channelName },
          guild: {
             members: { cache: mCache },
          },
+         // user: { username, nickname, discriminator },
       } = interaction;
 
       // const config = await PollChannel.countDocuments({ channelId: channelId });
-
+      l({ interaction });
+      l({ channelName });
       // console.log({ config });
       const configExists = await PollChannel.configExists(channelId);
 
@@ -37,6 +40,7 @@ module.exports = {
 
       const voterId = interaction.options.getString('discord-id');
       const voterDoc = await User.findOne().byDiscordId(voterId).exec();
+
       const {
          roles: { cache: memberRoles },
       } = await mCache.get(voterId);
@@ -104,6 +108,7 @@ module.exports = {
          l({ newUser });
 
          // allPolls.
+
 
          const channelParticipation = await newUser.participation(channelId);
 
