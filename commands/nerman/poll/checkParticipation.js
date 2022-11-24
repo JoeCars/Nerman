@@ -28,14 +28,15 @@ module.exports = {
       const configExists = await PollChannel.configExists(channelId);
 
       if (!configExists) {
-         throw new Error('There are no configurations registered to this channel. You may only register from a channel in which polling has been configured.');
+         throw new Error(
+            'There are no configurations registered to this channel. You may only register from a channel in which polling has been configured.'
+         );
          // return interaction.reply({
          //    content:
          //       'There are no configurations registered to this channel. You may only register from a channel in which polling has been configured.',
          //    ephemeral: true,
          // });
       }
-
 
       const voterId = interaction.options.getString('discord-id');
       const {
@@ -66,21 +67,18 @@ module.exports = {
             );
 
          const eligibleChannels = await User.findEligibleChannels(memberRoles);
-         l( { eligibleChannels });
-
 
          const newUser = await User.createUser(voterId, eligibleChannels);
          l({ newUser });
 
-
          const participation = await newUser.participation(channelId);
 
-          const header = `**#${channelName} | ${
-             nickname ?? username
-            }#${discriminator} vote participation**\n`;
+         const header = `**#${channelName} | ${
+            nickname ?? username
+         }#${discriminator} vote participation**\n`;
 
-          const stats = codeBlock(
-             `${witnessed} votes witnessed\n${participated} votes participated\n${participation} participation rate`
+         const stats = codeBlock(
+            `${witnessed} votes witnessed\n${participated} votes participated\n${participation} participation rate`
          );
 
          const response = `${header}${stats}`;
@@ -94,14 +92,13 @@ module.exports = {
 
          const header = `**#${channelName} | ${
             nickname ?? username
-            }#${discriminator} vote participation**\n`;
+         }#${discriminator} vote participation**\n`;
 
          const stats = codeBlock(
             `${witnessed} votes witnessed\n${participated} votes participated\n${participation} participation rate`
          );
 
          const response = `${header}${stats}`;
-
 
          interaction.reply({ content: response, ephemeral: true });
       }
