@@ -31,6 +31,7 @@ module.exports = {
          channelId,
          guildId,
          guild: {
+            members: { cache: memberCache },
             roles: {
                everyone: { id: everyoneId },
             },
@@ -373,11 +374,42 @@ module.exports = {
          const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
             async key => {
                l({ key });
-               const user = await User.findOne({ discordId: key }).exec();
-               user.eligibleChannels.get(newPoll.config.channelId)
-                  .eligiblePolls++;
-               user.markModified('eligibleChannels');
-               return await user.save();
+
+               // todo I need to add in a proper check for if these people exist
+               let user = await User.findOne().byDiscordId(key).exec();
+
+               if (user === null) {
+                  const member = memberCache.get(key);
+                  // l('MISSING USER', { member });
+                  // l(member.roles.cache);
+                  const memberRoles = member.roles.cache;
+                  const eligibleChannels = await User.findEligibleChannels(
+                     memberRoles
+                  );
+                  // l('ERIGIBIRU FROM POLLSUBMIT', await eligibleChannels);
+                  user = await User.createUser(key, eligibleChannels);
+               }
+
+               l('this is the new user', { user });
+
+               // l(user.eligibleChannels);
+
+               // l(newPoll);
+               // mystery ID 383705280174620704
+               // doppelnouncil 1017403835913863260
+
+               l(user.eligibleChannels.get(newPoll.config.channelId));
+               // const newEligibility = user.eligibleChannels.get(
+               //    newPoll.config.channelId
+               // );
+               // l({ newEligibility });
+               // newEligibility.eligiblePolls++;
+               // l({ newEligibility });
+               // l(user);
+
+               // user.eligibleChannels.set
+               // user.markModified('eligibleChannels');
+               // return await user.save();
                // l({ participation });
             }
          );
