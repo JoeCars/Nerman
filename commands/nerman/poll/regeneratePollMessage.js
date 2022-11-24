@@ -58,7 +58,7 @@ module.exports = {
       // Actually retrieve configuration
       const channelConfig = await PollChannel.findOne(
          { channelId },
-         'allowedRoles maxUserProposal voteAllowance'
+         'allowedRoles maxUserProposal voteAllowance quorum'
       ).exec();
 
       const messageId = interaction.options.getString('message-id');
@@ -110,9 +110,12 @@ module.exports = {
 
       // l('MESSAGE EMBED WITH FOOTER WOW\n', messageEmbed);
 
-      let embedQuorum = Math.floor(
+      let embedQuorum = await Math.floor(
          associatedPoll.allowedUsers.size * (channelConfig.quorum / 100)
       );
+
+      l({ channelConfig });
+      l({ embedQuorum });
 
       embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
@@ -128,14 +131,13 @@ module.exports = {
       l('MESSAGE EMBED AND AN END TIME WHADDAFUK\n', messageEmbed);
       l('MESSAGE OBJECT\n', messageObject);
 
-
       const newMsg = await channel.send(messageObject);
       await newMsg.startThread({
-            name: associatedPoll.pollData.title,
-            autoArchiveDuration: 60,
-         });
+         name: associatedPoll.pollData.title,
+         autoArchiveDuration: 60,
+      });
       l({ messageToUpdate });
-      l({newMsg});
+      l({ newMsg });
       associatedPoll.messageId = newMsg.id;
       associatedPoll.save();
 
