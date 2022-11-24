@@ -48,6 +48,9 @@ module.exports = {
          });
       }
 
+      // todo add in logic to check if the document already has existing vote entries and regenerate the message to reflect those votes
+      // todo also add in logic to check to see if the poll is closed, and if so, make sure the message is not regenerated as an open poll, or just error out the command perhaps so that it can not be used on closed polls
+
       // Actually retrieve configuration
       const channelConfig = await PollChannel.findOne(
          { channelId },
@@ -65,7 +68,7 @@ module.exports = {
       if (associatedPoll === null)
          throw new Error('This message has no polls associated with it.');
 
-      client
+      client;
       const {
          creatorId,
          pollData: { title, description },
