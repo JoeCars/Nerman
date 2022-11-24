@@ -17,9 +17,10 @@ module.exports = {
          member: {
             roles: { cache: roleCache },
          },
+         memberPermissions,
       } = interaction;
 
-      // if (!(await PollChannel.countDocuments({ channelId }))) {
+      // console.log('STATE OF NOUNS FROM SUBCOMMAND CREATEPOLL\n', stateOfNouns);
 
       const configExists = await PollChannel.configExists(channelId);
 
@@ -47,7 +48,12 @@ module.exports = {
          status: 'open',
       });
 
-      if (countedPolls >= channelConfig.maxUserProposal) {
+      // console.log(memberPermissions.toArray());
+
+      if (
+         !memberPermissions.has('MANAGE_GUILD') &&
+         countedPolls >= channelConfig.maxUserProposal
+      ) {
          return interaction.reply({
             content:
                'You have exceeded the amount of allowed polls in this channel. You must wait until your current poll is closed.',
