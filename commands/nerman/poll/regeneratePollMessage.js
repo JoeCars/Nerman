@@ -1,4 +1,8 @@
-const { CommandInteraction } = require('discord.js');
+const {
+   CommandInteraction,
+   MessageEmbed,
+   EmbedBuilder,
+} = require('discord.js');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 
@@ -68,32 +72,43 @@ module.exports = {
       if (associatedPoll === null)
          throw new Error('This message has no polls associated with it.');
 
-      client;
       const {
+         // client,
          creatorId,
          pollData: { title, description },
       } = associatedPoll;
 
       const messageToUpdate = await channel.messages.fetch(messageId);
 
-      const messageObject = await initPollMessage({
+      l({ messageToUpdate });
+
+      let messageObject = await initPollMessage({
          title,
          description,
          channelConfig,
          everyoneId,
       });
 
+      // l('MESSAGE OBJECT\n', messageObject);
+
       let messageEmbed = messageObject.embeds[0];
 
+      l('MESSAGE EMBED\n', messageEmbed);
+
       const {
-         user: { username, nickname, discriminator },
+         nickname,
+         user: { username, discriminator },
       } = await memberCache.get(creatorId);
+
+      l({ username, nickname, discriminator });
 
       messageEmbed.setFooter(
          `Poll #${associatedPoll.pollNumber} submitted by ${
             nickname ?? username
          }#${discriminator}`
       );
+
+      // l('MESSAGE EMBED WITH FOOTER WOW\n', messageEmbed);
 
       let embedQuorum = Math.floor(
          associatedPoll.allowedUsers.size * (channelConfig.quorum / 100)
@@ -102,12 +117,25 @@ module.exports = {
       embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
       messageEmbed.fields[1].value = embedQuorum.toString();
+      // l('MESSAGE EMBED WITH QUORUM TOO?!\n', messageEmbed);
 
       messageEmbed.fields[4].value = `<t:${Math.floor(
          associatedPoll.timeEnd.getTime() / 1000
       )}:f>`;
 
-      await messageToUpdate.edit(messageObject);
-      interaction.editReply({ content: 'Regeneration finished!' });
+      messageObject.embeds[0] = messageEmbed;
+
+      l('MESSAGE EMBED AND AN END TIME WHADDAFUK\n', messageEmbed);
+      l('MESSAGE OBJECT\n', messageObject);
+
+
+      const newMsg = await channel.send(messageObject);
+      l({ messageToUpdate });
+      l({newMsg});
+      associatedPoll.messageId = newMsg.id;
+      associatedPoll.save();
+
+      messageToUpdate.delete();
+      await interaction.editReply({ content: 'Regeneration finished!' });
    },
 };
