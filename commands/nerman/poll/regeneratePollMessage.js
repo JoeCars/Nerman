@@ -152,7 +152,6 @@ module.exports = {
          );
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
-         embedQuorum = 'Butts';
 
          updateEmbed.fields[1].value = embedQuorum.toString();
 
