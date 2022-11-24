@@ -1,7 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { CommandInteraction } = require('discord-modals');
 
+// !test this is going to be testing passing StateOfNouns in as an argument, so I'm attempting to make this a async thang?
 module.exports = {
+   // module.exports = {
    data: new SlashCommandBuilder()
       .setName('nerman')
       .setDescription('Nerman Global Command Prefix')
@@ -68,31 +70,60 @@ module.exports = {
             .addStringOption(option =>
                option
                   .setName('role-name')
-                  .setDescription("Enter name of the role you wish to check")
+                  .setDescription('Enter name of the role you wish to check')
                   .setRequired(false)
             )
       )
       .addSubcommand(subcommand =>
          subcommand
             .setName('regenerate-poll-message')
-            .setDescription(
-               'ADMIN ONLY, regenerate poll message.'
-            )
+            .setDescription('ADMIN ONLY, regenerate poll message.')
             .addStringOption(option =>
                option
                   .setName('message-id')
-                  .setDescription("Add the ID of the poll message you want to regenerate")
+                  .setDescription(
+                     'Add the ID of the poll message you want to regenerate'
+                  )
                   .setRequired(true)
+            )
+            .addBooleanOption(option =>
+               option
+                  .setName('embed-only')
+                  .setDescription(
+                     'Target only the embed? (in testing)'
+                  )
+                  .setRequired(false)
             )
       ),
    /**
     *
     * @param {CommandInteraction} interaction
     */
+   // !testing to see if SON is successfully passed in through this global space
    async execute(interaction) {
+      // console.log('...args FROM NERMAN.JS',...args);
+      // console.log(stateOfNouns);
+
       console.log(
          'interaction.options.getSubcommand:\n',
          interaction.options.getSubcommand()
       );
+
+      // console.log('LOGGING INTERACTION FROM NERMAN.JS\n', interaction);
+
+      // console.log('LOGGING THIS FROM NERMAN.JS\n', this);
+      // console.log(
+      //    'LOGGING client FROM NERMAN.JS\n',
+      //    interaction.client.libraries
+      // );
+      // console.log(
+      //    'LOGGING client FROM NERMAN.JS\n',
+      //    interaction.client.libraries.get('Nouns')
+      // );
+      // console.log(
+      //    'LOGGING TO SEE IF STATE OF NOUNS IS PASSED THROUGH THE NERMAN GLOBAL COMMAND HANDLER:\n',
+      //    stateOfNouns
+      // );
    },
 };
+// };
