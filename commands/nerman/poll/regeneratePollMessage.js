@@ -130,6 +130,10 @@ module.exports = {
 
 
       const newMsg = await channel.send(messageObject);
+      await newMsg.startThread({
+            name: associatedPoll.pollData.title,
+            autoArchiveDuration: 60,
+         });
       l({ messageToUpdate });
       l({newMsg});
       associatedPoll.messageId = newMsg.id;
