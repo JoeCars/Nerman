@@ -62,6 +62,7 @@ module.exports = {
       ).exec();
 
       const messageId = interaction.options.getString('message-id');
+      const embedOnly = interaction.options.getBoolean('embed-only');
       l({ messageId });
       const associatedPoll = await Poll.findOne()
          .byMessageId(messageId)
@@ -82,66 +83,85 @@ module.exports = {
 
       l({ messageToUpdate });
 
-      let messageObject = await initPollMessage({
-         title,
-         description,
-         channelConfig,
-         everyoneId,
-      });
+      if (!embedOnly) {
+         let messageObject = await initPollMessage({
+            title,
+            description,
+            channelConfig,
+            everyoneId,
+         });
 
-      // l('MESSAGE OBJECT\n', messageObject);
+         // l('MESSAGE OBJECT\n', messageObject);
 
-      let messageEmbed = messageObject.embeds[0];
+         let messageEmbed = messageObject.embeds[0];
 
-      l('MESSAGE EMBED\n', messageEmbed);
+         l('MESSAGE EMBED\n', messageEmbed);
 
-      const {
-         nickname,
-         user: { username, discriminator },
-      } = await memberCache.get(creatorId);
+         const {
+            nickname,
+            user: { username, discriminator },
+         } = await memberCache.get(creatorId);
 
-      l({ username, nickname, discriminator });
+         l({ username, nickname, discriminator });
 
-      messageEmbed.setFooter(
-         `Poll #${associatedPoll.pollNumber} submitted by ${
-            nickname ?? username
-         }#${discriminator}`
-      );
+         messageEmbed.setFooter(
+            `Poll #${associatedPoll.pollNumber} submitted by ${
+               nickname ?? username
+            }#${discriminator}`
+         );
 
-      // l('MESSAGE EMBED WITH FOOTER WOW\n', messageEmbed);
+         // l('MESSAGE EMBED WITH FOOTER WOW\n', messageEmbed);
 
-      let embedQuorum = await Math.floor(
-         associatedPoll.allowedUsers.size * (channelConfig.quorum / 100)
-      );
+         let embedQuorum = await Math.floor(
+            associatedPoll.allowedUsers.size * (channelConfig.quorum / 100)
+         );
 
-      l({ channelConfig });
-      l({ embedQuorum });
+         l({ channelConfig });
+         l({ embedQuorum });
 
-      embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
+         embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
-      messageEmbed.fields[1].value = embedQuorum.toString();
-      // l('MESSAGE EMBED WITH QUORUM TOO?!\n', messageEmbed);
+         messageEmbed.fields[1].value = embedQuorum.toString();
+         // l('MESSAGE EMBED WITH QUORUM TOO?!\n', messageEmbed);
 
-      messageEmbed.fields[4].value = `<t:${Math.floor(
-         associatedPoll.timeEnd.getTime() / 1000
-      )}:f>`;
+         messageEmbed.fields[4].value = `<t:${Math.floor(
+            associatedPoll.timeEnd.getTime() / 1000
+         )}:f>`;
 
-      messageObject.embeds[0] = messageEmbed;
+         messageObject.embeds[0] = messageEmbed;
 
-      l('MESSAGE EMBED AND AN END TIME WHADDAFUK\n', messageEmbed);
-      l('MESSAGE OBJECT\n', messageObject);
+         l('MESSAGE EMBED AND AN END TIME WHADDAFUK\n', messageEmbed);
+         l('MESSAGE OBJECT\n', messageObject);
 
-      const newMsg = await channel.send(messageObject);
-      await newMsg.startThread({
-         name: associatedPoll.pollData.title,
-         autoArchiveDuration: 60,
-      });
-      l({ messageToUpdate });
-      l({ newMsg });
-      associatedPoll.messageId = newMsg.id;
-      associatedPoll.save();
+         const newMsg = await channel.send(messageObject);
+         await newMsg.startThread({
+            name: associatedPoll.pollData.title,
+            autoArchiveDuration: 60,
+         });
+         l({ messageToUpdate });
+         l({ newMsg });
+         associatedPoll.messageId = newMsg.id;
+         associatedPoll.save();
 
-      messageToUpdate.delete();
+         messageToUpdate.delete();
+      } else {
+         const updateEmbed = new MessageEmbed(messageToUpdate.embeds[0]);
+
+         let embedQuorum = Math.floor(
+            associatedPoll.allowedUsers.size * (channelConfig.quorum / 100)
+         );
+
+         embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
+         embedQuorum = 'Butts';
+
+         updateEmbed.fields[1].value = embedQuorum.toString();
+
+         updateEmbed.fields[4].value = `<t:${Math.floor(
+            associatedPoll.timeEnd.getTime() / 1000
+         )}:f>`;
+
+         messageToUpdate.edit({ embeds: [updateEmbed] });
+      }
       await interaction.editReply({ content: 'Regeneration finished!' });
    },
 };
