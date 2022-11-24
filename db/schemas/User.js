@@ -68,11 +68,10 @@ const userSchema = new Schema(
             return !!hasVotingRoles;
          },
          async findEligibleChannels(memberRoles) {
+            l('[...memberRoles.keys()]', [...memberRoles.keys()]);
             const eligibleChannels = await PollChannel.find({
                allowedRoles: { $in: [...memberRoles.keys()] },
             });
-
-            // l('Bunga', { eligibleChannels });
 
             if (!eligibleChannels)
                throw new Error('User is not eligible to vote in any channels.');
