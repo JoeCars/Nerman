@@ -90,7 +90,9 @@ module.exports = {
 
       // disabled until DJS SELECT MENUS Modal supported
       // const voteArray = modal.getSelectMenuValues('votingSelect');
-      const voteReason = modal.getTextInputValue('votingReason');
+      const voteReason = modal.getTextInputValue('voteReason');
+
+      console.log({ voteReason });
 
       if (pollStatus.status === 'closed') {
          return modal.editReply({
