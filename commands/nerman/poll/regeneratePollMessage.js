@@ -63,6 +63,10 @@ module.exports = {
 
       const messageId = interaction.options.getString('message-id');
       const embedOnly = interaction.options.getBoolean('embed-only');
+      const noChannelMessage =
+         interaction.options.getBoolean('no-original-message') ?? false;
+
+      l({ noChannelMessage });
       l({ messageId });
       const associatedPoll = await Poll.findOne()
          .byMessageId(messageId)
@@ -79,9 +83,11 @@ module.exports = {
          pollData: { title, description },
       } = associatedPoll;
 
-      const messageToUpdate = await channel.messages.fetch(messageId);
+      if (noChannelMessage === false) {
+         const messageToUpdate = await channel.messages.fetch(messageId);
 
-      l({ messageToUpdate });
+         l({ messageToUpdate });
+      }
 
       if (!embedOnly) {
          let messageObject = await initPollMessage({
@@ -143,7 +149,9 @@ module.exports = {
          associatedPoll.messageId = newMsg.id;
          associatedPoll.save();
 
-         messageToUpdate.delete();
+         if (noChannelMessage === false) {
+            messageToUpdate.delete();
+         }
       } else {
          const updateEmbed = new MessageEmbed(messageToUpdate.embeds[0]);
 
