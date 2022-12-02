@@ -94,6 +94,14 @@ module.exports = {
                   )
                   .setRequired(false)
             )
+            .addBooleanOption(option =>
+               option
+                  .setName('no-original-message')
+                  .setDescription(
+                     'Set to true if you are recreating a poll which has no existing message in the channel.'
+                  )
+                  .setRequired(false)
+            )
       ),
    /**
     *
