@@ -1,4 +1,5 @@
 const { logToObject } = require('../utils/functions');
+const { log: l } = console;
 
 module.exports = {
    name: 'interactionCreate',
@@ -22,6 +23,8 @@ module.exports = {
             const subCommandFile = client.subCommands.get(
                `${interaction.commandName}.${subCommand}`
             );
+
+            l(client.subCommands);
 
             if (!subCommandFile) {
                throw Error('Invalid subcommand');
