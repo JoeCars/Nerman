@@ -92,21 +92,22 @@ const userSchema = new Schema(
             if (!eligibleHere)
                return 'User is not eligible to vote in this channel.';
 
+            // todo make sure that calculating -- IN THE FUTURE -- the participation leaves out polls that are not yet closed.
             const { eligiblePolls, participatedPolls } = eligibleChannels.get(
                channelId
             )
                ? eligibleChannels.get(channelId)
                : null;
             // console.log(this);
-            console.log({ channelId });
-            console.log({ eligibleChannels });
+            // console.log({ channelId });
+            // console.log({ eligibleChannels });
             // console.log(eligibleChannels[channelId]);
             // console.log(
             //    eligibleChannels[channelId].participatedPolls /
             //       eligibleChannels[channelId].eligibleChannels
             // );
 
-            console.log({ eligiblePolls, participatedPolls });
+            // console.log({ eligiblePolls, participatedPolls });
 
             console.log(
                Math.round((participatedPolls / eligiblePolls) * 100).toFixed(2)
@@ -115,6 +116,13 @@ const userSchema = new Schema(
             if (eligiblePolls === 0)
                return 'User has not yet been a party to an eligible poll';
             if (participatedPolls === 0) return '0%';
+
+            // console.log(
+            //    'FROM USER PARTICIPATION METHOD\n',
+            //    typeof `${Math.round(
+            //       (participatedPolls / eligiblePolls) * 100
+            //    ).toFixed(2)}%`
+            // );
 
             return `${Math.round(
                (participatedPolls / eligiblePolls) * 100
