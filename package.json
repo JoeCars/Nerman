@@ -31,7 +31,7 @@
       "mongodb": "^4.2.2",
       "mongoose": "^6.2.7",
       "node-fetch": "^2.6.6",
-      "stateofnouns": "^0.0.8",
+      "stateofnouns": "^0.0.9",
       "twit": "^2.2.11"
    },
    "devDependencies": {
