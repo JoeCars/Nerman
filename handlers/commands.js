@@ -2,6 +2,7 @@ const { Collection } = require('discord.js');
 const { getFiles } = require('../utils/functions');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
+const importSON = require('../utils/StateOfNouns/importSON');
 // todo use for permissions validation later on
 // const { Perms } = require('../validation/permissions');
 const clientId = process.env.DISCORD_CLIENT_ID;
@@ -9,10 +10,15 @@ const guildId = process.env.DISCORD_GUILD_ID;
 const token = process.env.DISCORD_TOKEN;
 
 module.exports = async client => {
+   const Nouns = await importSON();
+   // console.log(Nouns);
    const commandsArr = [];
 
    client.commands = new Collection();
    client.subCommands = new Collection();
+   client.libraries = new Collection();
+
+   client.libraries.set('Nouns', Nouns);
 
    const commands = await getFiles('commands', '.js');
 
@@ -31,6 +37,7 @@ module.exports = async client => {
          console.log('RELOAD TEST', { commandFile });
          return;
       }
+
       const command = require(`../${commandFile}`);
 
       if (command.subCommand) {
@@ -51,6 +58,15 @@ module.exports = async client => {
          );
       }
    });
+
+   // console.log(commandsArr);
+   // commandsArr.forEach(cmd => {
+   //    console.log(cmd);
+   //    cmd.options.forEach(option => {
+   //       console.log(option);
+   //       console.log(option.testAttribute);
+   //    });
+   // });
 
    const rest = new REST({ version: '9' }).setToken(token);
 
