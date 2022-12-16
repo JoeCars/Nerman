@@ -1,12 +1,11 @@
 const PollChannel = require('../db/schemas/PollChannel');
+const { log: l, table: tbl } = console;
 
 module.exports = {
    name: 'ready',
    once: true,
    async execute(client) {
-      console.log(
-         `Ready! Logged in as ${client.user.tag}: ` + process.env.NODE_ENV
-      );
+      l(`Ready! Logged in as ${client.user.tag}: ` + process.env.NODE_ENV);
 
       require('../db/index.js')(client);
       require('../utils/remindSheet.js')(client);
@@ -22,6 +21,9 @@ module.exports = {
             guilds: { cache: guildCache },
          } = client;
 
+         const testingGetAddress = await Nouns.getAddress('skilift.eth');
+         l('HEY LOOK AT ME', testingGetAddress);
+
          // *************************************************************
          //
          // EXAMPLE EVENTS
@@ -29,7 +31,7 @@ module.exports = {
          // *************************************************************
 
          Nouns.on('VoteCast', vote => {
-            console.log(
+            l(
                'NounsDAO | VoteCast | id:' +
                   vote.proposalId +
                   ',  voter: ' +
@@ -45,7 +47,7 @@ module.exports = {
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
             data.description = data.description.substring(0, 150);
-            console.log(
+            l(
                'NounsDAO | ProposalCreatedWithRequirements | id:' +
                   data.id +
                   ', proposer: ' +
@@ -62,10 +64,10 @@ module.exports = {
                   data.description
             );
 
-            console.log('targets: ' + JSON.stringify(data.targets));
-            console.log('values: ' + JSON.stringify(data.values));
-            console.log('signatures: ' + JSON.stringify(data.signatures));
-            console.log('calldatas: ' + JSON.stringify(data.calldatas));
+            l('targets: ' + JSON.stringify(data.targets));
+            l('values: ' + JSON.stringify(data.values));
+            l('signatures: ' + JSON.stringify(data.signatures));
+            l('calldatas: ' + JSON.stringify(data.calldatas));
 
             const propChannelId =
                process.env.DEPLOY_STAGE === 'staging'
@@ -85,16 +87,21 @@ module.exports = {
 
             const { id: propId, description: desc } = data;
 
-            console.log('ready.js -- propId', { propId });
-            console.log('ready.js -- desc', { desc });
+            l('ready.js -- propId', { propId });
+            l('ready.js -- desc', { desc });
 
+            // todo finetune thew regexp to extract title from any possible markdown
             const titleRegex = new RegExp(
                /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/
             );
             // const titleRegex = new RegExp(
             //    /^(\#\s(\w+\s)+\s(\w+\s)+(\w+\s+\n?))/
             // );
-// # PropBox: A Nouns Proposal Incubator\n\n## TL;DR\n\nUsing lessons from a Nouncil trial program, we will set up a robust incubator that will help the best
+            // # PropBox: A Nouns Proposal Incubator\n\n## TL;DR\n\nUsing lessons from a Nouncil trial program, we will set up a robust incubator that will help the best
+
+            // Prop 175: PropBox: A Nouns Proposal Incubator
+            // https://nouns.wtf/vote/175
+            // Yes, No, Abstain
 
             // /^(\#\s((\w|[0-9_\-.,\|])+\s+)+(\w+\s?\n?))/
             const title = desc
@@ -102,8 +109,8 @@ module.exports = {
                .replaceAll(/^(#\s)|(\n+)$/g, '');
             const description = `https://nouns.wtf/vote/${propId}`;
 
-            console.log('ready.js -- title', { title });
-            console.log('ready.js -- description', { description });
+            l('ready.js -- title', { title });
+            l('ready.js -- description', { description });
 
             let message = await propChannel.send({
                content: 'Generating proposal...',
@@ -112,8 +119,35 @@ module.exports = {
             client.emit('newProposal', message, data);
          });
 
-         Nouns.on('AuctionBid', data => {
-            console.log(
+         // Nouns.on(
+         //    'ProposalCreatedWithRequirements',
+         //    (data: nerman.EventData.ProposalCreatedWithRequirements) => {
+         Nouns.on('ProposalCreatedWithRequirements', async data => {
+            l('ready.js -- NOUNS.ON : PROPOSAL CREATED WITH REQUIREMENTS');
+            l(data);
+
+            l({
+               'prop id': data.id,
+               'proposer address': data.proposer.id,
+               startBlock: data.startBlock,
+               endBlock: data.endBlock,
+               quorumVotes: data.quorumVotes,
+               proposalThreshold: data.proposalThreshold,
+               description: data.description,
+               // values: data.values, // (add these to get total ETH?)
+            });
+            // prop id: data.id
+            // proposer address:data.proposer.id
+            // data.startBlock, data.endBlock
+            // data.quorumVotes
+            // data.proposalThreshold
+            // description: data.description);
+            // data.values (add these to get total ETH?)
+         });
+
+         Nouns.on('AuctionBid', async data => {
+            l('ready.js -- NOUNS.ON : AUCTION BID');
+            l(
                'NounsAuctionHouse | AuctionBid ' +
                   data.id +
                   ' ' +
@@ -125,6 +159,69 @@ module.exports = {
             );
          });
 
+         // Nouns.on('VoteCast', (vote: nerman.EventData.VoteCast) => {
+         Nouns.on('VoteCast', async vote => {
+            l('ready.js -- NOUNS.ON : VOTE CAST');
+            // Prop Id:          vote.proposalId
+            // Voter Address:    vote.voter.id
+            // Vote:             vote.votes
+            // supportDetailed:  vote.supportDetailed 0=against, 1=for, 2=abstain
+            // Reason:           vote.reason
+
+            l({
+               'Prop Id': vote.proposalId,
+               'Voter Address': vote.voter.id,
+               Vote: vote.votes,
+               supportDetailed: vote.supportDetailed, // 0=against, 1=for, 2=abstain,
+               Reason: vote.reason,
+            });
+
+            tbl({
+               'Prop Id': vote.proposalId,
+               'Voter Address': vote.voter.id,
+               Vote: vote.votes,
+               supportDetailed: vote.supportDetailed, // 0=against, 1=for, 2=abstain,
+               Reason: vote.reason,
+            });
+         });
+
+         // Nouns.on(
+         //    'ProposalCanceled',
+         //    (data: nerman.EventData.ProposalCanceled) => {
+         Nouns.on('ProposalCanceled', async data => {
+            l('ready.js -- NOUNS.ON : PROPOSAL CANCELED');
+
+            l('NounsDAO | ProposalCanceled | id:' + data.id);
+         });
+
+         // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
+         Nouns.on('ProposalQueued', async data => {
+            l('ready.js -- NOUNS.ON : PROPOSAL QUEUED');
+
+            l(
+               'NounsDAO | ProposalQueued | id:' +
+                  data.id +
+                  ', eta: ' +
+                  data.eta
+            );
+         });
+
+         // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
+         Nouns.on('ProposalVetoed', async data => {
+            l('ready.js -- NOUNS.ON : PROPOSAL VETOED');
+
+            l('NounsDAO | ProposalVetoed | id:' + data.id);
+         });
+
+         // Nouns.on(
+         //    'ProposalExecuted',
+         //    (data: nerman.EventData.ProposalExecuted) => {
+         Nouns.on('ProposalExecuted', async data => {
+            l('ready.js -- NOUNS.ON : PROPOSAL EXECUTED');
+
+            l('NounsDAO | ProposalExecuted | id:' + data.id);
+         });
+
          // *************************************************************
          //
          // EXAMPLE METADATA
@@ -132,7 +229,9 @@ module.exports = {
          // *************************************************************
 
          async function testing(nounId) {
-            console.log('Getting Data for Noun ' + nounId);
+            l('ready.js -- TESTING FUNCTION FOR LOOKING UP NOUN');
+
+            l('Getting Data for Noun ' + nounId);
 
             // Look up Owner of Noun by id
             const ownerAddress = await Nouns.NounsToken.Contract.ownerOf(
@@ -155,15 +254,15 @@ module.exports = {
                delegateAddress
             );
 
-            console.log('Owner: ' + ownerAddress);
+            l('Owner: ' + ownerAddress);
             if (ownerEns) {
-               console.log('ENS found: ' + ownerEns);
+               l('ENS found: ' + ownerEns);
             }
-            console.log('Delegate: ' + delegateAddress);
+            l('Delegate: ' + delegateAddress);
             if (delegateEns) {
-               console.log('ENS found: ' + delegateEns);
+               l('ENS found: ' + delegateEns);
             }
-            console.log('Voting Power:  ' + votingPower.toNumber());
+            l('Voting Power:  ' + votingPower.toNumber());
 
             // Get Final Bid Data
 
@@ -180,7 +279,7 @@ module.exports = {
 
             if (bid != null) {
                const name = bid.ens != null ? bid.ens : bid.address;
-               console.log(
+               l(
                   'Noun ' +
                      bid.id +
                      ' sold for ' +
@@ -197,7 +296,7 @@ module.exports = {
       }
 
       runNouns().catch(err => {
-         console.log(err);
+         l(err);
       });
    },
 };
