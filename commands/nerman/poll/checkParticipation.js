@@ -21,6 +21,7 @@ module.exports = {
             members: { cache: cmCache },
          },
          guild: {
+            members,
             members: { cache: mCache },
          },
       } = interaction;
@@ -38,21 +39,20 @@ module.exports = {
          // });
       }
 
+      // 993371424662224986 nerman-dev-jr
       const voterId = interaction.options.getString('discord-id');
       const {
          nickname,
          user: { username, discriminator },
-      } = mCache.get(voterId);
+         roles: { cache: memberRoles },
+         } = mCache.get(voterId) ?? (await members.fetch(voterId));
 
       const voterDoc = await User.findOne().byDiscordId(voterId).exec();
+      l({ voterDoc });
       const { eligiblePolls: witnessed, participatedPolls: participated } =
          voterDoc.eligibleChannels.get(channelId);
 
       l({ witnessed, participated });
-
-      const {
-         roles: { cache: memberRoles },
-      } = await mCache.get(voterId);
 
       if (!voterDoc) {
          l('[...memberRoles.keys()]', [...memberRoles.keys()]);
