@@ -36,14 +36,15 @@ module.exports = {
                   .setName('target')
                   .setDescription('Enter a ENS name or wallet address')
                   .setRequired(true)
-            )
-            .addBooleanOption(option =>
-               option
-                  .setName('delegates')
-                  .setDescription(
-                     'Include Nouns delegated to this address? (This is false if left blank)'
-                  )
-            )
+         )
+         // disabled until we find a better solution for how to output the tile
+            // .addBooleanOption(option =>
+            //    option
+            //       .setName('delegates')
+            //       .setDescription(
+            //          'Include Nouns delegated to this address on the output tile? (This is false if left blank)'
+            //       )
+            // )
       )
       .addSubcommand(subcommand =>
          subcommand
