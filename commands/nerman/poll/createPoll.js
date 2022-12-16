@@ -124,7 +124,7 @@ module.exports = {
          .setPlaceholder(
             'Comma separated values. Minimum two options. eg) Yes, No, Abstain'
          )
-         .setDefaultValue('Yes, No, Abstain')
+         .setDefaultValue('Yes, No')
          .setStyle('SHORT')
          .setMaxLength(100)
          .setRequired(true);
