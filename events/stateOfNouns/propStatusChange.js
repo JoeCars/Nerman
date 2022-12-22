@@ -37,21 +37,21 @@ module.exports = {
 
          const propRegExp = new RegExp(`^prop\\s${Number(proposalId)}`, 'i');
 
-         const targetPolls = await Poll.find({
-            'pollData.title': { $regex: propRegExp },
-         });
+         // const targetPolls = await Poll.find({
+         //    'pollData.title': { $regex: propRegExp },
+         // });
          // Poll.find({ 'pollData.title': { $regex: propRegExp })
          const targetPoll = await Poll.findOne({
             'pollData.title': { $regex: propRegExp },
          });
 
-         l({ targetPolls });
+         // l({ targetPolls });
          l({ targetPoll });
 
-         const titleFromFind = targetPolls[0].pollData.title;
+         // const titleFromFind = targetPolls[0].pollData.title;
          const titleFromFindOne = targetPoll.pollData.title;
 
-         l({ titleFromFind });
+         // l({ titleFromFind });
          l({ titleFromFindOne });
 
          // const { id } = data;
@@ -89,18 +89,18 @@ module.exports = {
          //    '-----------------------------------------------\n'
          // );
 
-         const voteEmbedFind = new MessageEmbed()
-            .setTitle(titleFromFind)
-            .setDescription(
-               `https://nouns.wtf/vote/${proposalId}\n${statusChange}`
-            );
+         // const voteEmbedFind = new MessageEmbed()
+         //    .setTitle(titleFromFind)
+         //    .setDescription(
+         //       `https://nouns.wtf/vote/${proposalId}\n${statusChange}`
+         //    );
          const voteEmbedFindOne = new MessageEmbed()
             .setTitle(titleFromFindOne)
             .setDescription(
                `https://nouns.wtf/vote/${proposalId}\n${statusChange}`
             );
 
-         l('VOTE EMBED FIND\n', { voteEmbedFind });
+         // l('VOTE EMBED FIND\n', { voteEmbedFind });
          l('VOTE EMBED FIND ONE\n', { voteEmbedFindOne });
 
          // return await message.edit({ content: null, embeds: [voteEmbedFind] });
