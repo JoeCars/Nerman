@@ -5,7 +5,16 @@ module.exports = async (Nouns, nounId) => {
    const ownerAddress = await Nouns.NounsToken.Contract.ownerOf(nounId);
 
    // Look up ENS from address
-   const ownerEns = await Nouns.getAddress(ownerAddress);
+   // const ownerEns = await Nouns.getAddress(ownerAddress);
+   const ownerEns = await Nouns.ensReverseLookup(ownerAddress);
+   // if (ownerEns) {
+   //    console.log('ENS found:  FROM WAY HIGHER UP THO' + (await ownerEns));
+   // }
+   // console.log('getNounInfo.js -- OWNER ENS VARIABLE', { ownerEns });
+   // console.log(
+   //    'getNounInfo.js -- OWNER ENS VARIABLE',
+   //    'ENS Found: ' + ownerEns
+   // );
 
    // Look up delegate from ownerAddress
    const delegateAddress = await Nouns.NounsToken.Contract.delegates(
@@ -20,13 +29,13 @@ module.exports = async (Nouns, nounId) => {
       delegateAddress
    );
 
-   console.log('Owner: ' + ownerAddress);
+   console.log('ownerAddress : Owner: ' + ownerAddress);
    if (ownerEns) {
-      console.log('ENS found: ' + ownerEns);
+      console.log('ownerEns : ENS found: ' + ownerEns);
    }
    console.log('Delegate: ' + delegateAddress);
    if (delegateEns) {
-      console.log('ENS found: ' + delegateEns);
+      console.log('delegateEns : ENS found: ' + delegateEns);
    }
    console.log('Voting Power:  ' + votingPower.toNumber());
 
