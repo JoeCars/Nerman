@@ -1,4 +1,5 @@
 const { MessageEmbed } = require('discord.js');
+const shortenAddress = require('./shortenAddress');
 const { log: l } = console;
 
 module.exports = async (data, attachment) => {
@@ -16,9 +17,18 @@ module.exports = async (data, attachment) => {
    const agora = `[Agora](https://www.nounsagora.com/delegate/${delegateAddress})`;
    const collective = `[Collective](https://collective.xyz/nouns/@${ownerAddress})`;
 
+   l({ ownerEns });
+   l({ ownerAddress });
+
+   const testString = `This string is testing to see if coalescence is the right choice for selecting a noun thing: ${
+      ownerEns ?? ownerAddress
+   }`;
+
+   l({ testString });
+
    // Noun ID
    const heldBy = `Held by: [${
-      ownerEns ?? ownerAddress
+      ownerEns ?? (await shortenAddress(ownerAddress))
    }](https://etherscan.io/address/${ownerAddress})\n\u200B\u200B`;
 
    // Auction
@@ -30,13 +40,18 @@ module.exports = async (data, attachment) => {
       minute: 'numeric',
       hour12: true,
    };
-   const winner = `Winner: [${bidEns}](https://etherscan.io/address/${bidAddress})`;
+
+   const winner = `Winner: [${
+      bidEns ?? (await shortenAddress(bidAddress))
+   }](https://etherscan.io/address/${bidAddress})`;
    const localeDate = `Date: ${date.toLocaleString('en-US', localeOptions)}`;
    const ethAmount = `Bid: ${amount} ETH`;
    const auction = `${winner}\n${localeDate}\n${ethAmount}\n\u200B\u200B`;
 
    // Governance
-   const delegate = `Delegate: [${delegateEns}](https://etherscan.io/address/${delegateAddress})`;
+   const delegate = `Delegate: [${
+      delegateEns ?? (await shortenAddress(delegateAddress))
+   }](https://etherscan.io/address/${delegateAddress})`;
    const votePower = `Voting Power: ${votingPower}`;
    const links = `${nounsDao}, ${agora}, ${collective}`;
    const governance = `${delegate}\n${votePower}\n--\n${links}`;
