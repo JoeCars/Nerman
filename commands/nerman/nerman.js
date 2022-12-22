@@ -27,7 +27,7 @@ module.exports = {
       )
       .addSubcommand(subcommand =>
          subcommand
-            .setName('nouner')
+            .setName('address')
             .setDescription(
                'Retrieve a tile of Nouns owned by a nouner.  Command Structure: /nouner <ETH Address || ENS Name>'
             )
