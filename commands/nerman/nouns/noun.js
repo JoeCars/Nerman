@@ -20,6 +20,11 @@ module.exports = {
       // const nounRegex = /^\d{1,6}$/; // 1 to 6 digits. This may need to go higher as new ones are created daily.
 
       const nounNum = interaction.options.getInteger('int');
+
+      if (nounNum <= 0) {
+         throw new Error('You must choose a Noun ID above 0.')
+      }
+
       console.time('nounShit');
       const promises = [];
       // const nounInfo = getNounInfo(Nouns, nounNum);
@@ -32,8 +37,8 @@ module.exports = {
       // const resp = fetch(`https://noun.pics/${nounNum}.png`);
 
       promises.push(
-         getNounInfo(Nouns, nounNum),
-         fetch(`https://noun.pics/${nounNum}.png`)
+         await getNounInfo(Nouns, nounNum),
+         await fetch(`https://noun.pics/${nounNum}.png`)
       );
       // promises.push({nounInfo}, resp);
       // const resp = await fetch(`https://noun.pics/${nounNum}.png`);
@@ -42,7 +47,7 @@ module.exports = {
       // l(resp);
 
       const [nounInfo, resp] = await Promise.all(promises);
-      l(nounInfo);
+      l('NOUN INFO HERE BABYYYYYYYY',{nounInfo});
       console.timeEnd('nounShit');
 
       if (!resp.ok) {
@@ -51,9 +56,10 @@ module.exports = {
          );
       }
 
-      const msgAttach = new MessageAttachment(
-         `https://noun.pics/${nounNum}.png`
-      );
+      // disabled 
+      // const msgAttach = new MessageAttachment(
+      //    `https://noun.pics/${nounNum}.png`
+      // );
 
       const imgUrl = `https://noun.pics/${nounNum}.png`;
 
