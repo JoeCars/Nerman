@@ -24,14 +24,26 @@ module.exports = {
          const testingGetAddress = await Nouns.getAddress('skilift.eth');
          l('HEY LOOK AT ME', testingGetAddress);
 
+         // const testingEnsReverseLookup = await Nouns.
+
          // *************************************************************
          //
          // EXAMPLE EVENTS
          //
          // *************************************************************
 
-         Nouns.on('VoteCast', vote => {
-            l(
+         Nouns.on('VoteCast', async vote => {
+            l('STATE OF NOUNS VOTE CAST -- VOTE INFO\n', vote);
+
+            const nounsGovId = process.env.NOUNS_GOV_ID;
+            l('ready.js -- VoteCast : \n',{ nounsGovId });
+
+            const nounsGovChannel = guildCache
+               .get(process.env.DISCORD_GUILD_ID)
+               .channels.cache.get(nounsGovId);
+            l('ready.js -- VoteCast : \n',{ nounsGovChannel });
+
+            l('ready.js -- VoteCast : \n',
                'NounsDAO | VoteCast | id:' +
                   vote.proposalId +
                   ',  voter: ' +
@@ -43,6 +55,12 @@ module.exports = {
                   ', reason: ' +
                   vote.reason
             );
+
+            let message = await nounsGovChannel.send({
+               content: 'Generating vote data...',
+            });
+
+            client.emit('propVoteCast', message, vote);
          });
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
@@ -160,30 +178,30 @@ module.exports = {
          });
 
          // Nouns.on('VoteCast', (vote: nerman.EventData.VoteCast) => {
-         Nouns.on('VoteCast', async vote => {
-            l('ready.js -- NOUNS.ON : VOTE CAST');
-            // Prop Id:          vote.proposalId
-            // Voter Address:    vote.voter.id
-            // Vote:             vote.votes
-            // supportDetailed:  vote.supportDetailed 0=against, 1=for, 2=abstain
-            // Reason:           vote.reason
+         // Nouns.on('VoteCast', async vote => {
+         //    l('ready.js -- NOUNS.ON : VOTE CAST');
+         //    // Prop Id:          vote.proposalId
+         //    // Voter Address:    vote.voter.id
+         //    // Vote:             vote.votes
+         //    // supportDetailed:  vote.supportDetailed 0=against, 1=for, 2=abstain
+         //    // Reason:           vote.reason
 
-            l({
-               'Prop Id': vote.proposalId,
-               'Voter Address': vote.voter.id,
-               Vote: vote.votes,
-               supportDetailed: vote.supportDetailed, // 0=against, 1=for, 2=abstain,
-               Reason: vote.reason,
-            });
+         //    l({
+         //       'Prop Id': vote.proposalId,
+         //       'Voter Address': vote.voter.id,
+         //       Vote: vote.votes,
+         //       supportDetailed: vote.supportDetailed, // 0=against, 1=for, 2=abstain,
+         //       Reason: vote.reason,
+         //    });
 
-            tbl({
-               'Prop Id': vote.proposalId,
-               'Voter Address': vote.voter.id,
-               Vote: vote.votes,
-               supportDetailed: vote.supportDetailed, // 0=against, 1=for, 2=abstain,
-               Reason: vote.reason,
-            });
-         });
+         //    tbl({
+         //       'Prop Id': vote.proposalId,
+         //       'Voter Address': vote.voter.id,
+         //       Vote: vote.votes,
+         //       supportDetailed: vote.supportDetailed, // 0=against, 1=for, 2=abstain,
+         //       Reason: vote.reason,
+         //    });
+         // });
 
          // Nouns.on(
          //    'ProposalCanceled',
@@ -191,12 +209,42 @@ module.exports = {
          Nouns.on('ProposalCanceled', async data => {
             l('ready.js -- NOUNS.ON : PROPOSAL CANCELED');
 
+            const nounsGovId = process.env.NOUNS_GOV_ID;
+
+            l({ nounsGovId });
+
+            const nounsGovChannel = guildCache
+               .get(process.env.DISCORD_GUILD_ID)
+               .channels.cache.get(nounsGovId);
+
+            const status = 'Canceled'
+
+            l({ nounsGovChannel });
+
             l('NounsDAO | ProposalCanceled | id:' + data.id);
+
+            let message = await nounsGovChannel.send({
+               content: 'Propsal status changed...',
+            });
+
+            client.emit('propStatusChange', message, status, data);
          });
 
          // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
          Nouns.on('ProposalQueued', async data => {
             l('ready.js -- NOUNS.ON : PROPOSAL QUEUED');
+
+            const nounsGovId = process.env.NOUNS_GOV_ID;
+
+            l({ nounsGovId });
+
+            const nounsGovChannel = guildCache
+               .get(process.env.DISCORD_GUILD_ID)
+               .channels.cache.get(nounsGovId);
+
+            l({ nounsGovChannel });
+
+            const status = 'Queued'
 
             l(
                'NounsDAO | ProposalQueued | id:' +
@@ -204,13 +252,37 @@ module.exports = {
                   ', eta: ' +
                   data.eta
             );
+
+            let message = await nounsGovChannel.send({
+               content: 'Propsal status changed...',
+            });
+
+            client.emit('propStatusChange', message, status, data);
          });
 
          // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
          Nouns.on('ProposalVetoed', async data => {
             l('ready.js -- NOUNS.ON : PROPOSAL VETOED');
 
+            const nounsGovId = process.env.NOUNS_GOV_ID;
+
+            l({ nounsGovId });
+
+            const nounsGovChannel = guildCache
+               .get(process.env.DISCORD_GUILD_ID)
+               .channels.cache.get(nounsGovId);
+
+            l({ nounsGovChannel });
+
+            const status = 'Vetoed'
+
             l('NounsDAO | ProposalVetoed | id:' + data.id);
+
+            let message = await nounsGovChannel.send({
+               content: 'Propsal status changed...',
+            });
+
+            client.emit('propStatusChange', message, status, data);
          });
 
          // Nouns.on(
@@ -219,7 +291,26 @@ module.exports = {
          Nouns.on('ProposalExecuted', async data => {
             l('ready.js -- NOUNS.ON : PROPOSAL EXECUTED');
 
+            const nounsGovId = process.env.NOUNS_GOV_ID;
+
+            l({ nounsGovId });
+
+            const nounsGovChannel = guildCache
+               .get(process.env.DISCORD_GUILD_ID)
+               .channels.cache.get(nounsGovId);
+
+            l({ nounsGovChannel });
+
+            const status = 'Executed';
+
+
             l('NounsDAO | ProposalExecuted | id:' + data.id);
+
+            let message = await nounsGovChannel.send({
+               content: 'Propsal status changed...',
+            });
+
+            client.emit('propStatusChange', message, status, data);
          });
 
          // *************************************************************
