@@ -83,8 +83,10 @@ module.exports = {
          pollData: { title, description },
       } = associatedPoll;
 
+      let messageToUpdate;
+
       if (noChannelMessage === false) {
-         const messageToUpdate = await channel.messages.fetch(messageId);
+         messageToUpdate = await channel.messages.fetch(messageId);
 
          l({ messageToUpdate });
       }
