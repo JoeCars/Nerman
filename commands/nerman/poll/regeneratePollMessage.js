@@ -3,6 +3,8 @@ const {
    MessageEmbed,
    EmbedBuilder,
 } = require('discord.js');
+const { roleMention } = require('@discordjs/builders');
+
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 
@@ -158,6 +160,12 @@ module.exports = {
          const updateEmbed = new MessageEmbed(messageToUpdate.embeds[0]);
          const embedTitle = associatedPoll.pollData.title;
 
+         const mentions = await channelConfig.allowedRoles
+            .map(role =>
+               role !== everyoneId ? roleMention(role) : '@everyone'
+            )
+            .join(' ');
+
          updateEmbed.setTitle(embedTitle);
 
          let embedQuorum = Math.floor(
@@ -173,7 +181,7 @@ module.exports = {
          )}:f>`;
 
          messageToUpdate.edit({
-            content: null,
+            content: mentions,
             embeds: [updateEmbed],
          });
       }
