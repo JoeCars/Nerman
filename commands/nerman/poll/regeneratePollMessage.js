@@ -156,7 +156,9 @@ module.exports = {
          }
       } else {
          const updateEmbed = new MessageEmbed(messageToUpdate.embeds[0]);
-         const messageContent = associatedPoll.pollData.title;
+         const embedTitle = associatedPoll.pollData.title;
+
+         updateEmbed.setTitle(embedTitle);
 
          let embedQuorum = Math.floor(
             associatedPoll.allowedUsers.size * (channelConfig.quorum / 100)
@@ -171,7 +173,7 @@ module.exports = {
          )}:f>`;
 
          messageToUpdate.edit({
-            content: messageContent,
+            content: null,
             embeds: [updateEmbed],
          });
       }
