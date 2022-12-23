@@ -156,6 +156,7 @@ module.exports = {
          }
       } else {
          const updateEmbed = new MessageEmbed(messageToUpdate.embeds[0]);
+         const messageContent = associatedPoll.pollData.title;
 
          let embedQuorum = Math.floor(
             associatedPoll.allowedUsers.size * (channelConfig.quorum / 100)
@@ -169,7 +170,10 @@ module.exports = {
             associatedPoll.timeEnd.getTime() / 1000
          )}:f>`;
 
-         messageToUpdate.edit({ embeds: [updateEmbed] });
+         messageToUpdate.edit({
+            content: messageContent,
+            embeds: [updateEmbed],
+         });
       }
       await interaction.editReply({ content: 'Regeneration finished!' });
    },
