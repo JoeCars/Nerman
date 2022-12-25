@@ -158,11 +158,7 @@ module.exports = {
             .setDescription(
                `${voterHyperlink} voted ${inlineCode(
                   supportEnum[supportDetailed]
-               )}${
-                  supportEnum[supportDetailed] !== 'ABSTAIN'
-                     ? ' with ' + inlineCode(Number(votes)) + ' votes'
-                     : ''
-               }${!!reason.trim() ? `\n\n${reason}` : ''}`
+               )} with ${inlineCode(Number(votes))} votes. ${!!reason.trim() ? `\n\n${reason}` : ''}`
             );
 
          l('VOTE EMBED FIND\n', voteEmbedFind);
