@@ -7,6 +7,7 @@ module.exports = async data => {
       // const { address, ens, owned, delegated } = data;
 
       const {
+         delegating,
          addressPrint,
          ownerVotingPower,
          ownerNounsOwned,
@@ -39,17 +40,27 @@ module.exports = async data => {
          `Voting Power: ${delegateVotingPower}\n----------------\n - owned: ${delegateNounsOwned}\n - delegations: ${delegateNounsDelegated}`
       );
 
-      const nounerEmbed = new MessageEmbed().setColor('#00FFFF').addFields(
-         {
+      const nounerEmbed = new MessageEmbed();
+
+      if (delegating) {
+         nounerEmbed.setColor('#00FFFF').addFields(
+            {
+               name: `**ADDRESS**`,
+               // value: `[${addressPrint}](https://etherscan.io/address/${address})\n\u200B\u200B`,
+               value: `${ownerHyperlink}\n${addressCodeBlock}\n${ownerHyperlink} is delegating ${ownerNounsOwned} votes to ${delegateHyperlink}\n\u200B`,
+            },
+            {
+               name: `**DELEGATE**`,
+               value: `${delegateHyperlink}\n${delegateCodeBlock}`,
+            }
+         );
+      } else {
+         nounerEmbed.setColor('#00FFFF').addFields({
             name: `**ADDRESS**`,
             // value: `[${addressPrint}](https://etherscan.io/address/${address})\n\u200B\u200B`,
-            value: `${ownerHyperlink}\n${addressCodeBlock}\n${ownerHyperlink} is delegating ${ownerNounsDelegated} votes to ${delegateHyperlink}\n\u200B`,
-         },
-         {
-            name: `**DELEGATE**`,
-            value: `${delegateHyperlink}\n${delegateCodeBlock}`,
-         }
-      );
+            value: `${ownerHyperlink}\n${addressCodeBlock}\n${ownerHyperlink} is not delegating.`,
+         });
+      }
 
       return nounerEmbed;
    } catch (err) {
