@@ -1,4 +1,5 @@
 const { MessageEmbed, Message } = require('discord.js');
+const { hyperlink } = require('@discordjs/builders');
 
 const { log: l } = console;
 
@@ -13,6 +14,7 @@ module.exports = {
       try {
          l('PROP CREATED EVENT HANDLER');
 
+
          const {
             guild: {
                channels: { cache },
@@ -24,7 +26,6 @@ module.exports = {
          } = proposal;
          l('PROP CREATED EVENT HANDLER');
 
-         // const Nouns = await message.client.libraries.get('Nouns');
          const nounsGovChannel = await cache.get(nounsGovId);
 
          l({ nounsGovChannel });
@@ -33,16 +34,18 @@ module.exports = {
 
          l({ proposalId, title, description });
 
-         const titleHyperlink = `[${title}](https://nouns.wtf/vote/${proposalId})`;
+         const propUrl = `https://nouns.wtf/vote/${proposalId}`;
+         const titleHyperlink = hyperlink(title, propUrl);
          const shortDescription = `${description.substring(0, 200)}...`;
-         const readMoreHyperlink = `[Read Full Proposal](https://nouns.wtf/vote/${proposalId})`;
+         const readMoreHyperlink = hyperlink('Read Full Propposal', propUrl);
 
-         l({ titleHyperlink, shortDescription, readMoreHyperlink });
+         l({ shortDescription, readMoreHyperlink });
 
          const propCreatedEmbed = new MessageEmbed()
-            .setTitle(titleHyperlink)
-            .setDescription(`${shortDescription}\n--> ${readMoreHyperlink}`);
-         // return await message.edit({ content: null, embeds: [voteEmbedFind] });
+            .setTitle(title)
+            .setURL(propUrl)
+            .setDescription(`${shortDescription}\n\n--> ${readMoreHyperlink}`);
+
          return await message.edit({
             content: null,
             embeds: [propCreatedEmbed],
