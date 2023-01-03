@@ -29,30 +29,51 @@ module.exports = async (Nouns, address) => {
          await Nouns.NounsToken.Contract.delegates(ownerAddress)
       );
 
+      console.log({ delegateAddress });
+
       const delegateDelegateAddress = await Nouns.getAddress(
          await Nouns.NounsToken.Contract.delegates(delegateAddress)
       );
 
+      console.log({ delegateDelegateAddress });
+
       const delegating = delegateAddress && delegateAddress != ownerAddress;
+
+      console.log({ delegating });
 
       const delegateDelegating = delegateDelegateAddress != delegateAddress;
 
+      console.log({ delegateDelegating });
+
       // const owned = await Nouns.NounsToken.Contract.balanceOf(ownerAddress);
       const addressPrint = ownerEnsJoel == null ? ownerAddress : ownerEnsJoel;
+      console.log({ addressPrint });
+
       const ownerNounsOwned = await Nouns.NounsToken.Contract.balanceOf(
          ownerAddress
       );
+
+      console.log({ ownerNounsOwned });
+
       const ownerVotingPower = await Nouns.NounsToken.Contract.getCurrentVotes(
          ownerAddress
       );
+
+      console.log({ ownerVotingPower });
+
       const ownerNounsDelegated = delegating
          ? ownerVotingPower
          : ownerVotingPower - ownerNounsOwned;
       console.log('Owned Nouns: ' + ownerNounsOwned);
 
+      console.log({ ownerNounsOwned });
+
       const delegated = await Nouns.NounsToken.Contract.getCurrentVotes(
          ownerAddress
       );
+
+      console.log({ delegated });
+
       console.log('Delegated Nouns: ' + delegated);
 
       console.log('--------------------------');
@@ -75,15 +96,24 @@ module.exports = async (Nouns, address) => {
 
       if (delegating) {
          const delegateEns = await Nouns.ensReverseLookup(delegateAddress);
+
+         console.log({ delegateEns });
+
          // const delegateAddressPrint =
          // delegateEns == null ? delegateAddress : delegateEns;
          // const dAdPrint = await delegateEns == null ? delegateAddress : delegateEns;
          delegateAddressPrint =
             (await delegateEns) == null ? delegateAddress : delegateEns;
+
+         console.log({ delegateAddressPrint });
+
          // console.log('DADPRINT LOL WTF', { dAdPrint });
          delegateNounsOwned = await Nouns.NounsToken.Contract.balanceOf(
             delegateAddress
          );
+
+         console.log({ delegateNounsOwned });
+
          // const delegateNounsOwned = await Nouns.NounsToken.Contract.balanceOf(
          //    delegateAddress
          // );
@@ -92,10 +122,14 @@ module.exports = async (Nouns, address) => {
             delegateAddress
          );
 
+         console.log({ delegateVotingPower });
+
          // const delegateNounsDelegated = delegateDelegating
          delegateNounsDelegated = delegateDelegating
             ? delegateVotingPower
             : delegateVotingPower - delegateNounsOwned;
+
+         console.log({ delegateNounsDelegated });
 
          console.log('');
          console.log(
@@ -118,6 +152,7 @@ module.exports = async (Nouns, address) => {
       }
 
       return {
+         delegating,
          addressPrint,
          ownerVotingPower,
          ownerNounsOwned,
