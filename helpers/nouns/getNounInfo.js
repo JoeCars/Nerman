@@ -65,14 +65,23 @@ module.exports = async (Nouns, nounId) => {
             ' on ' +
             bid.date.toLocaleString()
       );
-   }
 
-   return {
-      ownerAddress,
-      ownerEns,
-      delegateAddress,
-      delegateEns,
-      votingPower: votingPower.toNumber(),
-      bid,
-   };
+      return {
+         ownerAddress,
+         ownerEns,
+         delegateAddress,
+         delegateEns,
+         votingPower: votingPower.toNumber(),
+         bid,
+      };
+   } else {
+      return {
+         ownerAddress,
+         ownerEns,
+         delegateAddress,
+         delegateEns,
+         votingPower: votingPower.toNumber(),
+         nounId
+      };
+   }
 };
