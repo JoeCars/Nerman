@@ -14,7 +14,7 @@ module.exports = {
    data: new SlashCommandBuilder()
       .setName('emit-test-proposal')
       .setDescription(
-         "Mimic a new proposal event from the blockchain to test the output to the nouncil-voting channel."
+         'Mimic a new proposal event from the blockchain to test the output to the nouncil-voting channel.'
       ),
 
    async execute(interaction) {
@@ -34,6 +34,11 @@ module.exports = {
 
       const propChannel = await channelCache.get(propChannelId);
 
+      // return interaction.editReply({
+      //    content: 'Aborting early...',
+      //    ephemeral: true,
+      // });
+
       const channelConfig = await PollChannel.findOne(
          {
             channelId: propChannelId,
@@ -41,11 +46,16 @@ module.exports = {
          '_id allowedRoles quorum duration'
       ).exec();
 
-      let message = await propChannel.send({content: 'Generating proposal poll...'});
+      let message = await propChannel.send({
+         content: 'Generating proposal poll...',
+      });
 
       // client.emit('newProposal', interaction, testProposal);
       client.emit('newProposal', message, testProposal);
 
-      interaction.editReply({content: `Dummy proposal emitted, check #${propChannel.name} to see if the poll has been generated.`, ephemeral: true})
+      interaction.editReply({
+         content: `Dummy proposal emitted, check #${propChannel.name} to see if the poll has been generated.`,
+         ephemeral: true,
+      });
    },
 };
