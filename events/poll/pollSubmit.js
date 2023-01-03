@@ -455,6 +455,11 @@ module.exports = {
             name: title,
             autoArchiveDuration: 60,
          });
+
+         await message.thread.send(`**${title}**\nDiscussion:`);
+
+         console.log({ message });
+         console.log(message.thread);
       } catch (error) {
          console.error(error);
       }

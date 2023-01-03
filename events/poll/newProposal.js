@@ -244,11 +244,12 @@ module.exports = {
 
          messageObject.embeds[0] = updatedEmbed;
 
-         interaction.edit(messageObject);
-         interaction.startThread({
+         await interaction.edit(messageObject);
+         await interaction.startThread({
             name: title,
             autoArchiveDuration: 60,
          });
+         await interaction.thread.send(`**${title}**\nDiscussion:`);
 
          client.emit('enqueuePoll', newPoll);
 
