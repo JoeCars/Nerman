@@ -21,8 +21,8 @@ module.exports = {
 
       const nounNum = interaction.options.getInteger('int');
 
-      if (nounNum <= 0) {
-         throw new Error('You must choose a Noun ID above 0.')
+      if (nounNum < 0) {
+         throw new Error('You must choose a Noun ID that is a positive integer.')
       }
 
       console.time('nounShit');
@@ -56,7 +56,7 @@ module.exports = {
          );
       }
 
-      // disabled 
+      // disabled
       // const msgAttach = new MessageAttachment(
       //    `https://noun.pics/${nounNum}.png`
       // );
@@ -81,7 +81,7 @@ module.exports = {
 
       const nounEmbed = await createNounEmbed(nounInfo, imgUrl);
 
-      console.log(await nounEmbed);
+      console.log(nounEmbed);
 
       await interaction.editReply({
          // content: 'not empty?',
