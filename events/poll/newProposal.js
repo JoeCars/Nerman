@@ -46,9 +46,10 @@ module.exports = {
       } = interaction;
 
       const propChannel = await cache.get(propChannelId);
-      const nounsGovChannel = guildCache
-         .get(process.env.DISCORD_GUILD_ID)
-         .channels.cache.get(nounsGovId);
+      // const nounsGovChannel = guildCache
+      //    .get(process.env.DISCORD_GUILD_ID)
+      //    .channels.cache.get(nounsGovId);
+      const nounsGovChannel = await cache.get(nounsGovId);
       // const testConExists = await PollChannel.configExists(propChannel.id);
       // console.log({ testConExists });
       const configExists = await PollChannel.configExists(propChannel.id);
@@ -249,15 +250,13 @@ module.exports = {
             autoArchiveDuration: 60,
          });
 
-
          client.emit('enqueuePoll', newPoll);
-
 
          let nounsGovMessage = await nounsGovChannel.send({
             content: 'New proposal data...',
          });
-         
-         client.emit('propCreated', newPoll, nounsGovMessage, propId);
+
+         client.emit('propCreated', nounsGovMessage, newPoll, propId);
       } catch (error) {
          // console.log('BIG FAT FUCKN ERROR, BRUH');
          console.error(error);
