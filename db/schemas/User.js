@@ -128,14 +128,14 @@ const userSchema = new Schema(
                (participatedPolls / eligiblePolls) * 100
             ).toFixed(2)}%`;
          },
-         incParticipation(channelId) {
+         async incParticipation(channelId) {
             const newParticipation = this.eligibleChannels.get(channelId);
 
             newParticipation.participatedPolls++;
 
             // mark modified because Mixed SchemaType loses Mongoose's ability to detect changes to the data
             this.markModified('eligibleChannels');
-            this.save();
+            await this.save();
          },
       },
       query: {
