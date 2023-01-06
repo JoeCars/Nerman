@@ -456,7 +456,7 @@ module.exports = {
             autoArchiveDuration: 60,
          });
 
-         await message.thread.send(`**${title}**\nDiscussion:`);
+         await message.thread.send(`Discussion:`);
 
          console.log({ message });
          console.log(message.thread);
@@ -522,6 +522,8 @@ module.exports = {
       // Emit an event to trigger adding a new poll to the db poll interval queue
 
       // const reply = await modal.editReply({
+
+      // todo add button vomponents in AFTER initial DB commit of the poll
       return await modal.deleteReply({
          content: 'Poll Submitted!',
       });
