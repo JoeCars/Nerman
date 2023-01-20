@@ -190,12 +190,10 @@ module.exports = {
 
          const threadEmbed = new MessageEmbed()
             .setColor('#00FFFF')
-            // .setTitle(`${titleFromPoll}`)
-            // .setURL(titleUrl)
             .setDescription(
                `${voterHyperlink} voted ${inlineCode(
                   supportEnum[supportDetailed]
-               )} on ${propHyperlink}. ${
+               )} with ${inlineCode(Number(votes))} votes on ${propHyperlink}. ${
                   !!reason.trim() ? `\n\n${reason}` : ''
                }`
             );
