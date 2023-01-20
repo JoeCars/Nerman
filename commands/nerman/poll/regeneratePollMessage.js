@@ -290,8 +290,8 @@ module.exports = {
 
             updateEmbed.spliceFields(1, 4, closedFields);
 
-            console.log('closedEmbed.fields');
-            console.log(closedEmbed.fields);
+            console.log('updateEmbed.fields');
+            console.log(updateEmbed.fields);
 
             messageToUpdate.edit({
                content: mentions,
@@ -309,8 +309,8 @@ module.exports = {
 
             updateEmbed.spliceFields(1, 4, closedFields);
 
-            console.log('closedEmbed.fields');
-            console.log(closedEmbed.fields);
+            console.log('updateEmbed.fields');
+            console.log(updateEmbed.fields);
 
             messageToUpdate.edit({
                content: mentions,
