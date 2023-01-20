@@ -60,7 +60,7 @@ const PollSchema = new Schema(
       status: {
          type: String,
          default: 'closed',
-         enum: ['open', 'closed'],
+         enum: ['open', 'closed', 'cancelled'],
       },
       pollNumber: {
          type: Number,
