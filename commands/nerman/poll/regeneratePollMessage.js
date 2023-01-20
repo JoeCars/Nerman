@@ -9,6 +9,8 @@ const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 
 const { initPollMessage } = require('../../../helpers/poll/initPollMessage');
+const { drawBar, longestString } = require('../helpers/poll');
+
 const { log: l } = console;
 
 const guildAdminId = process.env.NERMAN_G_ADMIN_ID;
@@ -180,10 +182,130 @@ module.exports = {
             associatedPoll.timeEnd.getTime() / 1000
          )}:f>`;
 
-         messageToUpdate.edit({
-            content: mentions,
-            embeds: [updateEmbed],
-         });
+         if (associatedPoll.status === 'closed') {
+            const eligibleVoters = associatedPoll.allowedUsers.size;
+
+            let winningResult = '';
+            const results = await associatedPoll.results;
+
+            console.log({ results });
+
+            if ('winner' in results) {
+               console.log(results.winner);
+               winningResult =
+                  results.winner !== null
+                     ? `${
+                          results.winner[0].toUpperCase() +
+                          results.winner.substring(1)
+                       } - Wins`
+                     : 'Literally nobody voted on this :<';
+            }
+
+            if ('tied' in results) {
+               winningResult = `${results.tied
+                  .flatMap(arr => arr[0][0].toUpperCase() + arr[0].substring(1))
+                  .join(', ')} - Tied`;
+            }
+
+            const longestOption = longestString(
+               associatedPoll.pollData.choices
+            ).length;
+            let resultsArray = ['```', '```'];
+            let resultsOutput = [];
+
+            const barWidth = 8;
+            let totalVotes = associatedPoll.results.totalVotes;
+
+            let votesMap = new Map([
+               ['maxLength', barWidth],
+               ['totalVotes', totalVotes],
+            ]);
+            for (const key in results.distribution) {
+               const label = key[0].toUpperCase() + key.substring(1);
+               let optionObj = {
+                  label,
+                  votes: results.distribution[key],
+                  room: longestOption - label.length,
+                  get spacer() {
+                     return this.room !== 0
+                        ? Array.from(
+                             { length: this.room },
+                             () => '\u200b '
+                          ).join('')
+                        : '';
+                  },
+                  get portion() {
+                     return votesMap.get('totalVotes') !== 0
+                        ? this.votes / votesMap.get('totalVotes')
+                        : 0;
+                  },
+                  get portionOutput() {
+                     // return ` ${(this.portion * 100).toFixed(1)}%`;
+                     return ` ${this.votes ?? 0} votes`;
+                  },
+                  get bar() {
+                     return drawBar(votesMap.get('maxLength'), this.portion);
+                  },
+                  get completeBar() {
+                     return [
+                        `${this.label}${this.spacer} `,
+                        this.bar,
+                        this.portionOutput,
+                     ].join('');
+                  },
+               };
+
+               votesMap.set(label, optionObj);
+               resultsArray.splice(-1, 0, optionObj.completeBar);
+            }
+
+            resultsOutput = resultsArray.join('\n');
+
+            // let closedEmbed = message.embeds[0];
+            // console.log({ closedEmbed });
+
+            // closedEmbed.setTitle(`${closedEmbed.title}`);
+
+            // console.log({ closedEmbed });
+
+            const closedFields = [
+               {
+                  name: 'RESULTS',
+                  value: codeBlock(winningResult),
+                  inline: false,
+               },
+               {
+                  name: 'VOTES',
+                  value: resultsOutput,
+                  inline: false,
+               },
+               {
+                  name: 'VOTERS',
+                  value: codeBlock(
+                     `Quorum: ${associatedPoll.voterQuorum}\n\nEligible: ${eligibleVoters}\nSubmitted: ${associatedPoll.countVoters}\nAbstained: ${associatedPoll.countAbstains}\n\nParticipation Rate: ${associatedPoll.participation}%`
+                  ),
+                  inline: false,
+               },
+            ];
+
+            updateEmbed.spliceFields(1, 4, closedFields);
+
+            console.log('closedEmbed.fields');
+            console.log(closedEmbed.fields);
+
+            messageToUpdate.edit({
+               content: mentions,
+               embeds: [updateEmbed],
+               components: [],
+            });
+         } else {
+            messageToUpdate.edit({
+               content: mentions,
+               embeds: [updateEmbed],
+            });
+         }
+
+         // todo make sure I can regenerate if closed
       }
       await interaction.editReply({ content: 'Regeneration finished!' });
    },
