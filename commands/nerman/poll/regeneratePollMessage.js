@@ -298,6 +298,25 @@ module.exports = {
                embeds: [updateEmbed],
                components: [],
             });
+         } else if (associatedPoll.status === 'cancelled') {
+            const closedFields = [
+               {
+                  name: 'CANCELLED',
+                  // value: codeBlock(winningResult),
+                  inline: false,
+               },
+            ];
+
+            updateEmbed.spliceFields(1, 4, closedFields);
+
+            console.log('closedEmbed.fields');
+            console.log(closedEmbed.fields);
+
+            messageToUpdate.edit({
+               content: mentions,
+               embeds: [updateEmbed],
+               components: [],
+            });
          } else {
             messageToUpdate.edit({
                content: mentions,
