@@ -9,7 +9,7 @@ const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 
 const { initPollMessage } = require('../../../helpers/poll/initPollMessage');
-const { drawBar, longestString } = require('../helpers/poll');
+const { drawBar, longestString } = require('../../../helpers/poll');
 
 const { log: l } = console;
 
