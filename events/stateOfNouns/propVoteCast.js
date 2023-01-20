@@ -21,6 +21,7 @@ module.exports = {
             guild: {
                channels: { cache },
             },
+            client,
          } = message;
 
          const {
@@ -39,13 +40,32 @@ module.exports = {
 
          const propRegExp = new RegExp(`^prop\\s${Number(proposalId)}`, 'i');
 
-         const targetPolls = await Poll.find({
-            'pollData.title': { $regex: propRegExp },
-         });
+         // const targetPolls = await Poll.find({
+         //    'pollData.title': { $regex: propRegExp },
+         // });
          // Poll.find({ 'pollData.title': { $regex: propRegExp })
          const targetPoll = await Poll.findOne({
             'pollData.title': { $regex: propRegExp },
-         });
+         })
+            .populate('config')
+            .exec();
+
+         let pollChannelId;
+         let pollMessage = null;
+
+         if (targetPoll) {
+            pollChannelId = targetPoll.config.channelId;
+            pollMessage = await (client.channels.cache
+               .get(pollChannelId)
+               .messages.cache.get(targetPoll.messageId) ??
+               client.channels.cache
+                  .get(pollChannelId)
+                  .messages.fetch(targetPoll.messageId));
+
+            l('propVoteCast -- TARGET POLL\n', targetPoll);
+         }
+
+         // const pollMessage = await (client.channels.cache
 
          l('propVoteCast.js : \n', { message });
          l('propVoteCast.js : \n', { vote });
@@ -58,7 +78,7 @@ module.exports = {
          l('propVoteCast.js : \n', { votes });
          l(Number(votes));
 
-         l('propVoteCast.js : \n', { targetPolls });
+         // l('propVoteCast.js : \n', { targetPolls });
          l('propVoteCast.js : \n', { targetPoll });
 
          const titleRegex = new RegExp(
@@ -81,11 +101,11 @@ module.exports = {
          //    .match(titleRegex)[0]
          //    .replaceAll(/^(#\s)|(\n+)$/g, '');
 
-         const titleFromFind = targetPolls[0].pollData.title;
-         const titleFromFindOne = targetPoll.pollData.title;
+         // const titleFromFind = targetPolls[0].pollData.title;
+         const titleFromPoll = targetPoll?.pollData.title ?? 'No poll title';
 
-         l('propVoteCast.js : \n', { titleFromFind });
-         l('propVoteCast.js : \n', { titleFromFindOne });
+         // l('propVoteCast.js : \n', { titleFromFind });
+         l('propVoteCast.js : \n', { titleFromPoll });
 
          const titleUrl = `https://nouns.wtf/vote/${proposalId}`;
 
@@ -97,22 +117,26 @@ module.exports = {
          l('propVoteCast.js : \n', { voterUrl });
          const voterHyperlink = `[${voter}](${voterUrl})`;
          l('propVoteCast.js : \n', { voterHyperlink });
+         const propHyperlink = hyperlink(
+            `Prop ${proposalId}`,
+            `https://nouns.wtf/vote/${proposalId}`
+         );
 
-         const title =
-            'Test Title String Until I Discover Where This Should Come from ';
+         // const title =
+         //    'Test Title String Until I Discover Where This Should Come from ';
          // const title = description
          //    .match(titleRegex)[0]
          //    .replaceAll(/^(#\s)|(\n+)$/g, '');
-         l('propVoteCast.js : \n', { title });
+         // l('propVoteCast.js : \n', { title });
 
          // const titleHyperlink = `[Prop ${proposalId} - ${title}](https://nouns.wtf/vote/${proposalId})`;
-         const titleHyperlinkFind = `[${titleFromFind}](https://nouns.wtf/vote/${proposalId})`;
-         // const titleHyperlinkFindOne = `[${titleFromFindOne}](https://nouns.wtf/vote/${proposalId})`;
-         const titleHyperlinkFindOne = hyperlink(titleFromFindOne, titleUrl);
+         // const titleHyperlinkFind = `[${titleFromFind}](https://nouns.wtf/vote/${proposalId})`;
+         // const titleHyperlinkFindOne = `[${titleFromPoll}](https://nouns.wtf/vote/${proposalId})`;
+         // const titleHyperlinkFindOne = hyperlink(titleFromPoll, titleUrl);
          // const description = `https://nouns.wtf/vote/${propId}`;
          // l('propVoteCast.js : \n',{ titleHyperlink });
-         l('propVoteCast.js : \n', { titleHyperlinkFind });
-         l('propVoteCast.js : \n', { titleHyperlinkFindOne });
+         // l('propVoteCast.js : \n', { titleHyperlinkFind });
+         // l('propVoteCast.js : \n', { titleHyperlinkFindOne });
 
          // const intRegex = new RegExp(/^\d*$/);
 
@@ -142,27 +166,54 @@ module.exports = {
          //             : ''
          //       }\n\u200B\u200B${reason}`
          //    );
-         const voteEmbedFind = new MessageEmbed()
-            .setTitle(titleHyperlinkFind)
-            .setDescription(
-               `${voterHyperlink} voted ${supportEnum[supportDetailed]}${
-                  supportEnum[supportDetailed] !== 'ABSTAIN'
-                     ? ' with ' + Number(votes) + ' votes'
-                     : ''
-               }\n\u200B\u200B${reason}`
-            );
-         const voteEmbedFindOne = new MessageEmbed()
+         // const voteEmbedFind = new MessageEmbed()
+         //    .setTitle(titleHyperlinkFind)
+         //    .setDescription(
+         //       `${voterHyperlink} voted ${supportEnum[supportDetailed]}${
+         //          supportEnum[supportDetailed] !== 'ABSTAIN'
+         //             ? ' with ' + Number(votes) + ' votes'
+         //             : ''
+         //       }\n\u200B\u200B${reason}`
+         //    );
+
+         const voteEmbed = new MessageEmbed()
             .setColor('#00FFFF')
-            .setTitle(`${titleFromFindOne}`)
+            .setTitle(`${titleFromPoll}`)
             .setURL(titleUrl)
             .setDescription(
                `${voterHyperlink} voted ${inlineCode(
                   supportEnum[supportDetailed]
-               )} with ${inlineCode(Number(votes))} votes. ${!!reason.trim() ? `\n\n${reason}` : ''}`
+               )} with ${inlineCode(Number(votes))} votes. ${
+                  !!reason.trim() ? `\n\n${reason}` : ''
+               }`
             );
 
-         l('VOTE EMBED FIND\n', voteEmbedFind);
-         l('VOTE EMBED FIND ONE\n', voteEmbedFindOne);
+         const threadEmbed = new MessageEmbed()
+            .setColor('#00FFFF')
+            // .setTitle(`${titleFromPoll}`)
+            // .setURL(titleUrl)
+            .setDescription(
+               `${voterHyperlink} voted ${inlineCode(
+                  supportEnum[supportDetailed]
+               )} on ${propHyperlink}. ${
+                  !!reason.trim() ? `\n\n${reason}` : ''
+               }`
+            );
+
+         // l('VOTE EMBED FIND\n', voteEmbedFind);
+         l('propVoteCast.js : \n', { pollMessage });
+         // l(
+         //    'propVoteCast.js -- pollMessage.hasThread: \n',
+         //    pollMessage.hasThread
+         // );
+         l('propVoteCast.js -- pollMessage.thread: \n', pollMessage.thread);
+         l(
+            'propVoteCast.js -- pollMessage.thread.fetch(): \n',
+            await pollMessage.thread.fetch()
+         );
+
+         l('VOTE EMBED\n', voteEmbed);
+         l('THREAD EMBED\n', threadEmbed);
 
          // const pollData = {
          //    title,
@@ -171,9 +222,17 @@ module.exports = {
          //    choices: ['yes', 'no', 'abstain'],
          // };
 
+         // l(pollMessage?.thread.hasThread);
+         if (pollMessage !== null) {
+            pollMessage.thread.send({
+               content: null,
+               embeds: [threadEmbed],
+            });
+         }
+
          return await message.edit({
             content: null,
-            embeds: [voteEmbedFindOne],
+            embeds: [voteEmbed],
          });
       } catch (error) {
          // console.log('BIG FAT FUCKN ERROR, BRUH');
