@@ -302,7 +302,7 @@ module.exports = {
             const closedFields = [
                {
                   name: 'CANCELLED',
-                  // value: codeBlock(winningResult),
+                  value: '\u200B',
                   inline: false,
                },
             ];
