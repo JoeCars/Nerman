@@ -249,7 +249,7 @@ module.exports = {
             name: title,
             autoArchiveDuration: 60,
          });
-         await interaction.thread.send(`**${title}**\nDiscussion:`);
+         await interaction.thread.send(`**Discussion:**`);
 
          client.emit('enqueuePoll', newPoll);
 
