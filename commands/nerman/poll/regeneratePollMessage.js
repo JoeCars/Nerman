@@ -178,7 +178,7 @@ module.exports = {
 
          updateEmbed.fields[1].value = embedQuorum.toString();
 
-         updateEmbed.fields[4].value = `<t:${Math.floor(
+         updateEmbed?.fields[4].value = `<t:${Math.floor(
             associatedPoll.timeEnd.getTime() / 1000
          )}:f>`;
 
