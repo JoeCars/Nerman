@@ -4,10 +4,14 @@ const {
    ModalSubmitInteraction,
    MessageEmbed,
 } = require('discord.js');
+const { userMention, inlineCode, hyperlink } = require('@discordjs/builders');
+
 const { Types } = require('mongoose');
 const Poll = require('../../db/schemas/Poll');
 const User = require('../../db/schemas/User');
 const Vote = require('../../db/schemas/Vote');
+
+const { log: l, error: lerr } = console;
 
 module.exports = {
    name: 'modalSubmit',
@@ -38,6 +42,8 @@ module.exports = {
          },
          message: { id: messageId },
       } = modal;
+
+      const propRegExp = new RegExp(/^prop\s(\d{1,5})/, 'i');
 
       const pollStatus = await Poll.findOne(
          { messageId },
@@ -153,6 +159,41 @@ module.exports = {
       );
 
       message.edit({ embeds: [updateEmbed] });
+
+      l({ propRegExp });
+      l(updatedPoll.pollData.title);
+
+      if (propRegExp.test(updatedPoll.pollData.title)) {
+         try {
+            const matches = updatedPoll.pollData.title.match(propRegExp);
+
+            l({ matches });
+            l(matches[0]);
+            l(matches[1]);
+
+            const propText = matches[0];
+            const propId = matches[1];
+
+            l({ propText });
+            l({ propId });
+
+            const threadEmbed = new MessageEmbed()
+               .setColor('#00FFFF')
+               .setDescription(
+                  `Anon voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+                     propText,
+                     `https://nouns.wtf/vote/${propId}`
+                  )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+               );
+
+            l({ threadEmbed });
+
+            await message.thread.fetch();
+            await message.thread.send({ embeds: [threadEmbed] });
+         } catch (error) {
+            l({ error });
+         }
+      }
 
       // await targetPoll
       //    .save()
