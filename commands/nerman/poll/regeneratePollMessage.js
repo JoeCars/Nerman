@@ -176,11 +176,11 @@ module.exports = {
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
-         if (updateEmbed.fields[1].value) {
+         if (updateEmbed.fields[1]) {
             updateEmbed.fields[1].value = embedQuorum.toString();
          }
 
-         if (updateEmbed.fields[4].value) {
+         if (updateEmbed.fields[4]) {
             updateEmbed.fields[4].value = `<t:${Math.floor(
                associatedPoll.timeEnd.getTime() / 1000
             )}:f>`;
