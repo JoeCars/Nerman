@@ -176,11 +176,15 @@ module.exports = {
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
-         updateEmbed.fields[1].value = embedQuorum.toString();
+         if (updateEmbed.fields[1].value) {
+            updateEmbed.fields[1].value = embedQuorum.toString();
+         }
 
-         updateEmbed?.fields[4].value = `<t:${Math.floor(
-            associatedPoll.timeEnd.getTime() / 1000
-         )}:f>`;
+         if (updateEmbed.fields[4].value) {
+            updateEmbed.fields[4].value = `<t:${Math.floor(
+               associatedPoll.timeEnd.getTime() / 1000
+            )}:f>`;
+         }
 
          if (associatedPoll.status === 'closed') {
             const eligibleVoters = associatedPoll.allowedUsers.size;
