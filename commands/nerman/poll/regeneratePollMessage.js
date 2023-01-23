@@ -313,7 +313,7 @@ module.exports = {
             console.log(updateEmbed.fields);
 
             messageToUpdate.edit({
-               content: mentions,
+               content: null,
                embeds: [updateEmbed],
                components: [],
             });
