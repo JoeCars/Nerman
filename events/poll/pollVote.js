@@ -180,7 +180,7 @@ module.exports = {
             const threadEmbed = new MessageEmbed()
                .setColor('#00FFFF')
                .setDescription(
-                  `Anon voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+                  `Anon Nouncillor voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
                      propText,
                      `https://nouns.wtf/vote/${propId}`
                   )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
