@@ -180,7 +180,9 @@ module.exports = {
             const threadEmbed = new MessageEmbed()
                .setColor('#00FFFF')
                .setDescription(
-                  `Anon Nouncillor voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+                  `Anon Nouncillor voted ${inlineCode(
+                     voteArray.join(' ')
+                  )} on ${hyperlink(
                      propText,
                      `https://nouns.wtf/vote/${propId}`
                   )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
@@ -188,8 +190,9 @@ module.exports = {
 
             l({ threadEmbed });
 
-            await message.thread.fetch();
-            await message.thread.send({ embeds: [threadEmbed] });
+            const thread = await message.thread.fetch();
+            // await message.thread.fetch();
+            await thread.send({ embeds: [threadEmbed] });
          } catch (error) {
             l({ error });
          }
