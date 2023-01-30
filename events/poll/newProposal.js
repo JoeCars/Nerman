@@ -246,8 +246,8 @@ module.exports = {
 
          const threadName =
             title.length <= 100
-               ? title.length
-               : `${title.length.substring(0, 96)}...`;
+               ? title
+               : `${title.substring(0, 96)}...`;
 
          await interaction.edit(messageObject);
          await interaction.startThread({
