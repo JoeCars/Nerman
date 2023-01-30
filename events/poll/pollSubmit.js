@@ -453,7 +453,7 @@ module.exports = {
          await message.edit({ embeds: [updatedEmbed] });
          await message.startThread({
             name: title,
-            autoArchiveDuration: 60,
+            autoArchiveDuration: 168, // todo probably make this based on channelConfig?
          });
 
          await message.thread.send(`Discussion:`);
