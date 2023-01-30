@@ -247,7 +247,7 @@ module.exports = {
          await interaction.edit(messageObject);
          await interaction.startThread({
             name: title,
-            autoArchiveDuration: 60,
+            autoArchiveDuration: 168, // todo probably make this based on channelConfig?
          });
          await interaction.thread.send(`**Discussion:**`);
 
