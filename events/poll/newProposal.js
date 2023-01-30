@@ -244,9 +244,14 @@ module.exports = {
 
          messageObject.embeds[0] = updatedEmbed;
 
+         const threadName =
+            title.length <= 100
+               ? title.length
+               : `${title.length.substring(0, 96)}...`;
+
          await interaction.edit(messageObject);
          await interaction.startThread({
-            name: title,
+            name: threadName,
             autoArchiveDuration: 10080, // todo probably make this based on channelConfig?
          });
          await interaction.thread.send(`**Discussion:**`);
