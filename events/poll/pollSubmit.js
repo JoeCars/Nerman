@@ -449,10 +449,13 @@ module.exports = {
             newPoll.timeEnd.getTime() / 1000
          )}:f>`; // timeEnd
 
+         const threadName =
+            title.length <= 100 ? title : `${title.substring(0, 96)}...`;
+         
          client.emit('enqueuePoll', newPoll);
          await message.edit({ embeds: [updatedEmbed] });
          await message.startThread({
-            name: title,
+            name: threadName,
             autoArchiveDuration: 10080, // todo probably make this based on channelConfig?
          });
 
