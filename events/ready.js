@@ -108,9 +108,15 @@ module.exports = {
             l('ready.js -- desc', { desc });
 
             // todo finetune thew regexp to extract title from any possible markdown
-            const titleRegex = new RegExp(
-               /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/
-            );
+            // const titleRegex = new RegExp(
+            //    /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*\/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/
+            // );
+
+            // !test this is the new Regexp for extracting titles from the proposals. Let's see how this goes.
+            // const titleRegex = new RegExp(/^(\#\s(?:\S+\s)+(?:\S+\N))/);
+
+            // !test ... looking at this new expression... couldn't I even just use something so simple as /^\N/ ? -- omg I think I can. I hate myself.
+            const titleRegex = new RegExp(/^\N+/);
             // const titleRegex = new RegExp(
             //    /^(\#\s(\w+\s)+\s(\w+\s)+(\w+\s+\n?))/
             // );
@@ -139,28 +145,28 @@ module.exports = {
          // Nouns.on(
          //    'ProposalCreatedWithRequirements',
          //    (data: nerman.EventData.ProposalCreatedWithRequirements) => {
-         Nouns.on('ProposalCreatedWithRequirements', async data => {
-            l('ready.js -- NOUNS.ON : PROPOSAL CREATED WITH REQUIREMENTS');
-            l(data);
+         // Nouns.on('ProposalCreatedWithRequirements', async data => {
+         //    l('ready.js -- NOUNS.ON : PROPOSAL CREATED WITH REQUIREMENTS');
+         //    l(data);
 
-            l({
-               'prop id': data.id,
-               'proposer address': data.proposer.id,
-               startBlock: data.startBlock,
-               endBlock: data.endBlock,
-               quorumVotes: data.quorumVotes,
-               proposalThreshold: data.proposalThreshold,
-               description: data.description,
-               // values: data.values, // (add these to get total ETH?)
-            });
-            // prop id: data.id
-            // proposer address:data.proposer.id
-            // data.startBlock, data.endBlock
-            // data.quorumVotes
-            // data.proposalThreshold
-            // description: data.description);
-            // data.values (add these to get total ETH?)
-         });
+         //    l({
+         //       'prop id': data.id,
+         //       'proposer address': data.proposer.id,
+         //       startBlock: data.startBlock,
+         //       endBlock: data.endBlock,
+         //       quorumVotes: data.quorumVotes,
+         //       proposalThreshold: data.proposalThreshold,
+         //       description: data.description,
+         //       // values: data.values, // (add these to get total ETH?)
+         //    });
+         //    // prop id: data.id
+         //    // proposer address:data.proposer.id
+         //    // data.startBlock, data.endBlock
+         //    // data.quorumVotes
+         //    // data.proposalThreshold
+         //    // description: data.description);
+         //    // data.values (add these to get total ETH?)
+         // });
 
          Nouns.on('AuctionBid', async data => {
             l('ready.js -- NOUNS.ON : AUCTION BID');
