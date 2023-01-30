@@ -145,9 +145,14 @@ module.exports = {
          l('MESSAGE EMBED AND AN END TIME WHADDAFUK\n', messageEmbed);
          l('MESSAGE OBJECT\n', messageObject);
 
+         const threadName =
+            associatedPoll.pollData.title.length <= 100
+               ? associatedPoll.pollData.title.length
+               : `${associatedPoll.pollData.title.length.substring(0, 96)}...`;
+
          const newMsg = await channel.send(messageObject);
          await newMsg.startThread({
-            name: associatedPoll.pollData.title,
+            name: threadName,
             autoArchiveDuration: 10080, // todo probably make this based on channelConfig?
          });
          l({ messageToUpdate });
