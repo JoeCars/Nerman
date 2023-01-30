@@ -21,11 +21,10 @@ module.exports = {
             guilds: { cache: guildCache },
          } = client;
 
-         const testingGetAddress = await Nouns.getAddress('skilift.eth');
-         l('HEY LOOK AT ME', testingGetAddress);
+         // const testingGetAddress = await Nouns.getAddress('skilift.eth');
+         // l('HEY LOOK AT ME', testingGetAddress);
 
-         // const testingEnsReverseLookup = await Nouns.
-
+         // const testingEnsReverseLookup = await Nouns
          // *************************************************************
          //
          // EXAMPLE EVENTS
@@ -383,7 +382,7 @@ module.exports = {
             }
          }
 
-         testing(2);
+         // testing(2);
       }
 
       runNouns().catch(err => {
