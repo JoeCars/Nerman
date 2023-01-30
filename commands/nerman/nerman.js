@@ -58,12 +58,12 @@ module.exports = {
       .addSubcommand(subcommand =>
          subcommand
             .setName('participation')
-            .setDescription('Check user voting participation in given channel')
+            .setDescription('Check user voting participation in current channel.')
             .addStringOption(option =>
                option
                   .setName('discord-id')
-                  .setDescription("Enter user's Discord ID")
-                  .setRequired(true)
+                  .setDescription("Enter user's Discord ID. Checks your own participation, if left blank.")
+                  .setRequired(false)
             )
       )
       .addSubcommand(subcommand =>
