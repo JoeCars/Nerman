@@ -148,12 +148,12 @@ module.exports = {
          const newMsg = await channel.send(messageObject);
          await newMsg.startThread({
             name: associatedPoll.pollData.title,
-            autoArchiveDuration: 168, // todo probably make this based on channelConfig?
+            autoArchiveDuration: 10080, // todo probably make this based on channelConfig?
          });
          l({ messageToUpdate });
          l({ newMsg });
          associatedPoll.messageId = newMsg.id;
-         associatedPoll.save();
+         await associatedPoll.save();
 
          if (noChannelMessage === false) {
             messageToUpdate.delete();
