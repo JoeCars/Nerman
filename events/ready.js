@@ -218,7 +218,7 @@ module.exports = {
             l('NounsDAO | ProposalCanceled | id:' + data.id);
 
             let message = await nounsGovChannel.send({
-               content: 'Propsal status changed...',
+               content: 'Proposal status changed...',
             });
 
             client.emit('propStatusChange', message, status, data);
@@ -248,7 +248,7 @@ module.exports = {
             );
 
             let message = await nounsGovChannel.send({
-               content: 'Propsal status changed...',
+               content: 'Proposal status changed...',
             });
 
             client.emit('propStatusChange', message, status, data);
@@ -273,7 +273,7 @@ module.exports = {
             l('NounsDAO | ProposalVetoed | id:' + data.id);
 
             let message = await nounsGovChannel.send({
-               content: 'Propsal status changed...',
+               content: 'Proposal status changed...',
             });
 
             client.emit('propStatusChange', message, status, data);
@@ -300,7 +300,7 @@ module.exports = {
             l('NounsDAO | ProposalExecuted | id:' + data.id);
 
             let message = await nounsGovChannel.send({
-               content: 'Propsal status changed...',
+               content: 'Proposal status changed...',
             });
 
             client.emit('propStatusChange', message, status, data);
