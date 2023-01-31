@@ -35,14 +35,15 @@ module.exports = {
             l('STATE OF NOUNS VOTE CAST -- VOTE INFO\n', vote);
 
             const nounsGovId = process.env.NOUNS_GOV_ID;
-            l('ready.js -- VoteCast : \n',{ nounsGovId });
+            l('ready.js -- VoteCast : \n', { nounsGovId });
 
             const nounsGovChannel = guildCache
                .get(process.env.DISCORD_GUILD_ID)
                .channels.cache.get(nounsGovId);
-            l('ready.js -- VoteCast : \n',{ nounsGovChannel });
+            l('ready.js -- VoteCast : \n', { nounsGovChannel });
 
-            l('ready.js -- VoteCast : \n',
+            l(
+               'ready.js -- VoteCast : \n',
                'NounsDAO | VoteCast | id:' +
                   vote.proposalId +
                   ',  voter: ' +
@@ -112,21 +113,9 @@ module.exports = {
             //    /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*\/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/
             // );
 
-            // !test this is the new Regexp for extracting titles from the proposals. Let's see how this goes.
-            // const titleRegex = new RegExp(/^(\#\s(?:\S+\s)+(?:\S+\N))/);
+            // const titleRegex = new RegExp(/^\N+/);
+            const titleRegex = new RegExp(/^(\#\s(?:\S+\s)+(?:\S+\n?))/);
 
-            // !test ... looking at this new expression... couldn't I even just use something so simple as /^\N/ ? -- omg I think I can. I hate myself.
-            const titleRegex = new RegExp(/^\N+/);
-            // const titleRegex = new RegExp(
-            //    /^(\#\s(\w+\s)+\s(\w+\s)+(\w+\s+\n?))/
-            // );
-            // # PropBox: A Nouns Proposal Incubator\n\n## TL;DR\n\nUsing lessons from a Nouncil trial program, we will set up a robust incubator that will help the best
-
-            // Prop 175: PropBox: A Nouns Proposal Incubator
-            // https://nouns.wtf/vote/175
-            // Yes, No, Abstain
-
-            // /^(\#\s((\w|[0-9_\-.,\|])+\s+)+(\w+\s?\n?))/
             const title = desc
                .match(titleRegex)[0]
                .replaceAll(/^(#\s)|(\n+)$/g, '');
@@ -222,7 +211,7 @@ module.exports = {
                .get(process.env.DISCORD_GUILD_ID)
                .channels.cache.get(nounsGovId);
 
-            const status = 'Canceled'
+            const status = 'Canceled';
 
             l({ nounsGovChannel });
 
@@ -249,7 +238,7 @@ module.exports = {
 
             l({ nounsGovChannel });
 
-            const status = 'Queued'
+            const status = 'Queued';
 
             l(
                'NounsDAO | ProposalQueued | id:' +
@@ -279,7 +268,7 @@ module.exports = {
 
             l({ nounsGovChannel });
 
-            const status = 'Vetoed'
+            const status = 'Vetoed';
 
             l('NounsDAO | ProposalVetoed | id:' + data.id);
 
@@ -307,7 +296,6 @@ module.exports = {
             l({ nounsGovChannel });
 
             const status = 'Executed';
-
 
             l('NounsDAO | ProposalExecuted | id:' + data.id);
 
