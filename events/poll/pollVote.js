@@ -20,12 +20,8 @@ module.exports = {
     */
    async execute(modal) {
       if (modal.customId !== 'vote-modal') return;
+      
       await modal.deferReply({ ephemeral: true });
-      // async execute(interaction) {
-      // console.log({ modal });
-
-      // return;
-      // if (!interaction.isCommand() && customId !== 'vote-modal') return;
 
       console.log('CUSTOM ID: \n', modal.customId);
 
@@ -47,9 +43,13 @@ module.exports = {
 
       const pollStatus = await Poll.findOne(
          { messageId },
-         'status pollData.voteAllowance pollData.choices'
-      );
+         'status pollData.voteAllowance pollData.choices config'
+      ).exec();
+
+      const pollOptions = await pollStatus.pollOptions();
+
       console.log({ pollStatus });
+      console.log({ pollOptions });
 
       let voteArray = modal.getTextInputValue('votingSelect');
 
@@ -119,7 +119,7 @@ module.exports = {
          _id: new Types.ObjectId(),
          // poll: targetPoll._id,
          poll: pollStatus._id,
-         user: userId,
+         user: pollOptions.anonymous ? undefined: userId,
          choices: voteArray,
          reason: voteReason || undefined,
       });
@@ -198,24 +198,6 @@ module.exports = {
          }
       }
 
-      // await targetPoll
-      //    .save()
-      //    .then(savedDoc => {
-      //       console.log('targetPoll === savedDoc', targetPoll === savedDoc);
-      //       console.log({ savedDoc });
-      //       console.log('savedDoc.allowedUsers', savedDoc.allowedUsers);
-      //    })
-      //    .catch(err => console.error(err));
-      // await targetPoll
-      //    .save()
-      //    .then(savedDoc => {
-      //       console.log('targetPoll === savedDoc', targetPoll === savedDoc);
-      //       console.log({ savedDoc });
-      //       console.log('savedDoc.allowedUsers', savedDoc.allowedUsers);
-      //    })
-      //    .catch(err => console.error(err));
-
-      // console.log('pollVote.js -- modal', { modal });
       console.log('pollVote.js -- userVote', { userVote });
 
       return modal.editReply({
