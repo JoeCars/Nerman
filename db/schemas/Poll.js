@@ -131,6 +131,14 @@ const PollSchema = new Schema(
                   this.abstains.clear();
             }
          },
+         async pollOptions() {
+            await this.populate(
+               'config',
+               'anonymous liveVisualFeed voteAllowance -_id'
+            );
+
+            return { anonymous, liveVisualFeed, voteAllowance } = this.config;
+         },
       },
    }
 );
