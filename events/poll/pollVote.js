@@ -20,7 +20,7 @@ module.exports = {
     */
    async execute(modal) {
       if (modal.customId !== 'vote-modal') return;
-      
+
       await modal.deferReply({ ephemeral: true });
 
       console.log('CUSTOM ID: \n', modal.customId);
@@ -119,7 +119,7 @@ module.exports = {
          _id: new Types.ObjectId(),
          // poll: targetPoll._id,
          poll: pollStatus._id,
-         user: pollOptions.anonymous ? undefined: userId,
+         user: pollOptions.anonymous ? undefined : userId,
          choices: voteArray,
          reason: voteReason || undefined,
       });
@@ -180,9 +180,11 @@ module.exports = {
             const threadEmbed = new MessageEmbed()
                .setColor('#00FFFF')
                .setDescription(
-                  `Anon Nouncillor voted ${inlineCode(
-                     voteArray.join(' ')
-                  )} on ${hyperlink(
+                  `${
+                     pollOptions.anonymous
+                        ? 'Anon Nouncillor'
+                        : userMention(userId)
+                  } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
                      propText,
                      `https://nouns.wtf/vote/${propId}`
                   )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
