@@ -206,6 +206,34 @@ module.exports = {
          } catch (error) {
             l({ error });
          }
+      } else {
+         try {
+            const threadEmbed = new MessageEmbed()
+               .setColor('#00FFFF')
+               .setDescription(
+                  `Anon Nouncillor voted ${inlineCode(
+                     voteArray.join(' ')
+                  )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+               );
+            // .setDescription(
+            //    `${
+            //       pollOptions.anonymous
+            //          ? 'Anon Nouncillor'
+            //          : userMention(userId)
+            //    } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+            //       propText,
+            //       `https://nouns.wtf/vote/${propId}`
+            //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+            // );
+
+            l({ threadEmbed });
+
+            const thread = await message.thread.fetch();
+            // await message.thread.fetch();
+            await thread.send({ embeds: [threadEmbed] });
+         } catch (error) {
+            l({ error });
+         }
       }
 
       console.log('pollVote.js -- userVote', { userVote });
