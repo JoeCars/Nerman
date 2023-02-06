@@ -1,8 +1,13 @@
 const { Guild } = require('discord.js');
+const { log: l} = console;
 
 module.exports = {
    name: 'guildCreate',
-   async execute(whatever) {
-      console.log('THIS IS WHATEVER', whatever);
+   /**
+    *
+    * @param {Guild} guild
+    */
+   async execute(guild) {
+      console.log('NEW GUILD JOINED', guild);
    },
 };
