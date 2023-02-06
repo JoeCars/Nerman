@@ -8,6 +8,7 @@ const { drawBar, longestString } = require('../helpers/poll');
 const Poll = require('../db/schemas/Poll');
 const { lc } = require('../utils/functions');
 
+const { log: l } = console;
 // const {
 //    createPollTest,
 // } = require('../scratchcode/db/schema/testExecutions/createPoll');
@@ -64,8 +65,24 @@ module.exports = async client => {
             const openPolls = await Poll.find({ status: 'open' })
                .populate('config', 'channelId')
                .then(foundPolls => {
-                  console.log('TESTING FOUND POLLS');
-                  lc('foundPolls', '131', foundPolls);
+                  const sortedPolls = foundPolls.sort(
+                     (a, b) => a.timeEnd - b.timeEnd
+                  );
+
+                  const sortedPollsLogMap = sortedPolls.map(
+                     ({ pollData, pollNumber, timeEnd, status }) => ({
+                        pollData,
+                        pollNumber,
+                        timeEnd,
+                        status,
+                     })
+                  );
+
+                  lc(
+                     'SORTED FOUND POLLS',
+                     '131',
+                     JSON.stringify(sortedPollsLogMap, null, 4)
+                  );
                   return foundPolls.sort((a, b) => a.timeEnd - b.timeEnd);
                })
                .catch(err => console.error(err));
@@ -76,20 +93,62 @@ module.exports = async client => {
 
             client.on('enqueuePoll', newPoll => {
                // console.log('PRE PUSH AND SORT', { openPolls });
-               lc('PRE PUSH AND SORT\nopenPolls', '131', openPolls);
+               // lc('PRE PUSH AND SORT\nopenPolls', '131', openPolls);
 
                openPolls.push(newPoll);
                openPolls.sort((a, b) => a.timeEnd - b.timeEnd);
                // console.log('POST PUSH AND SORT', { openPolls });
-               lc('POST PUSH AND SORT\nopenPolls', '132', openPolls);
+               // lc('POST PUSH AND SORT\nopenPolls', '132', openPolls);
+
+               l('NEW POLL ADDED TO QUEUE -- NEW POLL LIST:');
+
+               const sortedPollsLogMap = openPolls.map(
+                  ({ pollData, pollNumber, timeEnd, status }) => ({
+                     pollData,
+                     pollNumber,
+                     timeEnd,
+                     status,
+                  })
+               );
+
+               lc(
+                  'POLL QUEUED -- NEW SORTED OPEN POLLS LIST',
+                  '131',
+                  JSON.stringify(sortedPollsLogMap, null, 4)
+               );
+
+               // openPolls.forEach(({ pollData, pollNumber, timeEnd, status }) =>
+               //    lc(
+               //       'FOUND POLL',
+               //       '131',
+               //       JSON.stringify(
+               //          {
+               //             pollData,
+               //             pollNumber,
+               //             timeEnd,
+               //             status,
+               //          },
+               //          null,
+               //          4
+               //       )
+               //    )
+               // );
 
                intervalFunction();
             });
 
             client.on('dequeuePoll', oldPoll => {
-               console.log('TESTING OLD POLLS');
+               console.log('DEQUEUEING POLL:');
 
-               lc('oldPoll', '131', oldPoll);
+               lc(
+                  'oldPoll',
+                  '131',
+                  JSON.stringify(
+                     { pollData: oldPoll.pollData, timeEnd: oldPoll.timeEnd },
+                     null,
+                     4
+                  )
+               );
                // const idx = openPolls.findIndex(({ _id }) => {
                const idx = openPolls.findIndex(({ _id }) => {
                   console.log('_id', _id);
@@ -103,9 +162,22 @@ module.exports = async client => {
                lc('idx', '132', idx);
 
                openPolls.splice(idx, 1);
-               console.log('TESTING POST REMOVED POLLS');
+               // console.log('TESTING POST REMOVED POLLS');
 
-               lc('POST REMOVAL OF POLL\nopenPolls', '133', openPolls);
+               const sortedPollsLogMap = openPolls.map(
+                  ({ pollData, pollNumber, timeEnd, status }) => ({
+                     pollData,
+                     pollNumber,
+                     timeEnd,
+                     status,
+                  })
+               );
+
+               lc(
+                  'POLL DEQUEUED -- NEW OPEN POLLS LIST:',
+                  '133',
+                  JSON.stringify(sortedPollsLogMap, null, 4)
+               );
             });
 
             let intervalId;
@@ -179,7 +251,6 @@ module.exports = async client => {
                               .messages.fetch(closingPoll.messageId));
 
                         console.log({ message });
- 
 
                         if (message === null) {
                            return openPolls.shift();
@@ -371,8 +442,8 @@ module.exports = async client => {
                intervalFunction();
             }
             // background: ESC[48;5;#m
-            console.log(`openPolls\n\x1b[48;5;162m${openPolls}\x1b[0m`);
-            console.log(`openPolls\n\x1b[46m${openPolls}\x1b[0m`);
+            // console.log(`openPolls\n\x1b[48;5;162m${openPolls}\x1b[0m`);
+            // console.log(`openPolls\n\x1b[46m${openPolls}\x1b[0m`);
          });
          await mongoose.connect(mongoURI, options);
 
