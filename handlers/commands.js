@@ -22,13 +22,13 @@ module.exports = async client => {
 
    const commands = await getFiles('commands', '.js');
 
-   console.log({ commands });
+   // console.log({ commands });
 
    if (commands.length === 0) throw 'No slash commands provided';
 
    commands.forEach(commandFile => {
       // const command = require(`../commands/${commandFile}`);
-      console.log({ commandFile });
+      // console.log({ commandFile });
 
       if (
          process.env.DEPLOY_STAGE !== 'development' &&
@@ -44,7 +44,7 @@ module.exports = async client => {
          return client.subCommands.set(command.subCommand, command);
       }
 
-      console.log({ command });
+      // console.log({ command });
 
       if (command.data.name && typeof command.data.name === 'string') {
          commandsArr.push(command.data.toJSON());
