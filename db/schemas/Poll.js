@@ -69,6 +69,7 @@ const PollSchema = new Schema(
    {
       timestamps: { createdAt: 'timeCreated', updatedAt: 'modified' },
       query: {
+         // todo change this to now accomodate guildId as well? For multi-server shenanigans
          byMessageId(messageId) {
             l('FROM QUERY HELPER', { messageId });
             return this.where({ messageId: new RegExp(messageId, 'i') });
