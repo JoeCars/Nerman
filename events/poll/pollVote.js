@@ -39,6 +39,8 @@ module.exports = {
          message: { id: messageId },
       } = modal;
 
+      console.log({ modal });
+
       const propRegExp = new RegExp(/^prop\s(\d{1,5})/, 'i');
 
       const pollStatus = await Poll.findOne(
@@ -211,9 +213,9 @@ module.exports = {
             const threadEmbed = new MessageEmbed()
                .setColor('#00FFFF')
                .setDescription(
-                  `Anon Nouncillor voted ${inlineCode(
-                     voteArray.join(' ')
-                  )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+                  `Anon Nouncillor voted ${inlineCode(voteArray.join(' '))}.${
+                     !!voteReason ? `\n\n${voteReason.trim()}` : ``
+                  }`
                );
             // .setDescription(
             //    `${
