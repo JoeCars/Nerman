@@ -383,7 +383,9 @@ module.exports = {
          l(err);
       });
 
-      l({ client });
-      l('CHECKING GUILDS', client.guilds);
+      // l({ client });
+      // l('CHECKING GUILDS', client.guilds);
+      l('CHECKING GUILDS CACHE', client.guilds.cache);
+      l('CHECKING GUILDS FETCH', await client.guilds.fetch());
    },
 };
