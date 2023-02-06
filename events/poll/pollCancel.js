@@ -21,7 +21,6 @@ module.exports = {
 
       if (!rCustomId.test(modal.customId)) return;
 
-
       try {
          await modal.deferReply({ ephemeral: true });
 
@@ -60,6 +59,7 @@ module.exports = {
          targetPoll.clearProperty('abstains');
          targetPoll.markModified('allowedUsers');
          targetPoll.markModified('abstains');
+         targetPoll.status = 'cancelled';
 
          await targetPoll.save();
 
