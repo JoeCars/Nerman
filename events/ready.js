@@ -382,5 +382,8 @@ module.exports = {
       runNouns().catch(err => {
          l(err);
       });
+
+      l({ client });
+      l('CHECKING GUILDS', client.guilds);
    },
 };
