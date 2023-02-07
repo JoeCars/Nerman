@@ -114,7 +114,7 @@ module.exports = {
             // );
 
             // const titleRegex = new RegExp(/^\N+/);
-            const titleRegex = new RegExp(/^(\#\s(?:\S+\s)+(?:\S+\n?))/);
+            const titleRegex = new RegExp(/^(\#\s(?:\S+\s?)+(?:\S+\n?))/);
 
             const title = desc
                .match(titleRegex)[0]
