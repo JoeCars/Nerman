@@ -198,8 +198,9 @@ module.exports = {
          const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
             async key => {
                l({ key });
-               const user = await User.findOne({ discordId: key }).exec();
-               user.eligibleChannels.get(newPoll.config.channelId)
+               // !test to see if this optional chaining will fix the user eligible channels null value error
+               const user = await User.findOne({ guildId: guildId, discordId: key }).exec();
+               user.eligibleChannels?.get(newPoll.config.channelId)
                   .eligiblePolls++;
                user.markModified('eligibleChannels');
                return await user.save();
