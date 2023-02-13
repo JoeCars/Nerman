@@ -13,7 +13,8 @@ const { drawBar, longestString } = require('../../../helpers/poll');
 
 const { log: l } = console;
 
-const guildAdminId = process.env.NERMAN_G_ADMIN_ID;
+// fixme change this once we have a better way of nailing down the guild's admin permissions
+const authorizedIds = process.env.BAD_BITCHES.split(',');
 module.exports = {
    subCommand: 'nerman.regenerate-poll-message',
    /**
@@ -25,23 +26,35 @@ module.exports = {
          channelId,
          channel,
          client,
+         user: { id: userId },
+         member: {
+            roles: { cache: roleCache },
+         },
          guild: {
             members: { cache: memberCache },
             roles: {
                everyone: { id: everyoneId },
             },
          },
-         member: {
-            roles: { cache: roleCache },
-         },
       } = interaction;
 
       await interaction.deferReply({ ephemeral: true });
 
       // if (!(await PollChannel.countDocuments({ channelId }))) {
-      if (!roleCache.has(guildAdminId))
-         throw new Error('This is an admin-only command');
+      // disabled until we find a better way to handle the cross-guild admin permissions when accessing bot commands
+      // if (!roleCache.has(guildAdminId)) {
+      //    throw new Error('This is an admin-only command');
+      // }
 
+      // todo later on change permissions associated with this, once we decide one how to tdeal with the cross guild shenanigans
+      if (authorizedIds.includes(userId)) {
+         l('NO USER ID');
+         throw new Error('You do not have permission to access this command.');
+      }
+
+      // return await interaction.editReply({ content: 'TEST END' });
+
+      // todo maybe convert this over to access the config from the guildConfigs collection within Nerman -- going to wait on migratiung these over for now, only sticking to using it this way where I need it, until I can account for new error/security issues in this method
       const configExists = await PollChannel.configExists(channelId);
 
       console.log('CREATE', { configExists });
