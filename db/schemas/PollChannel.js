@@ -1,9 +1,34 @@
 const { model, Schema, SchemaTypes } = require('mongoose');
+const { log: l } = console;
 
 const PollChannelSchema = new Schema(
    {
       _id: Schema.Types.ObjectId,
-      channelId: { type: String, required: true, unique: true },
+      guildConfig: {
+         type: Schema.Types.ObjectId,
+         ref: 'GuildConfig',
+         required: true,
+      },
+      channelId: {
+         type: String,
+         required: true,
+         // unique: true,
+         validate: {
+            validator: async function (channelId) {
+               l({ channelId });
+               await this.populate('guildConfig');
+               await this.guildConfig.populate('pollChannels');
+
+               const noChannel = !this.guildConfig.pollChannels.find(
+                  ({ channelId }) => channelId === this.channelId
+               );
+
+               l({ noChannel });
+
+               return noChannel;
+            },
+         },
+      },
       allowedRoles: [{ type: String, required: true, default: {} }],
       duration: { type: Number, required: true },
       maxUserProposal: { type: Number, default: 1 },
@@ -27,6 +52,10 @@ const PollChannelSchema = new Schema(
       },
    }
 );
+
+// todo threshold dominationg vite needs to have 30% of the total eligible votes to win
+// must pass voter quorum
+// then after that passes, if the leading votes pases the threshold then we call that a pass
 
 // const PollChannelSchema = new Schema({
 //    _id: Schema.Types.ObjectId,
