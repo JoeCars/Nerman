@@ -22,6 +22,7 @@ module.exports = {
          },
          guild: {
             members,
+            id: guildId,
             members: { cache: mCache },
          },
       } = interaction;
@@ -34,26 +35,32 @@ module.exports = {
          );
       }
 
-
       // 993371424662224986 nerman-dev-jr
-      const voterId = interaction.options.getString('discord-id') ?? interaction.member.user.id;
+      const voterId =
+         interaction.options.getString('discord-id') ??
+         interaction.member.user.id;
 
-      l({voterId})
+      l({ voterId });
       const {
          nickname,
          user: { username, discriminator },
          roles: { cache: memberRoles },
       } = mCache.get(voterId) ?? (await members.fetch(voterId));
 
-      const voterDoc = await User.findOne().byDiscordId(voterId).exec();
+      const voterDoc = await User.findOne()
+         .byDiscordId(voterId, guildId)
+         .exec();
       l({ voterDoc });
-      const { eligiblePolls: witnessed, participatedPolls: participated } =
-         voterDoc.eligibleChannels.get(channelId);
+      // const { eligiblePolls: witnessed, participatedPolls: participated } =
+      //    voterDoc.eligibleChannels.get(channelId);
 
-      l({ witnessed, participated });
+      // l({ witnessed, participated });
 
       if (!voterDoc) {
          l('[...memberRoles.keys()]', [...memberRoles.keys()]);
+
+         const { eligiblePolls: witnessed, participatedPolls: participated } =
+            voterDoc.eligibleChannels.get(channelId);
 
          const hasVotingRole = await User.checkVotingRoles(memberRoles);
 
@@ -66,7 +73,11 @@ module.exports = {
 
          const eligibleChannels = await User.findEligibleChannels(memberRoles);
 
-         const newUser = await User.createUser(voterId, eligibleChannels);
+         const newUser = await User.createUser(
+            guildId,
+            voterId,
+            eligibleChannels
+         );
          l({ newUser });
 
          const participation = await newUser.participation(channelId);
@@ -86,6 +97,9 @@ module.exports = {
             ephemeral: true,
          });
       } else {
+         const { eligiblePolls: witnessed, participatedPolls: participated } =
+            voterDoc.eligibleChannels.get(channelId);
+
          const participation = await voterDoc.participation(channelId);
 
          const header = `**#${channelName} | ${
