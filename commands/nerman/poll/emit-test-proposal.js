@@ -8,7 +8,8 @@ const propChannelId =
       ? process.env.TESTNERMAN_NOUNCIL_CHAN_ID
       : process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
 
-const adminId = process.env.NERMAN_G_ADMIN_ID;
+// const adminId = process.env.NERMAN_G_ADMIN_ID;
+const authorizedIds = process.env.BAD_BITCHES.split(',');
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -20,6 +21,7 @@ module.exports = {
    async execute(interaction) {
       const {
          client,
+         user: { id: userId },
          guild: {
             channels: { cache: channelCache },
          },
@@ -30,7 +32,11 @@ module.exports = {
 
       await interaction.deferReply({ ephemeral: true });
 
-      if (!roleCache.has(adminId)) return;
+      // disabled until we do the permissions thang etc
+      // if (!roleCache.has(adminId)) return;
+      if (!authorizedIds.includes(userId)) {
+         throw new Error('You lack the permissions to use this commmand.');
+      }
 
       const propChannel = await channelCache.get(propChannelId);
 
