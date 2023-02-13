@@ -128,7 +128,7 @@ module.exports = {
 
       // await targetPoll.allowedUsers.set(userId, true);
 
-      let votingUser = await User.findOne().byDiscordId(userId).exec();
+      let votingUser = await User.findOne().byDiscordId(userId, guildId).exec();
 
       if (!votingUser) {
          const eligibleChannels = await User.findEligibleChannels(
