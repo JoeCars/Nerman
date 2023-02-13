@@ -17,6 +17,7 @@ module.exports = {
       const {
          client,
          channelId,
+         guild: { id: guildId },
          message: { id: messageId },
          user: { id: userId },
          member: {
@@ -59,7 +60,7 @@ module.exports = {
          });
       }
 
-      let abstainingUser = await User.findOne().byDiscordId(userId).exec();
+      let abstainingUser = await User.findOne().byDiscordId(userId, guildId).exec();
 
       if (!abstainingUser) {
          const eligibleChannels = await User.findEligibleChannels(roleCache);
