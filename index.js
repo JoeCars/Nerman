@@ -18,6 +18,7 @@ const client = new Client({
 const discordModals = require('discord-modals');
 discordModals(client);
 
+
 ['events', 'commands', 'buttons'].forEach(handler =>
    require(`./handlers/${handler}.js`)(client, (reload = false))
 );
