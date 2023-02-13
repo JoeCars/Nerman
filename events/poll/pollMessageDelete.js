@@ -9,8 +9,10 @@ module.exports = {
       const {
          client,
          channelId,
-         author: { bot },
+
          id: messageId,
+         author: { bot },
+         guild: { id: guildId },
       } = message;
 
       l({ message });
@@ -32,9 +34,10 @@ module.exports = {
       )
          return;
 
+      // todo Later on I should maybe make a new version of this that actually rebuilds the message if it's deleted, rather than simply closing the poll in the DB
       // const messagePoll = await Poll.findOneAndDelete({ messageId });
       const messagePoll = await Poll.findOneAndUpdate(
-         { messageId },
+         { messageId, guildId },
          { status: 'closed' }
       );
 
