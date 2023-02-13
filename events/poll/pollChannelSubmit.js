@@ -1,7 +1,10 @@
 const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
 const PollChannel = require('../../db/schemas/PollChannel');
+// const GuildConfig = require('../../db/schemas/GuildConfig');
 const { logToObject } = require('../../utils/functions');
+
+const { log: l } = console;
 
 module.exports = {
    name: 'modalSubmit',
@@ -15,7 +18,8 @@ module.exports = {
 
       const {
          channelId,
-         guild: { roles: gRoleCache },
+         client: { guildConfigs },
+         guild: { id: guildId, roles: gRoleCache },
          member: {
             roles: { cache: roleCache },
          },
@@ -36,6 +40,15 @@ module.exports = {
                'A configuration has already been created for this channel.',
             ephemeral: true,
          });
+
+      // const guildConfig = await GuildConfig.findOne({
+      //    guildId: guildId,
+      // }).exec();
+
+      const guildConfig = await (guildConfigs.has(guildId) &&
+         guildConfigs.get(guildId));
+
+      l({ guildConfig });
 
       const durRegex = new RegExp(/^\d{1,3}(\.\d{1,2})?$/, 'g');
       // const quorRegex = new RegExp(/^\d{1,2}(\.\d{1,2})?$/, 'g');
@@ -138,9 +151,11 @@ module.exports = {
       console.log({ pollQuorum });
 
       try {
+         l('Creating new channelConfig document...');
+
          const newPollChannel = await PollChannel.create({
             _id: new Types.ObjectId(),
-            // channelId: pollChannel[0],
+            guildConfig: guildConfig._id,
             channelId,
             //disabled until modal support
             // allowedRoles: votingRoles,
@@ -150,9 +165,18 @@ module.exports = {
             voteAllowance: pollChannelOptions.includes('vote-allowance'),
             anonymous: pollChannelOptions.includes('anonymous-voting'),
             liveVisualFeed: pollChannelOptions.includes('live-results'),
-            // quorum: undefined,
             quorum: pollQuorum,
          });
+
+         l(
+            `${guildConfig.pollChannels.length} Poll Channels belong to this guild configuration.\nRepopulating channel configuration list...`
+         );
+         await guildConfig.depopulate('pollChannels');
+         await guildConfig.populate('pollChannels');
+
+         l(
+            `Configuration list has been repopulated!\n\n${guildConfig.pollChannels.length} poll Channels now belong to this guild.`
+         );
       } catch (error) {
          console.error(error);
       }
