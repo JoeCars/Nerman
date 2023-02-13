@@ -11,9 +11,9 @@ module.exports = {
       // TESTING GUILD ID: 783406052372643940
       const { id: guildId } = guild;
 
-      l('CLIENT', guild.client);
-      l('GUILD LEFT', guild);
-      l('GUILD LEFT ID:', guildId);
+      // l('CLIENT', guild.client);
+      // l('GUILD LEFT', guild);
+      // l('GUILD LEFT ID:', guildId);
 
       // if (!guildWhitelist.includes(guildId)) {
       // l('THIS GUILD IS FULL OF STUPID POSEURS!');
