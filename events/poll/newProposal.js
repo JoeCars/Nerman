@@ -199,9 +199,24 @@ module.exports = {
             async key => {
                l({ key });
                // !test to see if this optional chaining will fix the user eligible channels null value error
-               const user = await User.findOne({ guildId: guildId, discordId: key }).exec();
-               user.eligibleChannels?.get(newPoll.config.channelId)
-                  .eligiblePolls++;
+               const user = await User.findOne({
+                  guildId: guildId,
+                  discordId: key,
+               }).exec();
+
+               if (
+                  user.eligibleChannels !== null &&
+                  user.eligibleChannels.has(newPoll.config.channelId)
+               ) {
+                  user.eligibleChannels.get(newPoll.config.channelId)
+                     .eligiblePolls++;
+               } else {
+                  user.eligibleChannels.set(newPoll.config.channelId, {
+                     eligiblePolls: 1,
+                     participatedPolls: 0,
+                  });
+               }
+               
                user.markModified('eligibleChannels');
                return await user.save();
                // l({ participation });
@@ -246,9 +261,7 @@ module.exports = {
          messageObject.embeds[0] = updatedEmbed;
 
          const threadName =
-            title.length <= 100
-               ? title
-               : `${title.substring(0, 96)}...`;
+            title.length <= 100 ? title : `${title.substring(0, 96)}...`;
 
          await interaction.edit(messageObject);
          await interaction.startThread({
