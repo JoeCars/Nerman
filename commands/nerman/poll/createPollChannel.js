@@ -2,6 +2,10 @@ const { CommandInteraction } = require('discord.js');
 const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
+const GuildConfig = require('../../../db/schemas/GuildConfig');
+
+// fixme will need to remove these after we figure out a better permission control for admin command
+const authorizedIds = process.env.BAD_BITCHES.split(',');
 module.exports = {
    subCommand: 'nerman.create-poll-channel',
    /**
@@ -14,34 +18,40 @@ module.exports = {
          channelId,
          channel,
          guild,
+         client: { guildConfigs },
+         user: { id: userId },
+         member: {
+            permissions,
+            roles: { cache: roleCache },
+         },
          guild: {
             channels,
+            id: guildId,
             roles: gRoles,
             roles: {
                cache: guildRoleCache,
                everyone: { id: everyoneId },
             },
          },
-         user: { id: userId },
-         member: {
-            permissions,
-            roles: { cache: roleCache },
-         },
          memberPermissions,
       } = interaction;
       // console.timeEnd('destruct')'
 
-      console.log(memberPermissions.has('MANAGE_GUILD'));
       console.log('commandInteraction -- create-poll', { channelId });
       // console.log('isTextBased', channel.isText());
       // console.log('isDMBased', channel.isDM());
 
-      if (!memberPermissions.has('MANAGE_GUILD')) {
-         return interaction.reply({
-            content: 'Only guild managers have access to this.',
-            ephemeral: true,
-         });
+      if (!authorizedIds.includes(userId)) {
+         throw new Error('You do not have permission to use this command.');
       }
+
+      // disabled until we nail down the cross-guild permissions on this command
+      // if (!memberPermissions.has('MANAGE_GUILD')) {
+      //    return interaction.reply({
+      //       content: 'Only guild managers have access to this.',
+      //       ephemeral: true,
+      //    });
+      // }
 
       if (!channel.isText())
          return interaction.reply({
@@ -53,10 +63,22 @@ module.exports = {
       // const configCheck = await PollChannel.countDocuments({
       //    channelId,
       // });
-      const configCheck = await PollChannel.configExists(channelId);
-      // console.log({ configCheck });
 
-      if (configCheck)
+      // const guildConfig = await GuildConfig.exists({
+      //    guildId: guildId,
+      // }).exec();
+      const guildConfig = await guildConfigs.has(guildId);
+
+      if (!guildConfig) {
+         throw new Error(
+            'There is not yet a configuration file for this guild.'
+         );
+      }
+
+      const channelConfig = await PollChannel.configExists(channelId);
+      // console.log({ channelConfig });
+
+      if (channelConfig)
          return interaction.reply({
             content: 'There already exists a configuration for this channel.',
             ephemeral: true,
@@ -133,7 +155,6 @@ module.exports = {
       }
 
       let placeholder = [];
-      // todo cut off the placeholder text at 100ch
       roleOptions.forEach(({ label }) => placeholder.push(label));
 
       placeholder = placeholder.join(', ');
