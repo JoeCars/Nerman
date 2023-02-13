@@ -7,6 +7,9 @@ const Poll = require('../../db/schemas/Poll');
 
 const { log: l } = console;
 
+// fixme will need to remove these after we figure out a better permission control for admin command
+const authorizedIds = process.env.BAD_BITCHES.split(',');
+
 module.exports = {
    data: new ContextMenuCommandBuilder()
       .setName('Cancel Poll')
@@ -25,15 +28,21 @@ module.exports = {
             targetId,
             guildId,
             memberPermissions,
+            user: {id: userId}
          } = interaction;
 
          l({ targetId, guildId });
 
-         if (!memberPermissions.has('MANAGE_GUILD')) {
-            throw new Error(
-               'You require manage guild permissions to use this command'
-            );
+         if (!authorizedIds.includes(userId)) {
+            throw new Error('You do not have permission to use this command.');
          }
+
+         // disabled until we nail down the cross-guild permissions on this command
+         // if (!memberPermissions.has('MANAGE_GUILD')) {
+         //    throw new Error(
+         //       'You require manage guild permissions to use this command'
+         //    );
+         // }
 
          const targetPoll = await Poll.findOne(
             {
