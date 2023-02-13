@@ -20,6 +20,7 @@ module.exports = {
 
          const {
             guild: {
+               channels,
                channels: { cache },
             },
          } = message;
@@ -28,7 +29,8 @@ module.exports = {
          l('PROP STATUS CHANGE EVENT HANDLER');
 
          const Nouns = await message.client.libraries.get('Nouns');
-         const nounsGovChannel = await cache.get(nounsGovId);
+         const nounsGovChannel =
+            (await cache.get(nounsGovId)) ?? (await channels.fetch(nounsGovId));
 
          l({ message });
          l({ statusChange });
@@ -43,10 +45,19 @@ module.exports = {
          // Poll.find({ 'pollData.title': { $regex: propRegExp })
          const targetPoll = await Poll.findOne({
             'pollData.title': { $regex: propRegExp },
-         });
+         }).exec();
 
-         // l({ targetPolls });
          l({ targetPoll });
+         const propChannel =
+            (await cache.get(targetPoll.channelId)) ??
+            (await channels.fetch(targetPoll.channelId));
+
+         const propMessage = await propChannel.messages.fetch(
+            targetPoll.messageId
+         );
+
+         const messageThread = await propMessage.thread.fetch();
+         // l({ targetPolls });
 
          // const titleFromFind = targetPolls[0].pollData.title;
          const titleFromFindOne = targetPoll.pollData.title;
@@ -100,10 +111,19 @@ module.exports = {
                `https://nouns.wtf/vote/${proposalId}\n${statusChange}`
             );
 
+         const pollThreadEmbed = new MessageEmbed()
+            .setColor('#00FFFF')
+            .setDescription(
+               `Proposal status changed to ${inlineCode(statusChange)}`
+            );
+
          // l('VOTE EMBED FIND\n', { voteEmbedFind });
          l('VOTE EMBED FIND ONE\n', { voteEmbedFindOne });
 
          // return await message.edit({ content: null, embeds: [voteEmbedFind] });
+
+         await messageThread.send({ embeds: [pollThreadEmbed] });
+
          return await message.edit({
             content: null,
             embeds: [voteEmbedFindOne],
