@@ -2,7 +2,9 @@ const { CommandInteraction } = require('discord.js');
 const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
-// const PollChannel = require('../../db/schemas/PollChannelCount')
+
+// fixme will need to remove these after we figure out a better permission control for admin command
+const authorizedIds = process.env.BAD_BITCHES.split(',');
 module.exports = {
    subCommand: 'nerman.create-poll',
    /**
@@ -37,10 +39,12 @@ module.exports = {
       }
 
       // Actually retrieve configuration
+      // todo connect this to the GuildConfig from the collection
       const channelConfig = await PollChannel.findOne(
          { channelId },
          'maxUserProposal voteAllowance'
       ).exec();
+
 
       const countedPolls = await Poll.countDocuments({
          config: channelConfig._id,
@@ -51,15 +55,23 @@ module.exports = {
       // console.log(memberPermissions.toArray());
 
       if (
-         !memberPermissions.has('MANAGE_GUILD') &&
+         !authorizedIds.includes(userId) &&
          countedPolls >= channelConfig.maxUserProposal
       ) {
-         return interaction.reply({
-            content:
-               'You have exceeded the amount of allowed polls in this channel. You must wait until your current poll is closed.',
-            ephemeral: true,
-         });
+         throw new Error('You do not have permission to use this command.');
       }
+
+      // disabled until we nail down the cross-guild permissions on this command
+      // if (
+      //    !memberPermissions.has('MANAGE_GUILD') &&
+      //    countedPolls >= channelConfig.maxUserProposal
+      // ) {
+      //    return interaction.reply({
+      //       content:
+      //          'You have exceeded the amount of allowed polls in this channel. You must wait until your current poll is closed.',
+      //       ephemeral: true,
+      //    });
+      // }
 
       // return interaction.reply({
       //    content: 'canceling this for testing purposes',
