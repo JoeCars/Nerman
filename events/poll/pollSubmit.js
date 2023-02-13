@@ -373,10 +373,12 @@ module.exports = {
 
          const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
             async key => {
-               l({ key });
+               l('updateVoterPromise', { key });
 
                // todo I need to add in a proper check for if these people exist
-               let user = await User.findOne().byDiscordId(key).exec();
+               let user = await User.findOne().byDiscordId(key, guildId).exec();
+
+               l({ user });
 
                if (user === null) {
                   const member = memberCache.get(key);
@@ -387,7 +389,7 @@ module.exports = {
                      memberRoles
                   );
                   // l('ERIGIBIRU FROM POLLSUBMIT', await eligibleChannels);
-                  user = await User.createUser(key, eligibleChannels);
+                  user = await User.createUser(guildId, key, eligibleChannels);
                }
 
                l('this is the new user', { user });
@@ -451,7 +453,7 @@ module.exports = {
 
          const threadName =
             title.length <= 100 ? title : `${title.substring(0, 96)}...`;
-         
+
          client.emit('enqueuePoll', newPoll);
          await message.edit({ embeds: [updatedEmbed] });
          await message.startThread({
