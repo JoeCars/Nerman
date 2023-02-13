@@ -1,4 +1,10 @@
+const { Collection } = require('discord.js');
+
 const PollChannel = require('../db/schemas/PollChannel');
+const GuildConfig = require('../db/schemas/GuildConfig');
+
+const { Types } = require('mongoose');
+
 const { log: l, table: tbl } = console;
 
 module.exports = {
@@ -7,8 +13,8 @@ module.exports = {
    async execute(client) {
       l(`Ready! Logged in as ${client.user.tag}: ` + process.env.NODE_ENV);
 
-      require('../db/index.js')(client);
-      require('../utils/remindSheet.js')(client);
+      await require('../db/index.js')(client);
+      await require('../utils/remindSheet.js')(client);
 
       // const _StateOfNouns = import('stateofnouns');
       const _nerman = import('stateofnouns');
@@ -306,6 +312,62 @@ module.exports = {
             client.emit('propStatusChange', message, status, data);
          });
 
+         Nouns.on('Transfer', async data => {
+            const genId = process.env.NOUNCIL_GENERAL;
+            const genChannel = await guildCache.get(genId);
+
+            l({ genId, genChannel });
+
+            console.log(
+               'NounsToken | Transfer | from:' +
+                  data.from.id +
+                  ', to: ' +
+                  data.to.id +
+                  ', tokenId: ' +
+                  data.tokenId
+            );
+
+            // let message = await genChannel.send({
+            //    content: 'Generating Noun transfer...',
+            // });
+
+            client.emit('transferNoun', genChannel, data);
+         });
+
+         Nouns.on('AuctionCreated', async auction => {
+            const genId = process.env.NOUNCIL_GENERAL;
+            const genChannel = await guildCache.get(genId);
+
+            console.log(
+               'NounsAuctionHouse | AuctionCreated ' +
+                  auction.id +
+                  ' ' +
+                  auction.startTime +
+                  ' ' +
+                  auction.endTime
+            );
+
+            client.emit('auctionCreated', genChannel, data);
+         });
+
+         Nouns.on('AuctionBid', async data => {
+            const genId = process.env.NOUNCIL_GENERAL;
+            const genChannel = await guildCache.get(genId);
+
+            console.log(
+               'NounsAuctionHouse | AuctionBid ' +
+                  data.id +
+                  ' ' +
+                  data.bidder.id +
+                  ' ' +
+                  data.amount +
+                  ' ' +
+                  data.extended
+            );
+
+            client.emit('auctionBid', genChannel, data);
+         });
+
          // *************************************************************
          //
          // EXAMPLE METADATA
@@ -383,9 +445,25 @@ module.exports = {
          l(err);
       });
 
-      // l({ client });
-      // l('CHECKING GUILDS', client.guilds);
-      l('CHECKING GUILDS CACHE', client.guilds.cache);
-      l('CHECKING GUILDS FETCH', await client.guilds.fetch());
+      try {
+         client.guildConfigs = new Collection();
+
+         const clientGuilds = await client.guilds.fetch();
+
+         l({ clientGuilds });
+
+         for (const [key, _] of clientGuilds) {
+            const gConfig = await GuildConfig.findOne({ guildId: key })
+               .populate('pollChannels')
+               .exec();
+
+            client.guildConfigs.set(key, gConfig);
+         }
+      } catch (error) {
+         l({ error });
+      }
+
+      l('GUILD CONFIGS:');
+      l(client.guildConfigs);
    },
 };
