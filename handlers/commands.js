@@ -75,6 +75,10 @@ module.exports = async client => {
          console.log('Attemping to register application commands...');
 
          await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+            body: [],
+         });
+
+         await rest.put(Routes.applicationCommands(clientId), {
             body: commandsArr,
          });
 
