@@ -163,20 +163,6 @@ module.exports = {
          //    // data.values (add these to get total ETH?)
          // });
 
-         Nouns.on('AuctionBid', async data => {
-            l('ready.js -- NOUNS.ON : AUCTION BID');
-            l(
-               'NounsAuctionHouse | AuctionBid ' +
-                  data.id +
-                  ' ' +
-                  data.bidder.id +
-                  ' ' +
-                  data.amount +
-                  ' ' +
-                  data.extended
-            );
-         });
-
          // Nouns.on('VoteCast', (vote: nerman.EventData.VoteCast) => {
          // Nouns.on('VoteCast', async vote => {
          //    l('ready.js -- NOUNS.ON : VOTE CAST');
@@ -313,8 +299,11 @@ module.exports = {
          });
 
          Nouns.on('Transfer', async data => {
+            const guildId = process.env.DISCORD_GUILD_ID;
             const genId = process.env.NOUNCIL_GENERAL;
-            const genChannel = await guildCache.get(genId);
+            const genChannel = await guildCache
+               .get(guildId)
+               .channels.cache.get(genId);
 
             l({ genId, genChannel });
 
@@ -335,8 +324,11 @@ module.exports = {
          });
 
          Nouns.on('AuctionCreated', async auction => {
+            const guildId = process.env.DISCORD_GUILD_ID;
             const genId = process.env.NOUNCIL_GENERAL;
-            const genChannel = await guildCache.get(genId);
+            const genChannel = await guildCache
+               .get(guildId)
+               .channels.cache.get(genId);
 
             console.log(
                'NounsAuctionHouse | AuctionCreated ' +
@@ -351,18 +343,21 @@ module.exports = {
          });
 
          Nouns.on('AuctionBid', async data => {
+            const guildId = process.env.DISCORD_GUILD_ID;
             const genId = process.env.NOUNCIL_GENERAL;
-            const genChannel = await guildCache.get(genId);
+            const genChannel = await guildCache
+               .get(guildId)
+               .channels.cache.get(genId);
 
             console.log(
                'NounsAuctionHouse | AuctionBid ' +
-                  data.id +
+                  data.id + // noun id
                   ' ' +
-                  data.bidder.id +
+                  data.bidder.id + // wallet address
                   ' ' +
-                  data.amount +
+                  data.amount + // ethereum, divisible by 18, so it has 18 decimal places | eg) 1770000000000000000 = 1.77 eth
                   ' ' +
-                  data.extended
+                  data.extended // not really sure what this means? auction end extended, I think?
             );
 
             client.emit('auctionBid', genChannel, data);
