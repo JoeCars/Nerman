@@ -1,7 +1,7 @@
 const { model, Schema, Types } = require('mongoose');
 const PollChannel = require('./PollChannel');
 const Poll = require('./Poll');
-const { log: l } = console;
+const { log: l, trace: tr, error: lerr } = console;
 
 const userSchema = new Schema(
    {
@@ -15,7 +15,7 @@ const userSchema = new Schema(
       discordId: {
          type: String,
          required: true,
-         // unique: true,
+         unique: false,
          validate: {
             validator: async function (discordId) {
                const userExists = await this.schema.statics.userExists(
@@ -24,6 +24,7 @@ const userSchema = new Schema(
                );
 
                l({ userExists });
+               tr({ userExists });
 
                return !userExists;
             },
@@ -38,6 +39,7 @@ const userSchema = new Schema(
          of: Schema.Types.Mixed,
          default: new Map(),
       },
+      // todo add a way to have user's status change to inactive when they leave the Discord server
       status: {
          type: String,
          enum: ['active', 'inactive', 'warning'],
@@ -49,36 +51,41 @@ const userSchema = new Schema(
       timestamps: { createdAt: 'timeCreated', updatedAt: 'modified' },
       statics: {
          async createUser(guildId, voterId, eligibleChannels) {
-            const eligibleMap = new Map();
+            try {
+               const eligibleMap = new Map();
 
-            for (const channel of eligibleChannels) {
-               const polls = await Poll.aggregate([
-                  {
-                     $match: {
-                        [`config`]: channel._id,
-                        [`allowedUsers.${voterId}`]: { $exists: true },
+               for (const channel of eligibleChannels) {
+                  const polls = await Poll.aggregate([
+                     {
+                        $match: {
+                           [`config`]: channel._id,
+                           [`allowedUsers.${voterId}`]: { $exists: true },
+                        },
                      },
-                  },
-               ]).exec();
+                  ]).exec();
 
-               const statsObject = {
-                  eligiblePolls: polls.length,
-                  participatedPolls: polls.filter(
-                     ({ allowedUsers }) => allowedUsers[voterId] === true
-                  ).length,
-               };
+                  const statsObject = {
+                     eligiblePolls: polls.length,
+                     participatedPolls: polls.filter(
+                        ({ allowedUsers }) => allowedUsers[voterId] === true
+                     ).length,
+                  };
 
-               l({ statsObject });
+                  l({ statsObject });
 
-               eligibleMap.set(channel.channelId, statsObject);
+                  eligibleMap.set(channel.channelId, statsObject);
+               }
+
+               return await this.create({
+                  _id: new Types.ObjectId(),
+                  guildId: guildId,
+                  discordId: voterId,
+                  eligibleChannels: eligibleMap,
+               });
+            } catch (error) {
+               l('IS THIS THE ERROR?');
+               l({ error });
             }
-
-            return await this.create({
-               _id: new Types.ObjectId(),
-               guildId: guildId,
-               discordId: voterId,
-               eligibleChannels: eligibleMap,
-            });
          },
          async checkVotingRoles(memberRoles) {
             const hasVotingRoles = await PollChannel.countDocuments({
@@ -166,13 +173,31 @@ const userSchema = new Schema(
             ).toFixed(2)}%`;
          },
          async incParticipation(channelId) {
-            const newParticipation = this.eligibleChannels.get(channelId);
+            try {
+               const newParticipation = this.eligibleChannels.get(channelId);
 
-            newParticipation.participatedPolls++;
+               l(
+                  'channelParticiation before incrementation : ',
+                  newParticipation
+               );
 
-            // mark modified because Mixed SchemaType loses Mongoose's ability to detect changes to the data
-            this.markModified('eligibleChannels');
-            await this.save();
+               newParticipation.participatedPolls++;
+
+               this.markModified('eligibleChannels');
+               await this.updateOne({
+                  $set: { [`eligibleChannels.${channelId}`]: newParticipation },
+               });
+
+               l(
+                  'channelParticiation after incrementation : ',
+                  this.eligibleChannels.get(channelId)
+               );
+
+               return;
+            } catch (error) {
+               l(':::ERROR IN PARTICIPATION INCREMENTATION:::');
+               lerr(error);
+            }
          },
       },
       query: {
