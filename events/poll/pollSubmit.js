@@ -378,7 +378,7 @@ module.exports = {
                // todo I need to add in a proper check for if these people exist
                let user = await User.findOne().byDiscordId(key, guildId).exec();
 
-               l({ user });
+               // l({ user });
 
                if (user === null) {
                   const member = memberCache.get(key);
@@ -392,13 +392,15 @@ module.exports = {
                   user = await User.createUser(guildId, key, eligibleChannels);
                }
 
-               l('this is the new user', { user });
+               l('this is the user', { user });
 
                // l(user.eligibleChannels);
 
                // l(newPoll);
                // mystery ID 383705280174620704
                // doppelnouncil 1017403835913863260
+
+               l({ newPoll });
 
                l(user.eligibleChannels.get(newPoll.config.channelId));
                // const newEligibility = user.eligibleChannels.get(
@@ -413,6 +415,7 @@ module.exports = {
                // user.markModified('eligibleChannels');
                // return await user.save();
                // l({ participation });
+               return user;
             }
          );
 
