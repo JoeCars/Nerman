@@ -204,7 +204,7 @@ module.exports = async client => {
                         return clearInterval(intervalId);
                      }
                      console.log('\x1b[33m Welcome to the app! \x1b[0m');
-                     console.log('NERPPPPROPRPR');
+                     console.log('NERPPPPROPR');
                      // console.log(`\x1b[43m${openPolls[0]}\x1b[0m`);
                      lc('openPolls[0]', '116', openPolls[0]);
                      const closingPoll =
