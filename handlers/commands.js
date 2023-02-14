@@ -74,13 +74,22 @@ module.exports = async client => {
       try {
          console.log('Attemping to register application commands...');
 
-         await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
-            body: [],
-         });
+         if (process.env.NODE_ENV === 'development') {
+            console.log(
+               'DEVELOPMENT, CLEARING APPLICATION COMMANDS AND ADDING APPLICATION GUILD COMMANDS'
+            );
 
-         await rest.put(Routes.applicationCommands(clientId), {
-            body: commandsArr,
-         });
+            await rest.put(Routes.applicationCommands(clientId), {
+               body: [],
+            });
+            await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+               body: commandsArr,
+            });
+         } else {
+            await rest.put(Routes.applicationCommands(clientId), {
+               body: commandsArr,
+            });
+         }
 
          console.log('Successfully registered application commands! :D');
       } catch (error) {
