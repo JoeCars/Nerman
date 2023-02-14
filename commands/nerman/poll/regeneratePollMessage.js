@@ -48,9 +48,7 @@ module.exports = {
 
       // todo later on change permissions associated with this, once we decide one how to tdeal with the cross guild shenanigans
 
-      console.log({ authorizedIds });
-      console.log({ userId }, 'SHOULD BE 427627212821495818');
-      if (authorizedIds.includes(userId)) {
+      if (!authorizedIds.includes(userId)) {
          l('NO USER ID');
          throw new Error('You do not have permission to access this command.');
       }
