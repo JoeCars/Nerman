@@ -43,7 +43,7 @@ module.exports = {
       // if (!(await PollChannel.countDocuments({ channelId }))) {
       // disabled until we find a better way to handle the cross-guild admin permissions when accessing bot commands
       // if (!roleCache.has(guildAdminId)) {
-      //    throw new Error('This is an admin-only command');
+      // throw new Error('This is an admin-only command');
       // }
 
       // todo later on change permissions associated with this, once we decide one how to tdeal with the cross guild shenanigans
