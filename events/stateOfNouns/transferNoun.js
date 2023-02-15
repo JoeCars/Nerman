@@ -1,7 +1,7 @@
 const { MessageEmbed, Channel } = require('discord.js');
 const { inlineCode, hyperlink } = require('@discordjs/builders');
 
-const shortenAddress = require('../../helpers/nouns/createNounEmbed');
+const shortenAddress = require('../../helpers/nouns/shortenAddress');
 
 const { log: l } = console;
 
@@ -24,6 +24,7 @@ module.exports = {
          } = data;
 
          // const { } = message;
+         const Nouns = genChannel.client.libraries.get('Nouns');
 
          const baseEthUrl = 'https://etherscan.io/address/';
 
@@ -34,14 +35,19 @@ module.exports = {
          l({ data });
          l({ tokenId, fromId, toId });
 
+         const fromDisplay = await (Nouns.ensReverseLookup(fromId) ??
+            shortenAddress(fromId));
+         const toDisplay = await (Nouns.ensReverseLookup(toId) ??
+            shortenAddress(toId));
+
          const transferEmbed = new MessageEmbed()
             .setColor('#00FFFF')
             .setTitle(`Transfer | Noun ${tokenId}`)
             .setDescription(
                `From ${hyperlink(
-                  fromId,
+                  fromDisplay,
                   `${baseEthUrl}${fromId}`
-               )} to ${hyperlink(toId, `${baseEthUrl}${toId}`)}`
+               )} to ${hyperlink(toDisplay, `${baseEthUrl}${toId}`)}`
             )
             .setImage(`https://nouns.pics/${tokenId}.png`);
 
