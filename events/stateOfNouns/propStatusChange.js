@@ -52,6 +52,19 @@ module.exports = {
             (await cache.get(targetPoll.channelId)) ??
             (await channels.fetch(targetPoll.channelId));
 
+         l({ propChannel });
+         l('(propChannel?.messages => ', propChannel?.messages);
+         
+         l(
+            'propChannel?.messages.cache.get(targetPoll.messageId',
+            propChannel?.messages.cache.get(targetPoll.messageId)
+         );
+
+         l(
+            'propChannel?.messages.fetch(targetPoll.messageId)',
+            propChannel?.messages.fetch(targetPoll.messageId)
+         );
+
          const propMessage = await propChannel.messages.fetch(
             targetPoll.messageId
          );
