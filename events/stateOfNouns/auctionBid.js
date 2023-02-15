@@ -1,6 +1,8 @@
 const { MessageEmbed, Channel } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
 
+const shortenAddress = require('../../helpers/nouns/shortenAddress');
+
 const { log: l } = console;
 
 module.exports = {
@@ -26,9 +28,10 @@ module.exports = {
          l({ data });
          l({ id, amount, extended, bidderId });
 
+         l('Number(amount) => ', Number(amount))
 
-
-         const bidderENS = await Nouns.ensReverseLookup(bidderId);
+         const bidderENS = await (Nouns.ensReverseLookup(bidderId) ??
+            shortenAddress(bidderId));
          const ethBaseUrl = 'https://etherscan.io/address/';
 
          const bidderLink = hyperlink(bidderENS, `${ethBaseUrl}${bidderId}`);
@@ -36,7 +39,7 @@ module.exports = {
          const bidEmbed = new MessageEmbed()
             .setColor('#00FFFF')
             .setTitle(`Auction Bid`)
-            .setDescription(`${bidderLink} bid ${amount}Ξ on Noun ${id}`);
+            .setDescription(`${bidderLink} bid ${Number(amount)}Ξ on Noun ${id}`);
 
          return await genChannel.send({ embeds: [bidEmbed] });
       } catch (error) {
