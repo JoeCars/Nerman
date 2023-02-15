@@ -33,12 +33,22 @@ module.exports = {
 
          l({ genChannel });
          l({ data });
-         l({ tokenId, fromId, toId });
+         l({ tokenId });
+         l({ fromId });
+         l({ toId });
 
-         const fromDisplay = await (Nouns.ensReverseLookup(fromId) ??
-            shortenAddress(fromId));
-         const toDisplay = await (Nouns.ensReverseLookup(toId) ??
-            shortenAddress(toId));
+         l('shortenAddress(fromId) => ', await shortenAddress(fromId));
+         l('shortenAddress(toId) => ', await shortenAddress(toId));
+
+         const fromDisplay =
+            (await Nouns.ensReverseLookup(fromId)) ??
+            (await shortenAddress(fromId));
+         const toDisplay =
+            (await Nouns.ensReverseLookup(toId)) ??
+            (await shortenAddress(toId));
+
+         l({ fromDisplay });
+         l({ toDisplay });
 
          const transferEmbed = new MessageEmbed()
             .setColor('#00FFFF')
@@ -49,7 +59,7 @@ module.exports = {
                   `${baseEthUrl}${fromId}`
                )} to ${hyperlink(toDisplay, `${baseEthUrl}${toId}`)}`
             )
-            .setImage(`https://nouns.pics/${tokenId}.png`);
+            .setImage(`https://noun.pics/${tokenId}.png`);
 
          return await genChannel.send({ embeds: [transferEmbed] });
       } catch (error) {
