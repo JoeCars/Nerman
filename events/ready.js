@@ -320,6 +320,10 @@ module.exports = {
             //    content: 'Generating Noun transfer...',
             // });
 
+            console.log('data.from.id => type:', typeof data.from.id);
+            console.log('data.to.id => type:', typeof data.to.id);
+            console.log('data.tokenId => type:', typeof data.tokenId);
+
             client.emit('transferNoun', genChannel, data);
          });
 
@@ -338,6 +342,10 @@ module.exports = {
                   ' ' +
                   auction.endTime
             );
+
+            console.log('auction.id => type:', typeof auction.id);
+            console.log('auction.startTime => type:', typeof auction.startTime);
+            console.log('auction.endTime => type:', typeof auction.endTime);
 
             client.emit('auctionCreated', genChannel, data);
          });
@@ -359,6 +367,11 @@ module.exports = {
                   ' ' +
                   data.extended // not really sure what this means? auction end extended, I think?
             );
+
+            console.log('data.id => type:', typeof data.id);
+            console.log('data.bidder.id => type:', typeof data.bidder.id);
+            console.log('data.amount => type:', typeof data.amount);
+            console.log('data.extended => type:', typeof data.extended);
 
             client.emit('auctionBid', genChannel, data);
          });
