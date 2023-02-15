@@ -39,7 +39,7 @@ module.exports = {
          const bidEmbed = new MessageEmbed()
             .setColor('#00FFFF')
             .setTitle(`Auction Bid`)
-            .setDescription(`${bidderLink} bid ${Number(amount)}Ξ on Noun ${id}`);
+            .setDescription(`${bidderLink} bid ${amount.toNumber()}Ξ on Noun ${id}`);
 
          return await genChannel.send({ embeds: [bidEmbed] });
       } catch (error) {
