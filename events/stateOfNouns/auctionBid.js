@@ -24,20 +24,20 @@ module.exports = {
 
          const Nouns = genChannel.client.libraries.get('Nouns');
 
-         // l({ genChannel });
          l({ data });
          l({ id, amount, extended, bidderId });
 
-         l('Number(amount) => ', Number(amount));
+         const bigNumString = amount.toString();
 
-         const bidderENS = await (Nouns.ensReverseLookup(bidderId) ??
-            shortenAddress(bidderId));
+         const bidderENS =
+            (await Nouns.ensReverseLookup(bidderId)) ??
+            (await shortenAddress(bidderId));
          const ethBaseUrl = 'https://etherscan.io/address/';
 
          const bidderLink = hyperlink(bidderENS, `${ethBaseUrl}${bidderId}`);
 
          const amountNew = Number(
-            amount.slice(0, -18) + '.' + amount.slice(-18)
+            bigNumString.slice(0, -18) + '.' + bigNumString.slice(-18)
          );
 
          const bidEmbed = new MessageEmbed()
