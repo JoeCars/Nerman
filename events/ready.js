@@ -347,7 +347,7 @@ module.exports = {
             console.log('auction.startTime => type:', typeof auction.startTime);
             console.log('auction.endTime => type:', typeof auction.endTime);
 
-            client.emit('auctionCreated', genChannel, data);
+            client.emit('auctionCreated', genChannel, auction);
          });
 
          Nouns.on('AuctionBid', async data => {
