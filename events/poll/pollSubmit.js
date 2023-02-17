@@ -468,6 +468,7 @@ module.exports = {
 
          console.log({ message });
          console.log(message.thread);
+         return message.react('✅');
       } catch (error) {
          console.error(error);
       }

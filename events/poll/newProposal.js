@@ -216,7 +216,7 @@ module.exports = {
                      participatedPolls: 0,
                   });
                }
-               
+
                user.markModified('eligibleChannels');
                return await user.save();
                // l({ participation });
@@ -269,6 +269,8 @@ module.exports = {
             autoArchiveDuration: 10080, // todo probably make this based on channelConfig?
          });
          await interaction.thread.send(`**Discussion:**`);
+
+         await interaction.react('✅');
 
          client.emit('enqueuePoll', newPoll);
 
