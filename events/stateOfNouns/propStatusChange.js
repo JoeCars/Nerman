@@ -32,10 +32,12 @@ module.exports = {
          const nounsGovChannel =
             (await cache.get(nounsGovId)) ?? (await channels.fetch(nounsGovId));
 
-         l({ message });
+         // l({ message });
          l({ statusChange });
          l({ data });
-         l({ nounsGovChannel });
+         // l({ nounsGovChannel });
+
+         l(`${Number(proposalId)}`)
 
          const propRegExp = new RegExp(`^prop\\s${Number(proposalId)}`, 'i');
 
@@ -45,16 +47,16 @@ module.exports = {
          // Poll.find({ 'pollData.title': { $regex: propRegExp })
          const targetPoll = await Poll.findOne({
             'pollData.title': { $regex: propRegExp },
-         }).exec();
+         }).populate('config').exec();
 
          l({ targetPoll });
          const propChannel =
-            (await cache.get(targetPoll.channelId)) ??
-            (await channels.fetch(targetPoll.channelId));
+            (await cache.get(targetPoll.config.channelId)) ??
+            (await channels.fetch(targetPoll.config.channelId));
 
          l({ propChannel });
          l('(propChannel?.messages => ', propChannel?.messages);
-         
+
          l(
             'propChannel?.messages.cache.get(targetPoll.messageId',
             propChannel?.messages.cache.get(targetPoll.messageId)
