@@ -37,6 +37,7 @@ module.exports = {
          l({ fromId });
          l({ toId });
 
+
          l('shortenAddress(fromId) => ', await shortenAddress(fromId));
          l('shortenAddress(toId) => ', await shortenAddress(toId));
 
