@@ -227,10 +227,7 @@ module.exports = {
                         : !guildNouncilIds.includes(channelId)
                         ? 'Anon'
                         : 'Anon Nouncillor'
-                  } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
-                     propText,
-                     `https://nouns.wtf/vote/${propId}`
-                  )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+                  } voted ${inlineCode(voteArray.join(' '))}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
                );
             //    .setDescription(
             //       `Anon Nouncillor voted ${inlineCode(voteArray.join(' '))}.${
