@@ -138,7 +138,13 @@ const PollSchema = new Schema(
                'anonymous liveVisualFeed voteAllowance -_id'
             );
 
-            return { anonymous, liveVisualFeed, voteAllowance } = this.config;
+            const options = {
+               anonymous: this.config.anonymous ?? false,
+               liveVisualFeed: this.config.liveVisualFeed ?? false,
+               voteAllowance: this.config.voteAllowance ?? false,
+            }
+
+            return options;
          },
       },
    }
