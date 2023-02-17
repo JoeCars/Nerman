@@ -13,6 +13,21 @@ module.exports = (() => {
       to: { id: '0x3004E7d0bA11BcD506349F1062eA57f7037F0BBd' },
       tokenId: 608,
    });
+   eventDataMap.set('propStatusChange', {
+      proposalCanceled: {
+         id: 9001, //BigNum
+      },
+      proposalQueued: {
+         id: 9002, // BigNum
+         eta: 1676668307, // BigNum
+      },
+      proposalVetoed: {
+         id: 9003, // BigNum
+      },
+      proposalExecuted: {
+         id: 9004, // BigNum
+      },
+   });
 
    return eventDataMap;
 })();
