@@ -11,6 +11,12 @@ const Poll = require('../../db/schemas/Poll');
 const User = require('../../db/schemas/User');
 const Vote = require('../../db/schemas/Vote');
 
+const nouncilId = process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
+const jtsNouncilId = process.env.JTS_NOUNCIL_ID;
+const doppelId = process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
+
+const guildNouncilIds = [nouncilId, jtsNouncilId, doppelId];
+
 const { log: l, error: lerr } = console;
 
 module.exports = {
@@ -182,19 +188,21 @@ module.exports = {
             const threadEmbed = new MessageEmbed()
                .setColor('#00FFFF')
                .setDescription(
-                  `Anon Nouncillor voted ${inlineCode(
-                     voteArray.join(' ')
-                  )} on ${hyperlink(
+                  `${
+                     !pollOptions.anonymous
+                        ? userMention(userId)
+                        : !guildNouncilIds.includes(channelId)
+                        ? 'Anon'
+                        : 'Anon Nouncillor'
+                  } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
                      propText,
                      `https://nouns.wtf/vote/${propId}`
                   )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
                );
             // .setDescription(
-            //    `${
-            //       pollOptions.anonymous
-            //          ? 'Anon Nouncillor'
-            //          : userMention(userId)
-            //    } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+            //    `Anon Nouncillor voted ${inlineCode(
+            //       voteArray.join(' ')
+            //    )} on ${hyperlink(
             //       propText,
             //       `https://nouns.wtf/vote/${propId}`
             //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
@@ -213,10 +221,22 @@ module.exports = {
             const threadEmbed = new MessageEmbed()
                .setColor('#00FFFF')
                .setDescription(
-                  `Anon Nouncillor voted ${inlineCode(voteArray.join(' '))}.${
-                     !!voteReason ? `\n\n${voteReason.trim()}` : ``
-                  }`
+                  `${
+                     !pollOptions.anonymous
+                        ? userMention(userId)
+                        : !guildNouncilIds.includes(channelId)
+                        ? 'Anon'
+                        : 'Anon Nouncillor'
+                  } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+                     propText,
+                     `https://nouns.wtf/vote/${propId}`
+                  )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
                );
+            //    .setDescription(
+            //       `Anon Nouncillor voted ${inlineCode(voteArray.join(' '))}.${
+            //          !!voteReason ? `\n\n${voteReason.trim()}` : ``
+            //       }`
+            // );
             // .setDescription(
             //    `${
             //       pollOptions.anonymous
