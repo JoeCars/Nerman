@@ -189,16 +189,28 @@ module.exports = {
                .setColor('#00FFFF')
                .setDescription(
                   `${
-                     !pollOptions.anonymous
+                     guildNouncilIds.includes(channelId)
+                        ? 'Anon Nouncillor'
+                        : !pollOptions.anonymous
                         ? userMention(userId)
-                        : !guildNouncilIds.includes(channelId)
-                        ? 'Anon'
-                        : 'Anon Nouncillor'
+                        : 'Anon'
                   } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
                      propText,
                      `https://nouns.wtf/vote/${propId}`
                   )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
                );
+               // .setDescription(
+               //    `${
+               //       !pollOptions.anonymous
+               //          ? userMention(userId)
+               //          : !guildNouncilIds.includes(channelId)
+               //          ? 'Anon'
+               //          : 'Anon Nouncillor'
+               //    } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+               //       propText,
+               //       `https://nouns.wtf/vote/${propId}`
+               //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+               // );
             // .setDescription(
             //    `Anon Nouncillor voted ${inlineCode(
             //       voteArray.join(' ')
@@ -218,17 +230,54 @@ module.exports = {
          }
       } else {
          try {
+            // if (!guildNouncilIds.includes(channelId)) {
+            //    const threadEmbed = new MessageEmbed()
+            //       .setColor('#00FFFF')
+            //       .setDescription(
+            //          `${
+            //             guildNouncilIds.includes(channelId)
+            //                ? 'Anon Nouncillor'
+            //                : !pollOptions.anonymous
+            //                ? userMention(userId)
+            //                : 'Anon'
+            //          } voted ${inlineCode(voteArray.join(' '))}.${
+            //             !!voteReason ? `\n\n${voteReason.trim()}` : ``
+            //          }`
+            //       );
+            //    // .setDescription(
+            //    //    `${
+            //    //       !pollOptions.anonymous
+            //    //          ? userMention(userId)
+            //    //          : !guildNouncilIds.includes(channelId)
+            //    //          ? 'Anon'
+            //    //          : 'Anon Nouncillor'
+            //    //    } voted ${inlineCode(voteArray.join(' '))}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+            //    // );
+            // }
             const threadEmbed = new MessageEmbed()
                .setColor('#00FFFF')
                .setDescription(
                   `${
-                     !pollOptions.anonymous
+                     guildNouncilIds.includes(channelId)
+                        ? 'Anon Nouncillor'
+                        : !pollOptions.anonymous
                         ? userMention(userId)
-                        : !guildNouncilIds.includes(channelId)
-                        ? 'Anon'
-                        : 'Anon Nouncillor'
-                  } voted ${inlineCode(voteArray.join(' '))}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+                        : 'Anon'
+                  } voted ${inlineCode(voteArray.join(' '))}.${
+                     !!voteReason ? `\n\n${voteReason.trim()}` : ``
+                  }`
                );
+            //    .setDescription(
+            //       `${
+            //          !pollOptions.anonymous
+            //             ? userMention(userId)
+            //             : !guildNouncilIds.includes(channelId)
+            //             ? 'Anon'
+            //             : 'Anon Nouncillor'
+            //       } voted ${inlineCode(voteArray.join(' '))}.${
+            //          !!voteReason ? `\n\n${voteReason.trim()}` : ``
+            //       }`
+            // );
             //    .setDescription(
             //       `Anon Nouncillor voted ${inlineCode(voteArray.join(' '))}.${
             //          !!voteReason ? `\n\n${voteReason.trim()}` : ``
