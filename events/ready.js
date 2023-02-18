@@ -298,14 +298,14 @@ module.exports = {
             client.emit('propStatusChange', message, status, data);
          });
 
-         Nouns.on('Transfer', async data => {
+         Nouns.on('Transfer', async data => {dis
             const guildId = process.env.DISCORD_GUILD_ID;
-            const genId = process.env.NOUNCIL_GENERAL;
+            const nounsTokenId = process.env.NOUNS_TOKEN_ID;
             const genChannel = await guildCache
                .get(guildId)
-               .channels.cache.get(genId);
+               .channels.cache.get(nounsTokenId);
 
-            l({ genId, genChannel });
+            l({ nounsTokenId, genChannel });
 
             console.log(
                'NounsToken | Transfer | from:' +

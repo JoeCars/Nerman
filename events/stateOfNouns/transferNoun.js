@@ -5,7 +5,8 @@ const shortenAddress = require('../../helpers/nouns/shortenAddress');
 
 const { log: l } = console;
 
-const generalId = process.env.NOUNCIL_GENERAL;
+const mintId = '0x0000000000000000000000000000000000000000';
+const nounsTokenId = process.env.NOUNS_TOKEN_ID;
 
 module.exports = {
    name: 'transferNoun',
@@ -37,7 +38,6 @@ module.exports = {
          l({ fromId });
          l({ toId });
 
-
          l('shortenAddress(fromId) => ', await shortenAddress(fromId));
          l('shortenAddress(toId) => ', await shortenAddress(toId));
 
@@ -51,16 +51,39 @@ module.exports = {
          l({ fromDisplay });
          l({ toDisplay });
 
-         const transferEmbed = new MessageEmbed()
-            .setColor('#00FFFF')
-            .setTitle(`Transfer | Noun ${tokenId}`)
-            .setDescription(
-               `From ${hyperlink(
-                  fromDisplay,
-                  `${baseEthUrl}${fromId}`
-               )} to ${hyperlink(toDisplay, `${baseEthUrl}${toId}`)}`
-            )
-            .setImage(`https://noun.pics/${tokenId}.png`);
+         let transferEmbed = new MessageEmbed();
+
+         if (fromId === toId) {
+            transferEmbed = new MessageEmbed()
+               .setColor('#00FFFF')
+               .setTitle(
+                  `Stanky Shameless Washing | Noun ${tokenId}`
+               )
+               .setDescription(
+                  `From ${hyperlink(
+                     fromDisplay,
+                     `${baseEthUrl}${fromId}`
+                  )} to ${hyperlink(toDisplay, `${baseEthUrl}${toId}`)}`
+               )
+               .setImage(`https://noun.pics/${tokenId}.png`);
+         } else {
+            transferEmbed = new MessageEmbed()
+               .setColor('#00FFFF')
+               .setTitle(
+                  `${
+                     fromId === '0x0000000000000000000000000000000000000000'
+                        ? 'Mint'
+                        : 'Transfer'
+                  } | Noun ${tokenId}`
+               )
+               .setDescription(
+                  `From ${hyperlink(
+                     fromDisplay,
+                     `${baseEthUrl}${fromId}`
+                  )} to ${hyperlink(toDisplay, `${baseEthUrl}${toId}`)}`
+               )
+               .setImage(`https://noun.pics/${tokenId}.png`);
+         }
 
          return await genChannel.send({ embeds: [transferEmbed] });
       } catch (error) {

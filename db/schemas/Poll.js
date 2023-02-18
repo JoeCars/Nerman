@@ -1,14 +1,19 @@
 const mongoose = require('mongoose');
-const { model, Schema, Types } = require('mongoose');
+const { model, Schema } = require('mongoose');
+
 const { PollChannel } = require('../schemas/PollChannel');
+
 const { log: l } = console;
 
 // Building Up, start basic
 const PollSchema = new Schema(
    {
       _id: Schema.Types.ObjectId,
+
       guildId: { type: String, required: true },
+
       creatorId: { type: String, required: true },
+
       messageId: { type: String, required: true },
       // allowance IMPLEMENT SOON
       // allowanceStrategy: {type: [String]}
@@ -17,6 +22,7 @@ const PollSchema = new Schema(
          ref: 'channelConfig',
          required: true,
       },
+
       timeEnd: { type: Date, default: () => Date.now() + 5 * 60 * 1000 }, // add in default calc for Date.now() + pollDuration value
       pollData: {
          title: {
@@ -142,7 +148,7 @@ const PollSchema = new Schema(
                anonymous: this.config.anonymous ?? false,
                liveVisualFeed: this.config.liveVisualFeed ?? false,
                voteAllowance: this.config.voteAllowance ?? false,
-            }
+            };
 
             return options;
          },
