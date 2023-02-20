@@ -13,9 +13,9 @@ module.exports = {
    name: 'transferNoun',
    /**
     *
-    * @param {Channel} genChannel
+    * @param {Channel} tokenChannel
     */
-   async execute(genChannel, data) {
+   async execute(tokenChannel, data) {
       try {
          l('NOUN TRANSFER EVENT HANDLER');
 
@@ -28,14 +28,14 @@ module.exports = {
          const tokenId = Number(data.tokenId);
 
          // const { } = message;
-         const Nouns = genChannel.client.libraries.get('Nouns');
+         const Nouns = tokenChannel.client.libraries.get('Nouns');
 
          const baseEthUrl = 'https://etherscan.io/address/';
 
-         // const genChannel =
+         // const tokenChannel =
          //    (await cache.get(nounsGovId)) ?? (await channels.fetch(nounsGovId));
 
-         l({ genChannel });
+         l({ tokenChannel });
          l({ data });
          l({ tokenId });
          l({ fromId });
@@ -73,7 +73,7 @@ module.exports = {
             transferEmbed
                .setTitle(
                   `${
-                     fromId === '0x0000000000000000000000000000000000000000'
+                     fromId === mintId
                         ? 'Mint'
                         : 'Transfer'
                   } | Noun ${tokenId}`
@@ -87,7 +87,7 @@ module.exports = {
                .setImage(`https://noun.pics/${tokenId}.png`);
          }
 
-         return await genChannel.send({ embeds: [transferEmbed] });
+         return await tokenChannel.send({ embeds: [transferEmbed] });
       } catch (error) {
          console.error(error);
       }
