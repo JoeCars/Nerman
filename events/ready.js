@@ -301,11 +301,11 @@ module.exports = {
          Nouns.on('Transfer', async data => {dis
             const guildId = process.env.DISCORD_GUILD_ID;
             const nounsTokenId = process.env.NOUNS_TOKEN_ID;
-            const genChannel = await guildCache
+            const nounsTokenChannel = await guildCache
                .get(guildId)
                .channels.cache.get(nounsTokenId);
 
-            l({ nounsTokenId, genChannel });
+            l({ nounsTokenId, nounsTokenChannel });
 
             console.log(
                'NounsToken | Transfer | from:' +
@@ -316,7 +316,7 @@ module.exports = {
                   data.tokenId
             );
 
-            // let message = await genChannel.send({
+            // let message = await nounsTokenChannel.send({
             //    content: 'Generating Noun transfer...',
             // });
 
@@ -324,7 +324,7 @@ module.exports = {
             console.log('data.to.id => type:', typeof data.to.id);
             console.log('data.tokenId => type:', typeof data.tokenId);
 
-            client.emit('transferNoun', genChannel, data);
+            client.emit('transferNoun', nounsTokenChannel, data);
          });
 
          Nouns.on('AuctionCreated', async auction => {
@@ -352,10 +352,10 @@ module.exports = {
 
          Nouns.on('AuctionBid', async data => {
             const guildId = process.env.DISCORD_GUILD_ID;
-            const genId = process.env.NOUNCIL_GENERAL;
-            const genChannel = await guildCache
+            const nounsTokenId = process.env.NOUNS_TOKEN_ID;
+            const nounsTokenChannel = await guildCache
                .get(guildId)
-               .channels.cache.get(genId);
+               .channels.cache.get(nounsTokenId);
 
             console.log(
                'NounsAuctionHouse | AuctionBid ' +
@@ -373,7 +373,7 @@ module.exports = {
             console.log('data.amount => type:', typeof data.amount);
             console.log('data.extended => type:', typeof data.extended);
 
-            client.emit('auctionBid', genChannel, data);
+            client.emit('auctionBid', nounsTokenChannel, data);
          });
 
          // *************************************************************
@@ -416,7 +416,11 @@ module.exports = {
             if (delegateEns) {
                l('ENS found: ' + delegateEns);
             }
-            l('Voting Power:  ' + votingPower.toNumber());
+            l('Voting Power:');
+            l('typeof votingPower: => ', typeof votingPower);
+            l('votingPower: => ', votingPower);
+            l('votingPower.toNumber() => ',  votingPower.toNumber());
+            l('Number(votingPower) => ',  Number(votingPower));
 
             // Get Final Bid Data
 
