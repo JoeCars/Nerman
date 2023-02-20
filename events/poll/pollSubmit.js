@@ -49,7 +49,7 @@ module.exports = {
          {
             channelId,
          },
-         'allowedRoles'
+         'allowedRoles forAgainst'
       );
 
       const intRegex = new RegExp(/^\d*$/);
@@ -65,15 +65,23 @@ module.exports = {
       // extract data from submitted modal
       const title = modal.getTextInputValue('pollTitle');
       const description = modal.getTextInputValue('pollDescription') ?? '';
-      const options = [
-         ...new Set(
-            modal
-               .getTextInputValue('pollChoices')
-               .split(',')
-               .map(x => x.trim().toLowerCase())
-               .filter(v => v !== '')
-         ),
-      ];
+
+      let options;
+
+      if (channelConfig.forAgainst) {
+         options = ['for', 'against'];
+      } else {
+         options = [
+            // const options = [
+            ...new Set(
+               modal
+                  .getTextInputValue('pollChoices')
+                  .split(',')
+                  .map(x => x.trim().toLowerCase())
+                  .filter(v => v !== '')
+            ),
+         ];
+      }
       let voteAllowance = parseInt(
          modal.getTextInputValue('voteAllowance') ?? 1
       );
@@ -468,7 +476,7 @@ module.exports = {
 
          console.log({ message });
          console.log(message.thread);
-         return message.react('✅');
+         message.react('✅');
       } catch (error) {
          console.error(error);
       }
