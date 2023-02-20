@@ -42,7 +42,7 @@ module.exports = {
       // todo connect this to the GuildConfig from the collection
       const channelConfig = await PollChannel.findOne(
          { channelId },
-         'maxUserProposal voteAllowance'
+         'maxUserProposal voteAllowance forAgainst'
       ).exec();
 
 
@@ -141,7 +141,13 @@ module.exports = {
          .setMaxLength(100)
          .setRequired(true);
 
-      createPollComponents.push(pollTitle, pollDescription, pollChoices);
+      // createPollComponents.push(pollTitle, pollDescription, pollChoices);
+      createPollComponents.push(pollTitle, pollDescription);
+
+      if (!channelConfig.forAgainst) {
+         createPollComponents.push(pollChoices);
+      }
+
 
       console.log(channelConfig.voteAllowance);
 
