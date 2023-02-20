@@ -56,7 +56,7 @@ module.exports = {
       // /^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/;
       const quorRegex = new RegExp(/^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/);
       const optionRegex = new RegExp(
-         /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?$/
+         /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?(^for-or-against$)?$/
       );
 
       console.log({ durRegex });
@@ -140,7 +140,7 @@ module.exports = {
       ) {
          return modal.editReply({
             content:
-               'One or more of the Poll Channel Options you have entered does not match.\nYour options are: vote-allowance, live-results, anonymous-voting',
+               'One or more of the Poll Channel Options you have entered does not match.\nYour options are: vote-allowance, live-results, anonymous-voting, for-or-against',
             ephermeral: true,
          });
       }
@@ -165,6 +165,7 @@ module.exports = {
             voteAllowance: pollChannelOptions.includes('vote-allowance'),
             anonymous: pollChannelOptions.includes('anonymous-voting'),
             liveVisualFeed: pollChannelOptions.includes('live-results'),
+            forAgainst: pollChannelOptions.includes('for-or-against'),
             quorum: pollQuorum,
          });
 
