@@ -63,6 +63,8 @@ module.exports = {
                   .messages.fetch(targetPoll.messageId));
 
             l('propVoteCast -- TARGET POLL\n', targetPoll);
+         } else {
+            return message.delete();
          }
 
          // const pollMessage = await (client.channels.cache
