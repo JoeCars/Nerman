@@ -35,6 +35,7 @@ const PollChannelSchema = new Schema(
       anonymous: { type: Boolean, default: false },
       liveVisualFeed: { type: Boolean, default: false },
       voteAllowance: { type: Boolean, required: true, default: false },
+      forAgainst: { type: Boolean, required: true, default: false },
       quorum: { type: Number, default: 1 }, // leaving default as 1 for testuing purposes
    },
    {
@@ -50,6 +51,18 @@ const PollChannelSchema = new Schema(
             return !!configExists;
          },
       },
+      methods: {
+         channelOptions() {
+            const options = {
+               anonymous: this.anonymous ?? false,
+               liveVisualFeed: this.liveVisualFeed ?? false,
+               voteAllowance: this.voteAllowance ?? false,
+               forAgainst: this.forAgainst ?? false,
+            };
+
+            return options
+         }
+      }
    }
 );
 
