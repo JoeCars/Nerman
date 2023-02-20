@@ -9,9 +9,9 @@ module.exports = {
    name: 'auctionBid',
    /**
     *
-    * @param {Channel} genChannel
+    * @param {Channel} tokenChannel
     */
-   async execute(genChannel, data) {
+   async execute(tokenChannel, data) {
       try {
          l('AUCTION BID EVENT HANDLER');
 
@@ -22,7 +22,7 @@ module.exports = {
             bidder: { id: bidderId },
          } = data;
 
-         const Nouns = genChannel.client.libraries.get('Nouns');
+         const Nouns = tokenChannel.client.libraries.get('Nouns');
 
          l({ data });
          l({ id, amount, extended, bidderId });
@@ -36,6 +36,11 @@ module.exports = {
 
          const bidderLink = hyperlink(bidderENS, `${ethBaseUrl}${bidderId}`);
 
+         const nounsLink = hyperlink(
+            `Noun ${id}`,
+            `https://nouns.wtf/noun/${id}`
+         );
+
          const amountNew = Number(
             bigNumString.slice(0, -18) + '.' + bigNumString.slice(-18)
          );
@@ -43,9 +48,9 @@ module.exports = {
          const bidEmbed = new MessageEmbed()
             .setColor('#00FFFF')
             .setTitle(`Auction Bid`)
-            .setDescription(`${bidderLink} bid ${amountNew}Ξ on Noun ${id}`);
+            .setDescription(`${bidderLink} bid ${amountNew}Ξ on ${nounsLink}`);
 
-         return await genChannel.send({ embeds: [bidEmbed] });
+         return await tokenChannel.send({ embeds: [bidEmbed] });
       } catch (error) {
          console.error(error);
       }
