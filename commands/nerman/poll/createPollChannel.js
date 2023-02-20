@@ -226,10 +226,10 @@ module.exports = {
       const pollChannelOptions = new TextInputComponent()
          .setCustomId('pollChannelOptions')
          .setLabel('Choose Channel Options (if any)')
-         .setPlaceholder('anonymous-voting, live-results, vote-allowance')
-         .setDefaultValue('anonymous-voting, live-results, vote-allowance')
+         .setPlaceholder('anonymous-voting, live-results, vote-allowance, for-or-against')
+         .setDefaultValue('anonymous-voting, live-results, vote-allowance, for-or-against')
          .setStyle('SHORT')
-         .setMaxLength(50);
+         .setMaxLength(100);
 
       // disabled until DJS add back support for SelectMenus in Modals
       // const pollChannelOptions = new SelectMenuComponent()
