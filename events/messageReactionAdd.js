@@ -1,4 +1,9 @@
 // disabled
+const stahp = process.env.NODE_ENV === 'development' ? true : false;
+let nTwitter;
+if (stahp === true) {
+   nTwitter = require(`../helpers/twitter.js`);
+}
 // const nTwitter = require(`../helpers/twitter.js`);
 const nMongoDB = require(`../helpers/mongodb.js`);
 const nThreshold = require(`../helpers/nThreshold.js`);
@@ -9,7 +14,6 @@ const allowedRoles =
    process.env.DEPLOY_STAGE === 'staging'
       ? process.env.TESTNERMAN_VOTER_ID
       : process.env.DEVNERMAN_VOTER_ID;
-
 
 // nerman emoji ID - for now env based on DEPLOY_STAGE
 const nermanEmojiId =
@@ -42,6 +46,12 @@ module.exports = {
             reactions: { cache: reactionsCache },
          },
       } = reaction;
+
+      console.log('stahp => ',stahp)
+
+      if (stahp === true) {
+         return;
+      }
 
       l(process.env.DEPLOY_STAGE);
       l({ nermanEmojiId });
