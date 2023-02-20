@@ -139,16 +139,16 @@ const PollSchema = new Schema(
             }
          },
          async pollOptions() {
-            await this.populate(
-               'config',
-               'anonymous liveVisualFeed voteAllowance -_id'
-            );
+            await this.populate('config');
 
-            const options = {
-               anonymous: this.config.anonymous ?? false,
-               liveVisualFeed: this.config.liveVisualFeed ?? false,
-               voteAllowance: this.config.voteAllowance ?? false,
-            };
+            const options = await this.config.channelOptions();
+
+            // const options = {
+            //    anonymous: this.config.anonymous ?? false,
+            //    liveVisualFeed: this.config.liveVisualFeed ?? false,
+            //    voteAllowance: this.config.voteAllowance ?? false,
+            //    forAgainst: this.config.forAgainst ?? false,
+            // };
 
             return options;
          },
