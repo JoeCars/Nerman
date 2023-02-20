@@ -87,11 +87,17 @@ module.exports = {
          // const Role = rolesCache.find(role => role.name == 'Voters');
          const Role = rolesCache.find(role => role.id === allowedRoles);
 
-         let votersOnline = membersCache
-            .filter(member => member.presence?.status == 'online')
-            .filter(member => member.roles.cache.find(role => role == Role)).size;
+         //disabled - writing a new temporary one to use below, const nouncillors
+         // let votersOnline = membersCache
+         //    .filter(member => member.presence?.status == 'online')
+         //    .filter(member => member.roles.cache.find(role => role == Role)).size;
 
-         let voteThreshold = nThreshold.getThreshold(votersOnline);
+         const nouncillors = membersCache.filter(member => member.roles.cache.find(role => role == Role)).size;
+
+         // disabled - writing a temporary new version below
+         // let voteThreshold = nThreshold.getThreshold(votersOnline);
+
+         const voteThreshold = Math.ceil(nouncillors * 0.03)
 
          let msgAttachmentUrls = [];
 
