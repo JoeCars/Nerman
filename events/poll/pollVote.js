@@ -127,7 +127,11 @@ module.exports = {
          _id: new Types.ObjectId(),
          // poll: targetPoll._id,
          poll: pollStatus._id,
-         user: pollOptions.anonymous ? undefined : userId,
+         // user: pollOptions.anonymous ? undefined : userId,
+         user:
+            !guildNouncilIds.includes(channelId) && pollOptions.anonymous
+               ? undefined
+               : userId,
          choices: voteArray,
          reason: voteReason || undefined,
       });
@@ -199,18 +203,18 @@ module.exports = {
                      `https://nouns.wtf/vote/${propId}`
                   )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
                );
-               // .setDescription(
-               //    `${
-               //       !pollOptions.anonymous
-               //          ? userMention(userId)
-               //          : !guildNouncilIds.includes(channelId)
-               //          ? 'Anon'
-               //          : 'Anon Nouncillor'
-               //    } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
-               //       propText,
-               //       `https://nouns.wtf/vote/${propId}`
-               //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
-               // );
+            // .setDescription(
+            //    `${
+            //       !pollOptions.anonymous
+            //          ? userMention(userId)
+            //          : !guildNouncilIds.includes(channelId)
+            //          ? 'Anon'
+            //          : 'Anon Nouncillor'
+            //    } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+            //       propText,
+            //       `https://nouns.wtf/vote/${propId}`
+            //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+            // );
             // .setDescription(
             //    `Anon Nouncillor voted ${inlineCode(
             //       voteArray.join(' ')
