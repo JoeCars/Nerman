@@ -6,6 +6,7 @@ const shortenAddress = require('../../helpers/nouns/shortenAddress');
 const { log: l } = console;
 
 const mintId = '0x0000000000000000000000000000000000000000';
+// const mintId = '0x55e1490a1878D0B61811726e2cB96560022E764c';
 const nounsTokenId = process.env.NOUNS_TOKEN_ID;
 
 module.exports = {
@@ -19,10 +20,12 @@ module.exports = {
          l('NOUN TRANSFER EVENT HANDLER');
 
          const {
-            tokenId,
+            // tokenId,
             from: { id: fromId },
             to: { id: toId },
          } = data;
+
+         const tokenId = Number(data.tokenId);
 
          // const { } = message;
          const Nouns = genChannel.client.libraries.get('Nouns');
@@ -51,14 +54,13 @@ module.exports = {
          l({ fromDisplay });
          l({ toDisplay });
 
-         let transferEmbed = new MessageEmbed();
+         let transferEmbed = new MessageEmbed().setColor('#00FFFF');
 
+         l('fromId === toId ? =>', fromId === toId);
          if (fromId === toId) {
-            transferEmbed = new MessageEmbed()
-               .setColor('#00FFFF')
-               .setTitle(
-                  `Stanky Shameless Washing | Noun ${tokenId}`
-               )
+            // transferEmbed = new MessageEmbed()
+            transferEmbed
+               .setTitle(`Stanky Shameless Washing | Noun ${tokenId}`)
                .setDescription(
                   `From ${hyperlink(
                      fromDisplay,
@@ -67,8 +69,8 @@ module.exports = {
                )
                .setImage(`https://noun.pics/${tokenId}.png`);
          } else {
-            transferEmbed = new MessageEmbed()
-               .setColor('#00FFFF')
+            // transferEmbed = new MessageEmbed()
+            transferEmbed
                .setTitle(
                   `${
                      fromId === '0x0000000000000000000000000000000000000000'
