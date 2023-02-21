@@ -298,7 +298,7 @@ module.exports = {
             client.emit('propStatusChange', message, status, data);
          });
 
-         Nouns.on('Transfer', async data => {dis
+         Nouns.on('Transfer', async data => {
             const guildId = process.env.DISCORD_GUILD_ID;
             const nounsTokenId = process.env.NOUNS_TOKEN_ID;
             const nounsTokenChannel = await guildCache
