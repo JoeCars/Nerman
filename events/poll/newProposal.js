@@ -111,9 +111,11 @@ module.exports = {
 
       // todo try to implement env for the allowed roles so that we can do this dynamically when hosting and using in other servers
       // todo also this should be done via fetching the config
+      let allowedUsers;
       try {
          // const allowedUsers = await message.guild.members
-         const allowedUsers = await interaction.guild.members
+         // const allowedUsers = await interaction.guild.members
+         allowedUsers = await interaction.guild.members
             .fetch({
                withPresences: true,
             })
@@ -198,19 +200,43 @@ module.exports = {
          const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
             async key => {
                l({ key });
-               // !test to see if this optional chaining will fix the user eligible channels null value error
-               const user = await User.findOne({
+
+               let user = await User.findOne({
                   guildId: guildId,
                   discordId: key,
                }).exec();
 
-               if (
+               if (!user) {
+                  l(
+                     'User does not yet exist, creating new user from allowedUsers map...'
+                  );
+
+                  const {
+                     roles: { cache: userRoleCache },
+                  } = allowedUsers.get(key);
+
+                  const eligibleChannels = await User.findEligibleChannels(
+                     userRoleCache
+                  );
+
+                  user = await User.createUser(guildId, key, eligibleChannels);
+
+                  l('User created! => ', user);
+               } else if (
                   user.eligibleChannels !== null &&
                   user.eligibleChannels.has(newPoll.config.channelId)
                ) {
+                  l(
+                     'User exists and has channel key!'
+                  );
+
                   user.eligibleChannels.get(newPoll.config.channelId)
                      .eligiblePolls++;
                } else {
+                  l(
+                     `user did not have the key: ${newPoll.config.channelId} present in their eligibleChannels Map.\n Attempting to set key...`
+                  );
+
                   user.eligibleChannels.set(newPoll.config.channelId, {
                      eligiblePolls: 1,
                      participatedPolls: 0,
@@ -219,7 +245,6 @@ module.exports = {
 
                user.markModified('eligibleChannels');
                return await user.save();
-               // l({ participation });
             }
          );
 
