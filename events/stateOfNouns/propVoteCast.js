@@ -53,6 +53,8 @@ module.exports = {
          let pollChannelId;
          let pollMessage = null;
 
+         l('targetPoll => ', targetPoll);
+
          if (targetPoll) {
             pollChannelId = targetPoll.config.channelId;
             pollMessage = await (client.channels.cache
@@ -195,7 +197,9 @@ module.exports = {
             .setDescription(
                `${voterHyperlink} voted ${inlineCode(
                   supportEnum[supportDetailed]
-               )} with ${inlineCode(Number(votes))} votes on ${propHyperlink}. ${
+               )} with ${inlineCode(
+                  Number(votes)
+               )} votes on ${propHyperlink}. ${
                   !!reason.trim() ? `\n\n${reason}` : ''
                }`
             );
