@@ -1,7 +1,7 @@
 const { model, Schema, Types } = require('mongoose');
 const PollChannel = require('./PollChannel');
 const Poll = require('./Poll');
-const { log: l, trace: tr, error: lerr } = console;
+const { log: l, trace: tr, error: lerr, group: gr, groupEnd: grE } = console;
 
 const userSchema = new Schema(
    {
@@ -18,16 +18,31 @@ const userSchema = new Schema(
          unique: false,
          validate: {
             validator: async function (discordId) {
+               gr('User - discordId validator');
                const userExists = await this.schema.statics.userExists(
                   this.guildId,
                   discordId
                );
 
-               l({ userExists });
-               tr({ userExists });
+               // tr({ userExists });
 
+               // l('this => :\n', this);
+               // l('userExists => :\n', userExists);
+               l('this.equals(userExists) :\n', this.equals(userExists));
+
+               grE('User - discordId validator');
+               if (userExists === null) {
+                  return true;
+               }
+
+               if (this.equals(userExists)) {
+                  return true;
+               } else {
+                  return false;
+               }
                return !userExists;
             },
+            message: 'YOU FAILED THE CHECK?!',
          },
       },
       // todo I'm going to need to maybe add in a guildId to this to differentiate users... or perhaps change the eligible channels map to have guildId as parent keys and then channels as a sub-map to those keys
@@ -111,7 +126,7 @@ const userSchema = new Schema(
             l(this.schema.query);
          },
          async userExists(guildId, discordId) {
-            l('FROM STATIC');
+            l('MODEL => User : STATIC => userExists:');
 
             l({ guildId });
             l({ discordId });
@@ -172,32 +187,90 @@ const userSchema = new Schema(
                (participatedPolls / eligiblePolls) * 100
             ).toFixed(2)}%`;
          },
-         async incParticipation(channelId) {
+         async incParticipation(channelId, configId) {
+            gr('DOCUMENT => User : METHOD => incParticipation:');
+
+            l(
+               '!this.eligibleChannels.has(channelId) => ',
+               !this.eligibleChannels.has(channelId)
+            );
+
             try {
-               const newParticipation = this.eligibleChannels.get(channelId);
+               if (!this.eligibleChannels.has(channelId)) {
+                  l(
+                     `Channel key ${channelId} does NOT exist!\n Creating new participationObject for this channel...`
+                  );
 
-               l(
-                  'channelParticiation before incrementation : ',
-                  newParticipation
-               );
+                  // if configId is not provided in the code, we find and return it with a query
+                  configId = configId
+                     ? configId
+                     : await PollChannel.findOne({ channelId }, '_id')
+                          .lean()
+                          .then(({ _id }) => _id);
 
-               newParticipation.participatedPolls++;
+                  const eligiblePolls = await Poll.aggregate([
+                     {
+                        $match: {
+                           [`config`]: configId,
+                           [`allowedUsers.${this.discordId}`]: {
+                              $exists: true,
+                           },
+                        },
+                     },
+                  ]).exec();
 
-               this.markModified('eligibleChannels');
-               await this.updateOne({
-                  $set: { [`eligibleChannels.${channelId}`]: newParticipation },
-               });
+                  const participationObject = {
+                     eligiblePolls: eligiblePolls.length,
+                     participatedPolls: eligiblePolls.filter(
+                        ({ allowedUsers }) =>
+                           allowedUsers[this.discordId] === true
+                     ).length,
+                  };
 
-               l(
-                  'channelParticiation after incrementation : ',
-                  this.eligibleChannels.get(channelId)
-               );
+                  l(`New participation object => `, { participationObject });
 
-               return;
+                  await this.updateOne(
+                     {
+                        $set: {
+                           [`eligibleChannels.${channelId}`]:
+                              participationObject,
+                        },
+                     },
+                     { new: true }
+                  ).exec();
+               } else {
+                  l(`Channel key ${channelId} exists!`);
+
+                  const newParticipation = this.eligibleChannels.get(channelId);
+
+                  l(
+                     'channelParticiation before incrementation : ',
+                     newParticipation
+                  );
+
+                  newParticipation.participatedPolls++;
+
+                  // this.markModified('eligibleChannels');
+                  await this.updateOne(
+                     {
+                        $set: {
+                           [`eligibleChannels.${channelId}`]: newParticipation,
+                        },
+                     },
+                     { new: true }
+                  ).exec();
+
+                  l(
+                     'channelParticiation after incrementation : ',
+                     this.eligibleChannels.get(channelId)
+                  );
+               }
             } catch (error) {
                l(':::ERROR IN PARTICIPATION INCREMENTATION:::');
                lerr(error);
             }
+            grE('DOCUMENT => User : METHOD => incParticipation:');
+            return;
          },
       },
       query: {
