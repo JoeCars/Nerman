@@ -141,17 +141,54 @@ module.exports = {
       let votingUser = await User.findOne().byDiscordId(userId, guildId).exec();
 
       if (!votingUser) {
+         l(
+            '/////////////// !votingUser ///////////////\nGetting eligibleChannels...'
+         );
          const eligibleChannels = await User.findEligibleChannels(
             memberRoleCache
          );
+         l({ eligibleChannels });
 
-         votingUser = await User.createUser(userId, eligibleChannels);
+         votingUser = await User.createUser(guildId, userId, eligibleChannels);
       }
 
       const updatedPoll = await Poll.findAndSetVoted(messageId, userId);
 
       console.log({ channelId });
       console.log('OUTSIDE IF', { votingUser });
+
+      // if (!votingUser.eligibleChannels.has(channelId)) {
+      //    l('votingUser does not have this channel key.\nCreating new key...');
+      //    l('pollStatus.config._id', pollStatus.config._id);
+      //    const pollCount = await Poll.countDocuments({
+      //       [`config`]: pollStatus.config._id,
+      //       [`allowedUsers.${userId}`]: { $exists: true },
+      //    }).exec();
+
+      //    l({ votingUser });
+      //    l({ pollCount });
+      //    l({ channelId });
+      //    await votingUser
+      //       .updateOne(
+      //          {
+      //             $set: {
+      //                [`eligibleChannels.${channelId}`]: {
+      //                   eligiblePolls: pollCount,
+      //                   participatedPolls: 0,
+      //                },
+      //             },
+      //          },
+      //       )
+      //       .exec();
+      //    l(votingUser.eligibleChannels);
+      //    l(
+      //       'AFTER ADDING CHELIGIBLE CHANNEL ::: votingUser.eligibleChannels.get(channelId) => ',
+      //       votingUser.eligibleChannels.get(channelId)
+      //    );
+      // }
+
+
+      // votingUser.incParticipation(channelId, pollStatus.config._id);
       votingUser.incParticipation(channelId);
 
       let message = await client.channels.cache
