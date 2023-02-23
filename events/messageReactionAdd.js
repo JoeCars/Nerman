@@ -1,7 +1,7 @@
 // disabled
 const stahp = process.env.NODE_ENV === 'development' ? true : false;
 let nTwitter;
-if (stahp === true) {
+if (stahp === false) {
    nTwitter = require(`../helpers/twitter.js`);
 }
 // const nTwitter = require(`../helpers/twitter.js`);
