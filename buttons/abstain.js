@@ -65,7 +65,11 @@ module.exports = {
       if (!abstainingUser) {
          const eligibleChannels = await User.findEligibleChannels(roleCache);
 
-         abstainingUser = await User.createUser(userId, eligibleChannels);
+         abstainingUser = await User.createUser(
+            guildId,
+            userId,
+            eligibleChannels
+         );
       }
 
       const updatedPoll = await Poll.findAndSetAbstained(messageId, userId);
