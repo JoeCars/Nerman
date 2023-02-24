@@ -68,6 +68,7 @@ module.exports = {
 
       let options;
 
+      // todo forGainst in newProposal
       if (channelConfig.forAgainst) {
          options = ['for', 'against'];
       } else {
@@ -388,7 +389,37 @@ module.exports = {
 
                // l({ user });
 
-               if (user === null) {
+               l(
+                  'pre mapping user?.eligibleChannels.get(channelId) => ',
+                  user?.eligibleChannels.get(channelId)
+               );
+
+               if (user && user.eligibleChannels.has(channelId)) {
+                  l(
+                     "User exists and has channel key!\nIncrementing channel's eligiblePolls...\neligiblePolls PRE incrementation => ",
+                     +user.eligibleChannels.get(channelId)
+                  );
+
+                  user.eligibleChannels.get(channelId).eligiblePolls++;
+
+                  l(
+                     "User exists and has channel key!\nIncrementing channel's eligiblePolls...\neligiblePolls POST incrementation => ",
+                     +user.eligibleChannels.get(channelId)
+                  );
+               } else if (user && !user.eligibleChannels.has(channelId)) {
+                  l(
+                     `User did not have the key: ${channelId} present in their eligibleChannels Map.\n Attempting to set key...`
+                  );
+
+                  // todo maybe use the method to construct the paerticipation object by aggregating all docs accounting for Polls with the allowed user, just to be a bit more thorough
+                  user.eligibleChannels.set(newPoll.config.channelId, {
+                     eligiblePolls: 1,
+                     participatedPolls: 0,
+                  });
+               } else {
+                  l(
+                     'User does not yet exist, creating new user from allowedUsers map...'
+                  );
                   const member = memberCache.get(key);
                   // l('MISSING USER', { member });
                   // l(member.roles.cache);
@@ -398,9 +429,16 @@ module.exports = {
                   );
                   // l('ERIGIBIRU FROM POLLSUBMIT', await eligibleChannels);
                   user = await User.createUser(guildId, key, eligibleChannels);
-               }
 
-               l('this is the user', { user });
+                  l('User created! => ', user);
+
+                  l(
+                     'pre mapping user?.eligibleChannels.get(channelId) => ',
+                     user?.eligibleChannels.get(channelId)
+                  );
+
+                  return user;
+               }
 
                // l(user.eligibleChannels);
 
@@ -408,9 +446,9 @@ module.exports = {
                // mystery ID 383705280174620704
                // doppelnouncil 1017403835913863260
 
-               l({ newPoll });
+               // l({ newPoll });
 
-               l(user.eligibleChannels.get(newPoll.config.channelId));
+               // l(user.eligibleChannels.get(newPoll.config.channelId));
                // const newEligibility = user.eligibleChannels.get(
                //    newPoll.config.channelId
                // );
@@ -420,10 +458,16 @@ module.exports = {
                // l(user);
 
                // user.eligibleChannels.set
-               // user.markModified('eligibleChannels');
-               // return await user.save();
                // l({ participation });
-               return user;
+
+               l(
+                  'post mapping user?.eligibleChannels.get(channelId) => ',
+                  user?.eligibleChannels.get(channelId)
+               );
+
+               user.markModified('eligibleChannels');
+               return await user.save();
+               // return user;
             }
          );
 
