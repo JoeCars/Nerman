@@ -78,7 +78,7 @@ module.exports = {
          {
             channelId: propChannelId,
          },
-         '_id allowedRoles quorum duration'
+         '_id allowedRoles quorum duration forAgainst'
       ).exec();
 
       // const intRegex = new RegExp(/^\d*$/);
@@ -104,7 +104,10 @@ module.exports = {
          title,
          description,
          voteAllowance: 1,
-         choices: ['yes', 'no', 'abstain'],
+         choices:
+            channelConfig.forAgainst === true
+               ? ['for', 'against']
+               : ['yes', 'no'],
       };
 
       const snapshotMap = new Map();
@@ -199,7 +202,7 @@ module.exports = {
 
          const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
             async key => {
-               l({ key });
+               l('updateVoterPromise', { key });
 
                let user = await User.findOne({
                   guildId: guildId,
@@ -226,9 +229,7 @@ module.exports = {
                   user.eligibleChannels !== null &&
                   user.eligibleChannels.has(newPoll.config.channelId)
                ) {
-                  l(
-                     'User exists and has channel key!'
-                  );
+                  l('User exists and has channel key!');
 
                   user.eligibleChannels.get(newPoll.config.channelId)
                      .eligiblePolls++;
