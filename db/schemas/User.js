@@ -42,7 +42,7 @@ const userSchema = new Schema(
                }
                return !userExists;
             },
-            message: 'YOU FAILED THE CHECK?!',
+            message: `User document with:\nguildId => ${this.guildId}\ndiscordId => ${this.discordId}\nAlready exists.`,
          },
       },
       // todo I'm going to need to maybe add in a guildId to this to differentiate users... or perhaps change the eligible channels map to have guildId as parent keys and then channels as a sub-map to those keys
