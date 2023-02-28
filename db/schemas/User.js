@@ -6,11 +6,6 @@ const { log: l, trace: tr, error: lerr, group: gr, groupEnd: grE } = console;
 const userSchema = new Schema(
    {
       _id: Schema.Types.ObjectId,
-      // discordId: {
-      //    type: String,
-      //    required: true,
-      //    unique: true,
-      // },
       guildId: { type: String, required: true },
       discordId: {
          type: String,
@@ -40,7 +35,6 @@ const userSchema = new Schema(
                } else {
                   return false;
                }
-               return !userExists;
             },
             message: `User document with:\nguildId => ${this.guildId}\ndiscordId => ${this.discordId}\nAlready exists.`,
          },
@@ -109,8 +103,10 @@ const userSchema = new Schema(
 
             return !!hasVotingRoles;
          },
-         async findEligibleChannels(memberRoles) {
-            l('[...memberRoles.keys()]', [...memberRoles.keys()]);
+         async findEligibleChannels(memberRoles, anon = false) {
+            if (!anon) {
+               l('[...memberRoles.keys()]', [...memberRoles.keys()]);
+            }
             const eligibleChannels = await PollChannel.find({
                allowedRoles: { $in: [...memberRoles.keys()] },
             });
@@ -125,11 +121,13 @@ const userSchema = new Schema(
             l(this.schema.methods);
             l(this.schema.query);
          },
-         async userExists(guildId, discordId) {
+         async userExists(guildId, discordId, anon = false) {
             l('MODEL => User : STATIC => userExists:');
 
-            l({ guildId });
-            l({ discordId });
+            if (!anon) {
+               l({ guildId });
+               l({ discordId });
+            }
             // const userDoc = await this.findOne()
             //    .byDiscordId(guildId, discordId)
             //    .exec();
@@ -138,7 +136,11 @@ const userSchema = new Schema(
                .byDiscordId(discordId, guildId)
                .exec();
 
-            l({ userDoc });
+            if (!anon) {
+               l({ userDoc });
+            }
+
+            l('User doc found? => ', !!userDoc);
 
             return userDoc;
          },
@@ -187,7 +189,7 @@ const userSchema = new Schema(
                (participatedPolls / eligiblePolls) * 100
             ).toFixed(2)}%`;
          },
-         async incParticipation(channelId, configId) {
+         async incParticipation(channelId, configId, anon = false) {
             gr('DOCUMENT => User : METHOD => incParticipation:');
 
             l(
@@ -227,7 +229,9 @@ const userSchema = new Schema(
                      ).length,
                   };
 
-                  l(`New participation object => `, { participationObject });
+                  if (!anon) {
+                     l(`New participation object => `, { participationObject });
+                  }
 
                   await this.updateOne(
                      {
@@ -243,10 +247,12 @@ const userSchema = new Schema(
 
                   const newParticipation = this.eligibleChannels.get(channelId);
 
-                  l(
-                     'channelParticiation before incrementation : ',
-                     newParticipation
-                  );
+                  if (!anon) {
+                     l(
+                        'channelParticiation before incrementation : ',
+                        newParticipation
+                     );
+                  }
 
                   newParticipation.participatedPolls++;
 
@@ -260,10 +266,12 @@ const userSchema = new Schema(
                      { new: true }
                   ).exec();
 
-                  l(
-                     'channelParticiation after incrementation : ',
-                     this.eligibleChannels.get(channelId)
-                  );
+                  if (!anon) {
+                     l(
+                        'channelParticiation after incrementation : ',
+                        this.eligibleChannels.get(channelId)
+                     );
+                  }
                }
             } catch (error) {
                l(':::ERROR IN PARTICIPATION INCREMENTATION:::');
