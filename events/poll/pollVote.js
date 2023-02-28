@@ -45,8 +45,6 @@ module.exports = {
          message: { id: messageId },
       } = modal;
 
-      console.log({ modal });
-
       const propRegExp = new RegExp(/^prop\s(\d{1,5})/, 'i');
 
       const pollStatus = await Poll.findOne(
@@ -56,6 +54,7 @@ module.exports = {
 
       const pollOptions = await pollStatus.pollOptions();
 
+      !pollOptions.anonymous && console.log({ modal });
       console.log({ pollStatus });
       console.log({ pollOptions });
 
@@ -145,9 +144,10 @@ module.exports = {
             '/////////////// !votingUser ///////////////\nGetting eligibleChannels...'
          );
          const eligibleChannels = await User.findEligibleChannels(
-            memberRoleCache
+            memberRoleCache, pollOptions.anonymous
          );
-         l({ eligibleChannels });
+
+        !pollOptions.anonymous && l({ eligibleChannels });
 
          votingUser = await User.createUser(guildId, userId, eligibleChannels);
       }
@@ -155,40 +155,8 @@ module.exports = {
       const updatedPoll = await Poll.findAndSetVoted(messageId, userId);
 
       console.log({ channelId });
-      console.log('OUTSIDE IF', { votingUser });
+      !pollOptions.anonymous && console.log('votingUser => ', { votingUser });
 
-      // if (!votingUser.eligibleChannels.has(channelId)) {
-      //    l('votingUser does not have this channel key.\nCreating new key...');
-      //    l('pollStatus.config._id', pollStatus.config._id);
-      //    const pollCount = await Poll.countDocuments({
-      //       [`config`]: pollStatus.config._id,
-      //       [`allowedUsers.${userId}`]: { $exists: true },
-      //    }).exec();
-
-      //    l({ votingUser });
-      //    l({ pollCount });
-      //    l({ channelId });
-      //    await votingUser
-      //       .updateOne(
-      //          {
-      //             $set: {
-      //                [`eligibleChannels.${channelId}`]: {
-      //                   eligiblePolls: pollCount,
-      //                   participatedPolls: 0,
-      //                },
-      //             },
-      //          },
-      //       )
-      //       .exec();
-      //    l(votingUser.eligibleChannels);
-      //    l(
-      //       'AFTER ADDING CHELIGIBLE CHANNEL ::: votingUser.eligibleChannels.get(channelId) => ',
-      //       votingUser.eligibleChannels.get(channelId)
-      //    );
-      // }
-
-
-      // votingUser.incParticipation(channelId, pollStatus.config._id);
       votingUser.incParticipation(channelId);
 
       let message = await client.channels.cache
