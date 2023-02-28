@@ -143,13 +143,6 @@ const PollSchema = new Schema(
 
             const options = await this.config.channelOptions();
 
-            // const options = {
-            //    anonymous: this.config.anonymous ?? false,
-            //    liveVisualFeed: this.config.liveVisualFeed ?? false,
-            //    voteAllowance: this.config.voteAllowance ?? false,
-            //    forAgainst: this.config.forAgainst ?? false,
-            // };
-
             return options;
          },
       },
