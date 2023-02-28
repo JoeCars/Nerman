@@ -1,6 +1,7 @@
 // disabled
 const stahp = process.env.NODE_ENV === 'development' ? true : false;
 let nTwitter;
+console.log('messageReactionAdd stahp => ', stahp);
 if (stahp === false) {
    nTwitter = require(`../helpers/twitter.js`);
 }
@@ -12,7 +13,7 @@ const tenor = require(`../helpers/tenor.js`);
 // role allowed for nerman tweet functions - for now env based on DEPLOY_STAGE
 const allowedRoles =
    process.env.DEPLOY_STAGE === 'staging'
-      ? process.env.TESTNERMAN_VOTER_ID
+      ? process.env.TESTNERMAN_NOUNCIL_ROLE_ID
       : process.env.DEVNERMAN_VOTER_ID;
 
 // nerman emoji ID - for now env based on DEPLOY_STAGE
@@ -32,6 +33,7 @@ module.exports = {
 
       const {
          emoji,
+         count,
          emoji: { id: emojiId },
          message: {
             attachments,
@@ -48,8 +50,7 @@ module.exports = {
       } = reaction;
 
       try {
-
-         console.log('stahp => ', stahp)
+         console.log('messageReactionAdd  try:catch stahp => ', stahp);
 
          if (stahp === true) {
             return;
@@ -87,17 +88,27 @@ module.exports = {
          // const Role = rolesCache.find(role => role.name == 'Voters');
          const Role = rolesCache.find(role => role.id === allowedRoles);
 
+         console.log({ Role });
+         console.log({ count });
+         console.log(reaction);
+
          //disabled - writing a new temporary one to use below, const nouncillors
          // let votersOnline = membersCache
          //    .filter(member => member.presence?.status == 'online')
          //    .filter(member => member.roles.cache.find(role => role == Role)).size;
 
-         const nouncillors = membersCache.filter(member => member.roles.cache.find(role => role == Role)).size;
+         const nouncillors = membersCache.filter(member =>
+            member.roles.cache.find(role => role == Role)
+         ).size;
+
+         console.log({ nouncillors });
 
          // disabled - writing a temporary new version below
          // let voteThreshold = nThreshold.getThreshold(votersOnline);
 
-         const voteThreshold = Math.ceil(nouncillors * 0.03)
+         const voteThreshold = Math.ceil(nouncillors * 0.03);
+
+         console.log({ voteThreshold });
 
          let msgAttachmentUrls = [];
 
@@ -161,8 +172,8 @@ module.exports = {
             await reaction.message.react('932664888642400276');
          }
       } catch (error) {
-         console.error('messageReactionAdd -----------  AW BEANZ')
-         console.error(error)
+         console.error('messageReactionAdd -----------  AW BEANZ');
+         console.error(error);
       }
    },
 };
