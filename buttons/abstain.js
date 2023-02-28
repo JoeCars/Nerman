@@ -25,7 +25,7 @@ module.exports = {
          },
       } = interaction;
 
-      const { allowedRoles } = await PollChannel.findOne(
+      const { allowedRoles, anonymous: anon } = await PollChannel.findOne(
          { channelId },
          'allowedRoles'
       ).exec();
@@ -60,10 +60,12 @@ module.exports = {
          });
       }
 
-      let abstainingUser = await User.findOne().byDiscordId(userId, guildId).exec();
+      let abstainingUser = await User.findOne()
+         .byDiscordId(userId, guildId)
+         .exec();
 
       if (!abstainingUser) {
-         const eligibleChannels = await User.findEligibleChannels(roleCache);
+         const eligibleChannels = await User.findEligibleChannels(roleCache, anon);
 
          abstainingUser = await User.createUser(
             guildId,
