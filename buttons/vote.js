@@ -16,7 +16,7 @@ module.exports = {
     */
    async execute(interaction) {
       if (!interaction.isButton()) {
-         console.log('VOTE BUTTON -- isButton: false', { interaction });
+         // console.log('VOTE BUTTON -- isButton: false', { interaction });
          return;
       }
       // console.log(
@@ -34,19 +34,21 @@ module.exports = {
          },
       } = interaction;
 
-      console.log({ interaction });
-      console.log({ joinedTimestamp });
-      console.log(new Date(joinedTimestamp));
-
-      const { allowedRoles } = await PollChannel.findOne(
+      const { allowedRoles, anonymous: anon } = await PollChannel.findOne(
          { channelId },
          'allowedRoles'
       ).exec();
 
+      if (!anon) {
+         console.log({ interaction });
+         console.log({ joinedTimestamp });
+         console.log(new Date(joinedTimestamp));
+      }
+
       // console.log({ allowedRoles });
 
       if (!roleCache.hasAny(...allowedRoles)) {
-         console.log('USER DOES NOT HAS ROLE');
+         console.log('USER DOES NOT HAS DA SPESHUL ROLL');
          return interaction.reply({
             content: 'You do not have a role eligible to vote on this poll.',
             ephemeral: true,
@@ -134,6 +136,6 @@ module.exports = {
          console.error(error);
       }
 
-      console.log({ modal });
+      !anon && console.log({ modal });
    },
 };
