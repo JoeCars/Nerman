@@ -144,10 +144,11 @@ module.exports = {
             '/////////////// !votingUser ///////////////\nGetting eligibleChannels...'
          );
          const eligibleChannels = await User.findEligibleChannels(
-            memberRoleCache, pollOptions.anonymous
+            memberRoleCache,
+            pollOptions.anonymous
          );
 
-        !pollOptions.anonymous && l({ eligibleChannels });
+         !pollOptions.anonymous && l({ eligibleChannels });
 
          votingUser = await User.createUser(guildId, userId, eligibleChannels);
       }
@@ -203,11 +204,17 @@ module.exports = {
                         : !pollOptions.anonymous
                         ? userMention(userId)
                         : 'Anon'
-                  } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+                  } voted ${
+                     pollOptions.forAgainst
+                        ? inlineCode(voteArray.join(' ').toUpperCase())
+                        : inlineCode(voteArray.join(' '))
+                  } on ${hyperlink(
                      propText,
                      `https://nouns.wtf/vote/${propId}`
                   )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
                );
+
+            console.log(voteArray.join(' ').toUpperCase());
             // .setDescription(
             //    `${
             //       !pollOptions.anonymous
@@ -272,9 +279,11 @@ module.exports = {
                         : !pollOptions.anonymous
                         ? userMention(userId)
                         : 'Anon'
-                  } voted ${inlineCode(voteArray.join(' '))}.${
-                     !!voteReason ? `\n\n${voteReason.trim()}` : ``
-                  }`
+                  } voted ${
+                     pollOptions.forAgainst
+                        ? inlineCode(voteArray.join(' ').toUpperCase())
+                        : inlineCode(voteArray.join(' '))
+                  }.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
                );
             //    .setDescription(
             //       `${
