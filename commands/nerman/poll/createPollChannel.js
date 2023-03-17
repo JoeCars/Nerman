@@ -216,18 +216,26 @@ module.exports = {
          .setRequired(true);
 
       const pollQuorum = new TextInputComponent()
-         .setCustomId('pollQuorum')
+         .setCustomId('pollQuorumThreshold')
+         // .setLabel('Choose Quorum and Threshold %')
          .setLabel('Choose Quorum %')
-         .setPlaceholder('0 - 100')
+         // .setPlaceholder('Eg) 20:10 <= (quorum:threshold)')
+         .setPlaceholder('Eg) 30.5')
+         // .setDefaultValue('30.5:30')
+         .setDefaultValue('30.5')
          .setStyle('SHORT')
-         .setMaxLength(6)
+         .setMaxLength(15)
          .setRequired(true);
 
       const pollChannelOptions = new TextInputComponent()
          .setCustomId('pollChannelOptions')
          .setLabel('Choose Channel Options (if any)')
-         .setPlaceholder('anonymous-voting, live-results, vote-allowance, for-or-against')
-         .setDefaultValue('anonymous-voting, live-results, vote-allowance, for-or-against')
+         .setPlaceholder(
+            'anonymous-voting, live-results, vote-allowance, for-or-against'
+         )
+         .setDefaultValue(
+            'anonymous-voting, live-results, vote-allowance, for-or-against'
+         )
          .setStyle('SHORT')
          .setMaxLength(100);
 
