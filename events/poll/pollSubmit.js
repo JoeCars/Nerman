@@ -49,7 +49,7 @@ module.exports = {
          {
             channelId,
          },
-         'allowedRoles forAgainst'
+         'allowedRoles forAgainst voteThreshold'
       );
 
       const intRegex = new RegExp(/^\d*$/);
@@ -397,14 +397,14 @@ module.exports = {
                if (user && user.eligibleChannels.has(channelId)) {
                   l(
                      "User exists and has channel key!\nIncrementing channel's eligiblePolls...\neligiblePolls PRE incrementation => ",
-                     +user.eligibleChannels.get(channelId)
+                     user.eligibleChannels.get(channelId)
                   );
 
                   user.eligibleChannels.get(channelId).eligiblePolls++;
 
                   l(
                      "User exists and has channel key!\nIncrementing channel's eligiblePolls...\neligiblePolls POST incrementation => ",
-                     +user.eligibleChannels.get(channelId)
+                     user.eligibleChannels.get(channelId)
                   );
                } else if (user && !user.eligibleChannels.has(channelId)) {
                   l(
@@ -498,13 +498,23 @@ module.exports = {
             newPoll.allowedUsers.size * (quorum / 100)
          );
 
-         embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
+         embedQuorum = embedQuorum > 1 ? embedQuorum : embedQuorum > 0 ? 1: 0;
 
          updatedEmbed.fields[1].value = embedQuorum.toString(); // quorum
 
-         updatedEmbed.fields[4].value = `<t:${Math.floor(
-            newPoll.timeEnd.getTime() / 1000
-         )}:f>`; // timeEnd
+         // if (updatedEmbed.fields.length === 6) {
+         //    const votesAmount = Math.floor(
+         //       newPoll.allowedUsers.size * (channelConfig.voteThreshold / 100)
+         //    );
+         //    updatedEmbed.fields[2].value = `${votesAmount >= 1 ? votesAmount : 1}`; // voteThreshold
+         //    updatedEmbed.fields[5].value = `<t:${Math.floor(
+         //       newPoll.timeEnd.getTime() / 1000
+         //    )}:f>`; // timeEnd
+         // } else {
+            updatedEmbed.fields[4].value = `<t:${Math.floor(
+               newPoll.timeEnd.getTime() / 1000
+            )}:f>`; // timeEnd
+         // }
 
          const threadName =
             title.length <= 100 ? title : `${title.substring(0, 96)}...`;
