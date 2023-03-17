@@ -40,15 +40,44 @@ const initPollMessage = async ({
 
    voteActionRow.addComponents(voteBtn, abstainBtn);
 
+   const embedFields = [
+      { name: '\u200B', value: '\u200B', inline: false },
+      { name: 'Quorum', value: '...', inline: true },
+      { name: 'Voters', value: '0', inline: true },
+      { name: 'Abstains', value: '0', inline: true },
+      { name: 'Voting Closes', value: '...', inline: false },
+   ];
+
+   console.log('/////////////////////// EMBED FIELDS ///////////////////////');
+   console.log(embedFields);
+
+   console.log(channelConfig);
+   console.log(channelConfig.voteThreshold);
+
+   // disabled until Joel decides if we need this here
+   // if (channelConfig.voteThreshold > 0) {
+   //    console.log('THRESHOLD IS ABOVE 0');
+
+   //    embedFields.splice(2, 0, {
+   //       name: 'Vote Threshold',
+   //       value: '...',
+   //       inline: true,
+   //    });
+   // }
+
+   console.log('/////////////////////// EMBED FIELDS ///////////////////////');
+   console.log(embedFields);
+
    const embed = new MessageEmbed()
       .setColor('#ffffff')
       .setTitle(title)
       .setDescription(description)
-      .addField('\u200B', '\u200B')
-      .addField('Quorum', '...', true)
-      .addField('Voters', '0', true)
-      .addField('Abstains', '0', true)
-      .addField('Voting Closes', '...', true)
+      .addFields(embedFields)
+      // .addField('\u200B', '\u200B')
+      // .addField('Quorum', '...', true)
+      // .addField('Voters', '0', true)
+      // .addField('Abstains', '0', true)
+      // .addField('Voting Closes', '...', true)
       // .addField('Poll Results:', resultsOutput)
       // .setTimestamp()
       .setFooter('Submitted by ...');
