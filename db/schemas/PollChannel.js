@@ -37,6 +37,7 @@ const PollChannelSchema = new Schema(
       voteAllowance: { type: Boolean, required: true, default: false },
       forAgainst: { type: Boolean, required: true, default: false },
       quorum: { type: Number, default: 1 }, // leaving default as 1 for testuing purposes
+      voteThreshold: { type: Number, default: 0},
    },
    {
       statics: {
@@ -60,9 +61,9 @@ const PollChannelSchema = new Schema(
                forAgainst: this.forAgainst ?? false,
             };
 
-            return options
-         }
-      }
+            return options;
+         },
+      },
    }
 );
 
@@ -70,30 +71,10 @@ const PollChannelSchema = new Schema(
 // must pass voter quorum
 // then after that passes, if the leading votes pases the threshold then we call that a pass
 
-// const PollChannelSchema = new Schema({
-//    _id: Schema.Types.ObjectId,
-//    channelId: { type: String, required: true, unique: true },
-//    // channelName: { type: String, required: true },
-//    duration: { type: Number, required: true },
-//    voteAllowance: { type: Number, required: true, default: 1 },
-//    allowanceOptions: {
-//       type: [String],
-//       default: ['1/option'],
-//       enum: ['1/option', 'Compounding'],
-//    },
-//    maxUserProposal: { type: Number, default: 1 },
-//    anonymous: { type: Boolean, default: false },
-//    // liveVisualFeed: { type: Boolean, default: false },
-//    quorum: { type: Number, default: 1 }, // leaving default as 1 for testuing purposes
-//    allowedRoles: [{ type: String, required: true, default: {} }],
-// });
-
 PollChannelSchema.virtual('durationMs').get(function () {
    console.log('DURATIONNNNNNNNN', this.duration);
    return Math.round(this.duration * 60 * 60 * 1000);
 });
-// PollChannelSchema.virtual('polls',{ref: 'Poll', localField: '_id', foreignField: 'config'});
-// });
 
 // Should look into:
 // Optimistic Concurrency => https://mongoosejs.com/docs/5.x/docs/guide.html#optimisticConcurrency
@@ -101,13 +82,3 @@ PollChannelSchema.virtual('durationMs').get(function () {
 // Virtuals => https://mongoosejs.com/docs/5.x/docs/guide.html#virtuals
 
 module.exports = model('channelConfig', PollChannelSchema);
-
-// User.findById({
-//    _id,
-// })
-//    .select('participation')
-//    .exec(callback)
-//    .then(data => {
-//       // do whatever
-//    })
-//    .catch(err => console.error(err));
