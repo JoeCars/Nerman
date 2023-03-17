@@ -66,7 +66,10 @@ const PollSchema = new Schema(
       status: {
          type: String,
          default: 'closed',
-         enum: ['open', 'closed', 'cancelled'],
+         enum: ['open', 'closed', 'cancelled', 'canceled'],
+      },
+      conclusive: {
+         type: Boolean,
       },
       pollNumber: {
          type: Number,
@@ -180,16 +183,31 @@ PollSchema.virtual('participation').get(function () {
 });
 
 PollSchema.virtual('voterQuorum').get(function () {
-   // Add in an evaluation for a quroum of zero and make it use a %
+   // Add in an evaluation for a quorum of zero and make it use a %
    const voterQuorum = Math.floor(
       this.allowedUsers.size * (this.config.quorum / 100)
    );
 
    console.log(
-      '--------------------------------------\nFROM GETTER\n---------------------------',
-      { voterQuorum }
+      '--------------------------------------\nFROM GETTER\nPoll.js -- virtual: voterQuorum\n---------------------------',
+      { voterQuorum },
+      this.config
    );
    return voterQuorum > 1 ? voterQuorum : 1;
+});
+
+PollSchema.virtual('voteThreshold').get(function () {
+   // Add in an evaluation for a quorum of zero and make it use a %
+   const voteThreshold = Math.floor(
+      this.allowedUsers.size * (this.config.voteThreshold / 100)
+   );
+
+   console.log(
+      '--------------------------------------\nFROM GETTER\nPoll.js -- virtual: voteThreshold\n---------------------------',
+      { voteThreshold },
+      this.config
+   );
+   return voteThreshold > 1 ? voteThreshold : 1;
 });
 
 PollSchema.virtual('results').get(function () {
@@ -230,6 +248,30 @@ PollSchema.virtual('results').get(function () {
    }
 
    resultsObject.totalVotes = flatVotes.length;
+
+   resultsObject.quorumPass =
+      resultsObject.totalVotes >= this.voterQuorum
+         ? true
+         : this.abstains.size >= this.voterQuorum
+         ? true
+         : false;
+
+   resultsObject.thresholdPass =
+      !tiedLeads.length &&
+      resultsObject.distribution[leadingOption] >= this.voteThreshold
+         ? true
+         : false;
+
+   console.log('Poll.js -- this.voterQuorum => ', this.voterQuorum);
+   console.log('Poll.js -- this.voteThreshold => ', this.voteThreshold);
+   console.log(
+      'Poll.js -- resultsObject.quorumPass => ',
+      resultsObject.quorumPass
+   );
+   console.log(
+      'Poll.js -- resultsObject.thresholdPass => ',
+      resultsObject.thresholdPass
+   );
 
    if (!tiedLeads.length) {
       resultsObject.winner = leadingOption;
