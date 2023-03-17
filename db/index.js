@@ -216,7 +216,10 @@ module.exports = async client => {
                            { new: true }
                         )
                            .populate([
-                              { path: 'config', select: 'channelId quorum' },
+                              {
+                                 path: 'config',
+                                 select: 'channelId quorum voteThreshold',
+                              },
                               { path: 'countVoters' },
                               { path: 'getVotes' },
                            ])
@@ -284,6 +287,61 @@ module.exports = async client => {
                               .join(', ')} - Tied`;
                         }
 
+                        let failedChecks = [];
+
+                        // if (
+                        //    results.quorumPass === true &&
+                        //    results.thresholdPass === true
+                        // ) {
+                        // } else if (
+                        //    results.quorumPass === true &&
+                        //    results.thresholdPass === false
+                        // ) {
+                        // }
+
+                        console.log(
+                           'db/index.js -- jsfailedChecks before checks=> ',
+                           failedChecks
+                        );
+
+                        if (results.quorumPass === false) {
+                           failedChecks.push('quorum');
+                        }
+
+                        if (results.thresholdPass === false) {
+                           failedChecks.push('vote threshold');
+                        }
+                        console.log(
+                           'db/index.js -- jsfailedChecks after checks=> ',
+                           failedChecks
+                        );
+
+                        console.log(
+                           'db/index.js -- closingPoll.conclusive PRE checks => ',
+                           closingPoll.conclusive
+                        );
+
+                        if (failedChecks.length) {
+                           closingPoll.conclusive = false;
+                           winningResult = `Poll failed to meet ${failedChecks.join(
+                              ' and '
+                           )}.`;
+                        } else {
+                           closingPoll.conclusive = true;
+                        }
+
+                        console.log(
+                           'db/index.js -- closingPoll.conclusive POST checks => ',
+                           closingPoll.conclusive
+                        );
+
+                        await closingPoll.save();
+
+                        console.log(
+                           'index.js -- winningResult after checks => ',
+                           winningResult
+                        );
+
                         //
                         //
                         //
@@ -300,7 +358,21 @@ module.exports = async client => {
                         const longestOption = longestString(
                            closingPoll.pollData.choices
                         ).length;
-                        let resultsArray = ['```', '```'];
+
+                        console.log(
+                           'db/index.js -- longestOption => ',
+                           longestOption
+                        );
+                        // let resultsArray = ['```', '```'];
+                        let resultsArray = closingPoll.config.voteThreshold
+                           ? [
+                                `Threshold: ${closingPoll.voteThreshold} ${
+                                   closingPoll.voteThreshold >= 1
+                                      ? 'votes'
+                                      : 'vote'
+                                }\n`,
+                             ]
+                           : [];
                         let resultsOutput = [];
 
                         const barWidth = 8;
@@ -313,6 +385,16 @@ module.exports = async client => {
                         for (const key in results.distribution) {
                            const label =
                               key[0].toUpperCase() + key.substring(1);
+
+                           console.log('db/index.js -- label => ', label);
+                           console.log(
+                              'db/index.js -- label.length => ',
+                              label.length
+                           );
+                           console.log(
+                              'db/index.js -- logging :  longestOption - label.length => ',
+                              longestOption - label.length
+                           );
                            let optionObj = {
                               label,
                               votes: results.distribution[key],
@@ -350,12 +432,14 @@ module.exports = async client => {
                            };
 
                            votesMap.set(label, optionObj);
-                           resultsArray.splice(-1, 0, optionObj.completeBar);
+                           // resultsArray.splice(-1, 0, optionObj.completeBar);
+                           resultsArray.push(optionObj.completeBar);
                         }
 
                         // console.log(votesMap);
 
-                        resultsOutput = resultsArray.join('\n');
+                        // resultsOutput = resultsArray.join('\n');
+                        resultsOutput = codeBlock(resultsArray.join('\n'));
                         //
                         //
                         //
@@ -376,6 +460,22 @@ module.exports = async client => {
 
                         console.log({ closedEmbed });
 
+                        const votersValue = closingPoll.config.voteThreshold
+                           ? `Quorum: ${
+                                closingPoll.voterQuorum
+                             }\n\nParticipated: ${
+                                closingPoll.countVoters +
+                                closingPoll.countAbstains
+                             }\nEligible: ${eligibleVoters}\n\nParticipation Rate: ${
+                                closingPoll.participation
+                             }%`
+                           : `Quorum: ${
+                                closingPoll.voterQuorum
+                             }\n\nParticipated: ${
+                                closingPoll.countVoters +
+                                closingPoll.countAbstains
+                             }\nEligible: ${eligibleVoters}`;
+
                         const closedFields = [
                            {
                               name: 'RESULTS',
@@ -389,9 +489,20 @@ module.exports = async client => {
                            },
                            {
                               name: 'VOTERS',
-                              value: codeBlock(
-                                 `Quorum: ${closingPoll.voterQuorum}\n\nEligible: ${eligibleVoters}\nSubmitted: ${closingPoll.countVoters}\nAbstained: ${closingPoll.countAbstains}\n\nParticipation Rate: ${closingPoll.participation}%`
-                              ),
+                              value: codeBlock(votersValue),
+                              // value: codeBlock(
+                              //    `Quorum: ${
+                              //       closingPoll.voterQuorum
+                              //    }\n\nParticipated: ${
+                              //       closingPoll.countVoters +
+                              //       closingPoll.countAbstains
+                              //    }\nEligible: ${eligibleVoters}\n\nParticipation Rate: ${
+                              //       closingPoll.participation
+                              //    }%`
+                              // ),
+                              // value: codeBlock(
+                              //    `Quorum: ${closingPoll.voterQuorum}\n\nEligible: ${eligibleVoters}\nSubmitted: ${closingPoll.countVoters}\nAbstained: ${closingPoll.countAbstains}\n\nParticipation Rate: ${closingPoll.participation}%`
+                              // ),
                               inline: false,
                            },
                         ];
