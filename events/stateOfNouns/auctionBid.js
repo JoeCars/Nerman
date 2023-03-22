@@ -9,9 +9,9 @@ module.exports = {
    name: 'auctionBid',
    /**
     *
-    * @param {Channel} tokenChannel
+    * @param {Channel} auctionChannel
     */
-   async execute(tokenChannel, data) {
+   async execute(auctionChannel, data) {
       try {
          l('AUCTION BID EVENT HANDLER');
 
@@ -22,7 +22,7 @@ module.exports = {
             bidder: { id: bidderId },
          } = data;
 
-         const Nouns = tokenChannel.client.libraries.get('Nouns');
+         const Nouns = auctionChannel.client.libraries.get('Nouns');
 
          l({ data });
          l({ id, amount, extended, bidderId });
@@ -50,7 +50,7 @@ module.exports = {
             .setTitle(`Auction Bid`)
             .setDescription(`${bidderLink} bid ${amountNew}Ξ on ${nounsLink}`);
 
-         return await tokenChannel.send({ embeds: [bidEmbed] });
+         return await auctionChannel.send({ embeds: [bidEmbed] });
       } catch (error) {
          console.error(error);
       }
