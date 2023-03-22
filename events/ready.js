@@ -352,10 +352,11 @@ module.exports = {
 
          Nouns.on('AuctionBid', async data => {
             const guildId = process.env.DISCORD_GUILD_ID;
-            const nounsTokenId = process.env.NOUNS_TOKEN_ID;
-            const nounsTokenChannel = await guildCache
+            // const nounsTokenId = process.env.NOUNS_TOKEN_ID;
+            const nounsAuctionId = process.env.NOUNS_AUCTION_ID;
+            const nounsAuctionChannel = await guildCache
                .get(guildId)
-               .channels.cache.get(nounsTokenId);
+               .channels.cache.get(nounsAuctionId);
 
             console.log(
                'NounsAuctionHouse | AuctionBid ' +
@@ -373,7 +374,7 @@ module.exports = {
             console.log('data.amount => type:', typeof data.amount);
             console.log('data.extended => type:', typeof data.extended);
 
-            client.emit('auctionBid', nounsTokenChannel, data);
+            client.emit('auctionBid', nounsAuctionChannel, data);
          });
 
          // *************************************************************
