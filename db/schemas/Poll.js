@@ -184,7 +184,7 @@ PollSchema.virtual('participation').get(function () {
 
 PollSchema.virtual('voterQuorum').get(function () {
    // Add in an evaluation for a quorum of zero and make it use a %
-   const voterQuorum = Math.ceiling(
+   const voterQuorum = Math.ceil(
       this.allowedUsers.size * (this.config.quorum / 100)
    );
 
@@ -198,7 +198,7 @@ PollSchema.virtual('voterQuorum').get(function () {
 
 PollSchema.virtual('voteThreshold').get(function () {
    // Add in an evaluation for a quorum of zero and make it use a %
-   const voteThreshold = Math.ceiling(
+   const voteThreshold = Math.ceil(
       this.allowedUsers.size * (this.config.voteThreshold / 100)
    );
 
