@@ -1,5 +1,6 @@
 require('dotenv').config();
 const fs = require('fs');
+
 const { Client, Collection, Intents } = require('discord.js');
 const token = process.env.DISCORD_TOKEN;
 
@@ -16,6 +17,7 @@ const client = new Client({
 });
 const discordModals = require('discord-modals');
 discordModals(client);
+
 
 ['events', 'commands', 'buttons'].forEach(handler =>
    require(`./handlers/${handler}.js`)(client, (reload = false))

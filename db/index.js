@@ -6,7 +6,9 @@ const mongoose = require('mongoose');
 const { drawBar, longestString } = require('../helpers/poll');
 // const { encodeURI } = require('../utils/functions');
 const Poll = require('../db/schemas/Poll');
+const { lc } = require('../utils/functions');
 
+const { log: l } = console;
 // const {
 //    createPollTest,
 // } = require('../scratchcode/db/schema/testExecutions/createPoll');
@@ -63,7 +65,24 @@ module.exports = async client => {
             const openPolls = await Poll.find({ status: 'open' })
                .populate('config', 'channelId')
                .then(foundPolls => {
-                  console.log({ foundPolls });
+                  const sortedPolls = foundPolls.sort(
+                     (a, b) => a.timeEnd - b.timeEnd
+                  );
+
+                  const sortedPollsLogMap = sortedPolls.map(
+                     ({ pollData, pollNumber, timeEnd, status }) => ({
+                        pollData,
+                        pollNumber,
+                        timeEnd,
+                        status,
+                     })
+                  );
+
+                  lc(
+                     'SORTED FOUND POLLS',
+                     '131',
+                     JSON.stringify(sortedPollsLogMap, null, 4)
+                  );
                   return foundPolls.sort((a, b) => a.timeEnd - b.timeEnd);
                })
                .catch(err => console.error(err));
@@ -73,15 +92,63 @@ module.exports = async client => {
             // createChannelTest();
 
             client.on('enqueuePoll', newPoll => {
-               console.log('PRE PUSH AND SORT', { openPolls });
+               // console.log('PRE PUSH AND SORT', { openPolls });
+               // lc('PRE PUSH AND SORT\nopenPolls', '131', openPolls);
+
                openPolls.push(newPoll);
                openPolls.sort((a, b) => a.timeEnd - b.timeEnd);
-               console.log('POST PUSH AND SORT', { openPolls });
+               // console.log('POST PUSH AND SORT', { openPolls });
+               // lc('POST PUSH AND SORT\nopenPolls', '132', openPolls);
+
+               l('NEW POLL ADDED TO QUEUE -- NEW POLL LIST:');
+
+               const sortedPollsLogMap = openPolls.map(
+                  ({ pollData, pollNumber, timeEnd, status }) => ({
+                     pollData,
+                     pollNumber,
+                     timeEnd,
+                     status,
+                  })
+               );
+
+               lc(
+                  'POLL QUEUED -- NEW SORTED OPEN POLLS LIST',
+                  '131',
+                  JSON.stringify(sortedPollsLogMap, null, 4)
+               );
+
+               // openPolls.forEach(({ pollData, pollNumber, timeEnd, status }) =>
+               //    lc(
+               //       'FOUND POLL',
+               //       '131',
+               //       JSON.stringify(
+               //          {
+               //             pollData,
+               //             pollNumber,
+               //             timeEnd,
+               //             status,
+               //          },
+               //          null,
+               //          4
+               //       )
+               //    )
+               // );
+
                intervalFunction();
             });
 
             client.on('dequeuePoll', oldPoll => {
-               console.log({ oldPoll });
+               console.log('DEQUEUEING POLL:');
+
+               lc(
+                  'oldPoll',
+                  '131',
+                  JSON.stringify(
+                     { pollData: oldPoll.pollData, timeEnd: oldPoll.timeEnd },
+                     null,
+                     4
+                  )
+               );
                // const idx = openPolls.findIndex(({ _id }) => {
                const idx = openPolls.findIndex(({ _id }) => {
                   console.log('_id', _id);
@@ -92,10 +159,25 @@ module.exports = async client => {
                   // return poll._id.equals(oldPoll._id);
                });
 
-               console.log({ idx });
+               lc('idx', '132', idx);
 
                openPolls.splice(idx, 1);
-               console.log('POST REMOVAL OF POLL', { openPolls });
+               // console.log('TESTING POST REMOVED POLLS');
+
+               const sortedPollsLogMap = openPolls.map(
+                  ({ pollData, pollNumber, timeEnd, status }) => ({
+                     pollData,
+                     pollNumber,
+                     timeEnd,
+                     status,
+                  })
+               );
+
+               lc(
+                  'POLL DEQUEUED -- NEW OPEN POLLS LIST:',
+                  '133',
+                  JSON.stringify(sortedPollsLogMap, null, 4)
+               );
             });
 
             let intervalId;
@@ -121,8 +203,10 @@ module.exports = async client => {
                      if (!openPolls[0]) {
                         return clearInterval(intervalId);
                      }
-
-                     console.log(openPolls[0]);
+                     console.log('\x1b[33m Welcome to the app! \x1b[0m');
+                     console.log('NERPPPPROPR');
+                     // console.log(`\x1b[43m${openPolls[0]}\x1b[0m`);
+                     lc('openPolls[0]', '116', openPolls[0]);
                      const closingPoll =
                         (await Poll.findByIdAndUpdate(
                            openPolls[0]._id,
@@ -132,7 +216,10 @@ module.exports = async client => {
                            { new: true }
                         )
                            .populate([
-                              { path: 'config', select: 'channelId quorum' },
+                              {
+                                 path: 'config',
+                                 select: 'channelId quorum voteThreshold',
+                              },
                               { path: 'countVoters' },
                               { path: 'getVotes' },
                            ])
@@ -154,16 +241,19 @@ module.exports = async client => {
                            'closingPoll !== null && closingPoll.config !== null',
                            closingPoll.config
                         );
-                        const message =
-                           (await client.channels.cache
+
+                        console.log(
+                           `closingPoll.messageId\n\n${closingPoll.messageId}`
+                        );
+
+                        const message = await (client.channels.cache
+                           .get(closingPoll.config.channelId)
+                           .messages.cache.get(closingPoll.messageId) ??
+                           client.channels.cache
                               .get(closingPoll.config.channelId)
-                              .messages.cache.get(closingPoll.messageId)) ??
-                           null;
+                              .messages.fetch(closingPoll.messageId));
 
                         console.log({ message });
-                        // const message = await client.channels.cache
-                        //    .get(foundPoll.config.channelId)
-                        //    .messages.fetch(foundPoll.messageId);
 
                         if (message === null) {
                            return openPolls.shift();
@@ -197,6 +287,61 @@ module.exports = async client => {
                               .join(', ')} - Tied`;
                         }
 
+                        let failedChecks = [];
+
+                        // if (
+                        //    results.quorumPass === true &&
+                        //    results.thresholdPass === true
+                        // ) {
+                        // } else if (
+                        //    results.quorumPass === true &&
+                        //    results.thresholdPass === false
+                        // ) {
+                        // }
+
+                        console.log(
+                           'db/index.js -- jsfailedChecks before checks=> ',
+                           failedChecks
+                        );
+
+                        if (results.quorumPass === false) {
+                           failedChecks.push('quorum');
+                        }
+
+                        if (results.thresholdPass === false) {
+                           failedChecks.push('vote threshold');
+                        }
+                        console.log(
+                           'db/index.js -- jsfailedChecks after checks=> ',
+                           failedChecks
+                        );
+
+                        console.log(
+                           'db/index.js -- closingPoll.conclusive PRE checks => ',
+                           closingPoll.conclusive
+                        );
+
+                        if (failedChecks.length) {
+                           closingPoll.conclusive = false;
+                           winningResult = `Poll failed to meet ${failedChecks.join(
+                              ' and '
+                           )}.`;
+                        } else {
+                           closingPoll.conclusive = true;
+                        }
+
+                        console.log(
+                           'db/index.js -- closingPoll.conclusive POST checks => ',
+                           closingPoll.conclusive
+                        );
+
+                        await closingPoll.save();
+
+                        console.log(
+                           'index.js -- winningResult after checks => ',
+                           winningResult
+                        );
+
                         //
                         //
                         //
@@ -213,7 +358,21 @@ module.exports = async client => {
                         const longestOption = longestString(
                            closingPoll.pollData.choices
                         ).length;
-                        let resultsArray = ['```', '```'];
+
+                        console.log(
+                           'db/index.js -- longestOption => ',
+                           longestOption
+                        );
+                        // let resultsArray = ['```', '```'];
+                        let resultsArray = closingPoll.config.voteThreshold
+                           ? [
+                                `Threshold: ${closingPoll.voteThreshold} ${
+                                   closingPoll.voteThreshold >= 1
+                                      ? 'votes'
+                                      : 'vote'
+                                }\n`,
+                             ]
+                           : [];
                         let resultsOutput = [];
 
                         const barWidth = 8;
@@ -226,6 +385,16 @@ module.exports = async client => {
                         for (const key in results.distribution) {
                            const label =
                               key[0].toUpperCase() + key.substring(1);
+
+                           console.log('db/index.js -- label => ', label);
+                           console.log(
+                              'db/index.js -- label.length => ',
+                              label.length
+                           );
+                           console.log(
+                              'db/index.js -- logging :  longestOption - label.length => ',
+                              longestOption - label.length
+                           );
                            let optionObj = {
                               label,
                               votes: results.distribution[key],
@@ -263,12 +432,14 @@ module.exports = async client => {
                            };
 
                            votesMap.set(label, optionObj);
-                           resultsArray.splice(-1, 0, optionObj.completeBar);
+                           // resultsArray.splice(-1, 0, optionObj.completeBar);
+                           resultsArray.push(optionObj.completeBar);
                         }
 
                         // console.log(votesMap);
 
-                        resultsOutput = resultsArray.join('\n');
+                        // resultsOutput = resultsArray.join('\n');
+                        resultsOutput = codeBlock(resultsArray.join('\n'));
                         //
                         //
                         //
@@ -289,6 +460,22 @@ module.exports = async client => {
 
                         console.log({ closedEmbed });
 
+                        const votersValue = closingPoll.config.voteThreshold
+                           ? `Quorum: ${
+                                closingPoll.voterQuorum
+                             }\n\nParticipated: ${
+                                closingPoll.countVoters +
+                                closingPoll.countAbstains
+                             }\nEligible: ${eligibleVoters}\n\nParticipation Rate: ${
+                                closingPoll.participation
+                             }%`
+                           : `Quorum: ${
+                                closingPoll.voterQuorum
+                             }\n\nParticipated: ${
+                                closingPoll.countVoters +
+                                closingPoll.countAbstains
+                             }\nEligible: ${eligibleVoters}`;
+
                         const closedFields = [
                            {
                               name: 'RESULTS',
@@ -302,9 +489,20 @@ module.exports = async client => {
                            },
                            {
                               name: 'VOTERS',
-                              value: codeBlock(
-                                 `Quorum: ${closingPoll.voterQuorum}\n\nEligible: ${eligibleVoters}\nSubmitted: ${closingPoll.countVoters}\nAbstained: ${closingPoll.countAbstains}\n\nParticipation Rate: ${closingPoll.participation}%`
-                              ),
+                              value: codeBlock(votersValue),
+                              // value: codeBlock(
+                              //    `Quorum: ${
+                              //       closingPoll.voterQuorum
+                              //    }\n\nParticipated: ${
+                              //       closingPoll.countVoters +
+                              //       closingPoll.countAbstains
+                              //    }\nEligible: ${eligibleVoters}\n\nParticipation Rate: ${
+                              //       closingPoll.participation
+                              //    }%`
+                              // ),
+                              // value: codeBlock(
+                              //    `Quorum: ${closingPoll.voterQuorum}\n\nEligible: ${eligibleVoters}\nSubmitted: ${closingPoll.countVoters}\nAbstained: ${closingPoll.countAbstains}\n\nParticipation Rate: ${closingPoll.participation}%`
+                              // ),
                               inline: false,
                            },
                         ];
@@ -354,8 +552,9 @@ module.exports = async client => {
             if (openPolls.length) {
                intervalFunction();
             }
-
-            console.log({ openPolls });
+            // background: ESC[48;5;#m
+            // console.log(`openPolls\n\x1b[48;5;162m${openPolls}\x1b[0m`);
+            // console.log(`openPolls\n\x1b[46m${openPolls}\x1b[0m`);
          });
          await mongoose.connect(mongoURI, options);
 

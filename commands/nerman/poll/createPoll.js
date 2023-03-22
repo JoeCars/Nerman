@@ -2,7 +2,9 @@ const { CommandInteraction } = require('discord.js');
 const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
-// const PollChannel = require('../../db/schemas/PollChannelCount')
+
+// fixme will need to remove these after we figure out a better permission control for admin command
+const authorizedIds = process.env.BAD_BITCHES.split(',');
 module.exports = {
    subCommand: 'nerman.create-poll',
    /**
@@ -17,9 +19,10 @@ module.exports = {
          member: {
             roles: { cache: roleCache },
          },
+         memberPermissions,
       } = interaction;
 
-      // if (!(await PollChannel.countDocuments({ channelId }))) {
+      // console.log('STATE OF NOUNS FROM SUBCOMMAND CREATEPOLL\n', stateOfNouns);
 
       const configExists = await PollChannel.configExists(channelId);
 
@@ -36,10 +39,12 @@ module.exports = {
       }
 
       // Actually retrieve configuration
+      // todo connect this to the GuildConfig from the collection
       const channelConfig = await PollChannel.findOne(
          { channelId },
-         'maxUserProposal voteAllowance'
+         'maxUserProposal voteAllowance forAgainst'
       ).exec();
+
 
       const countedPolls = await Poll.countDocuments({
          config: channelConfig._id,
@@ -47,13 +52,26 @@ module.exports = {
          status: 'open',
       });
 
-      if (countedPolls >= channelConfig.maxUserProposal) {
-         return interaction.reply({
-            content:
-               'You have exceeded the amount of allowed polls in this channel. You must wait until your current poll is closed.',
-            ephemeral: true,
-         });
+      // console.log(memberPermissions.toArray());
+
+      if (
+         !authorizedIds.includes(userId) &&
+         countedPolls >= channelConfig.maxUserProposal
+      ) {
+         throw new Error('You do not have permission to use this command.');
       }
+
+      // disabled until we nail down the cross-guild permissions on this command
+      // if (
+      //    !memberPermissions.has('MANAGE_GUILD') &&
+      //    countedPolls >= channelConfig.maxUserProposal
+      // ) {
+      //    return interaction.reply({
+      //       content:
+      //          'You have exceeded the amount of allowed polls in this channel. You must wait until your current poll is closed.',
+      //       ephemeral: true,
+      //    });
+      // }
 
       // return interaction.reply({
       //    content: 'canceling this for testing purposes',
@@ -118,12 +136,18 @@ module.exports = {
          .setPlaceholder(
             'Comma separated values. Minimum two options. eg) Yes, No, Abstain'
          )
-         .setDefaultValue('Yes, No, Abstain')
+         .setDefaultValue('Yes, No')
          .setStyle('SHORT')
          .setMaxLength(100)
          .setRequired(true);
 
-      createPollComponents.push(pollTitle, pollDescription, pollChoices);
+      // createPollComponents.push(pollTitle, pollDescription, pollChoices);
+      createPollComponents.push(pollTitle, pollDescription);
+
+      if (!channelConfig.forAgainst) {
+         createPollComponents.push(pollChoices);
+      }
+
 
       console.log(channelConfig.voteAllowance);
 

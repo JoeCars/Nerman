@@ -1,13 +1,19 @@
 const mongoose = require('mongoose');
-const { model, Schema, Types } = require('mongoose');
+const { model, Schema } = require('mongoose');
+
 const { PollChannel } = require('../schemas/PollChannel');
+
+const { log: l } = console;
 
 // Building Up, start basic
 const PollSchema = new Schema(
    {
       _id: Schema.Types.ObjectId,
+
       guildId: { type: String, required: true },
+
       creatorId: { type: String, required: true },
+
       messageId: { type: String, required: true },
       // allowance IMPLEMENT SOON
       // allowanceStrategy: {type: [String]}
@@ -16,6 +22,7 @@ const PollSchema = new Schema(
          ref: 'channelConfig',
          required: true,
       },
+
       timeEnd: { type: Date, default: () => Date.now() + 5 * 60 * 1000 }, // add in default calc for Date.now() + pollDuration value
       pollData: {
          title: {
@@ -38,6 +45,7 @@ const PollSchema = new Schema(
             required: true,
          },
       },
+      // todo Should maybe peak at this to check on whether or not I'm actually using this votes array. It would be more efficient and follow the Principles of Least Cardinality if I were to eleiminate this field entirely and then rely on the populate virtual to maintain these votes?
       votes: [
          {
             type: Schema.Types.ObjectId,
@@ -53,11 +61,15 @@ const PollSchema = new Schema(
       allowedUsers: {
          type: Map,
          of: Boolean,
+         default: new Map(),
       },
       status: {
          type: String,
          default: 'closed',
-         enum: ['open', 'closed'],
+         enum: ['open', 'closed', 'cancelled', 'canceled'],
+      },
+      conclusive: {
+         type: Boolean,
       },
       pollNumber: {
          type: Number,
@@ -66,8 +78,10 @@ const PollSchema = new Schema(
    {
       timestamps: { createdAt: 'timeCreated', updatedAt: 'modified' },
       query: {
+         // todo change this to now accomodate guildId as well? For multi-server shenanigans
          byMessageId(messageId) {
-            return this.where({ messsageId: new RegExp(messageId, 'i') });
+            l('FROM QUERY HELPER', { messageId });
+            return this.where({ messageId: new RegExp(messageId, 'i') });
          },
       },
       statics: {
@@ -116,6 +130,25 @@ const PollSchema = new Schema(
             return await newPoll.save();
          },
       },
+      methods: {
+         async clearProperty(property) {
+            const normalizedArgument = property.toLowerCase().trim();
+            switch (true) {
+               case normalizedArgument === 'allowedusers':
+                  this.allowedUsers.clear();
+                  break;
+               case normalizedArgument === 'abstains':
+                  this.abstains.clear();
+            }
+         },
+         async pollOptions() {
+            await this.populate('config');
+
+            const options = await this.config.channelOptions();
+
+            return options;
+         },
+      },
    }
 );
 
@@ -150,16 +183,31 @@ PollSchema.virtual('participation').get(function () {
 });
 
 PollSchema.virtual('voterQuorum').get(function () {
-   // Add in an evaluation for a quroum of zero and make it use a %
-   const voterQuorum = Math.floor(
+   // Add in an evaluation for a quorum of zero and make it use a %
+   const voterQuorum = Math.ceil(
       this.allowedUsers.size * (this.config.quorum / 100)
    );
 
    console.log(
-      '--------------------------------------\nFROM GETTER\n---------------------------',
-      { voterQuorum }
+      '--------------------------------------\nFROM GETTER\nPoll.js -- virtual: voterQuorum\n---------------------------',
+      { voterQuorum },
+      this.config
    );
    return voterQuorum > 1 ? voterQuorum : 1;
+});
+
+PollSchema.virtual('voteThreshold').get(function () {
+   // Add in an evaluation for a quorum of zero and make it use a %
+   const voteThreshold = Math.ceil(
+      this.allowedUsers.size * (this.config.voteThreshold / 100)
+   );
+
+   console.log(
+      '--------------------------------------\nFROM GETTER\nPoll.js -- virtual: voteThreshold\n---------------------------',
+      { voteThreshold },
+      this.config
+   );
+   return voteThreshold > 1 ? voteThreshold : 1;
 });
 
 PollSchema.virtual('results').get(function () {
@@ -200,6 +248,30 @@ PollSchema.virtual('results').get(function () {
    }
 
    resultsObject.totalVotes = flatVotes.length;
+
+   resultsObject.quorumPass =
+      resultsObject.totalVotes >= this.voterQuorum
+         ? true
+         : this.abstains.size >= this.voterQuorum
+         ? true
+         : false;
+
+   resultsObject.thresholdPass =
+      !tiedLeads.length &&
+      resultsObject.distribution[leadingOption] >= this.voteThreshold
+         ? true
+         : false;
+
+   console.log('Poll.js -- this.voterQuorum => ', this.voterQuorum);
+   console.log('Poll.js -- this.voteThreshold => ', this.voteThreshold);
+   console.log(
+      'Poll.js -- resultsObject.quorumPass => ',
+      resultsObject.quorumPass
+   );
+   console.log(
+      'Poll.js -- resultsObject.thresholdPass => ',
+      resultsObject.thresholdPass
+   );
 
    if (!tiedLeads.length) {
       resultsObject.winner = leadingOption;

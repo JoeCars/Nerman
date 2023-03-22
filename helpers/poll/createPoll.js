@@ -1,5 +1,3 @@
 const createPoll = (eventData, eventType) => {
-
+// todo later
 }
-
-// /^(\#\s((\w|[0-9_\-.,\|])+\s+)+(\w+\s)+(\w+\s+\n?))/;

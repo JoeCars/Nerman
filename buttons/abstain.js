@@ -1,4 +1,5 @@
 const { ButtonInteraction, MessageEmbed } = require('discord.js');
+const User = require('../db/schemas/User');
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
 
@@ -16,6 +17,7 @@ module.exports = {
       const {
          client,
          channelId,
+         guild: { id: guildId },
          message: { id: messageId },
          user: { id: userId },
          member: {
@@ -23,7 +25,7 @@ module.exports = {
          },
       } = interaction;
 
-      const { allowedRoles } = await PollChannel.findOne(
+      const { allowedRoles, anonymous: anon } = await PollChannel.findOne(
          { channelId },
          'allowedRoles'
       ).exec();
@@ -53,15 +55,28 @@ module.exports = {
       // if (attachedPoll.allowedUsers.get(userId) === true) {
       if (pollStatus.allowedUsers.get(userId) === true) {
          return interaction.editReply({
-            content: 'You have already cast your vote, you political glutton',
+            content: 'You have already used up your vote allowance.',
             ephemeral: true,
          });
       }
 
+      let abstainingUser = await User.findOne()
+         .byDiscordId(userId, guildId)
+         .exec();
 
+      if (!abstainingUser) {
+         const eligibleChannels = await User.findEligibleChannels(roleCache, anon);
+
+         abstainingUser = await User.createUser(
+            guildId,
+            userId,
+            eligibleChannels
+         );
+      }
 
       const updatedPoll = await Poll.findAndSetAbstained(messageId, userId);
 
+      abstainingUser.incParticipation(channelId);
 
       let message = await client.channels.cache
          .get(channelId)

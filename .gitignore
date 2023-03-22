@@ -5,6 +5,7 @@ npm-debug.log
 .DS_Store
 helpers/mongodb.js
 commands/check.js
+commands/dervan/*
 commands/reload-test.js
 commands/scratch-pad.js
 commands/test-poll.js

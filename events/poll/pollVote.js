@@ -4,9 +4,20 @@ const {
    ModalSubmitInteraction,
    MessageEmbed,
 } = require('discord.js');
+const { userMention, inlineCode, hyperlink } = require('@discordjs/builders');
+
 const { Types } = require('mongoose');
 const Poll = require('../../db/schemas/Poll');
+const User = require('../../db/schemas/User');
 const Vote = require('../../db/schemas/Vote');
+
+const nouncilId = process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
+const jtsNouncilId = process.env.JTS_NOUNCIL_ID;
+const doppelId = process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
+
+const guildNouncilIds = [nouncilId, jtsNouncilId, doppelId];
+
+const { log: l, error: lerr } = console;
 
 module.exports = {
    name: 'modalSubmit',
@@ -15,12 +26,8 @@ module.exports = {
     */
    async execute(modal) {
       if (modal.customId !== 'vote-modal') return;
-      await modal.deferReply({ ephemeral: true });
-      // async execute(interaction) {
-      // console.log({ modal });
 
-      // return;
-      // if (!interaction.isCommand() && customId !== 'vote-modal') return;
+      await modal.deferReply({ ephemeral: true });
 
       console.log('CUSTOM ID: \n', modal.customId);
 
@@ -32,16 +39,24 @@ module.exports = {
          customId,
          channelId,
          member: {
+            roles: { cache: memberRoleCache },
             user: { id: userId },
          },
          message: { id: messageId },
       } = modal;
 
+      const propRegExp = new RegExp(/^prop\s(\d{1,5})/, 'i');
+
       const pollStatus = await Poll.findOne(
          { messageId },
-         'status pollData.voteAllowance pollData.choices'
-      );
+         'status pollData.voteAllowance pollData.choices config'
+      ).exec();
+
+      const pollOptions = await pollStatus.pollOptions();
+
+      !pollOptions.anonymous && console.log({ modal });
       console.log({ pollStatus });
+      console.log({ pollOptions });
 
       let voteArray = modal.getTextInputValue('votingSelect');
 
@@ -88,7 +103,9 @@ module.exports = {
 
       // disabled until DJS SELECT MENUS Modal supported
       // const voteArray = modal.getSelectMenuValues('votingSelect');
-      const voteReason = modal.getTextInputValue('votingReason');
+      const voteReason = modal.getTextInputValue('voteReason');
+
+      console.log({ voteReason });
 
       if (pollStatus.status === 'closed') {
          return modal.editReply({
@@ -109,14 +126,39 @@ module.exports = {
          _id: new Types.ObjectId(),
          // poll: targetPoll._id,
          poll: pollStatus._id,
-         user: userId,
+         // user: pollOptions.anonymous ? undefined : userId,
+         user:
+            !guildNouncilIds.includes(channelId) && pollOptions.anonymous
+               ? undefined
+               : userId,
          choices: voteArray,
          reason: voteReason || undefined,
       });
 
       // await targetPoll.allowedUsers.set(userId, true);
 
+      let votingUser = await User.findOne().byDiscordId(userId, guildId).exec();
+
+      if (!votingUser) {
+         l(
+            '/////////////// !votingUser ///////////////\nGetting eligibleChannels...'
+         );
+         const eligibleChannels = await User.findEligibleChannels(
+            memberRoleCache,
+            pollOptions.anonymous
+         );
+
+         !pollOptions.anonymous && l({ eligibleChannels });
+
+         votingUser = await User.createUser(guildId, userId, eligibleChannels);
+      }
+
       const updatedPoll = await Poll.findAndSetVoted(messageId, userId);
+
+      console.log({ channelId });
+      !pollOptions.anonymous && console.log('votingUser => ', { votingUser });
+
+      votingUser.incParticipation(channelId);
 
       let message = await client.channels.cache
          .get(channelId)
@@ -136,24 +178,150 @@ module.exports = {
 
       message.edit({ embeds: [updateEmbed] });
 
-      // await targetPoll
-      //    .save()
-      //    .then(savedDoc => {
-      //       console.log('targetPoll === savedDoc', targetPoll === savedDoc);
-      //       console.log({ savedDoc });
-      //       console.log('savedDoc.allowedUsers', savedDoc.allowedUsers);
-      //    })
-      //    .catch(err => console.error(err));
-      // await targetPoll
-      //    .save()
-      //    .then(savedDoc => {
-      //       console.log('targetPoll === savedDoc', targetPoll === savedDoc);
-      //       console.log({ savedDoc });
-      //       console.log('savedDoc.allowedUsers', savedDoc.allowedUsers);
-      //    })
-      //    .catch(err => console.error(err));
+      l({ propRegExp });
+      l(updatedPoll.pollData.title);
 
-      // console.log('pollVote.js -- modal', { modal });
+      if (propRegExp.test(updatedPoll.pollData.title)) {
+         try {
+            const matches = updatedPoll.pollData.title.match(propRegExp);
+
+            l({ matches });
+            l(matches[0]);
+            l(matches[1]);
+
+            const propText = matches[0];
+            const propId = matches[1];
+
+            l({ propText });
+            l({ propId });
+
+            const threadEmbed = new MessageEmbed()
+               .setColor('#00FFFF')
+               .setDescription(
+                  `${
+                     guildNouncilIds.includes(channelId)
+                        ? 'Anon Nouncillor'
+                        : !pollOptions.anonymous
+                        ? userMention(userId)
+                        : 'Anon'
+                  } voted ${
+                     pollOptions.forAgainst
+                        ? inlineCode(voteArray.join(' ').toUpperCase())
+                        : inlineCode(voteArray.join(' '))
+                  } on ${hyperlink(
+                     propText,
+                     `https://nouns.wtf/vote/${propId}`
+                  )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+               );
+
+            console.log(voteArray.join(' ').toUpperCase());
+            // .setDescription(
+            //    `${
+            //       !pollOptions.anonymous
+            //          ? userMention(userId)
+            //          : !guildNouncilIds.includes(channelId)
+            //          ? 'Anon'
+            //          : 'Anon Nouncillor'
+            //    } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+            //       propText,
+            //       `https://nouns.wtf/vote/${propId}`
+            //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+            // );
+            // .setDescription(
+            //    `Anon Nouncillor voted ${inlineCode(
+            //       voteArray.join(' ')
+            //    )} on ${hyperlink(
+            //       propText,
+            //       `https://nouns.wtf/vote/${propId}`
+            //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+            // );
+
+            l({ threadEmbed });
+
+            const thread = await message.thread.fetch();
+            // await message.thread.fetch();
+            await thread.send({ embeds: [threadEmbed] });
+         } catch (error) {
+            l({ error });
+         }
+      } else {
+         try {
+            // if (!guildNouncilIds.includes(channelId)) {
+            //    const threadEmbed = new MessageEmbed()
+            //       .setColor('#00FFFF')
+            //       .setDescription(
+            //          `${
+            //             guildNouncilIds.includes(channelId)
+            //                ? 'Anon Nouncillor'
+            //                : !pollOptions.anonymous
+            //                ? userMention(userId)
+            //                : 'Anon'
+            //          } voted ${inlineCode(voteArray.join(' '))}.${
+            //             !!voteReason ? `\n\n${voteReason.trim()}` : ``
+            //          }`
+            //       );
+            //    // .setDescription(
+            //    //    `${
+            //    //       !pollOptions.anonymous
+            //    //          ? userMention(userId)
+            //    //          : !guildNouncilIds.includes(channelId)
+            //    //          ? 'Anon'
+            //    //          : 'Anon Nouncillor'
+            //    //    } voted ${inlineCode(voteArray.join(' '))}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+            //    // );
+            // }
+            const threadEmbed = new MessageEmbed()
+               .setColor('#00FFFF')
+               .setDescription(
+                  `${
+                     guildNouncilIds.includes(channelId)
+                        ? 'Anon Nouncillor'
+                        : !pollOptions.anonymous
+                        ? userMention(userId)
+                        : 'Anon'
+                  } voted ${
+                     pollOptions.forAgainst
+                        ? inlineCode(voteArray.join(' ').toUpperCase())
+                        : inlineCode(voteArray.join(' '))
+                  }.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+               );
+            //    .setDescription(
+            //       `${
+            //          !pollOptions.anonymous
+            //             ? userMention(userId)
+            //             : !guildNouncilIds.includes(channelId)
+            //             ? 'Anon'
+            //             : 'Anon Nouncillor'
+            //       } voted ${inlineCode(voteArray.join(' '))}.${
+            //          !!voteReason ? `\n\n${voteReason.trim()}` : ``
+            //       }`
+            // );
+            //    .setDescription(
+            //       `Anon Nouncillor voted ${inlineCode(voteArray.join(' '))}.${
+            //          !!voteReason ? `\n\n${voteReason.trim()}` : ``
+            //       }`
+            // );
+            // .setDescription(
+            //    `${
+            //       pollOptions.anonymous
+            //          ? 'Anon Nouncillor'
+            //          : userMention(userId)
+            //    } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
+            //       propText,
+            //       `https://nouns.wtf/vote/${propId}`
+            //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+            // );
+
+            l({ threadEmbed });
+
+            const thread = await message.thread.fetch();
+            // await message.thread.fetch();
+            await thread.send({ embeds: [threadEmbed] });
+         } catch (error) {
+            l({ error });
+         }
+      }
+
       console.log('pollVote.js -- userVote', { userVote });
 
       return modal.editReply({

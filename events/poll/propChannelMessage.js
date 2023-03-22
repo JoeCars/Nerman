@@ -1,9 +1,11 @@
 const { Message } = require('discord.js');
+const PollChannel = require('../../db/schemas/PollChannel');
 const propChannelId =
    process.env.DEPLOY_STAGE === 'development'
       ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
       : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 const { log: l } = console;
+const { lc } = require('../../utils/functions');
 
 module.exports = {
    name: 'messageCreate',
@@ -12,23 +14,28 @@ module.exports = {
     * @param {Message} message
     */
    async execute(message) {
+      l({ message });
       const {
+         client,
          client: {
+            user,
             user: { id: botId },
          },
          channelId,
          author: { id: authorId },
       } = message;
 
-      l({ message });
+      lc('client', '79', client);
+      lc('user', '85', user);
 
-      if (channelId !== propChannelId || botId === authorId) return;
+      const configExists = await PollChannel.configExists(channelId);
+
+      // if (channelId !== propChannelId || botId === authorId) return;
+      if (!configExists || botId === authorId) return;
 
       try {
          await message.delete();
       } catch (error) {
-         console.error('ERROR\n', { error });
-         console.info('INFO\n', { error });
          console.trace('TRACE\n', { error });
       }
    },

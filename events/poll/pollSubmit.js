@@ -3,10 +3,12 @@ const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
 const { roleMention } = require('@discordjs/builders');
 const { initPollMessage } = require('../../helpers/poll/initPollMessage');
+const User = require('../../db/schemas/User');
 const Poll = require('../../db/schemas/Poll');
 const PollChannel = require('../../db/schemas/PollChannel');
 const PollCount = require('../../db/schemas/ChannelPollCount');
 
+const { log: l } = console;
 const { drawBar, longestString } = require('../../helpers/poll');
 const { logToObject, formatDate } = require('../../utils/functions');
 
@@ -29,6 +31,7 @@ module.exports = {
          channelId,
          guildId,
          guild: {
+            members: { cache: memberCache },
             roles: {
                everyone: { id: everyoneId },
             },
@@ -46,7 +49,7 @@ module.exports = {
          {
             channelId,
          },
-         'allowedRoles'
+         'allowedRoles forAgainst voteThreshold'
       );
 
       const intRegex = new RegExp(/^\d*$/);
@@ -62,15 +65,24 @@ module.exports = {
       // extract data from submitted modal
       const title = modal.getTextInputValue('pollTitle');
       const description = modal.getTextInputValue('pollDescription') ?? '';
-      const options = [
-         ...new Set(
-            modal
-               .getTextInputValue('pollChoices')
-               .split(',')
-               .map(x => x.trim().toLowerCase())
-               .filter(v => v !== '')
-         ),
-      ];
+
+      let options;
+
+      // todo forGainst in newProposal
+      if (channelConfig.forAgainst) {
+         options = ['for', 'against'];
+      } else {
+         options = [
+            // const options = [
+            ...new Set(
+               modal
+                  .getTextInputValue('pollChoices')
+                  .split(',')
+                  .map(x => x.trim().toLowerCase())
+                  .filter(v => v !== '')
+            ),
+         ];
+      }
       let voteAllowance = parseInt(
          modal.getTextInputValue('voteAllowance') ?? 1
       );
@@ -265,6 +277,7 @@ module.exports = {
       };
 
       const snapshotMap = new Map();
+      const eligibleKeys = [];
 
       // todo try to implement env for the allowed roles so that we can do this dynamically when hosting and using in other servers
       // todo also this should be done via fetching the config
@@ -292,10 +305,15 @@ module.exports = {
 
          for (const key of allowedUsers.keys()) {
             snapshotMap.set(key, false);
+            eligibleKeys.push(key);
          }
+
+         console.log({ eligibleKeys });
       } catch (error) {
          console.error({ error });
       }
+
+      console.log({ eligibleKeys });
 
       // todo decide if I really need this or can just stick with the use-case below
       // const config = await PollChannel.findOne({ channelId }).exec();
@@ -319,9 +337,9 @@ module.exports = {
          pollNumber = await PollCount.findOne({ channelId }).exec();
       }
 
-      console.log({ pollNumber });
+      // console.log({ pollNumber });
 
-      console.log({ durationMs });
+      // console.log({ durationMs });
 
       try {
          // todo refactor this to use {new: true} and return the document perhaps, rather than this two part operation?
@@ -348,38 +366,112 @@ module.exports = {
             pollNumber: undefined,
          };
 
-         const newPoll = await Poll.createNewPoll(data, durationMs).then(
-            async poll => {
+         const newPoll = await (await Poll.createNewPoll(data, durationMs))
+            .populate('config')
+            .then(async poll => {
                console.log('WITHIN THE THEN', { poll });
                await pollNumber.increment();
                poll.pollNumber = pollNumber.pollsCreated;
                return await poll.save();
-            }
-         );
+            });
 
          // await newPoll.populate('pollNumber');
          console.log('OUTSIDE THE THEN', { newPoll });
-         // newPoll.pollNumber.increment();
 
-         // const newPoll = await Poll.create(
-         //    [
-         //       {
-         //          _id: new Types.ObjectId(),
-         //          guildId,
-         //          creatorId: user.id,
-         //          messageId: id,
-         //          // config: config._id,
-         //          config: _id,
-         //          pollData,
-         //          votes: undefined,
-         //          abstains: undefined,
-         //          allowedUsers: snapshotMap,
-         //          status: 'open',
-         //       },
-         //    ],
+         // todo Make this updating eligible users channel map into a reusable function
 
-         //    { new: true }
-         // ).then(docArray => docArray[0]);
+         const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
+            async key => {
+               l('updateVoterPromise', { key });
+
+               // todo I need to add in a proper check for if these people exist
+               let user = await User.findOne().byDiscordId(key, guildId).exec();
+
+               // l({ user });
+
+               l(
+                  'pre mapping user?.eligibleChannels.get(channelId) => ',
+                  user?.eligibleChannels.get(channelId)
+               );
+
+               if (user && user.eligibleChannels.has(channelId)) {
+                  l(
+                     "User exists and has channel key!\nIncrementing channel's eligiblePolls...\neligiblePolls PRE incrementation => ",
+                     user.eligibleChannels.get(channelId)
+                  );
+
+                  user.eligibleChannels.get(channelId).eligiblePolls++;
+
+                  l(
+                     "User exists and has channel key!\nIncrementing channel's eligiblePolls...\neligiblePolls POST incrementation => ",
+                     user.eligibleChannels.get(channelId)
+                  );
+               } else if (user && !user.eligibleChannels.has(channelId)) {
+                  l(
+                     `User did not have the key: ${channelId} present in their eligibleChannels Map.\n Attempting to set key...`
+                  );
+
+                  // todo maybe use the method to construct the paerticipation object by aggregating all docs accounting for Polls with the allowed user, just to be a bit more thorough
+                  user.eligibleChannels.set(newPoll.config.channelId, {
+                     eligiblePolls: 1,
+                     participatedPolls: 0,
+                  });
+               } else {
+                  l(
+                     'User does not yet exist, creating new user from allowedUsers map...'
+                  );
+                  const member = memberCache.get(key);
+                  // l('MISSING USER', { member });
+                  // l(member.roles.cache);
+                  const memberRoles = member.roles.cache;
+                  const eligibleChannels = await User.findEligibleChannels(
+                     memberRoles
+                  );
+                  // l('ERIGIBIRU FROM POLLSUBMIT', await eligibleChannels);
+                  user = await User.createUser(guildId, key, eligibleChannels);
+
+                  l('User created! => ', user);
+
+                  l(
+                     'pre mapping user?.eligibleChannels.get(channelId) => ',
+                     user?.eligibleChannels.get(channelId)
+                  );
+
+                  return user;
+               }
+
+               // l(user.eligibleChannels);
+
+               // l(newPoll);
+               // mystery ID 383705280174620704
+               // doppelnouncil 1017403835913863260
+
+               // l({ newPoll });
+
+               // l(user.eligibleChannels.get(newPoll.config.channelId));
+               // const newEligibility = user.eligibleChannels.get(
+               //    newPoll.config.channelId
+               // );
+               // l({ newEligibility });
+               // newEligibility.eligiblePolls++;
+               // l({ newEligibility });
+               // l(user);
+
+               // user.eligibleChannels.set
+               // l({ participation });
+
+               l(
+                  'post mapping user?.eligibleChannels.get(channelId) => ',
+                  user?.eligibleChannels.get(channelId)
+               );
+
+               user.markModified('eligibleChannels');
+               return await user.save();
+               // return user;
+            }
+         );
+
+         await Promise.all(updateVoterPromise);
 
          console.log({ newPoll });
          let updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
@@ -406,20 +498,39 @@ module.exports = {
             newPoll.allowedUsers.size * (quorum / 100)
          );
 
-         embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
+         embedQuorum = embedQuorum > 1 ? embedQuorum : embedQuorum > 0 ? 1: 0;
 
          updatedEmbed.fields[1].value = embedQuorum.toString(); // quorum
 
-         updatedEmbed.fields[4].value = `<t:${Math.floor(
-            newPoll.timeEnd.getTime() / 1000
-         )}:f>`; // timeEnd
+         // if (updatedEmbed.fields.length === 6) {
+         //    const votesAmount = Math.floor(
+         //       newPoll.allowedUsers.size * (channelConfig.voteThreshold / 100)
+         //    );
+         //    updatedEmbed.fields[2].value = `${votesAmount >= 1 ? votesAmount : 1}`; // voteThreshold
+         //    updatedEmbed.fields[5].value = `<t:${Math.floor(
+         //       newPoll.timeEnd.getTime() / 1000
+         //    )}:f>`; // timeEnd
+         // } else {
+            updatedEmbed.fields[4].value = `<t:${Math.floor(
+               newPoll.timeEnd.getTime() / 1000
+            )}:f>`; // timeEnd
+         // }
+
+         const threadName =
+            title.length <= 100 ? title : `${title.substring(0, 96)}...`;
 
          client.emit('enqueuePoll', newPoll);
-         message.edit({ embeds: [updatedEmbed] });
+         await message.edit({ embeds: [updatedEmbed] });
          await message.startThread({
-            name: 'Discussion',
-            autoArchiveDuration: 60,
+            name: threadName,
+            autoArchiveDuration: 10080, // todo probably make this based on channelConfig?
          });
+
+         await message.thread.send(`Discussion:`);
+
+         console.log({ message });
+         console.log(message.thread);
+         message.react('✅');
       } catch (error) {
          console.error(error);
       }
@@ -482,6 +593,8 @@ module.exports = {
       // Emit an event to trigger adding a new poll to the db poll interval queue
 
       // const reply = await modal.editReply({
+
+      // todo add button vomponents in AFTER initial DB commit of the poll
       return await modal.deleteReply({
          content: 'Poll Submitted!',
       });

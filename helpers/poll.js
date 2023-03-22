@@ -17,7 +17,17 @@ const drawBlock = (fracIndex, completeBlocks) => {
 
    for (let i = 0; i < completeBlocks; i++) {
       blocks += complete;
+      console.log('drawBlock:\ni => ', i, '\nblocks => ', blocks)
    }
+   console.log(
+      'drawBlock -- uniXBlockArray[fracIndex] => ',
+      uniXBlockArray[fracIndex]
+   );
+
+   console.log(
+      'drawBlock -- blocks + uniXBlockArray[fracIndex] => ',
+      blocks + uniXBlockArray[fracIndex]
+   );
 
    blocks += uniXBlockArray[fracIndex];
 
@@ -37,18 +47,22 @@ const drawSpace = emptySpace => {
 
 // Create a bar
 const drawBar = function (maxLength, portion) {
-   const length = portion * maxLength;
-   const completeBlocks = Math.floor(length);
-   const fracPart = length - completeBlocks;
-   const fracIndex = Math.round(fracPart / step);
-   const filledBar = drawBlock(fracIndex, completeBlocks);
-   const emptySpace = maxLength - filledBar.length;
-   const emptyBar = drawSpace(emptySpace);
+   // assume maxLength = 8, and portion = 0.6 => 5 total votes, 3 botes for 'this'
+   const length = portion * maxLength; // 0.6 * 8 = 4.8
+   const completeBlocks = Math.floor(length); // 4
+   const fracPart = length - completeBlocks; // 4.8 - 4 = 0.8
+   const fracIndex = Math.round(fracPart / step); // 0.8 / 0.125 = 6.4, rounded = 6
+   // const uniXBlockArray = ['', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█'];
+   const filledBar = drawBlock(fracIndex, completeBlocks); // should be '████▊'
+   const emptySpace = maxLength - filledBar.length; // 8 - 5 = 3
+   const emptyBar = drawSpace(emptySpace); // '\u200b u200b u200b '
 
    // console.log([barStart, filledBar, emptyBar, barEnd].join(''));
+   // ['▏', '████▊', '\u200b u200b u200b ', '▕'].join('')
+   // should be: ''
 
    return [barStart, filledBar, emptyBar, barEnd].join('');
-};
+};;
 
 // console.log(drawBar(maxLength, portion));
 // drawBar();
