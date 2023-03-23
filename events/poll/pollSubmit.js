@@ -494,7 +494,7 @@ module.exports = {
             }#${discriminator}`
          );
 
-         let embedQuorum = Math.floor(
+         let embedQuorum = Math.ceil(
             newPoll.allowedUsers.size * (quorum / 100)
          );
 
