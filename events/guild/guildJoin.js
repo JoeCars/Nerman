@@ -31,12 +31,12 @@ module.exports = {
 
       // l('CHANNELS', channels.cache);
 
-      if (!guildWhitelist.includes(guildId)) {
-         l('THIS GUILD IS FULL OF STUPID POSEURS!');
-         l('LEAVING GUILD...');
+      // if (!guildWhitelist.includes(guildId)) {
+      //    l('THIS GUILD IS FULL OF STUPID POSEURS!');
+      //    l('LEAVING GUILD...');
 
-         return await guild.leave();
-      }
+      //    return await guild.leave();
+      // }
 
       l('THIS GUILD IS WHITELISTED');
 
