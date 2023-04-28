@@ -199,12 +199,7 @@ module.exports = {
          console.log({ pollQuorum });
          pollDuration = parseFloat(pollDuration);
          pollQuorum = parseFloat(pollQuorum) > 0 ? parseFloat(pollQuorum) : 0;
-         console.log({ pollQuorum });
-         console.log({ pollQuorum });
-         console.log({ pollQuorum });
-         console.log({ pollQuorum });
-         console.log({ pollQuorum });
-         console.log({ pollQuorum });
+
          console.log(parseFloat(pollQuorum));
          console.log(parseFloat(pollQuorum) > 0);
          console.log(parseFloat(pollQuorum) > 0 ? parseFloat(pollQuorum) : 0);
