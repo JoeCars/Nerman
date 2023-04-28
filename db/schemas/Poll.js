@@ -68,7 +68,7 @@ const PollSchema = new Schema(
          default: 'closed',
          enum: ['open', 'closed', 'cancelled', 'canceled'],
       },
-      conclusive: {
+      pollSucceeded: {
          type: Boolean,
       },
       pollNumber: {
@@ -193,6 +193,7 @@ PollSchema.virtual('voterQuorum').get(function () {
       { voterQuorum },
       this.config
    );
+
    return voterQuorum > 1 ? voterQuorum : 1;
 });
 
@@ -214,7 +215,10 @@ PollSchema.virtual('results').get(function () {
    const resultsObject = Object.create(null);
    resultsObject.distribution = Object.create(null);
    let len = this.pollData.choices.length;
-   const flatVotes = this.getVotes.flatMap(({ choices }) => choices);
+
+   l('db/schemas/Poll.js => this.getVotes', this.getVotes ?? []);
+   const flatVotes = this.getVotes?.flatMap(({ choices }) => choices) ?? [];
+   l('db/schemas/Poll.js => flatVotes ?? []', flatVotes);
 
    let prevHighest = null;
    let leadingOption = null;
@@ -256,11 +260,21 @@ PollSchema.virtual('results').get(function () {
          ? true
          : false;
 
-   resultsObject.thresholdPass =
-      !tiedLeads.length &&
-      resultsObject.distribution[leadingOption] >= this.voteThreshold
-         ? true
-         : false;
+   // if (!tiedLeads.length) {
+   //    resultsObject.thresholdPass =
+   //       resultsObject.distribution[leadingOption] >= this.voteThreshold
+   //          ? true
+   //          : false;
+   // } else {
+   //    resultsObject.thresholdPass =
+   //       resultsObject.tied[0][1] >= this.voteThreshold ? true : false;
+   // }
+
+   // resultsObject.thresholdPass =
+   //    !tiedLeads.length &&
+   //    resultsObject.distribution[leadingOption] >= this.voteThreshold
+   //       ? true
+   //       : false;
 
    console.log('Poll.js -- this.voterQuorum => ', this.voterQuorum);
    console.log('Poll.js -- this.voteThreshold => ', this.voteThreshold);
@@ -275,8 +289,16 @@ PollSchema.virtual('results').get(function () {
 
    if (!tiedLeads.length) {
       resultsObject.winner = leadingOption;
+
+      resultsObject.thresholdPass =
+         resultsObject.distribution[leadingOption] >= this.voteThreshold
+            ? true
+            : false;
    } else {
       resultsObject.tied = tiedLeads;
+
+      resultsObject.thresholdPass =
+         resultsObject.tied[0][1] >= this.voteThreshold ? true : false;
    }
    return resultsObject;
 });
