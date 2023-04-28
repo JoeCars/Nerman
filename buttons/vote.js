@@ -40,7 +40,6 @@ module.exports = {
       ).exec();
 
       if (!anon) {
-         console.log({ interaction });
          console.log({ joinedTimestamp });
          console.log(new Date(joinedTimestamp));
       }
@@ -59,7 +58,9 @@ module.exports = {
          .populate([{ path: 'config' }])
          .exec();
 
+
       // enabled disabled for testing
+
       if (attachedPoll.allowedUsers.get(userId) === true) {
          return interaction.reply({
             content: 'You have already used up your vote allowance.',
