@@ -75,15 +75,3 @@ Nice
 </dl>
 
 <br/>
-
-### **OAuth2 - Template URL:**
-
-
-
-<!-- https://discord.com/api/oauth2/authorize?client_id=##############&permissions=36507543616&redirect_uri=https%3A%2F%2Fgoogle.com&response_type=code&scope=bot%20applications.commands%20guilds%20guilds.members.read%20messages.read -->
-
-<!-- https://discord.com/api/oauth2/authorize?client_id=##################&permissions=173946234944&redirect_uri=https%3A%2F%2Fwww.google.com&response_type=code&scope=guilds%20bot%20guilds.members.read%20applications.commands%20messages.read -->
-
-```
-https://discord.com/api/oauth2/authorize?client_id=##################&permissions=36507543616&redirect_uri=https%3A%2F%2Fwww.google.com&response_type=code&scope=guilds%20bot%20guilds.members.read%20applications.commands%20messages.read
-```
