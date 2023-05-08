@@ -254,9 +254,7 @@ PollSchema.virtual('results').get(function () {
    resultsObject.totalVotes = flatVotes.length;
 
    resultsObject.quorumPass =
-      resultsObject.totalVotes >= this.voterQuorum
-         ? true
-         : this.abstains.size >= this.voterQuorum
+      resultsObject.totalVotes + this.abstains.size >= this.voterQuorum
          ? true
          : false;
 
