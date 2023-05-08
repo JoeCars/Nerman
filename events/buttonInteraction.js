@@ -16,6 +16,8 @@ module.exports = {
          member: { permissions },
       } = interaction;
 
+      // check
+
       console.log('buttonInteraction.js -- customId', { customId });
       console.log('buttonInteraction.js -- permissions', { permissions });
       // console.log(client.buttons);
