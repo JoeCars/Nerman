@@ -543,7 +543,11 @@ module.exports = {
          //       newPoll.timeEnd.getTime() / 1000
          //    )}:f>`; // timeEnd
          // } else {
-         updatedEmbed.fields[4].value = `<t:${Math.floor(
+         // updatedEmbed.fields[4].value = `<t:${Math.floor(
+         //    newPoll.timeEnd.getTime() / 1000
+         // )}:f>`; // timeEnd
+         // !testing NEW
+         updatedEmbed.fields.find(({name}) => name === 'Voting Closes').value = `<t:${Math.floor(
             newPoll.timeEnd.getTime() / 1000
          )}:f>`; // timeEnd
          // }
