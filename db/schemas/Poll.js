@@ -95,7 +95,14 @@ const PollSchema = new Schema(
                   },
                },
                { new: true }
-            ).exec();
+            )
+               .populate([
+                  // { path: 'results' },
+                  { path: 'config' },
+                  { path: 'countVoters' },
+                  { path: 'getVotes', select: 'choices -poll -_id' },
+               ])
+               .exec();
             return updatedPoll;
          },
          async findAndSetVoted(messageId, userId) {
