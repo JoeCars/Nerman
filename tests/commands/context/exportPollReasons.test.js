@@ -1,17 +1,15 @@
-const assert = require('chai').assert;
-
 const { expect } = require('chai');
+const { describe, it } = require('mocha');
+
 const {
    attachUsernames,
-   extractPollResults,
-   generatePollExport,
 } = require('../../../commands/context/exportPollReasons');
 
 describe('commands/context/exportPollReasons.js tests', () => {
    describe('attachUsernames() tests', () => {
       it('should add "anonymous" when configured to be anonymous', async () => {
-         let interaction = {};
-         let votes = [
+         const interaction = {};
+         const votes = [
             {
                user: '1',
             },
@@ -22,7 +20,7 @@ describe('commands/context/exportPollReasons.js tests', () => {
                user: '3',
             },
          ];
-         let targetPoll = {
+         const targetPoll = {
             config: { anonymous: true },
          };
 
@@ -44,7 +42,7 @@ describe('commands/context/exportPollReasons.js tests', () => {
       });
 
       it('should add usernames when configured to not be anonymous', async () => {
-         let interaction = {
+         const interaction = {
             guild: {
                members: {
                   async fetch(arg) {
@@ -53,7 +51,7 @@ describe('commands/context/exportPollReasons.js tests', () => {
                },
             },
          };
-         let votes = [
+         const votes = [
             {
                user: '1',
             },
@@ -64,7 +62,7 @@ describe('commands/context/exportPollReasons.js tests', () => {
                user: '3',
             },
          ];
-         let targetPoll = {
+         const targetPoll = {
             config: { anonymous: false },
          };
 
@@ -86,7 +84,7 @@ describe('commands/context/exportPollReasons.js tests', () => {
       });
 
       it('should handle empty votes when anonymous', async () => {
-         let interaction = {
+         const interaction = {
             guild: {
                members: {
                   async fetch(arg) {
@@ -95,8 +93,8 @@ describe('commands/context/exportPollReasons.js tests', () => {
                },
             },
          };
-         let votes = [];
-         let targetPoll = {
+         const votes = [];
+         const targetPoll = {
             config: { anonymous: true },
          };
 
@@ -105,7 +103,7 @@ describe('commands/context/exportPollReasons.js tests', () => {
       });
 
       it('should handle empty votes when not anonymous', async () => {
-         let interaction = {
+         const interaction = {
             guild: {
                members: {
                   async fetch(arg) {
@@ -114,8 +112,8 @@ describe('commands/context/exportPollReasons.js tests', () => {
                },
             },
          };
-         let votes = [];
-         let targetPoll = {
+         const votes = [];
+         const targetPoll = {
             config: { anonymous: false },
          };
 

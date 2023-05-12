@@ -14,14 +14,15 @@ const fetchPoll = async interaction => {
             messageId: interaction.targetId,
             guildId: interaction.guildId,
          },
-         'status -_id'
+         'status -_id',
       )
          .populate('config')
          .populate('_id')
          .populate('votes')
          .populate('abstains')
          .exec();
-   } catch (err) {
+   }
+   catch (err) {
       console.log({ err });
       throw new Error(err.message);
    }
@@ -41,7 +42,8 @@ const fetchVotes = async targetPoll => {
       })
          .populate('user')
          .exec();
-   } catch (err) {
+   }
+   catch (err) {
       console.log({ err });
       throw new Error(err.message);
    }
@@ -53,7 +55,8 @@ const attachUsernames = async (interaction, votes, targetPoll) => {
    for (let i = 0; i < votes.length; ++i) {
       if (targetPoll.config.anonymous) {
          votes[i].username = 'anonymous';
-      } else {
+      }
+      else {
          const guildUser = await interaction.guild.members.fetch(votes[i].user);
          votes[i].username = guildUser.user.username;
       }
@@ -65,13 +68,14 @@ const extractPollResults = (targetPoll, votes) => {
    const numOfAbstains = targetPoll.abstains.size;
 
    // Note. I am assuming we only have two types of votes. For and against.
-   let forVotes = [];
-   let againstVotes = [];
-   for (let vote of votes) {
-      for (let choice of vote.choices) {
+   const forVotes = [];
+   const againstVotes = [];
+   for (const vote of votes) {
+      for (const choice of vote.choices) {
          if (choice === 'for') {
             forVotes.push({ username: vote.username, reason: vote.reason });
-         } else if (choice === 'against') {
+         }
+         else if (choice === 'against') {
             againstVotes.push({
                username: vote.username,
                reason: vote.reason,
@@ -92,12 +96,12 @@ const generatePollExport = ({
    let output = `Poll Status: ${status}\n`;
 
    output += `\n**FOR - ${forVotes.length} VOTES**\n`;
-   for (let vote of forVotes) {
+   for (const vote of forVotes) {
       output += `\n**${vote.username}** | *"${vote.reason}"*\n`;
    }
 
    output += `\n**AGAINST - ${againstVotes.length} VOTES**\n`;
-   for (let vote of againstVotes) {
+   for (const vote of againstVotes) {
       output += `\n**${vote.username}** | *"${vote.reason}"*\n`;
    }
 
@@ -118,8 +122,8 @@ module.exports = {
          throw new Error('You do not have permission to use this command.');
       }
 
-      let targetPoll = await fetchPoll(interaction);
-      let votes = await fetchVotes(targetPoll);
+      const targetPoll = await fetchPoll(interaction);
+      const votes = await fetchVotes(targetPoll);
       await attachUsernames(interaction, votes, targetPoll);
 
       const pollResults = extractPollResults(targetPoll, votes);
