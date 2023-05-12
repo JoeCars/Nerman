@@ -277,6 +277,26 @@ module.exports = {
          }
       );
 
+      l(
+         '***********************************\nCHECKING TO SEE IF QUORUM FIELD IS PRESENT\n***********************************'
+      );
+
+      if (!updateEmbed.fields.find(({ name }) => name === 'Quorum')) {
+         l(
+            '***********************************\nQUORUM FIELD WAS NOT FOUND\n***********************************'
+         );
+
+         updateEmbed.spliceFields(
+            updateEmbed.fields.findIndex(({ name }) => name === 'Voters'),
+            0,
+            {
+               name: 'Quorum',
+               value: `${updatedPoll.voterQuorum}`,
+               inline: true,
+            }
+         );
+      }
+
       l('POST SPLICE updateEmbed => ', updateEmbed);
       l('POST SPLICE updateEmbed.fields => ', updateEmbed.fields);
 
@@ -292,11 +312,24 @@ module.exports = {
             'events/poll/pollVote.js  -- inside if (updatedPoll.config.liveVisualFeed) =>  SUCCESS'
          );
 
-         updateEmbed.spliceFields(1, 1, {
-            name: 'Results',
-            value: resultsOutput,
-            inline: false,
-         });
+         // !testing OLD
+
+         // updateEmbed.spliceFields(1, 1, {
+         //    name: 'Results',
+         //    value: resultsOutput,
+         //    inline: false,
+         // });
+
+         // !testing NEW
+         updateEmbed.spliceFields(
+            updateEmbed.fields.findIndex(({ name }) => name === 'Results'),
+            1,
+            {
+               name: 'Results',
+               value: resultsOutput,
+               inline: false,
+            }
+         );
       }
 
       message.edit({ embeds: [updateEmbed] });
