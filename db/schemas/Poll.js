@@ -110,6 +110,7 @@ const PollSchema = new Schema(
             )
                .populate([
                   // { path: 'results' },
+                  { path: 'config' },
                   { path: 'countVoters' },
                   { path: 'getVotes', select: 'choices -poll -_id' },
                ])
@@ -198,15 +199,13 @@ PollSchema.virtual('voterQuorum').get(function () {
 });
 
 PollSchema.virtual('voteThreshold').get(function () {
-   // Add in an evaluation for a quorum of zero and make it use a %
    const voteThreshold = Math.ceil(
       this.allowedUsers.size * (this.config.voteThreshold / 100)
    );
 
    console.log(
       '--------------------------------------\nFROM GETTER\nPoll.js -- virtual: voteThreshold\n---------------------------',
-      { voteThreshold },
-      this.config
+      { voteThreshold }
    );
    return voteThreshold > 1 ? voteThreshold : 1;
 });

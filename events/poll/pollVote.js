@@ -186,6 +186,11 @@ module.exports = {
          'events/poll/pollVote.js -- longestOption => ',
          longestOption
       );
+
+      console.log(
+         'events/poll/pollVote.js -- updatedPoll.config => ',
+         updatedPoll.config
+      );
       // let resultsArray = ['```', '```'];
       let resultsArray = pollStatus.config.voteThreshold
          ? [
