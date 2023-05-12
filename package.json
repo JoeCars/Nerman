@@ -8,7 +8,8 @@
    },
    "scripts": {
       "start": "node index.js",
-      "start:dev": "pm2 start . --watch"
+      "start:dev": "pm2 start . --watch",
+      "test": "mocha --recursive tests/**/*.test.js"
    },
    "repository": {
       "type": "git",

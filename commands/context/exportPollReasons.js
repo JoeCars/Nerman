@@ -5,9 +5,6 @@ const codeBlock = require('discord.js').Formatters.codeBlock;
 const Poll = require('../../db/schemas/Poll');
 const Vote = require('../../db/schemas/Vote');
 
-// TODO: Rename this to something more appropriate.
-const authorizedIds = process.env.BAD_BITCHES.split(',');
-
 const fetchPoll = async interaction => {
    let targetPoll;
    try {
@@ -115,6 +112,8 @@ module.exports = {
       .setType(ApplicationCommandType.Message),
 
    async execute(interaction) {
+      // TODO: Rename this to something more appropriate.
+      const authorizedIds = process.env.BAD_BITCHES.split(',');
       if (!authorizedIds.includes(interaction.user.id)) {
          throw new Error('You do not have permission to use this command.');
       }
@@ -131,4 +130,8 @@ module.exports = {
          ephemeral: true,
       });
    },
+
+   attachUsernames: attachUsernames,
+   extractPollResults: extractPollResults,
+   generatePollExport: generatePollExport,
 };
