@@ -35,10 +35,13 @@
       "twit": "^2.2.11"
    },
    "devDependencies": {
+      "chai": "^4.3.7",
       "chalk": "^5.0.0",
       "eslint": "^8.8.0",
       "eslint-config-prettier": "^8.3.0",
+      "mocha": "^10.2.0",
       "nodemon": "^2.0.15",
-      "prettier": "^2.5.1"
+      "prettier": "^2.5.1",
+      "sinon": "^15.0.4"
    }
 }
