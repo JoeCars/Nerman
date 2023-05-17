@@ -4,11 +4,10 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 // Personal Imports
 const { drawBar, longestString } = require('../helpers/poll');
-// const { encodeURI } = require('../utils/functions');
+const Logger = require('../helpers/logger');
 const Poll = require('../db/schemas/Poll');
 const { lc } = require('../utils/functions');
 
-const { log: l } = console;
 // const {
 //    createPollTest,
 // } = require('../scratchcode/db/schema/testExecutions/createPoll');
@@ -45,22 +44,23 @@ module.exports = async client => {
       options.keepAlive = true; // this is true by default since v5.2.0 but keeping it as a reminder
       options.keepAliveInitialDelay = 300000;
    }
-   console.log({ options });
+   Logger.info('db/index.js: Checking options.', {
+      options: options,
+   });
 
    (async () => {
       try {
          const DB = mongoose.connection;
 
          DB.on('error', err => {
-            // logError(err);
-            console.error({ err });
+            Logger.error('db/index.js: Database error.', { error: err });
          });
 
          DB.on('connected', () => {
-            console.log('Connected to DB');
+            Logger.info('db/index.js: Connected to database.');
          });
          DB.on('open', async () => {
-            console.log('Connection open');
+            Logger.info('db/index.js: Database is open.');
 
             const openPolls = await Poll.find({ status: 'open' })
                .populate('config', 'channelId')
@@ -78,29 +78,20 @@ module.exports = async client => {
                      })
                   );
 
-                  lc(
-                     'SORTED FOUND POLLS',
-                     '131',
-                     JSON.stringify(sortedPollsLogMap, null, 4)
-                  );
                   return foundPolls.sort((a, b) => a.timeEnd - b.timeEnd);
                })
-               .catch(err => console.error(err));
-
-            // console.log({ openPolls });
-            // createTest();
-            // createChannelTest();
+               .catch(err =>
+                  Logger.error(
+                     'db/index.js: Encountered an error in the index.',
+                     {
+                        error: err,
+                     }
+                  )
+               );
 
             client.on('enqueuePoll', newPoll => {
-               // console.log('PRE PUSH AND SORT', { openPolls });
-               // lc('PRE PUSH AND SORT\nopenPolls', '131', openPolls);
-
                openPolls.push(newPoll);
                openPolls.sort((a, b) => a.timeEnd - b.timeEnd);
-               // console.log('POST PUSH AND SORT', { openPolls });
-               // lc('POST PUSH AND SORT\nopenPolls', '132', openPolls);
-
-               l('NEW POLL ADDED TO QUEUE -- NEW POLL LIST:');
 
                const sortedPollsLogMap = openPolls.map(
                   ({ pollData, pollNumber, timeEnd, status }) => ({
@@ -111,58 +102,29 @@ module.exports = async client => {
                   })
                );
 
-               lc(
-                  'POLL QUEUED -- NEW SORTED OPEN POLLS LIST',
-                  '131',
-                  JSON.stringify(sortedPollsLogMap, null, 4)
-               );
-
-               // openPolls.forEach(({ pollData, pollNumber, timeEnd, status }) =>
-               //    lc(
-               //       'FOUND POLL',
-               //       '131',
-               //       JSON.stringify(
-               //          {
-               //             pollData,
-               //             pollNumber,
-               //             timeEnd,
-               //             status,
-               //          },
-               //          null,
-               //          4
-               //       )
-               //    )
-               // );
+               Logger.info('db/index.js: New poll added to queue', {
+                  sortedPollsLogMap: sortedPollsLogMap,
+               });
 
                intervalFunction();
             });
 
             client.on('dequeuePoll', oldPoll => {
-               console.log('DEQUEUEING POLL:');
-
-               lc(
-                  'oldPoll',
-                  '131',
-                  JSON.stringify(
-                     { pollData: oldPoll.pollData, timeEnd: oldPoll.timeEnd },
-                     null,
-                     4
-                  )
-               );
-               // const idx = openPolls.findIndex(({ _id }) => {
-               const idx = openPolls.findIndex(({ _id }) => {
-                  console.log('_id', _id);
-                  console.log('oldPoll ID', oldPoll._id);
-                  // console.log('oldPoll', oldPoll);
-                  // console.log('poll', poll);
-                  return _id.equals(oldPoll._id);
-                  // return poll._id.equals(oldPoll._id);
+               Logger.info('db/index.js: Dequeuing old poll.', {
+                  pollData: oldPoll.pollData,
+                  timeEnd: oldPoll.timeEnd,
                });
 
-               lc('idx', '132', idx);
+               const idx = openPolls.findIndex(({ _id }) => {
+                  Logger.debug('db/index.js: Finding id.', {
+                     id: _id,
+                     oldPollId: oldPoll._id,
+                  });
+
+                  return _id.equals(oldPoll._id);
+               });
 
                openPolls.splice(idx, 1);
-               // console.log('TESTING POST REMOVED POLLS');
 
                const sortedPollsLogMap = openPolls.map(
                   ({ pollData, pollNumber, timeEnd, status }) => ({
@@ -173,11 +135,9 @@ module.exports = async client => {
                   })
                );
 
-               lc(
-                  'POLL DEQUEUED -- NEW OPEN POLLS LIST:',
-                  '133',
-                  JSON.stringify(sortedPollsLogMap, null, 4)
-               );
+               Logger.info('db/index.js: Poll dequeued. New open polls list.', {
+                  sortedPollsLogMap: sortedPollsLogMap,
+               });
             });
 
             let intervalId;
@@ -192,21 +152,16 @@ module.exports = async client => {
 
                intervalId = setInterval(async () => {
                   currentTime += 1000;
-                  // console.log(endTime - currentTime);
-                  // console.log({ endTime });
-
-                  // console.log(endTime < currentTime);
 
                   if (endTime < currentTime) {
-                     // return;
-
                      if (!openPolls[0]) {
                         return clearInterval(intervalId);
                      }
-                     console.log('\x1b[33m Welcome to the app! \x1b[0m');
-                     console.log('NERPPPPROPR');
-                     // console.log(`\x1b[43m${openPolls[0]}\x1b[0m`);
-                     lc('openPolls[0]', '116', openPolls[0]);
+
+                     Logger.info(
+                        'db/index.js: Inside interval function. Welcome to the app.'
+                     );
+
                      const closingPoll =
                         (await Poll.findByIdAndUpdate(
                            openPolls[0]._id,
@@ -226,24 +181,20 @@ module.exports = async client => {
                            .exec()) ?? null;
 
                      // todo Maybe try evaluating for whether or not this poll is already closed instead of trying to check for the presence of an existing message and checking if null
-                     console.log('LOOKING FOR DELETED POLL THIS BE IT', {
-                        closingPoll,
+                     Logger.debug('db/index.js: Looking for deleted poll.', {
+                        closingPoll: closingPoll,
                      });
 
                      if (closingPoll !== null && closingPoll.config !== null) {
                         // todo consider whether or not this is better than using a channel messages.fetch()? perhaps using the fetch instead of the get() will affect this operation if the bot goes offline and this somehow clears the cache
 
-                        console.log(
-                           'closingPoll !== null && closingPoll.config !== null',
-                           { closingPoll }
-                        );
-                        console.log(
-                           'closingPoll !== null && closingPoll.config !== null',
-                           closingPoll.config
-                        );
-
-                        console.log(
-                           `closingPoll.messageId\n\n${closingPoll.messageId}`
+                        Logger.debug(
+                           "db/index.js: When closing poll isn't null and neither is the config.",
+                           {
+                              closingPoll: closingPoll,
+                              config: closingPoll.config,
+                              messageId: closingPoll.messageId,
+                           }
                         );
 
                         const message = await (client.channels.cache
@@ -253,7 +204,9 @@ module.exports = async client => {
                               .get(closingPoll.config.channelId)
                               .messages.fetch(closingPoll.messageId));
 
-                        console.log({ message });
+                        Logger.debug('db/index.js: Message.', {
+                           message: message,
+                        });
 
                         if (message === null) {
                            return openPolls.shift();
@@ -264,10 +217,11 @@ module.exports = async client => {
                         let winningResult = '';
                         const results = await closingPoll.results;
 
-                        console.log({ results });
+                        Logger.debug('db/index.js: Closing poll results.', {
+                           results: results,
+                        });
 
                         if ('winner' in results) {
-                           console.log(results.winner);
                            winningResult =
                               results.winner !== null
                                  ? `${
@@ -299,10 +253,9 @@ module.exports = async client => {
                         // ) {
                         // }
 
-                        console.log(
-                           'db/index.js -- jsfailedChecks before checks=> ',
-                           failedChecks
-                        );
+                        Logger.debug('db/index.js: Before failed checks.', {
+                           failedChecks: failedChecks,
+                        });
 
                         if (results.quorumPass === false) {
                            failedChecks.push('quorum');
@@ -311,14 +264,12 @@ module.exports = async client => {
                         if (results.thresholdPass === false) {
                            failedChecks.push('vote threshold');
                         }
-                        console.log(
-                           'db/index.js -- jsfailedChecks after checks=> ',
-                           failedChecks
-                        );
-
-                        console.log(
-                           'db/index.js -- closingPoll.conclusive PRE checks => ',
-                           closingPoll.conclusive
+                        Logger.debug(
+                           'db/index.js: After failed checks. Before conclusive checks.',
+                           {
+                              failedChecks: failedChecks,
+                              conclusive: closingPoll.conclusive,
+                           }
                         );
 
                         if (failedChecks.length) {
@@ -330,40 +281,24 @@ module.exports = async client => {
                            closingPoll.conclusive = true;
                         }
 
-                        console.log(
-                           'db/index.js -- closingPoll.conclusive POST checks => ',
-                           closingPoll.conclusive
+                        Logger.debug(
+                           'db/index.js: After failed checks. After conclusive checks.',
+                           {
+                              failedChecks: failedChecks,
+                              conclusive: closingPoll.conclusive,
+                           }
                         );
 
                         await closingPoll.save();
 
-                        console.log(
-                           'index.js -- winningResult after checks => ',
-                           winningResult
-                        );
-
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-
-                        // const longestOption = longestString(options).length;
                         const longestOption = longestString(
                            closingPoll.pollData.choices
                         ).length;
 
-                        console.log(
-                           'db/index.js -- longestOption => ',
-                           longestOption
-                        );
-                        // let resultsArray = ['```', '```'];
+                        Logger.debug('db/index.js: Longest option.', {
+                           longestOption: longestOption,
+                        });
+
                         let resultsArray = closingPoll.config.voteThreshold
                            ? [
                                 `Threshold: ${closingPoll.voteThreshold} ${
@@ -386,15 +321,12 @@ module.exports = async client => {
                            const label =
                               key[0].toUpperCase() + key.substring(1);
 
-                           console.log('db/index.js -- label => ', label);
-                           console.log(
-                              'db/index.js -- label.length => ',
-                              label.length
-                           );
-                           console.log(
-                              'db/index.js -- logging :  longestOption - label.length => ',
-                              longestOption - label.length
-                           );
+                           Logger.debug('db/index.js: Checking label.', {
+                              label: label,
+                              labelLength: label.length,
+                              distanceFromLongest: longestOption - label.length,
+                           });
+
                            let optionObj = {
                               label,
                               votes: results.distribution[key],
@@ -436,29 +368,11 @@ module.exports = async client => {
                            resultsArray.push(optionObj.completeBar);
                         }
 
-                        // console.log(votesMap);
-
-                        // resultsOutput = resultsArray.join('\n');
                         resultsOutput = codeBlock(resultsArray.join('\n'));
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
-                        //
 
                         let closedEmbed = message.embeds[0];
-                        console.log({ closedEmbed });
 
                         closedEmbed.setTitle(`${closedEmbed.title}`);
-
-                        console.log({ closedEmbed });
 
                         const votersValue = closingPoll.config.voteThreshold
                            ? `Quorum: ${
@@ -508,42 +422,46 @@ module.exports = async client => {
                         ];
 
                         closedEmbed.spliceFields(1, 4, closedFields);
-                        console.log('closedEmbed.fields');
-                        console.log(closedEmbed.fields);
+
+                        Logger.debug('db/index.js: Checking closed Embed.', {
+                           closedEmbedField: closedEmbed.fields,
+                        });
 
                         message.edit({
                            content: null,
                            embeds: [closedEmbed],
                            components: [],
                         });
-
-                        console.log({ closedEmbed });
-                        // })
-                        // .catch(err => console.error(err));
                      } else if (
                         closingPoll !== null &&
                         closingPoll.config === null
                      ) {
-                        console.log('ClosingPoll present but config is null', {
-                           closingPoll,
-                        });
                         const message = await client.channels.cache;
-                        // .get(closingPoll.config.channelId)
-                        // .messages.fetch(closingPoll.messageId);
-                        console.log({ message });
+
+                        Logger.debug(
+                           'db/index.js: Closing poll is present, but the config is null.',
+                           {
+                              closingPoll,
+                              message,
+                           }
+                        );
                      }
 
                      openPolls.shift();
 
-                     // console.log(openPolls[0]?.timeEnd ?? 'no time');
+                     Logger.debug('db/index.ks: Logging end time.', {
+                        endTime,
+                     });
 
-                     console.log({ endTime });
                      if (openPolls.length) {
                         endTime = openPolls[0].timeEnd.getTime();
                      } else {
                         clearInterval(intervalId);
                      }
-                     console.log({ endTime });
+
+                     Logger.debug('db/index.ks: Logging end time. Again.', {
+                        endTime,
+                     });
                   }
                }, 1000);
                // };
@@ -557,10 +475,8 @@ module.exports = async client => {
             // console.log(`openPolls\n\x1b[46m${openPolls}\x1b[0m`);
          });
          await mongoose.connect(mongoURI, options);
-
-         // console.log('DB/index.js', { DB });
       } catch (error) {
-         console.error(error);
+         Logger.error('db/index.js', { error: error });
       }
    })();
 };

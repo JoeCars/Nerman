@@ -1,5 +1,6 @@
 const { model, Schema, SchemaTypes } = require('mongoose');
-const { log: l } = console;
+
+const Logger = require('../../helpers/logger');
 
 const PollChannelSchema = new Schema(
    {
@@ -15,7 +16,13 @@ const PollChannelSchema = new Schema(
          // unique: true,
          validate: {
             validator: async function (channelId) {
-               l({ channelId });
+               Logger.info(
+                  'db/schemas/PollChannel.js: Attempting to validate poll channel ID.',
+                  {
+                     channelId: channelId,
+                  }
+               );
+
                await this.populate('guildConfig');
                await this.guildConfig.populate('pollChannels');
 
@@ -23,7 +30,13 @@ const PollChannelSchema = new Schema(
                   ({ channelId }) => channelId === this.channelId
                );
 
-               l({ noChannel });
+               Logger.info(
+                  'db/schemas/PollChannel.js: Finished validating poll channel ID.',
+                  {
+                     channelId: channelId,
+                     noChannel: noChannel,
+                  }
+               );
 
                return noChannel;
             },
@@ -37,7 +50,7 @@ const PollChannelSchema = new Schema(
       voteAllowance: { type: Boolean, required: true, default: false },
       forAgainst: { type: Boolean, required: true, default: false },
       quorum: { type: Number, default: 1 }, // leaving default as 1 for testuing purposes
-      voteThreshold: { type: Number, default: 0},
+      voteThreshold: { type: Number, default: 0 },
    },
    {
       statics: {
@@ -46,9 +59,13 @@ const PollChannelSchema = new Schema(
                channelId: new RegExp(channelId, 'i'),
             }).exec();
 
-            console.log('STATIC', { configExists });
-            console.log('STATIC', !configExists);
-            console.log('STATIC', !!configExists);
+            Logger.debug(
+               'db/schemas/PollChannel.js: Checking static poll config exists.',
+               {
+                  configExists: configExists,
+               }
+            );
+
             return !!configExists;
          },
       },
@@ -72,7 +89,9 @@ const PollChannelSchema = new Schema(
 // then after that passes, if the leading votes pases the threshold then we call that a pass
 
 PollChannelSchema.virtual('durationMs').get(function () {
-   console.log('DURATIONNNNNNNNN', this.duration);
+   Logger.debug('db/schemas/PollChannel.js: Checking poll channel duration', {
+      duration: this.duration,
+   });
    return Math.round(this.duration * 60 * 60 * 1000);
 });
 

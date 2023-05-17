@@ -3,6 +3,7 @@ const { getFiles } = require('../utils/functions');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const importSON = require('../utils/StateOfNouns/importSON');
+const Logger = require('../helpers/logger');
 // todo use for permissions validation later on
 // const { Perms } = require('../validation/permissions');
 const clientId = process.env.DISCORD_CLIENT_ID;
@@ -10,6 +11,8 @@ const guildId = process.env.DISCORD_GUILD_ID;
 const token = process.env.DISCORD_TOKEN;
 
 module.exports = async client => {
+   Logger.info('handlers/commands.js: Handling commands.');
+
    const Nouns = await importSON();
    // console.log(Nouns);
    const commandsArr = [];
@@ -34,7 +37,9 @@ module.exports = async client => {
          process.env.DEPLOY_STAGE !== 'development' &&
          commandFile === 'commands/reload-test.js'
       ) {
-         console.log('RELOAD TEST', { commandFile });
+         Logger.info('handlers/commands.js: Reloading test.', {
+            commandFile: commandFile,
+         });
          return;
       }
 
@@ -72,11 +77,13 @@ module.exports = async client => {
 
    (async () => {
       try {
-         console.log('Attemping to register application commands...');
+         Logger.info(
+            'handlers/commands.js: Attempting to register application commands.'
+         );
 
          if (process.env.NODE_ENV === 'development') {
-            console.log(
-               'DEVELOPMENT, CLEARING APPLICATION COMMANDS AND ADDING APPLICATION GUILD COMMANDS'
+            Logger.info(
+               'handlers/commands.js: In development mode. Clearing application commands and adding application guild commands.'
             );
 
             await rest.put(Routes.applicationCommands(clientId), {
@@ -91,9 +98,15 @@ module.exports = async client => {
             });
          }
 
-         console.log('Successfully registered application commands! :D');
+         Logger.info(
+            'handlers/commands.js: Successfully registered application commands! :D'
+         );
       } catch (error) {
-         console.log(error);
+         Logger.error('handlers/commands.js: Received an error.', {
+            error: error,
+         });
       }
    })();
+
+   Logger.info('handlers/commands.js: Finished handling commands.');
 };

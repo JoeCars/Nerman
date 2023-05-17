@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 const { model, Schema } = require('mongoose');
 
 const { PollChannel } = require('../schemas/PollChannel');
-
-const { log: l } = console;
+const Logger = require('../../helpers/logger');
 
 // Building Up, start basic
 const PollSchema = new Schema(
@@ -80,7 +79,9 @@ const PollSchema = new Schema(
       query: {
          // todo change this to now accomodate guildId as well? For multi-server shenanigans
          byMessageId(messageId) {
-            l('FROM QUERY HELPER', { messageId });
+            Logger.debug('db/schemas/Poll.js: Querying poll by message id.', {
+               messageId: messageId,
+            });
             return this.where({ messageId: new RegExp(messageId, 'i') });
          },
       },
@@ -188,11 +189,14 @@ PollSchema.virtual('voterQuorum').get(function () {
       this.allowedUsers.size * (this.config.quorum / 100)
    );
 
-   console.log(
-      '--------------------------------------\nFROM GETTER\nPoll.js -- virtual: voterQuorum\n---------------------------',
-      { voterQuorum },
-      this.config
+   Logger.debug(
+      'db/schemas/Poll.js: Attempting to get the virtual voter quorum.',
+      {
+         voterQuorum: voterQuorum,
+         config: this.config,
+      }
    );
+
    return voterQuorum > 1 ? voterQuorum : 1;
 });
 
@@ -202,11 +206,14 @@ PollSchema.virtual('voteThreshold').get(function () {
       this.allowedUsers.size * (this.config.voteThreshold / 100)
    );
 
-   console.log(
-      '--------------------------------------\nFROM GETTER\nPoll.js -- virtual: voteThreshold\n---------------------------',
-      { voteThreshold },
-      this.config
+   Logger.debug(
+      'db/schemas/Poll.js: Attempting to get the virtual voter threshold.',
+      {
+         voterQuorum: voterQuorum,
+         config: this.config,
+      }
    );
+
    return voteThreshold > 1 ? voteThreshold : 1;
 });
 
@@ -262,16 +269,12 @@ PollSchema.virtual('results').get(function () {
          ? true
          : false;
 
-   console.log('Poll.js -- this.voterQuorum => ', this.voterQuorum);
-   console.log('Poll.js -- this.voteThreshold => ', this.voteThreshold);
-   console.log(
-      'Poll.js -- resultsObject.quorumPass => ',
-      resultsObject.quorumPass
-   );
-   console.log(
-      'Poll.js -- resultsObject.thresholdPass => ',
-      resultsObject.thresholdPass
-   );
+   Logger.debug('db/schemas/Poll.js: Checking virtual poll results.', {
+      voterQuorum: this.voterQuorum,
+      voteThreshold: this.voteThreshold,
+      quorumPass: resultsObject.quorumPass,
+      thresholdPass: resultsObject.thresholdPass,
+   });
 
    if (!tiedLeads.length) {
       resultsObject.winner = leadingOption;

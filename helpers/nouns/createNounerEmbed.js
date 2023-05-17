@@ -1,9 +1,23 @@
 const { MessageEmbed } = require('discord.js');
 const { hyperlink, codeBlock } = require('@discordjs/builders');
-const { log: l } = console;
+const Logger = require('../logger');
 
 module.exports = async data => {
    try {
+      Logger.info(
+         'helpers/nouns/createNounerEmbed.js: Creating Nouner embed.',
+         {
+            delegating: data.delegating,
+            addressPrint: data.addressPrint,
+            ownerVotingPower: data.ownerVotingPower,
+            ownerNounsOwned: data.ownerNounsOwned,
+            ownerNounsDelegated: data.ownerNounsDelegated,
+            delegateAddressPrint: data.delegateAddressPrint,
+            delegateVotingPower: data.delegateVotingPower,
+            delegateNounsOwned: data.delegateNounsOwned,
+            delegateNounsDelegated: data.delegateNounsDelegated,
+         }
+      );
       // const { address, ens, owned, delegated } = data;
 
       const {
@@ -62,8 +76,25 @@ module.exports = async data => {
          });
       }
 
+      Logger.info(
+         'helpers/nouns/createNounerEmbed.js: Finished creating Nouner embed.',
+         {
+            delegating: data.delegating,
+            addressPrint: data.addressPrint,
+            ownerVotingPower: data.ownerVotingPower,
+            ownerNounsOwned: data.ownerNounsOwned,
+            ownerNounsDelegated: data.ownerNounsDelegated,
+            delegateAddressPrint: data.delegateAddressPrint,
+            delegateVotingPower: data.delegateVotingPower,
+            delegateNounsOwned: data.delegateNounsOwned,
+            delegateNounsDelegated: data.delegateNounsDelegated,
+         }
+      );
+
       return nounerEmbed;
    } catch (err) {
-      l({ err });
+      Logger.error('helpers/nouns/createNounerEmbed.js: Received an error.', {
+         error: err,
+      });
    }
 };

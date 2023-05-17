@@ -1,5 +1,5 @@
 const { readdir } = require('fs').promises;
-// const { log: l, error: lerr, info: inf, trace: tr, table: tbl} = console;
+const Logger = require('../helpers/logger');
 
 const getFiles = async (path, ending) => {
    let fileList = [];
@@ -18,7 +18,9 @@ const getFiles = async (path, ending) => {
          }
       }
    }
-   console.log({ fileList });
+   Logger.debug('utils/functions.js/getFiles(): Checking file list.', {
+      fileList,
+   });
 
    return fileList;
 };
@@ -167,9 +169,7 @@ const formatDate = (date, format) => {
 // encodeURI();
 
 const lc = (label, bg, data) => {
-   console.log(
-      `${label}\n\x1b[48;5;${bg}m${data}\x1b[0m]`
-   );
+   console.log(`${label}\n\x1b[48;5;${bg}m${data}\x1b[0m]`);
 };
 
 module.exports = {

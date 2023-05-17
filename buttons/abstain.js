@@ -2,6 +2,7 @@ const { ButtonInteraction, MessageEmbed } = require('discord.js');
 const User = require('../db/schemas/User');
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
+const Logger = require('../helpers/logger');
 
 module.exports = {
    id: 'abstain',
@@ -10,6 +11,16 @@ module.exports = {
     * @param {ButtonInteraction} interaction
     */
    async execute(interaction) {
+      Logger.info(
+         'buttons/abstain.js: Attempting to press the abstain button.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guild.id,
+            channelId: interaction.channelId,
+            messageId: interaction.message.id,
+         }
+      );
+
       if (!interaction.isButton()) return;
 
       await interaction.deferReply({ ephemeral: true });
@@ -31,7 +42,15 @@ module.exports = {
       ).exec();
 
       if (!roleCache.hasAny(...allowedRoles)) {
-         console.log('USER DOES NOT HAS ROLE');
+         Logger.warn(
+            'buttons/abstain.js: User does have an appropriate role.',
+            {
+               userId: userId,
+               guildId: guildId,
+               channelId: channelId,
+               messageId: messageId,
+            }
+         );
          return interaction.editReply({
             content: 'You do not have the role, dummy',
             ephemeral: true,
@@ -65,7 +84,10 @@ module.exports = {
          .exec();
 
       if (!abstainingUser) {
-         const eligibleChannels = await User.findEligibleChannels(roleCache, anon);
+         const eligibleChannels = await User.findEligibleChannels(
+            roleCache,
+            anon
+         );
 
          abstainingUser = await User.createUser(
             guildId,
@@ -100,5 +122,15 @@ module.exports = {
          content: 'You have chosen to abstain from this poll',
          ephemeral: true,
       });
+
+      Logger.info(
+         'buttons/abstain.js: Successfully pressed the abstain button.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guild.id,
+            channelId: interaction.channelId,
+            messageId: interaction.message.id,
+         }
+      );
    },
 };

@@ -7,8 +7,8 @@ const User = require('../../db/schemas/User');
 const Poll = require('../../db/schemas/Poll');
 const PollChannel = require('../../db/schemas/PollChannel');
 const PollCount = require('../../db/schemas/ChannelPollCount');
+const Logger = require('../../helpers/logger');
 
-const { log: l } = console;
 const { drawBar, longestString } = require('../../helpers/poll');
 const { logToObject, formatDate } = require('../../utils/functions');
 
@@ -20,6 +20,12 @@ module.exports = {
     * @param {Modal} modal
     */
    async execute(modal) {
+      Logger.info('events/poll/pollSubmit.js: Attempting to submit a poll.', {
+         channelId: modal.channelId,
+         guildId: modal.guildId,
+         user: modal.user.username,
+      });
+
       if (modal.customId !== 'modal-create-poll') return;
 
       // console.log('pollSubmit.js -- modal', { modal });
@@ -43,8 +49,6 @@ module.exports = {
          },
       } = modal;
 
-      console.log({ modal });
-
       const channelConfig = await PollChannel.findOne(
          {
             channelId,
@@ -54,8 +58,13 @@ module.exports = {
 
       const intRegex = new RegExp(/^\d*$/);
 
-      console.log({ everyoneId });
-      console.log(channelConfig.allowedRoles);
+      Logger.debug('events/poll/pollSubmit.js: Checking permissions.', {
+         channelId: modal.channelId,
+         guildId: modal.guildId,
+         user: modal.user.username,
+         everyoneId: everyoneId,
+         allowedRoles: channelConfig.allowedRoles,
+      });
 
       // return modal.editReply({
       //    content: 'ABORT',
@@ -87,8 +96,13 @@ module.exports = {
          modal.getTextInputValue('voteAllowance') ?? 1
       );
 
-      console.log({ options });
-      console.log({ voteAllowance });
+      Logger.debug('events/poll/pollSubmit.js: Checking vote options.', {
+         channelId: modal.channelId,
+         guildId: modal.guildId,
+         user: modal.user.username,
+         options: options,
+         voteAllowance: voteAllowance,
+      });
 
       // return modal.editReply({ content: 'Return early', ephemeral: true });
 
@@ -98,15 +112,6 @@ module.exports = {
             ephemeral: true,
          });
       }
-
-      // console.log('merp');
-
-      // let voteAllowance = parseInt(
-      //    modal.getTextInputValue('voteAllowance') ?? 1
-      // );
-
-      // console.log({ voteAllowance });
-      // console.log(typeof voteAllowance);
 
       // ,, , Yes, No,Abstain,,, ,, , // <---- testing format string
 
@@ -203,12 +208,6 @@ module.exports = {
          everyoneId,
       });
 
-      console.log(
-         '-----------------------------------------------\n',
-         messageObject.embeds,
-         '-----------------------------------------------\n'
-      );
-
       // const voteActionRow = new MessageActionRow();
       // const voteBtn = new MessageButton()
       //    .setCustomId('vote')
@@ -240,12 +239,22 @@ module.exports = {
       //    .join(' ');
 
       // console.log({ mentions });
-      console.log({ messageObject });
+
+      Logger.debug('events/poll/pollSubmit.js: Checking vote options.', {
+         channelId: modal.channelId,
+         guildId: modal.guildId,
+         user: modal.user.username,
+         messageObject: messageObject,
+      });
+
       let message;
       try {
          message = await channel.send(messageObject);
       } catch (error) {
-         console.log({ error });
+         Logger.error('events/poll/pollSubmit.js: Received error.', {
+            error: error,
+         });
+
          await modal.deleteReply({
             content: '',
             ephemeral: true,
@@ -308,12 +317,17 @@ module.exports = {
             eligibleKeys.push(key);
          }
 
-         console.log({ eligibleKeys });
+         Logger.debug('events/poll/pollSubmit.js: Checking eligible keys.', {
+            channelId: modal.channelId,
+            guildId: modal.guildId,
+            user: modal.user.username,
+            eligibleKeys: eligibleKeys,
+         });
       } catch (error) {
-         console.error({ error });
+         Logger.error('events/poll/pollSubmit.js: Received error.', {
+            error: error,
+         });
       }
-
-      console.log({ eligibleKeys });
 
       // todo decide if I really need this or can just stick with the use-case below
       // const config = await PollChannel.findOne({ channelId }).exec();
@@ -325,31 +339,21 @@ module.exports = {
 
       const countExists = await PollCount.checkExists(channelId);
 
-      console.log({ countExists });
-
       let pollNumber;
 
       if (!countExists) {
-         console.log('Count does not exist');
          pollNumber = await PollCount.createCount(channelId);
       } else {
-         console.log('Count exists');
          pollNumber = await PollCount.findOne({ channelId }).exec();
       }
 
-      // console.log({ pollNumber });
-
-      // console.log({ durationMs });
-
       try {
          // todo refactor this to use {new: true} and return the document perhaps, rather than this two part operation?
-         console.group('Create Poll Attributes');
-         console.log({ guildId });
-         console.log(user.id);
-         console.log({ _id });
-         console.log({ id });
-         console.log({ pollData });
-         console.groupEnd('Create Poll Attributes');
+         Logger.debug('events/poll/pollSubmit.js: Checking poll attributes.', {
+            guildId: guildId,
+            userId: user.id,
+            pollData: pollData,
+         });
 
          const data = {
             _id: new Types.ObjectId(),
@@ -369,57 +373,29 @@ module.exports = {
          const newPoll = await (await Poll.createNewPoll(data, durationMs))
             .populate('config')
             .then(async poll => {
-               console.log('WITHIN THE THEN', { poll });
                await pollNumber.increment();
                poll.pollNumber = pollNumber.pollsCreated;
                return await poll.save();
             });
 
          // await newPoll.populate('pollNumber');
-         console.log('OUTSIDE THE THEN', { newPoll });
 
          // todo Make this updating eligible users channel map into a reusable function
 
          const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
             async key => {
-               l('updateVoterPromise', { key });
-
                // todo I need to add in a proper check for if these people exist
                let user = await User.findOne().byDiscordId(key, guildId).exec();
 
-               // l({ user });
-
-               l(
-                  'pre mapping user?.eligibleChannels.get(channelId) => ',
-                  user?.eligibleChannels.get(channelId)
-               );
-
                if (user && user.eligibleChannels.has(channelId)) {
-                  l(
-                     "User exists and has channel key!\nIncrementing channel's eligiblePolls...\neligiblePolls PRE incrementation => ",
-                     user.eligibleChannels.get(channelId)
-                  );
-
                   user.eligibleChannels.get(channelId).eligiblePolls++;
-
-                  l(
-                     "User exists and has channel key!\nIncrementing channel's eligiblePolls...\neligiblePolls POST incrementation => ",
-                     user.eligibleChannels.get(channelId)
-                  );
                } else if (user && !user.eligibleChannels.has(channelId)) {
-                  l(
-                     `User did not have the key: ${channelId} present in their eligibleChannels Map.\n Attempting to set key...`
-                  );
-
                   // todo maybe use the method to construct the paerticipation object by aggregating all docs accounting for Polls with the allowed user, just to be a bit more thorough
                   user.eligibleChannels.set(newPoll.config.channelId, {
                      eligiblePolls: 1,
                      participatedPolls: 0,
                   });
                } else {
-                  l(
-                     'User does not yet exist, creating new user from allowedUsers map...'
-                  );
                   const member = memberCache.get(key);
                   // l('MISSING USER', { member });
                   // l(member.roles.cache);
@@ -429,13 +405,6 @@ module.exports = {
                   );
                   // l('ERIGIBIRU FROM POLLSUBMIT', await eligibleChannels);
                   user = await User.createUser(guildId, key, eligibleChannels);
-
-                  l('User created! => ', user);
-
-                  l(
-                     'pre mapping user?.eligibleChannels.get(channelId) => ',
-                     user?.eligibleChannels.get(channelId)
-                  );
 
                   return user;
                }
@@ -460,11 +429,6 @@ module.exports = {
                // user.eligibleChannels.set
                // l({ participation });
 
-               l(
-                  'post mapping user?.eligibleChannels.get(channelId) => ',
-                  user?.eligibleChannels.get(channelId)
-               );
-
                user.markModified('eligibleChannels');
                return await user.save();
                // return user;
@@ -473,11 +437,7 @@ module.exports = {
 
          await Promise.all(updateVoterPromise);
 
-         console.log({ newPoll });
          let updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
-
-         console.log(newPoll);
-         console.log(newPoll.timeCreated);
 
          // const timeEndMilli = new Date(
          //    newPoll.timeCreated.getTime() + durationMs
@@ -498,7 +458,7 @@ module.exports = {
             newPoll.allowedUsers.size * (quorum / 100)
          );
 
-         embedQuorum = embedQuorum > 1 ? embedQuorum : embedQuorum > 0 ? 1: 0;
+         embedQuorum = embedQuorum > 1 ? embedQuorum : embedQuorum > 0 ? 1 : 0;
 
          updatedEmbed.fields[1].value = embedQuorum.toString(); // quorum
 
@@ -511,9 +471,9 @@ module.exports = {
          //       newPoll.timeEnd.getTime() / 1000
          //    )}:f>`; // timeEnd
          // } else {
-            updatedEmbed.fields[4].value = `<t:${Math.floor(
-               newPoll.timeEnd.getTime() / 1000
-            )}:f>`; // timeEnd
+         updatedEmbed.fields[4].value = `<t:${Math.floor(
+            newPoll.timeEnd.getTime() / 1000
+         )}:f>`; // timeEnd
          // }
 
          const threadName =
@@ -527,12 +487,11 @@ module.exports = {
          });
 
          await message.thread.send(`Discussion:`);
-
-         console.log({ message });
-         console.log(message.thread);
          message.react('✅');
       } catch (error) {
-         console.error(error);
+         Logger.error('events/poll/pollSubmit.js: Encountered an error.', {
+            error: error,
+         });
       }
 
       // const newPoll = await Poll.create({
@@ -595,6 +554,13 @@ module.exports = {
       // const reply = await modal.editReply({
 
       // todo add button vomponents in AFTER initial DB commit of the poll
+
+      Logger.info('events/poll/pollSubmit.js: Successfully submitted poll.', {
+         channelId: modal.channelId,
+         guildId: modal.guildId,
+         user: modal.user.username,
+      });
+
       return await modal.deleteReply({
          content: 'Poll Submitted!',
       });

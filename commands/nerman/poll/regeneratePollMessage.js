@@ -10,8 +10,7 @@ const PollChannel = require('../../../db/schemas/PollChannel');
 
 const { initPollMessage } = require('../../../helpers/poll/initPollMessage');
 const { drawBar, longestString } = require('../../../helpers/poll');
-
-const { log: l } = console;
+const Logger = require('../../../helpers/logger');
 
 // fixme change this once we have a better way of nailing down the guild's admin permissions
 const authorizedIds = process.env.BAD_BITCHES.split(',');
@@ -22,6 +21,15 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
+      Logger.info(
+         'commands/nerman/poll/regeneratePollMessage.js: Starting to regenerate poll message.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
+
       const {
          channelId,
          channel,
@@ -49,7 +57,14 @@ module.exports = {
       // todo later on change permissions associated with this, once we decide one how to tdeal with the cross guild shenanigans
 
       if (!authorizedIds.includes(userId)) {
-         l('NO USER ID');
+         Logger.error(
+            'commands/nerman/poll/regeneratePollMessage.js: User ID is not authorized.',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+            }
+         );
          throw new Error('You do not have permission to access this command.');
       }
 
@@ -58,7 +73,15 @@ module.exports = {
       // todo maybe convert this over to access the config from the guildConfigs collection within Nerman -- going to wait on migratiung these over for now, only sticking to using it this way where I need it, until I can account for new error/security issues in this method
       const configExists = await PollChannel.configExists(channelId);
 
-      console.log('CREATE', { configExists });
+      Logger.debug(
+         'commands/nerman/poll/regeneratePollMessage.js: Checking if the guild config exists.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+            configExists: configExists,
+         }
+      );
 
       // Test existence of channel configuration
       if (!configExists) {
@@ -84,14 +107,22 @@ module.exports = {
       const noChannelMessage =
          interaction.options.getBoolean('no-original-message') ?? false;
 
-      l({ noChannelMessage });
-      l({ messageId });
+      Logger.debug(
+         'commands/nerman/poll/regeneratePollMessage.js: Checking message ID and no-channel-message.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+            noChannelMessage: noChannelMessage,
+            messageId: messageId,
+         }
+      );
+
       const associatedPoll = await Poll.findOne()
          .byMessageId(messageId)
          .populate('config')
          .exec();
 
-      l({ associatedPoll });
       if (associatedPoll === null)
          throw new Error('This message has no polls associated with it.');
 
@@ -106,7 +137,15 @@ module.exports = {
       if (noChannelMessage === false) {
          messageToUpdate = await channel.messages.fetch(messageId);
 
-         l({ messageToUpdate });
+         Logger.debug(
+            'commands/nerman/poll/regeneratePollMessage.js: Fetched message to update',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+               messageToUpdate: messageToUpdate,
+            }
+         );
       }
 
       if (!embedOnly) {
@@ -117,18 +156,33 @@ module.exports = {
             everyoneId,
          });
 
-         // l('MESSAGE OBJECT\n', messageObject);
-
          let messageEmbed = messageObject.embeds[0];
 
-         l('MESSAGE EMBED\n', messageEmbed);
+         Logger.debug(
+            'commands/nerman/poll/regeneratePollMessage.js: Retrieved message embed.',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+            }
+         );
 
          const {
             nickname,
             user: { username, discriminator },
          } = await memberCache.get(creatorId);
 
-         l({ username, nickname, discriminator });
+         Logger.debug(
+            'commands/nerman/poll/regeneratePollMessage.js: User extra user information.',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+               nickname: nickname,
+               username: username,
+               discriminator: discriminator,
+            }
+         );
 
          messageEmbed.setFooter(
             `Poll #${associatedPoll.pollNumber} submitted by ${
@@ -142,9 +196,6 @@ module.exports = {
             associatedPoll.allowedUsers.size * (channelConfig.quorum / 100)
          );
 
-         l({ channelConfig });
-         l({ embedQuorum });
-
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
          messageEmbed.fields[1].value = embedQuorum.toString();
@@ -156,9 +207,6 @@ module.exports = {
 
          messageObject.embeds[0] = messageEmbed;
 
-         l('MESSAGE EMBED AND AN END TIME WHADDAFUK\n', messageEmbed);
-         l('MESSAGE OBJECT\n', messageObject);
-
          const threadName =
             associatedPoll.pollData.title.length <= 100
                ? associatedPoll.pollData.title
@@ -169,8 +217,17 @@ module.exports = {
             name: threadName,
             autoArchiveDuration: 10080, // todo probably make this based on channelConfig?
          });
-         l({ messageToUpdate });
-         l({ newMsg });
+
+         Logger.debug(
+            'commands/nerman/poll/regeneratePollMessage.js: Checking new message.',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+               newMessage: newMessage,
+            }
+         );
+
          associatedPoll.messageId = newMsg.id;
          await associatedPoll.save();
 
@@ -211,10 +268,7 @@ module.exports = {
             let winningResult = '';
             const results = await associatedPoll.results;
 
-            console.log({ results });
-
             if ('winner' in results) {
-               console.log(results.winner);
                winningResult =
                   results.winner !== null
                      ? `${
@@ -313,9 +367,6 @@ module.exports = {
 
             updateEmbed.spliceFields(1, 4, closedFields);
 
-            console.log('updateEmbed.fields');
-            console.log(updateEmbed.fields);
-
             messageToUpdate.edit({
                content: mentions,
                embeds: [updateEmbed],
@@ -332,9 +383,6 @@ module.exports = {
 
             updateEmbed.spliceFields(1, 4, closedFields);
 
-            console.log('updateEmbed.fields');
-            console.log(updateEmbed.fields);
-
             messageToUpdate.edit({
                content: null,
                embeds: [updateEmbed],
@@ -350,5 +398,14 @@ module.exports = {
          // todo make sure I can regenerate if closed
       }
       await interaction.editReply({ content: 'Regeneration finished!' });
+
+      Logger.info(
+         'commands/nerman/poll/regeneratePollMessage.js: Finished regenerating poll message.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
    },
 };

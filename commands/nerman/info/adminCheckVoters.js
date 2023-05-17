@@ -1,5 +1,7 @@
 const { CommandInteraction } = require('discord.js');
-const { log: l } = console;
+
+const Logger = require('../../../helpers/logger');
+
 // const guildAdminId = process.env.NERMAN_G_ADMIN_ID;
 const authorizedIds = process.env.BAD_BITCHES.split(',');
 // const { lc } = require('../../../utils/functions');
@@ -10,6 +12,15 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
+      Logger.info(
+         'commands/nerman/info/adminCheckVoter.js: Attempting to admin check votes.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
+
       const {
          channelId,
          user: { id: userId },
@@ -21,8 +32,6 @@ module.exports = {
             members: { cache: mCache },
          },
       } = interaction;
-
-      l({ interaction });
 
       await interaction.deferReply({ ephemeral: true });
 
@@ -36,48 +45,41 @@ module.exports = {
 
       let fetchedMembers = await guildMembers.fetch();
 
-      l(fetchedMembers.length);
-
       if (checkingRole !== null) {
-         l('ROLE FILTER START');
+         Logger.info(
+            'commands/nerman/info/adminCheckVoter.js: Starting role filter.',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+            }
+         );
 
          fetchedMembers = fetchedMembers.filter(member => {
-            l('Member:');
-            l(member.user.username);
-            // l(member.roles.cache);
-            l(!!member.roles.cache.find(role => role.name === checkingRole));
-            // l(member.roles.cache.name);
-
             return member.roles.cache.find(role => role.name === checkingRole);
          });
 
-         l('ROLE FILTER END');
+         Logger.info(
+            'commands/nerman/info/adminCheckVoter.js: Finished role filter.',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+            }
+         );
       }
 
-      // l({ interaction });
-      l({ checkingRole });
-      // l({ userRoleCache });
+      Logger.info(
+         'commands/nerman/info/adminCheckVoter.js: Starting promises map',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
 
-      // l({ mCache });
-      // l({ fetchedMembers });
-
-      // let userArray = [];
-
-      // fetchedMembers.forEach(
-      l('PROMISES MAP START');
       const promises = await fetchedMembers.map(
          ({ id, nickname, user: { username, discriminator } }) => {
-            // l({
-            //    id,
-            //    nickname,
-            //    username,
-            //    discriminator,
-            //    fullName:
-            //       nickname !== null
-            //          ? `${nickname}#${discriminator}`
-            //          : `${username}#${discriminator}`,
-            // });
-
             return {
                discordId: id,
                fullNickname:
@@ -85,21 +87,33 @@ module.exports = {
                      ? `${nickname}#${discriminator}`
                      : `${username}#${discriminator}`,
                fullUsername: `${username}#${discriminator}`,
-               // nickname,
-               // username,
-               // discriminator,
             };
          }
       );
 
       const userArray = await Promise.all(promises);
 
-      l(JSON.stringify(userArray, null, 4));
-      l('userArray.length', userArray.length);
+      Logger.info(
+         'commands/nerman/info/adminCheckVoter.js: Finished promises map',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+            userArray: userArray,
+         }
+      );
 
-      l('PROMISES MAP END');
       await interaction.editReply({
          content: 'Logging information to console.',
       });
+
+      Logger.info(
+         'commands/nerman/info/adminCheckVoter.js: Finished admin check votes.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
    },
 };

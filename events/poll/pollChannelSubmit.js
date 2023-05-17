@@ -2,9 +2,7 @@ const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
 const PollChannel = require('../../db/schemas/PollChannel');
 // const GuildConfig = require('../../db/schemas/GuildConfig');
-const { logToObject } = require('../../utils/functions');
-
-const { log: l } = console;
+const Logger = require('../../helpers/logger');
 
 module.exports = {
    name: 'modalSubmit',
@@ -12,6 +10,14 @@ module.exports = {
     * @param {Modal} modal
     */
    async execute(modal) {
+      Logger.info(
+         'events/poll/pollChannelSubmit.js: Attempting to create a poll channel.',
+         {
+            guildId: modal.guild.id,
+            channelId: modal.channelId,
+         }
+      );
+
       if (modal.customId !== 'modal-create-poll-channel') return;
 
       await modal.deferReply({ ephemeral: true });
@@ -26,15 +32,10 @@ module.exports = {
             },
          } = modal;
 
-         // console.log(modal.member);
-         // console.log(modal.member.roles);
-         // console.log(modal.member.roles.cache);
-         console.log({ roleCache });
-
          const configCheck = await PollChannel.countDocuments({
             channelId,
          }).exec();
-         console.log({ configCheck });
+
          if (!!configCheck)
             return modal.editReply({
                content:
@@ -42,14 +43,17 @@ module.exports = {
                ephemeral: true,
             });
 
-         // const guildConfig = await GuildConfig.findOne({
-         //    guildId: guildId,
-         // }).exec();
-
          const guildConfig = await (guildConfigs.has(guildId) &&
             guildConfigs.get(guildId));
 
-         l({ guildConfig });
+         Logger.debug(
+            'events/poll/pollChannelSubmit.js: Checking guild config.',
+            {
+               guildId: modal.guild.id,
+               channelId: modal.channelId,
+               guildConfig: guildConfig,
+            }
+         );
 
          const durRegex = new RegExp(/^\d{1,3}(\.\d{1,2})?$/, 'g');
          // const quorRegex = new RegExp(/^\d{1,2}(\.\d{1,2})?$/, 'g');
@@ -61,9 +65,6 @@ module.exports = {
          const optionRegex = new RegExp(
             /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?(^for-or-against$)?$/
          );
-
-         console.log({ durRegex });
-         console.log({ quorRegex });
 
          // extract data from submitted modal
          // const pollChannel = modal.getSelectMenuValues('pollChannel');
@@ -88,7 +89,6 @@ module.exports = {
             pollQuorumThreshold.at(0),
             pollQuorumThreshold.at(-1),
          ];
-         console.log({ firstChar, lastChar });
 
          if (firstChar === ':' || lastChar === ':') {
             return modal.editReply({
@@ -122,15 +122,21 @@ module.exports = {
                  .filter(v => v !== '')
             : [];
 
-         console.log({ votingRoles });
-         console.log({ pollChannelOptions });
-         console.log({ pollQuorumThreshold });
-
          let pollQuorum = pollQuorumThreshold[0];
          let voteThreshold = pollQuorumThreshold[1] ?? 0;
 
-         console.log({ pollQuorum });
-         console.log({ voteThreshold });
+         Logger.debug(
+            'events/poll/pollChannelSubmit.js: Checking poll options.',
+            {
+               guildId: modal.guild.id,
+               channelId: modal.channelId,
+               pollQuorum: pollQuorum,
+               voteThreshold: voteThreshold,
+               pollChannelOptions: pollChannelOptions,
+               pollQuorumThreshold: pollQuorumThreshold,
+               votingRoles: votingRoles,
+            }
+         );
 
          // map the ids of the guild channels that match the names of the user submitted roles
          // const allowedRoles = roleCache
@@ -146,8 +152,6 @@ module.exports = {
                   )
                   .map(({ id }) => id)
             );
-
-         console.log({ allowedRoles });
 
          // Check to see if any values from user submission don't match roles in guild/channel
          if (allowedRoles.length !== votingRoles.length) {
@@ -165,10 +169,11 @@ module.exports = {
          // const pollChannelOptions =
          // modal.getSelectMenuValues('pollChannelOptions');
 
-         console.log(
-            'CHECKING 0 QUORUM => ',
-            Math.floor(50 * (pollQuorum / 100))
-         );
+         Logger.debug('events/poll/pollChannelSubmit.js: Checking 0 Quorum', {
+            guildId: modal.guild.id,
+            channelId: modal.channelId,
+            quorum: Math.floor(50 * (pollQuorum / 100)),
+         });
 
          if (!durRegex.test(pollDuration)) {
             return modal.editReply({
@@ -196,26 +201,16 @@ module.exports = {
             });
          }
 
-         console.log({ pollQuorum });
          pollDuration = parseFloat(pollDuration);
          pollQuorum = parseFloat(pollQuorum) > 0 ? parseFloat(pollQuorum) : 0;
-         console.log({ pollQuorum });
-         console.log({ pollQuorum });
-         console.log({ pollQuorum });
-         console.log({ pollQuorum });
-         console.log({ pollQuorum });
-         console.log({ pollQuorum });
-         console.log(parseFloat(pollQuorum));
-         console.log(parseFloat(pollQuorum) > 0);
-         console.log(parseFloat(pollQuorum) > 0 ? parseFloat(pollQuorum) : 0);
 
-         // return modal.editReply({
-         //    content: 'Aborting early for testing!',
-         //    ephermeral: true,
-         // });
-
-         // try {
-         l('Creating new channelConfig document...');
+         Logger.info(
+            'events/poll/pollChannelSubmit.js: Creating a new channel config document.',
+            {
+               guildId: modal.guild.id,
+               channelId: modal.channelId,
+            }
+         );
 
          const newPollChannel = await PollChannel.create({
             _id: new Types.ObjectId(),
@@ -234,14 +229,33 @@ module.exports = {
             voteThreshold: voteThreshold,
          });
 
-         l(
-            `${guildConfig.pollChannels.length} Poll Channels belong to this guild configuration.\nRepopulating channel configuration list...`
+         Logger.info(
+            `events/poll/pollChannelSubmit.js: Repopulating channel configuration list, because channels belong to this guild config.`,
+            {
+               guildId: modal.guild.id,
+               channelId: modal.channelId,
+               numOfPollChannels: guildConfig.pollChannels.length,
+            }
          );
+
          await guildConfig.depopulate('pollChannels');
          await guildConfig.populate('pollChannels');
 
-         l(
-            `Configuration list has been repopulated!\n\n${guildConfig.pollChannels.length} poll Channels now belong to this guild.`
+         Logger.info(
+            `events/poll/pollChannelSubmit.js: Configuration list has been repopulated!`,
+            {
+               guildId: modal.guild.id,
+               channelId: modal.channelId,
+               numOfPollChannels: guildConfig.pollChannels.length,
+            }
+         );
+
+         Logger.info(
+            'events/poll/pollChannelSubmit.js: Finished creating poll channel.',
+            {
+               guildId: modal.guild.id,
+               channelId: modal.channelId,
+            }
          );
 
          return modal.editReply({
@@ -249,7 +263,10 @@ module.exports = {
             ephemeral: true,
          });
       } catch (error) {
-         console.error(error);
+         Logger.error(
+            'events/poll/pollChannelSubmit.js: Encountered an error.',
+            { error: error }
+         );
          return modal.editReply({
             content: 'Polling channel has been successfully registered.',
             ephemeral: true,

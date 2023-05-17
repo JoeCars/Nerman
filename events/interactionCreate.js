@@ -1,30 +1,35 @@
-const { logToObject } = require('../utils/functions');
-const { log: l } = console;
+const Logger = require('../helpers/logger');
 
 module.exports = {
    name: 'interactionCreate',
    async execute(interaction) {
       if (!interaction.isCommand() && !interaction.isContextMenu()) return;
 
+      Logger.info(
+         'events/interactionCreate.js: Handling an interaction creation event.',
+         {
+            interaction: interaction,
+         }
+      );
+
       const { client } = interaction;
 
       const command = client.commands.get(interaction.commandName);
 
       if (!command) return;
-      console.log({ interaction });
-      console.log(interaction.options);
       // console.log(interaction.options.getSubcommand() ?? 'No subcommands');
       const subCommand = interaction.options?.getSubcommand(false);
 
-      console.log({ subCommand });
+      Logger.debug('events/interactionCreate.js: Checking subcommands.', {
+         interaction: interaction,
+         subCommand: subCommand,
+      });
 
       try {
          if (subCommand) {
             const subCommandFile = client.subCommands.get(
                `${interaction.commandName}.${subCommand}`
             );
-
-            l(client.subCommands);
 
             if (!subCommandFile) {
                throw Error('Invalid subcommand');
@@ -33,12 +38,26 @@ module.exports = {
             await subCommandFile.execute(interaction);
          }
 
+         Logger.info(
+            'events/interactionCreate.js: Finished handling an interaction creation event.',
+            {
+               interaction: interaction,
+            }
+         );
+
          await command.execute(interaction);
       } catch (error) {
-         console.error(error);
+         Logger.warn(
+            'events/interactionCreate.js: Encountered an error. Attempting to defer.',
+            {
+               error: error,
+            }
+         );
 
          if (interaction.deferred) {
-            console.log('INTERACTION CREATE DEFERRED');
+            Logger.info('events/interactionCreate.js: Deferred interaction.', {
+               interaction: interaction,
+            });
             await interaction.editReply({
                content:
                   error.message ||
@@ -46,7 +65,12 @@ module.exports = {
                ephemeral: true,
             });
          } else {
-            console.log('INTERACTION CREATE NOTDEFERRED');
+            Logger.info(
+               'events/interactionCreate.js: Did not defer interaction.',
+               {
+                  interaction: interaction,
+               }
+            );
             await interaction.reply({
                content:
                   error.message ||
@@ -54,7 +78,6 @@ module.exports = {
                ephemeral: true,
             });
          }
-         console.timeEnd('Interaction Timer');
       }
    },
 };
