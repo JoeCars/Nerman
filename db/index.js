@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 // Personal Imports
 const { drawBar, longestString } = require('../helpers/poll');
 const Logger = require('../helpers/logger');
+const ResultBar = require('../classes/ResultBar');
+
 const Poll = require('../db/schemas/Poll');
 const { lc } = require('../utils/functions');
 
@@ -238,7 +240,9 @@ module.exports = async client => {
                                     arr[0][0].toUpperCase() +
                                     arr[0].substring(1)
                               )
-                              .join(', ')} - Tied`;
+                              .join(', ')} - Tied\nPoll inconclusive.`;
+
+                           closingPoll.pollSucceeded = false;
                         }
 
                         let failedChecks = [];
@@ -273,12 +277,12 @@ module.exports = async client => {
                         );
 
                         if (failedChecks.length) {
-                           closingPoll.conclusive = false;
+                           closingPoll.pollSucceeded = false;
                            winningResult = `Poll failed to meet ${failedChecks.join(
                               ' and '
                            )}.`;
                         } else {
-                           closingPoll.conclusive = true;
+                           closingPoll.pollSucceeded = true;
                         }
 
                         Logger.debug(
@@ -302,7 +306,7 @@ module.exports = async client => {
                         let resultsArray = closingPoll.config.voteThreshold
                            ? [
                                 `Threshold: ${closingPoll.voteThreshold} ${
-                                   closingPoll.voteThreshold >= 1
+                                   closingPoll.voteThreshold > 1
                                       ? 'votes'
                                       : 'vote'
                                 }\n`,
@@ -326,69 +330,87 @@ module.exports = async client => {
                               labelLength: label.length,
                               distanceFromLongest: longestOption - label.length,
                            });
-
-                           let optionObj = {
+                          
+                           const votes = results.distribution[key];
+                           const room = longestOption - label.length;
+                           let optionObj = new ResultBar(
                               label,
-                              votes: results.distribution[key],
-                              room: longestOption - label.length,
-                              get spacer() {
-                                 return this.room !== 0
-                                    ? Array.from(
-                                         { length: this.room },
-                                         () => '\u200b '
-                                      ).join('')
-                                    : '';
-                              },
-                              get portion() {
-                                 return votesMap.get('totalVotes') !== 0
-                                    ? this.votes / votesMap.get('totalVotes')
-                                    : 0;
-                              },
-                              get portionOutput() {
-                                 // return ` ${(this.portion * 100).toFixed(1)}%`;
-                                 return ` ${this.votes ?? 0} votes`;
-                              },
-                              get bar() {
-                                 return drawBar(
-                                    votesMap.get('maxLength'),
-                                    this.portion
-                                 );
-                              },
-                              get completeBar() {
-                                 return [
-                                    `${this.label}${this.spacer} `,
-                                    this.bar,
-                                    this.portionOutput,
-                                 ].join('');
-                              },
-                           };
+                              votes,
+                              room,
+                              votesMap
+                           );
+
+
+                           //disabled for testing
+                           // let optionObj = {
+                           //    label,
+                           //    votes: results.distribution[key],
+                           //    room: longestOption - label.length,
+                           //    get spacer() {
+                           //       return this.room !== 0
+                           //          ? Array.from(
+                           //               { length: this.room },
+                           //               () => '\u200b '
+                           //            ).join('')
+                           //          : '';
+                           //    },
+                           //    get portion() {
+                           //       return votesMap.get('totalVotes') !== 0
+                           //          ? this.votes / votesMap.get('totalVotes')
+                           //          : 0;
+                           //    },
+                           //    get portionOutput() {
+                           //       // return ` ${(this.portion * 100).toFixed(1)}%`;
+                           //       return ` ${this.votes ?? 0} votes`;
+                           //    },
+                           //    get bar() {
+                           //       return drawBar(
+                           //          votesMap.get('maxLength'),
+                           //          this.portion
+                           //       );
+                           //    },
+                           //    get completeBar() {
+                           //       return [
+                           //          `${this.label}${this.spacer} `,
+                           //          this.bar,
+                           //          this.portionOutput,
+                           //       ].join('');
+                           //    },
+                           // };
 
                            votesMap.set(label, optionObj);
                            // resultsArray.splice(-1, 0, optionObj.completeBar);
                            resultsArray.push(optionObj.completeBar);
                         }
 
+                        resultsArray.push(
+                           `\nAbstains: ${closingPoll.abstains.size}`
+                        );
                         resultsOutput = codeBlock(resultsArray.join('\n'));
 
                         let closedEmbed = message.embeds[0];
 
                         closedEmbed.setTitle(`${closedEmbed.title}`);
 
-                        const votersValue = closingPoll.config.voteThreshold
-                           ? `Quorum: ${
-                                closingPoll.voterQuorum
-                             }\n\nParticipated: ${
-                                closingPoll.countVoters +
-                                closingPoll.countAbstains
-                             }\nEligible: ${eligibleVoters}\n\nParticipation Rate: ${
-                                closingPoll.participation
-                             }%`
-                           : `Quorum: ${
-                                closingPoll.voterQuorum
-                             }\n\nParticipated: ${
-                                closingPoll.countVoters +
-                                closingPoll.countAbstains
-                             }\nEligible: ${eligibleVoters}`;
+                        const votersValue = `Quorum: ${
+                           closingPoll.voterQuorum
+                        }\n\nParticipated: ${
+                           closingPoll.countVoters + closingPoll.countAbstains
+                        }\nEligible: ${eligibleVoters}`;
+
+                        // const votersValue = closingPoll.config.voteThreshold
+                        //    ? `Quorum: ${
+                        //         closingPoll.voterQuorum
+                        //      }\n\nParticipated: ${
+                        //         closingPoll.countVoters +
+                        //         closingPoll.countAbstains
+                        //      }\nEligible: ${eligibleVoters}`
+                        //    : `Quorum: ${
+                        //         closingPoll.voterQuorum
+                        //      }\n\nParticipated: ${
+                        //         closingPoll.countVoters +
+                        //         closingPoll.countAbstains
+                        //      }\nEligible: ${eligibleVoters}`;
 
                         const closedFields = [
                            {
@@ -432,6 +454,7 @@ module.exports = async client => {
                            embeds: [closedEmbed],
                            components: [],
                         });
+
                      } else if (
                         closingPoll !== null &&
                         closingPoll.config === null

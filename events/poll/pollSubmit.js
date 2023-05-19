@@ -1,8 +1,9 @@
 const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
-const { roleMention } = require('@discordjs/builders');
+const { roleMention, codeBlock } = require('@discordjs/builders');
 const { initPollMessage } = require('../../helpers/poll/initPollMessage');
+const ResultBar = require('../../classes/ResultBar');
 const User = require('../../db/schemas/User');
 const Poll = require('../../db/schemas/Poll');
 const PollChannel = require('../../db/schemas/PollChannel');
@@ -31,6 +32,7 @@ module.exports = {
       // console.log('pollSubmit.js -- modal', { modal });
 
       await modal.deferReply();
+      // await modal.deferReply({ ephemeral: true });
 
       const {
          client,
@@ -53,7 +55,7 @@ module.exports = {
          {
             channelId,
          },
-         'allowedRoles forAgainst voteThreshold'
+         'allowedRoles forAgainst voteThreshold liveVisualFeed'
       );
 
       const intRegex = new RegExp(/^\d*$/);
@@ -92,9 +94,10 @@ module.exports = {
             ),
          ];
       }
-      let voteAllowance = parseInt(
-         modal.getTextInputValue('voteAllowance') ?? 1
-      );
+      let voteAllowance = modal.getTextInputValue('voteAllowance') ?? 1;
+      // let voteAllowance = parseInt(
+      //    modal.getTextInputValue('voteAllowance') ?? 1
+      // );
 
       Logger.debug('events/poll/pollSubmit.js: Checking vote options.', {
          channelId: modal.channelId,
@@ -104,11 +107,18 @@ module.exports = {
          voteAllowance: voteAllowance,
       });
 
+      if (isNaN(voteAllowance)) {
+         voteAllowance = `${modal.getTextInputValue('voteAllowance')}`;
+      }
+
       // return modal.editReply({ content: 'Return early', ephemeral: true });
 
       if (!intRegex.test(voteAllowance)) {
-         return modal.editReply({
-            content: `${voteAllowance} - is not a valid vote allowance number.\nPlease choose a whole number.`,
+         modal.deleteReply();
+
+         return modal.followUp({
+            // return modal.followUp({
+            content: `***${voteAllowance}*** - is not a valid vote allowance number.\nPlease choose a whole number.`,
             ephemeral: true,
          });
       }
@@ -116,7 +126,10 @@ module.exports = {
       // ,, , Yes, No,Abstain,,, ,, , // <---- testing format string
 
       if (options.length < 2) {
-         return modal.editReply({
+         // return modal.editReply({
+         modal.deleteReply();
+
+         return modal.followUp({
             content:
                'You require a minimum of two options to vote. Use comma separated values to input choices. Eg) Yes, No, Abstain',
             ephemeral: true,
@@ -124,11 +137,21 @@ module.exports = {
       }
 
       if (voteAllowance > options.length) {
-         return modal.editReply({
+         // return modal.editReply({
+         // return modal.deleteReply({
+         modal.deleteReply();
+
+         return modal.followUp({
             content:
                'Currently we are unable to facilitate having more votes than options.',
             ephemeral: true,
          });
+
+         // return modal.deleteReply({
+         //    content:
+         //    'Currently we are unable to facilitate having more votes than options.',
+         //    // ephemeral: true,
+         // });
       }
 
       // console.log({ options });
@@ -454,7 +477,7 @@ module.exports = {
             }#${discriminator}`
          );
 
-         let embedQuorum = Math.floor(
+         let embedQuorum = Math.ceil(
             newPoll.allowedUsers.size * (quorum / 100)
          );
 
@@ -471,10 +494,98 @@ module.exports = {
          //       newPoll.timeEnd.getTime() / 1000
          //    )}:f>`; // timeEnd
          // } else {
-         updatedEmbed.fields[4].value = `<t:${Math.floor(
+
+         updatedEmbed.fields.find(({name}) => name === 'Voting Closes').value = `<t:${Math.floor(
             newPoll.timeEnd.getTime() / 1000
          )}:f>`; // timeEnd
          // }
+
+         /**
+          *
+          *
+          *
+          *
+          *
+          *
+          *
+          */
+
+         // todo Extract code into module
+         if (channelConfig.liveVisualFeed) {
+            const results = newPoll.results;
+            const longestOption = longestString(
+               newPoll.pollData.choices
+            ).length;
+
+            console.log(
+               'events/poll/pollVote.js -- longestOption => ',
+               longestOption
+            );
+            // let resultsArray = ['```', '```'];
+            let resultsArray = newPoll.config.voteThreshold
+               ? [
+                    `Threshold: ${newPoll.voteThreshold} ${
+                       newPoll.voteThreshold > 1 ? 'votes' : 'vote'
+                    }\n`,
+                 ]
+               : [];
+
+            let resultsOutput = [];
+
+            const barWidth = 8;
+            let totalVotes = results.totalVotes;
+            // let totalVotes = newPoll.results.totalVotes;
+
+            let votesMap = new Map([
+               ['maxLength', barWidth],
+               ['totalVotes', totalVotes],
+            ]);
+
+            for (const key in results.distribution) {
+               const label = key[0].toUpperCase() + key.substring(1);
+
+               console.log('db/index.js -- label => ', label);
+               console.log('db/index.js -- label.length => ', label.length);
+               console.log(
+                  'db/index.js -- logging :  longestOption - label.length => ',
+                  longestOption - label.length
+               );
+               const votes = results.distribution[key];
+               const room = longestOption - label.length;
+               let optionObj = new ResultBar(label, votes, room, votesMap);
+
+               console.log('optionObj => ', optionObj);
+               console.log('optionObj.completeBar => ', optionObj.completeBar);
+
+               votesMap.set(label, optionObj);
+               // resultsArray.splice(-1, 0, optionObj.completeBar);
+               resultsArray.push(optionObj.completeBar);
+            }
+
+            resultsArray.push(`\nAbstains: ${newPoll.abstains.size}`);
+
+            // console.log(votesMap);
+
+            // resultsOutput = resultsArray.join('\n');
+            resultsOutput = codeBlock(resultsArray.join('\n'));
+
+            updatedEmbed.spliceFields(1, 0, {
+               name: 'Results',
+               value: resultsOutput,
+               inline: false,
+            });
+         }
+
+         /**
+          *
+          *
+          *
+          *
+          *
+          *
+          *
+          *
+          */
 
          const threadName =
             title.length <= 100 ? title : `${title.substring(0, 96)}...`;
@@ -561,7 +672,11 @@ module.exports = {
          user: modal.user.username,
       });
 
-      return await modal.deleteReply({
+      await modal.followUp({
+         content: 'Poll Submitted!',
+      });
+
+      return modal.deleteReply({
          content: 'Poll Submitted!',
       });
    },

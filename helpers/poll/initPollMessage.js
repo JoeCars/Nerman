@@ -35,6 +35,8 @@ const initPollMessage = async ({
 
    voteActionRow.addComponents(voteBtn, abstainBtn);
 
+
+   // todo need to build in logic for max character limits in Embeds
    const embedFields = [
       { name: '\u200B', value: '\u200B', inline: false },
       { name: 'Quorum', value: '...', inline: true },

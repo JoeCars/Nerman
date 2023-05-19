@@ -183,6 +183,7 @@ module.exports = {
             .setPlaceholder('# of votes is a single user allowed.')
             .setDefaultValue('1')
             .setRequired(true)
+            .setMaxLength(2)
             .setStyle('SHORT');
 
          createPollComponents.push(pollAllowance);

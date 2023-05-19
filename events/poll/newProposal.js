@@ -281,7 +281,7 @@ module.exports = {
             }#${discriminator}`
          );
 
-         let embedQuorum = Math.floor(
+         let embedQuorum = Math.ceil(
             newPoll.allowedUsers.size * (channelConfig.quorum / 100)
          );
 

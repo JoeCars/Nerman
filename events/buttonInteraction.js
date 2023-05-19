@@ -27,6 +27,7 @@ module.exports = {
          member: { permissions },
       } = interaction;
 
+
       const button = client.buttons.get(customId);
 
       if (button.permission && !permissions.has(button.permission)) {
