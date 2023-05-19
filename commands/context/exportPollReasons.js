@@ -20,6 +20,7 @@ const fetchPoll = async interaction => {
          .populate('_id')
          .populate('votes')
          .populate('abstains')
+         .populate('pollData')
          .exec();
    }
    catch (err) {
@@ -67,43 +68,32 @@ const extractPollResults = (targetPoll, votes) => {
    const status = targetPoll.status;
    const numOfAbstains = targetPoll.abstains.size;
 
-   // Note. I am assuming we only have two types of votes. For and against.
-   const forVotes = [];
-   const againstVotes = [];
+   // This approach allows multiple choices that can be any value.
+   const votesForChoice = new Map();
+   targetPoll.pollData.choices.forEach(choice => {
+      votesForChoice.set(choice, []);
+   });
+
    for (const vote of votes) {
       for (const choice of vote.choices) {
-         if (choice === 'for') {
-            forVotes.push({ username: vote.username, reason: vote.reason });
-         }
-         else if (choice === 'against') {
-            againstVotes.push({
-               username: vote.username,
-               reason: vote.reason,
-            });
-         }
+         votesForChoice
+            .get(choice)
+            .push({ username: vote.username, reason: vote.reason });
       }
    }
 
-   return { status, numOfAbstains, forVotes, againstVotes };
+   return { status, numOfAbstains, votesForChoice };
 };
 
-const generatePollExport = ({
-   status,
-   forVotes,
-   againstVotes,
-   numOfAbstains,
-}) => {
+const generatePollExport = ({ status, numOfAbstains, votesForChoice }) => {
    let output = `Poll Status: ${status}\n`;
 
-   output += `\n**FOR - ${forVotes.length} VOTES**\n`;
-   for (const vote of forVotes) {
-      output += `\n**${vote.username}** | *"${vote.reason}"*\n`;
-   }
-
-   output += `\n**AGAINST - ${againstVotes.length} VOTES**\n`;
-   for (const vote of againstVotes) {
-      output += `\n**${vote.username}** | *"${vote.reason}"*\n`;
-   }
+   votesForChoice.forEach((votes, choice) => {
+      output += `\n**${choice.toUpperCase()} - ${votes.length} VOTES**\n`;
+      for (const vote of votes) {
+         output += `\n**${vote.username}** | *"${vote.reason}"*\n`;
+      }
+   });
 
    output += `\n**ABSTAINS - ${numOfAbstains} VOTES**`;
 
