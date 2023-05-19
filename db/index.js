@@ -4,6 +4,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 // Personal Imports
 const { drawBar, longestString } = require('../helpers/poll');
+const ResultBar = require('../classes/ResultBar');
 // const { encodeURI } = require('../utils/functions');
 const Poll = require('../db/schemas/Poll');
 const { lc } = require('../utils/functions');
@@ -284,7 +285,9 @@ module.exports = async client => {
                                     arr[0][0].toUpperCase() +
                                     arr[0].substring(1)
                               )
-                              .join(', ')} - Tied`;
+                              .join(', ')} - Tied\nPoll inconclusive.`;
+
+                           closingPoll.pollSucceeded = false;
                         }
 
                         let failedChecks = [];
@@ -311,28 +314,29 @@ module.exports = async client => {
                         if (results.thresholdPass === false) {
                            failedChecks.push('vote threshold');
                         }
+
                         console.log(
                            'db/index.js -- jsfailedChecks after checks=> ',
                            failedChecks
                         );
 
                         console.log(
-                           'db/index.js -- closingPoll.conclusive PRE checks => ',
-                           closingPoll.conclusive
+                           'db/index.js -- closingPoll.pollSucceeded PRE checks => ',
+                           closingPoll.pollSucceeded
                         );
 
                         if (failedChecks.length) {
-                           closingPoll.conclusive = false;
+                           closingPoll.pollSucceeded = false;
                            winningResult = `Poll failed to meet ${failedChecks.join(
                               ' and '
                            )}.`;
                         } else {
-                           closingPoll.conclusive = true;
+                           closingPoll.pollSucceeded = true;
                         }
 
                         console.log(
-                           'db/index.js -- closingPoll.conclusive POST checks => ',
-                           closingPoll.conclusive
+                           'db/index.js -- closingPoll.pollSucceeded POST checks => ',
+                           closingPoll.pollSucceeded
                         );
 
                         await closingPoll.save();
@@ -354,6 +358,8 @@ module.exports = async client => {
                         //
                         //
 
+                        // todo Extract code into module
+
                         // const longestOption = longestString(options).length;
                         const longestOption = longestString(
                            closingPoll.pollData.choices
@@ -367,7 +373,7 @@ module.exports = async client => {
                         let resultsArray = closingPoll.config.voteThreshold
                            ? [
                                 `Threshold: ${closingPoll.voteThreshold} ${
-                                   closingPoll.voteThreshold >= 1
+                                   closingPoll.voteThreshold > 1
                                       ? 'votes'
                                       : 'vote'
                                 }\n`,
@@ -395,46 +401,66 @@ module.exports = async client => {
                               'db/index.js -- logging :  longestOption - label.length => ',
                               longestOption - label.length
                            );
-                           let optionObj = {
+                           const votes = results.distribution[key];
+                           const room = longestOption - label.length;
+                           let optionObj = new ResultBar(
                               label,
-                              votes: results.distribution[key],
-                              room: longestOption - label.length,
-                              get spacer() {
-                                 return this.room !== 0
-                                    ? Array.from(
-                                         { length: this.room },
-                                         () => '\u200b '
-                                      ).join('')
-                                    : '';
-                              },
-                              get portion() {
-                                 return votesMap.get('totalVotes') !== 0
-                                    ? this.votes / votesMap.get('totalVotes')
-                                    : 0;
-                              },
-                              get portionOutput() {
-                                 // return ` ${(this.portion * 100).toFixed(1)}%`;
-                                 return ` ${this.votes ?? 0} votes`;
-                              },
-                              get bar() {
-                                 return drawBar(
-                                    votesMap.get('maxLength'),
-                                    this.portion
-                                 );
-                              },
-                              get completeBar() {
-                                 return [
-                                    `${this.label}${this.spacer} `,
-                                    this.bar,
-                                    this.portionOutput,
-                                 ].join('');
-                              },
-                           };
+                              votes,
+                              room,
+                              votesMap
+                           );
+
+                           console.log('optionObj => ', optionObj);
+                           console.log(
+                              'optionObj.completeBar => ',
+                              optionObj.completeBar
+                           );
+
+                           //disabled for testing
+                           // let optionObj = {
+                           //    label,
+                           //    votes: results.distribution[key],
+                           //    room: longestOption - label.length,
+                           //    get spacer() {
+                           //       return this.room !== 0
+                           //          ? Array.from(
+                           //               { length: this.room },
+                           //               () => '\u200b '
+                           //            ).join('')
+                           //          : '';
+                           //    },
+                           //    get portion() {
+                           //       return votesMap.get('totalVotes') !== 0
+                           //          ? this.votes / votesMap.get('totalVotes')
+                           //          : 0;
+                           //    },
+                           //    get portionOutput() {
+                           //       // return ` ${(this.portion * 100).toFixed(1)}%`;
+                           //       return ` ${this.votes ?? 0} votes`;
+                           //    },
+                           //    get bar() {
+                           //       return drawBar(
+                           //          votesMap.get('maxLength'),
+                           //          this.portion
+                           //       );
+                           //    },
+                           //    get completeBar() {
+                           //       return [
+                           //          `${this.label}${this.spacer} `,
+                           //          this.bar,
+                           //          this.portionOutput,
+                           //       ].join('');
+                           //    },
+                           // };
 
                            votesMap.set(label, optionObj);
                            // resultsArray.splice(-1, 0, optionObj.completeBar);
                            resultsArray.push(optionObj.completeBar);
                         }
+
+                        resultsArray.push(
+                           `\nAbstains: ${closingPoll.abstains.size}`
+                        );
 
                         // console.log(votesMap);
 
@@ -459,22 +485,30 @@ module.exports = async client => {
                         closedEmbed.setTitle(`${closedEmbed.title}`);
 
                         console.log({ closedEmbed });
+                        console.log(
+                           'closingPoll.config.voteThreshold => ',
+                           closingPoll.config.voteThreshold
+                        );
 
-                        const votersValue = closingPoll.config.voteThreshold
-                           ? `Quorum: ${
-                                closingPoll.voterQuorum
-                             }\n\nParticipated: ${
-                                closingPoll.countVoters +
-                                closingPoll.countAbstains
-                             }\nEligible: ${eligibleVoters}\n\nParticipation Rate: ${
-                                closingPoll.participation
-                             }%`
-                           : `Quorum: ${
-                                closingPoll.voterQuorum
-                             }\n\nParticipated: ${
-                                closingPoll.countVoters +
-                                closingPoll.countAbstains
-                             }\nEligible: ${eligibleVoters}`;
+                        const votersValue = `Quorum: ${
+                           closingPoll.voterQuorum
+                        }\n\nParticipated: ${
+                           closingPoll.countVoters + closingPoll.countAbstains
+                        }\nEligible: ${eligibleVoters}`;
+
+                        // const votersValue = closingPoll.config.voteThreshold
+                        //    ? `Quorum: ${
+                        //         closingPoll.voterQuorum
+                        //      }\n\nParticipated: ${
+                        //         closingPoll.countVoters +
+                        //         closingPoll.countAbstains
+                        //      }\nEligible: ${eligibleVoters}`
+                        //    : `Quorum: ${
+                        //         closingPoll.voterQuorum
+                        //      }\n\nParticipated: ${
+                        //         closingPoll.countVoters +
+                        //         closingPoll.countAbstains
+                        //      }\nEligible: ${eligibleVoters}`;
 
                         const closedFields = [
                            {
@@ -518,6 +552,11 @@ module.exports = async client => {
                         });
 
                         console.log({ closedEmbed });
+
+                        console.log(
+                           'closingPoll.results.tied => ',
+                           closingPoll.results.tied
+                        );
                         // })
                         // .catch(err => console.error(err));
                      } else if (

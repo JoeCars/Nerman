@@ -22,7 +22,7 @@ module.exports = {
       //       ? process.env.GUILD_ID_WHITELIST.split(',')
       //       : ['919783277726957599', '992462546860785778'];
 
-      const guildWhitelist = process.env.GUILD_ID_WHITELIST.split(',');
+      // const guildWhitelist = process.env.GUILD_ID_WHITELIST.split(',');
 
       // l({ guildWhitelist });
       // l('CLIENT', guild.client);
@@ -31,12 +31,12 @@ module.exports = {
 
       // l('CHANNELS', channels.cache);
 
-      if (!guildWhitelist.includes(guildId)) {
-         l('THIS GUILD IS FULL OF STUPID POSEURS!');
-         l('LEAVING GUILD...');
+      // if (!guildWhitelist.includes(guildId)) {
+      //    l('THIS GUILD IS FULL OF STUPID POSEURS!');
+      //    l('LEAVING GUILD...');
 
-         return await guild.leave();
-      }
+      //    return await guild.leave();
+      // }
 
       l('THIS GUILD IS WHITELISTED');
 

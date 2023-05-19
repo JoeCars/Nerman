@@ -68,7 +68,7 @@ const PollSchema = new Schema(
          default: 'closed',
          enum: ['open', 'closed', 'cancelled', 'canceled'],
       },
-      conclusive: {
+      pollSucceeded: {
          type: Boolean,
       },
       pollNumber: {
@@ -95,7 +95,14 @@ const PollSchema = new Schema(
                   },
                },
                { new: true }
-            ).exec();
+            )
+               .populate([
+                  // { path: 'results' },
+                  { path: 'config' },
+                  { path: 'countVoters' },
+                  { path: 'getVotes', select: 'choices -poll -_id' },
+               ])
+               .exec();
             return updatedPoll;
          },
          async findAndSetVoted(messageId, userId) {
@@ -110,6 +117,7 @@ const PollSchema = new Schema(
             )
                .populate([
                   // { path: 'results' },
+                  { path: 'config' },
                   { path: 'countVoters' },
                   { path: 'getVotes', select: 'choices -poll -_id' },
                ])
@@ -193,19 +201,18 @@ PollSchema.virtual('voterQuorum').get(function () {
       { voterQuorum },
       this.config
    );
+
    return voterQuorum > 1 ? voterQuorum : 1;
 });
 
 PollSchema.virtual('voteThreshold').get(function () {
-   // Add in an evaluation for a quorum of zero and make it use a %
    const voteThreshold = Math.ceil(
       this.allowedUsers.size * (this.config.voteThreshold / 100)
    );
 
    console.log(
       '--------------------------------------\nFROM GETTER\nPoll.js -- virtual: voteThreshold\n---------------------------',
-      { voteThreshold },
-      this.config
+      { voteThreshold }
    );
    return voteThreshold > 1 ? voteThreshold : 1;
 });
@@ -214,7 +221,10 @@ PollSchema.virtual('results').get(function () {
    const resultsObject = Object.create(null);
    resultsObject.distribution = Object.create(null);
    let len = this.pollData.choices.length;
-   const flatVotes = this.getVotes.flatMap(({ choices }) => choices);
+
+   l('db/schemas/Poll.js => this.getVotes', this.getVotes ?? []);
+   const flatVotes = this.getVotes?.flatMap(({ choices }) => choices) ?? [];
+   l('db/schemas/Poll.js => flatVotes ?? []', flatVotes);
 
    let prevHighest = null;
    let leadingOption = null;
@@ -250,17 +260,25 @@ PollSchema.virtual('results').get(function () {
    resultsObject.totalVotes = flatVotes.length;
 
    resultsObject.quorumPass =
-      resultsObject.totalVotes >= this.voterQuorum
-         ? true
-         : this.abstains.size >= this.voterQuorum
+      resultsObject.totalVotes + this.abstains.size >= this.voterQuorum
          ? true
          : false;
 
-   resultsObject.thresholdPass =
-      !tiedLeads.length &&
-      resultsObject.distribution[leadingOption] >= this.voteThreshold
-         ? true
-         : false;
+   // if (!tiedLeads.length) {
+   //    resultsObject.thresholdPass =
+   //       resultsObject.distribution[leadingOption] >= this.voteThreshold
+   //          ? true
+   //          : false;
+   // } else {
+   //    resultsObject.thresholdPass =
+   //       resultsObject.tied[0][1] >= this.voteThreshold ? true : false;
+   // }
+
+   // resultsObject.thresholdPass =
+   //    !tiedLeads.length &&
+   //    resultsObject.distribution[leadingOption] >= this.voteThreshold
+   //       ? true
+   //       : false;
 
    console.log('Poll.js -- this.voterQuorum => ', this.voterQuorum);
    console.log('Poll.js -- this.voteThreshold => ', this.voteThreshold);
@@ -275,8 +293,16 @@ PollSchema.virtual('results').get(function () {
 
    if (!tiedLeads.length) {
       resultsObject.winner = leadingOption;
+
+      resultsObject.thresholdPass =
+         resultsObject.distribution[leadingOption] >= this.voteThreshold
+            ? true
+            : false;
    } else {
       resultsObject.tied = tiedLeads;
+
+      resultsObject.thresholdPass =
+         resultsObject.tied[0][1] >= this.voteThreshold ? true : false;
    }
    return resultsObject;
 });

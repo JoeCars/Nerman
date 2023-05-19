@@ -17,7 +17,7 @@ const drawBlock = (fracIndex, completeBlocks) => {
 
    for (let i = 0; i < completeBlocks; i++) {
       blocks += complete;
-      console.log('drawBlock:\ni => ', i, '\nblocks => ', blocks)
+      console.log('drawBlock:\ni => ', i, '\nblocks => ', blocks);
    }
    console.log(
       'drawBlock -- uniXBlockArray[fracIndex] => ',
@@ -51,8 +51,31 @@ const drawBar = function (maxLength, portion) {
    const length = portion * maxLength; // 0.6 * 8 = 4.8
    const completeBlocks = Math.floor(length); // 4
    const fracPart = length - completeBlocks; // 4.8 - 4 = 0.8
-   const fracIndex = Math.round(fracPart / step); // 0.8 / 0.125 = 6.4, rounded = 6
+
+   // !testing
+   const divided = fracPart / step;
+   const rounded = Math.round(divided);
+   const difference = rounded - divided;
+   let fracIndex;
+
+   if (difference === 0) {
+      fracIndex = 0;
+   }
+
+   if (difference < 0) {
+      let abs = Math.abs(difference);
+      fracIndex = abs >= 0.5 ? 4 : 0
+   }
+
+   if (difference > 0) {
+      let abs = Math.abs(difference);
+      fracIndex = abs <= 0.5 ? 4 : 0
+   }
+
+   // disabled for testing
+   // const fracIndex = Math.round(fracPart / step); // 0.8 / 0.125 = 6.4, rounded = 6
    // const uniXBlockArray = ['', '▏', '▎', '▍', '▌', '▋', '▊', '▉', '█'];
+   // !test usng fracIndexx to test this new method for half bars
    const filledBar = drawBlock(fracIndex, completeBlocks); // should be '████▊'
    const emptySpace = maxLength - filledBar.length; // 8 - 5 = 3
    const emptyBar = drawSpace(emptySpace); // '\u200b u200b u200b '
@@ -62,7 +85,7 @@ const drawBar = function (maxLength, portion) {
    // should be: ''
 
    return [barStart, filledBar, emptyBar, barEnd].join('');
-};;
+};
 
 // console.log(drawBar(maxLength, portion));
 // drawBar();
