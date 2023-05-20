@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { CommandInteraction } = require('discord-modals');
 
+const Logger = require('../../helpers/logger');
+
 // !test this is going to be testing passing StateOfNouns in as an argument, so I'm attempting to make this a async thang?
 module.exports = {
    // module.exports = {
@@ -58,11 +60,15 @@ module.exports = {
       .addSubcommand(subcommand =>
          subcommand
             .setName('participation')
-            .setDescription('Check user voting participation in current channel.')
+            .setDescription(
+               'Check user voting participation in current channel.'
+            )
             .addStringOption(option =>
                option
                   .setName('discord-id')
-                  .setDescription("Enter user's Discord ID. Checks your own participation, if left blank.")
+                  .setDescription(
+                     "Enter user's Discord ID. Checks your own participation, if left blank."
+                  )
                   .setRequired(false)
             )
       )
@@ -112,29 +118,6 @@ module.exports = {
     */
    // !testing to see if SON is successfully passed in through this global space
    async execute(interaction) {
-      // console.log('...args FROM NERMAN.JS',...args);
-      // console.log(stateOfNouns);
-
-      console.log(
-         'interaction.options.getSubcommand:\n',
-         interaction.options.getSubcommand()
-      );
-
-      // console.log('LOGGING INTERACTION FROM NERMAN.JS\n', interaction);
-
-      // console.log('LOGGING THIS FROM NERMAN.JS\n', this);
-      // console.log(
-      //    'LOGGING client FROM NERMAN.JS\n',
-      //    interaction.client.libraries
-      // );
-      // console.log(
-      //    'LOGGING client FROM NERMAN.JS\n',
-      //    interaction.client.libraries.get('Nouns')
-      // );
-      // console.log(
-      //    'LOGGING TO SEE IF STATE OF NOUNS IS PASSED THROUGH THE NERMAN GLOBAL COMMAND HANDLER:\n',
-      //    stateOfNouns
-      // );
+      Logger.info('commands/nerman/nerman.js: Executed Nerman command.');
    },
 };
-// };

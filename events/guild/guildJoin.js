@@ -1,7 +1,7 @@
 const { Guild } = require('discord.js');
 const { Types } = require('mongoose');
 const GuildConfig = require('../../db/schemas/GuildConfig');
-const { log: l } = console;
+const Logger = require('../../helpers/logger');
 
 module.exports = {
    name: 'guildCreate',
@@ -10,6 +10,10 @@ module.exports = {
     * @param {Guild} guild
     */
    async execute(guild) {
+      Logger.info('events/guild/guildJoin.js: Joining guild.', {
+         guildId: guild.id,
+      });
+
       // TESTING GUILD ID: 783406052372643940
       const {
          id: guildId,
@@ -31,17 +35,15 @@ module.exports = {
 
       // l('CHANNELS', channels.cache);
 
-      // if (!guildWhitelist.includes(guildId)) {
-      //    l('THIS GUILD IS FULL OF STUPID POSEURS!');
-      //    l('LEAVING GUILD...');
+//       if (!guildWhitelist.includes(guildId)) {
+//          Logger.debug(
+//             'events/guild/guildJoin.js: The guild is not white-listed. Leaving the guild.',
+//             {
+//                guildId,
+//             }
+//          );
+//       }
 
-      //    return await guild.leave();
-      // }
-
-      l('THIS GUILD IS WHITELISTED');
-
-      l({ guild });
-      l({ guildConfigs });
 
       let gConfigDoc;
 
@@ -54,18 +56,21 @@ module.exports = {
                   guildId,
                }));
          } catch (error) {
-            l({ error });
+            Logger.error('events/guild/guildJoin.js: Error.', { error: error });
          }
       } else {
          gConfigDoc = guildConfigs.get(guildId);
       }
 
-      l({ gConfigDoc });
-
       guildConfigs.set(guildId, gConfigDoc);
 
-      l({ guildConfigs });
-
-      // await guild.leave();
+      Logger.info(
+         'events/guild/guildJoin.js: Checking guild configurations. Finished joining guild.',
+         {
+            gConfigDoc: gConfigDoc,
+            guildConfigs: guildConfigs,
+            guildId: guild.id,
+         }
+      );
    },
 };

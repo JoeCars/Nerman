@@ -4,8 +4,7 @@ const { inlineCode } = require('@discordjs/builders');
 const Poll = require('../../db/schemas/Poll');
 
 const shortenAddress = require('../../helpers/nouns/createNounEmbed');
-
-const { log: l } = console;
+const Logger = require('../../helpers/logger');
 
 const nounsGovId = process.env.NOUNS_GOV_ID;
 
@@ -16,7 +15,12 @@ module.exports = {
     */
    async execute(message, statusChange, data) {
       try {
-         l('PROP STATUS CHANGE EVENT HANDLER');
+         Logger.info(
+            'events/stateOfNouns/propStatusChange.js: Handling a proposal change event.',
+            {
+               proposalId: data.id,
+            }
+         );
 
          const {
             guild: {
@@ -26,18 +30,10 @@ module.exports = {
          } = message;
 
          const { id: proposalId } = data;
-         l('PROP STATUS CHANGE EVENT HANDLER');
 
          const Nouns = await message.client.libraries.get('Nouns');
          const nounsGovChannel =
             (await cache.get(nounsGovId)) ?? (await channels.fetch(nounsGovId));
-
-         // l({ message });
-         l({ statusChange });
-         l({ data });
-         // l({ nounsGovChannel });
-
-         l(`${Number(proposalId)}`)
 
          const propRegExp = new RegExp(`^prop\\s${Number(proposalId)}`, 'i');
 
@@ -47,38 +43,28 @@ module.exports = {
          // Poll.find({ 'pollData.title': { $regex: propRegExp })
          const targetPoll = await Poll.findOne({
             'pollData.title': { $regex: propRegExp },
-         }).populate('config').exec();
+         })
+            .populate('config')
+            .exec();
 
-         l({ targetPoll });
          const propChannel =
             (await cache.get(targetPoll.config.channelId)) ??
             (await channels.fetch(targetPoll.config.channelId));
-
-         l({ propChannel });
-         l('(propChannel?.messages => ', propChannel?.messages);
-
-         l(
-            'propChannel?.messages.cache.get(targetPoll.messageId',
-            propChannel?.messages.cache.get(targetPoll.messageId)
-         );
-
-         l(
-            'propChannel?.messages.fetch(targetPoll.messageId)',
-            propChannel?.messages.fetch(targetPoll.messageId)
-         );
 
          const propMessage = await propChannel.messages.fetch(
             targetPoll.messageId
          );
 
          const messageThread = await propMessage.thread.fetch();
-         // l({ targetPolls });
 
-         // const titleFromFind = targetPolls[0].pollData.title;
          const titleFromFindOne = targetPoll.pollData.title;
 
-         // l({ titleFromFind });
-         l({ titleFromFindOne });
+         Logger.debug(
+            "events/stateOfNouns/propStatusChange.js: Checking the target poll's title.",
+            {
+               title: titleFromFindOne,
+            }
+         );
 
          // const { id } = data;
          // const titleRegex = new RegExp(/^#+\s+.+\n/);
@@ -132,19 +118,26 @@ module.exports = {
                `Proposal status changed to ${inlineCode(statusChange)}`
             );
 
-         // l('VOTE EMBED FIND\n', { voteEmbedFind });
-         l('VOTE EMBED FIND ONE\n', { voteEmbedFindOne });
-
-         // return await message.edit({ content: null, embeds: [voteEmbedFind] });
-
          await messageThread.send({ embeds: [pollThreadEmbed] });
+
+         Logger.info(
+            'events/stateOfNouns/propStatusChange.js: Finished handling a proposal change event.',
+            {
+               proposalId: data.id,
+            }
+         );
 
          return await message.edit({
             content: null,
             embeds: [voteEmbedFindOne],
          });
       } catch (error) {
-         console.error(error);
+         Logger.error(
+            'events/stateOfNouns/propStatusChange.js: Received an error.',
+            {
+               error: error,
+            }
+         );
       }
    },
 };

@@ -1,7 +1,10 @@
 const { Collection } = require('discord.js');
 const { getFiles } = require('../utils/functions');
+const Logger = require('../helpers/logger');
 
 module.exports = async client => {
+   Logger.info('handlers/button.js: Handling buttons.');
+
    // const buttonsArr = [];
    client.buttons = new Collection();
 
@@ -21,4 +24,6 @@ module.exports = async client => {
          );
       }
    });
+
+   Logger.info('handlers/button.js: Finished handling buttons.');
 };

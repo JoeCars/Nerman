@@ -1,6 +1,13 @@
+const Logger = require('../logger');
+
 module.exports = async (Nouns, nounId) => {
    try {
-      console.log('Getting Data for Noun ' + nounId);
+      Logger.info(
+         `helpers/nouns/getNounInfo.js: Getting data for Noun ${nounId}.`,
+         {
+            nounId: nounId,
+         }
+      );
 
       // Look up Owner of Noun by id
       const ownerAddress = await Nouns.NounsToken.Contract.ownerOf(nounId);
@@ -30,29 +37,20 @@ module.exports = async (Nouns, nounId) => {
          delegateAddress
       );
 
-      console.log('ownerAddress : Owner: ' + ownerAddress);
-      if (ownerEns) {
-         console.log('ownerEns : ENS found: ' + ownerEns);
-      }
-      console.log('Delegate: ' + delegateAddress);
-      if (delegateEns) {
-         console.log('delegateEns : ENS found: ' + delegateEns);
-      }
-      console.log('Voting Power:  ' + votingPower.toNumber());
-
       // Get Final Bid Data
-
       const bid = await Nouns.NounsAuctionHouse.getLatestBidData(nounId);
 
-      //   bid : {
-      //     id: number,
-      //     block: numbre,
-      //     date: Date,
-      //     amount: number (ETH),
-      //     address: string,
-      //     ens: string
-      // }
-      console.log(await bid);
+      Logger.debug(
+         'helpers/nouns/getNounInfo.js: Checking owner information.',
+         {
+            nounId: nounId,
+            ownerAddress: ownerAddress,
+            ownerEns: ownerEns,
+            delegateAddress: delegateAddress,
+            delegateEns: delegateEns,
+            votingPower: votingPower,
+         }
+      );
 
       if (bid != null) {
          const name = bid.ens != null ? bid.ens : bid.address;
@@ -67,6 +65,17 @@ module.exports = async (Nouns, nounId) => {
                bid.date.toLocaleString()
          );
 
+         Logger.info(
+            `helpers/nouns/getNounInfo.js: Finished getting Noun info. Noun ${
+               bid.id
+            } sold for ${
+               bid.amount
+            } ETH to ${name} on ${bid.date.toLocaleString()}.`,
+            {
+               nounId: nounId,
+            }
+         );
+
          return {
             ownerAddress,
             ownerEns,
@@ -76,6 +85,13 @@ module.exports = async (Nouns, nounId) => {
             bid,
          };
       } else {
+         Logger.info(
+            'helpers/nouns/getNounInfo.js: Finished getting Noun info.',
+            {
+               nounId: nounId,
+            }
+         );
+
          return {
             ownerAddress,
             ownerEns,
@@ -86,8 +102,8 @@ module.exports = async (Nouns, nounId) => {
          };
       }
    } catch (error) {
-      console.trace(error);
+      Logger.error('helpers/nouns/getNounInfo.js: Received an error.', {
+         error: error,
+      });
    }
 };
-
-

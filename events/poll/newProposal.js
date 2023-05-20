@@ -11,8 +11,7 @@ const PollChannel = require('../../db/schemas/PollChannel');
 const PollCount = require('../../db/schemas/ChannelPollCount');
 const Poll = require('../../db/schemas/Poll');
 const User = require('../../db/schemas/User');
-const { logToObject } = require('../../utils/functions');
-const { log: l } = console;
+const Logger = require('../../helpers/logger');
 
 // todo I will need to change this to the new Nouncil channel once Joel gives the go-ahead
 const propChannelId =
@@ -45,6 +44,11 @@ module.exports = {
          // } = interaction;
       } = interaction;
 
+      Logger.info('events/poll/newProposal.js: Creating new proposal.', {
+         guildId: guildId,
+         member: username,
+      });
+
       const propChannel = await cache.get(propChannelId);
       // const nounsGovChannel = guildCache
       //    .get(process.env.DISCORD_GUILD_ID)
@@ -53,16 +57,19 @@ module.exports = {
       // const testConExists = await PollChannel.configExists(propChannel.id);
       // console.log({ testConExists });
       const configExists = await PollChannel.configExists(propChannel.id);
-      console.log({ configExists });
+      Logger.debug('events/poll/newProposal.js: Checking config exists.', {
+         configExists: configExists,
+         guildId: guildId,
+         member: username,
+      });
+
       if (!configExists) {
-         l('NO CHANNEL CONFIG ---- RETURNING');
+         Logger.info('events/poll/newProposal.js: No config exists. Exiting.', {
+            guildId: guildId,
+            member: username,
+         });
          return;
       }
-
-      // l({ title });
-
-      l({ interaction });
-      l({ proposal });
 
       const { id: propId, description: desc } = proposal;
       const titleRegex = new RegExp(/^#+\s+.+\n/);
@@ -72,7 +79,12 @@ module.exports = {
          .replaceAll(/^(#\s)|(\n+)$/g, '')}`;
       const description = `https://nouns.wtf/vote/${propId}`;
 
-      l({ title });
+      Logger.debug('events/poll/newProposal.js: Checking proposal.', {
+         guildId: guildId,
+         member: username,
+         title: title,
+         propId: propId,
+      });
 
       const channelConfig = await PollChannel.findOne(
          {
@@ -81,10 +93,12 @@ module.exports = {
          '_id allowedRoles quorum duration forAgainst'
       ).exec();
 
-      // const intRegex = new RegExp(/^\d*$/);
-
-      console.log({ everyoneId });
-      console.log(channelConfig.allowedRoles);
+      Logger.debug('events/poll/newProposal.js: Checking roles and IDs.', {
+         guildId: guildId,
+         member: username,
+         everyoneId: everyoneId,
+         allowedRoles: channelConfig.allowedRoles,
+      });
 
       const messageObject = await initPollMessage({
          propId,
@@ -93,12 +107,6 @@ module.exports = {
          channelConfig,
          everyoneId,
       });
-
-      console.log(
-         '-----------------------------------------------\n',
-         messageObject.embeds,
-         '-----------------------------------------------\n'
-      );
 
       const pollData = {
          title,
@@ -143,36 +151,36 @@ module.exports = {
             snapshotMap.set(key, false);
          }
       } catch (error) {
-         console.error({ error });
+         Logger.error('events/poll/newProposal.js: Error.', { error: error });
       }
 
       const countExists = await PollCount.checkExists(propChannelId);
 
-      console.log({ countExists });
+      Logger.debug('events/poll/newProposal.js: Checking existing count.', {
+         guildId: guildId,
+         member: username,
+         countExists: countExists,
+      });
 
       let pollNumber;
 
       if (!countExists) {
-         console.log('Count does not exist');
          pollNumber = await PollCount.createCount(propChannelId);
       } else {
-         console.log('Count exists');
          pollNumber = await PollCount.findOne({
             channelId: propChannelId,
          }).exec();
       }
 
-      console.log({ pollNumber });
-
       try {
          // todo refactor this to use {new: true} and return the document perhaps, rather than this two part operation?
-         console.group('Create Poll Attributes');
-         console.log({ guildId });
-         console.log(user.id);
-         console.log(channelConfig._id);
-         console.log(interaction.id);
-         console.log({ pollData });
-         console.groupEnd('Create Poll Attributes');
+         Logger.debug('events/poll/newProposal.js: Checking poll attributes.', {
+            guildId: guildId,
+            userId: user.id,
+            channelConfigId: channelConfig._id,
+            interactionId: interaction.id,
+            pollData: pollData,
+         });
 
          const data = {
             _id: new Types.ObjectId(),
@@ -194,7 +202,6 @@ module.exports = {
          )
             .populate('config')
             .then(async poll => {
-               console.log('WITHIN THE THEN', { poll });
                await pollNumber.increment();
                poll.pollNumber = pollNumber.pollsCreated;
                return await poll.save();
@@ -202,16 +209,14 @@ module.exports = {
 
          const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
             async key => {
-               l('updateVoterPromise', { key });
-
                let user = await User.findOne({
                   guildId: guildId,
                   discordId: key,
                }).exec();
 
                if (!user) {
-                  l(
-                     'User does not yet exist, creating new user from allowedUsers map...'
+                  Logger.warn(
+                     'events/poll/newProposal.js: User does not exist yet. Creating new user.'
                   );
 
                   const {
@@ -224,18 +229,26 @@ module.exports = {
 
                   user = await User.createUser(guildId, key, eligibleChannels);
 
-                  l('User created! => ', user);
+                  Logger.debug(
+                     'events/poll/newProposal.js: Successfully created new user.',
+                     { user: user }
+                  );
                } else if (
                   user.eligibleChannels !== null &&
                   user.eligibleChannels.has(newPoll.config.channelId)
                ) {
-                  l('User exists and has channel key!');
+                  Logger.debug(
+                     'events/poll/newProposal.js: User exists and has channel key!'
+                  );
 
                   user.eligibleChannels.get(newPoll.config.channelId)
                      .eligiblePolls++;
                } else {
-                  l(
-                     `user did not have the key: ${newPoll.config.channelId} present in their eligibleChannels Map.\n Attempting to set key...`
+                  Logger.warn(
+                     'events/poll/newProposal.js: User did not have the appropriate key. Attempting to set key.',
+                     {
+                        key: newPoll.config.channelId,
+                     }
                   );
 
                   user.eligibleChannels.set(newPoll.config.channelId, {
@@ -251,11 +264,7 @@ module.exports = {
 
          await Promise.all(updateVoterPromise);
 
-         console.log({ newPoll });
          let updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
-
-         console.log(newPoll);
-         console.log(newPoll.timeCreated);
 
          // const timeEndMilli = new Date(
          //    newPoll.timeCreated.getTime() + durationMs
@@ -305,9 +314,12 @@ module.exports = {
          });
 
          client.emit('propCreated', nounsGovMessage, newPoll, propId);
+
+         Logger.info('events/poll/newProposal.js: Finished creating proposal.');
       } catch (error) {
-         // console.log('BIG FAT FUCKN ERROR, BRUH');
-         console.error(error);
+         Logger.error('events/poll/newProposal.js: Encountered an error.', {
+            error: error,
+         });
       }
    },
 };

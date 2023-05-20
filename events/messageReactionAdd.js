@@ -1,7 +1,6 @@
 // disabled
 const stahp = process.env.NODE_ENV === 'development' ? true : false;
 let nTwitter;
-console.log('messageReactionAdd stahp => ', stahp);
 if (stahp === false) {
    nTwitter = require(`../helpers/twitter.js`);
 }
@@ -9,6 +8,7 @@ if (stahp === false) {
 const nMongoDB = require(`../helpers/mongodb.js`);
 const nThreshold = require(`../helpers/nThreshold.js`);
 const tenor = require(`../helpers/tenor.js`);
+const Logger = require('../helpers/logger.js');
 
 // role allowed for nerman tweet functions - for now env based on DEPLOY_STAGE
 const allowedRoles =
@@ -22,14 +22,20 @@ const nermanEmojiId =
       ? process.env.TESTNERMAN_EMOJI_ID
       : process.env.DEVNERMAN_EMOJI_ID;
 
-// ez loggins
-const { log: l, time: t, timeEnd: te } = console;
-
 module.exports = {
    name: 'messageReactionAdd',
    async execute(reaction, user) {
       //reaction.message.guild.roles.cache.forEach(role => console.log(role.name, role.id)) //prints all rolls
       //"@everyone" is default role
+
+      Logger.info(
+         'events/messageReactionAdd.js: Handling reaction added event.',
+         {
+            emoji: reaction.emoji,
+            count: reaction.count,
+            authorId: reaction.message.author.id,
+         }
+      );
 
       const {
          emoji,
@@ -50,36 +56,43 @@ module.exports = {
       } = reaction;
 
       try {
-         console.log('messageReactionAdd  try:catch stahp => ', stahp);
-
          if (stahp === true) {
+            Logger.info(
+               'events/messageReactionAdd.js: In development mode, so exiting function.',
+               {
+                  emoji: reaction.emoji,
+                  count: reaction.count,
+                  authorId: reaction.message.author.id,
+               }
+            );
             return;
          }
-
-         l(process.env.DEPLOY_STAGE);
-         l({ nermanEmojiId });
-         l({ emojiId });
 
          // if (process.env.DEPLOY_STAGE === 'staging') return;
          if (emojiId !== nermanEmojiId) {
-            l(`This is not MY nerman --- ${process.env.DEPLOY_STAGE}`);
+            Logger.info(
+               "events/messageReactionAdd.js: Emoji ID does not match Nerman's emoji ID, so leaving.",
+               {
+                  emoji: reaction.emoji,
+                  count: reaction.count,
+                  authorId: reaction.message.author.id,
+                  deployStage: process.env.DEPLOY_STAGE,
+               }
+            );
             return;
          } else {
-            l(`MY BABY NERMAN --- ${process.env.DEPLOY_STAGE}`);
+            Logger.debug(
+               "events/messageReactionAdd.js: Emoji ID matches Nerman's emoji ID.",
+               {
+                  emoji: reaction.emoji,
+                  count: reaction.count,
+                  authorId: reaction.message.author.id,
+                  deployStage: process.env.DEPLOY_STAGE,
+               }
+            );
          }
 
          const authorName = membersCache.get(id).nickname ?? username;
-
-         // console.log({ reaction });
-         console.log({ emoji });
-         console.log(emoji.name);
-         console.log(emoji.id); // yus
-         console.log(emoji.identifier); // maybe yus
-         // console.log(await emoji.toString());
-         // console.log(await reaction.fetch());
-         // console.log(reaction.message.reactions);
-         // console.log(reactionsCache);
-         // console.log(await reactionsCache.get());
 
          // return;
 
@@ -87,10 +100,6 @@ module.exports = {
 
          // const Role = rolesCache.find(role => role.name == 'Voters');
          const Role = rolesCache.find(role => role.id === allowedRoles);
-
-         console.log({ Role });
-         console.log({ count });
-         console.log(reaction);
 
          //disabled - writing a new temporary one to use below, const nouncillors
          // let votersOnline = membersCache
@@ -101,14 +110,20 @@ module.exports = {
             member.roles.cache.find(role => role == Role)
          ).size;
 
-         console.log({ nouncillors });
-
          // disabled - writing a temporary new version below
          // let voteThreshold = nThreshold.getThreshold(votersOnline);
 
          const voteThreshold = Math.ceil(nouncillors * 0.03);
 
-         console.log({ voteThreshold });
+         Logger.debug(
+            'events/messageReactionAdd.js: Checking vote threshold.',
+            {
+               emoji: reaction.emoji,
+               count: reaction.count,
+               authorId: reaction.message.author.id,
+               voteThreshold: voteThreshold,
+            }
+         );
 
          let msgAttachmentUrls = [];
 
@@ -171,9 +186,19 @@ module.exports = {
             // mark message with NermanBlast emoji
             await reaction.message.react('932664888642400276');
          }
+
+         Logger.info(
+            'events/messageReactionAdd.js: Finished handling reaction added event.',
+            {
+               emoji: reaction.emoji,
+               count: reaction.count,
+               authorId: reaction.message.author.id,
+            }
+         );
       } catch (error) {
-         console.error('messageReactionAdd -----------  AW BEANZ');
-         console.error(error);
+         Logger.error('events/messageReactionAdd.js: Received an error.', {
+            error: error,
+         });
       }
    },
 };

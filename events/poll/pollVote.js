@@ -15,6 +15,7 @@ const { Types } = require('mongoose');
 const Poll = require('../../db/schemas/Poll');
 const User = require('../../db/schemas/User');
 const Vote = require('../../db/schemas/Vote');
+const Logger = require('../../helpers/logger');
 
 const { longestString } = require('../../helpers/poll');
 const ResultBar = require('../../classes/ResultBar');
@@ -25,22 +26,23 @@ const doppelId = process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
 
 const guildNouncilIds = [nouncilId, jtsNouncilId, doppelId];
 
-const { log: l, error: lerr } = console;
-
 module.exports = {
    name: 'modalSubmit',
    /**
     * @param {ModalSubmitInteraction} interaction
     */
    async execute(modal) {
+      Logger.info('events/poll/pollVote.js: Attempting to submit vote.', {
+         guildId: modal.guildId,
+         channelId: modal.channelId,
+         userId: modal.member.user.id,
+         modalCustomId: modal.customId,
+      });
+
       if (modal.customId !== 'vote-modal') return;
 
       await modal.deferReply({ ephemeral: true });
 
-      console.log('CUSTOM ID: \n', modal.customId);
-
-      console.log('pollVote.js -- modal', { modal });
-      // {
       const {
          client,
          guildId,
@@ -62,10 +64,6 @@ module.exports = {
 
       const pollOptions = await pollStatus.pollOptions();
 
-      !pollOptions.anonymous && console.log({ modal });
-      console.log({ pollStatus });
-      console.log({ pollOptions });
-
       let voteArray = modal.getTextInputValue('votingSelect');
 
       if (voteArray !== null) {
@@ -85,7 +83,16 @@ module.exports = {
          vote => !pollStatus.pollData.choices.includes(vote)
       );
 
-      console.log({ incorrectOptions });
+      Logger.debug(
+         'events/poll/pollVote.js: Checking incorrect voting options.',
+         {
+            guildId: modal.guildId,
+            channelId: modal.channelId,
+            userId: modal.member.user.id,
+            modalCustomId: modal.customId,
+            incorrectOptions: incorrectOptions,
+         }
+      );
 
       if (incorrectOptions.length) {
          return modal.editReply({
@@ -95,12 +102,6 @@ module.exports = {
             ephermeral: true,
          });
       }
-
-      console.log('voteArray.length', voteArray.length);
-      console.log(
-         'pollStatus.pollData.voteAllowance',
-         pollStatus.pollData.voteAllowance
-      );
 
       if (voteArray.length !== pollStatus.pollData.voteAllowance) {
          return modal.editReply({
@@ -112,8 +113,6 @@ module.exports = {
       // disabled until DJS SELECT MENUS Modal supported
       // const voteArray = modal.getSelectMenuValues('votingSelect');
       const voteReason = modal.getTextInputValue('voteReason');
-
-      console.log({ voteReason });
 
       if (pollStatus.status === 'closed') {
          return modal.editReply({
@@ -148,23 +147,25 @@ module.exports = {
       let votingUser = await User.findOne().byDiscordId(userId, guildId).exec();
 
       if (!votingUser) {
-         l(
-            '/////////////// !votingUser ///////////////\nGetting eligibleChannels...'
+         Logger.warn(
+            'events/poll/pollVote.js: User cannot vote here. Attempting to find eligible voting channels.',
+            {
+               guildId: modal.guildId,
+               channelId: modal.channelId,
+               messageOd: modal.message.id,
+               userId: modal.member.user.id,
+            }
          );
+
          const eligibleChannels = await User.findEligibleChannels(
             memberRoleCache,
             pollOptions.anonymous
          );
 
-         !pollOptions.anonymous && l({ eligibleChannels });
-
          votingUser = await User.createUser(guildId, userId, eligibleChannels);
       }
 
       const updatedPoll = await Poll.findAndSetVoted(messageId, userId);
-
-      console.log({ channelId });
-      !pollOptions.anonymous && console.log('votingUser => ', { votingUser });
 
       votingUser.incParticipation(channelId);
 
@@ -334,22 +335,12 @@ module.exports = {
 
       message.edit({ embeds: [updateEmbed] });
 
-      l({ propRegExp });
-      l(updatedPoll.pollData.title);
-
       if (propRegExp.test(updatedPoll.pollData.title)) {
          try {
             const matches = updatedPoll.pollData.title.match(propRegExp);
 
-            l({ matches });
-            l(matches[0]);
-            l(matches[1]);
-
             const propText = matches[0];
             const propId = matches[1];
-
-            l({ propText });
-            l({ propId });
 
             const threadEmbed = new MessageEmbed()
                .setColor('#00FFFF')
@@ -369,8 +360,6 @@ module.exports = {
                      `https://nouns.wtf/vote/${propId}`
                   )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
                );
-
-            console.log(voteArray.join(' ').toUpperCase());
             // .setDescription(
             //    `${
             //       !pollOptions.anonymous
@@ -392,13 +381,13 @@ module.exports = {
             //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
             // );
 
-            l({ threadEmbed });
-
             const thread = await message.thread.fetch();
             // await message.thread.fetch();
             await thread.send({ embeds: [threadEmbed] });
          } catch (error) {
-            l({ error });
+            Logger.error('events/poll/pollVote.js: Received an error.', {
+               error: error,
+            });
          }
       } else {
          try {
@@ -468,17 +457,22 @@ module.exports = {
             //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
             // );
 
-            l({ threadEmbed });
-
             const thread = await message.thread.fetch();
             // await message.thread.fetch();
             await thread.send({ embeds: [threadEmbed] });
          } catch (error) {
-            l({ error });
+            Logger.error('events/poll/pollVote.js: Received an error.', {
+               error: error,
+            });
          }
       }
 
-      console.log('pollVote.js -- userVote', { userVote });
+      Logger.info('events/poll/pollVote.js: Successfully submitted vote.', {
+         guildId: modal.guildId,
+         channelId: modal.channelId,
+         userId: modal.member.user.id,
+         userVote: userVote,
+      });
 
       return modal.editReply({
          content: 'Your vote has been submitted',

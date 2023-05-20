@@ -1,5 +1,5 @@
 const { model, Schema } = require('mongoose');
-const { log: l } = console;
+const Logger = require('../../helpers/logger');
 
 const GuildConfigSchema = new Schema(
    {
@@ -13,13 +13,22 @@ const GuildConfigSchema = new Schema(
    {
       statics: {
          async findGuildConfig(guildId) {
+            Logger.info(
+               'db/schemas/GuildConfig.js: Attempting to find guild config.',
+               {
+                  guildId: guildId,
+               }
+            );
+
             const guildConfig = await this.findOne({ guildId: guildId })
                .populate('pollChannels')
                .exec();
 
-            l('guildConfig', guildConfig);
+            Logger.info('db/schemas/GuildConfig.js: Retrieved guild config.', {
+               guildId: guildId,
+            });
 
-            return guildConfig
+            return guildConfig;
          },
       },
    }

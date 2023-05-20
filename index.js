@@ -4,6 +4,8 @@ const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const token = process.env.DISCORD_TOKEN;
 
+const Logger = require('./helpers/logger');
+
 const client = new Client({
    intents: [
       Intents.FLAGS.GUILDS,
@@ -18,17 +20,20 @@ const client = new Client({
 const discordModals = require('discord-modals');
 discordModals(client);
 
-
 ['events', 'commands', 'buttons'].forEach(handler =>
    require(`./handlers/${handler}.js`)(client, (reload = false))
 );
 
 client.on('shardError', error => {
-   console.error('A websocket connection encountered an error:', error);
+   Logger.error('index.js: A websocket connection encountered an error.', {
+      error: error,
+   });
 });
 
 process.on('unhandledRejection', error => {
-   console.error('Unhandled promise rejection:', error);
+   Logger.error('index.js: Unhandled promise rejection.', {
+      error: error,
+   });
 });
 
 process.on('warning', console.warn);

@@ -1,6 +1,8 @@
 const { MongoClient } = require('mongodb');
 const dbUri = process.env.MONGODB_URI;
 
+const Logger = require('./logger');
+
 module.exports.init = async function () {
    return await init();
 };
@@ -16,6 +18,13 @@ module.exports.markMessageAsTweeted = async function (message_id, user_id) {
 var init = async function () {};
 
 var hasMessageBeenTweeted = async function (id) {
+   Logger.info(
+      'helpers/mongodb.js/hasMessageBeenTweeted(): Checking if message has been tweeted.',
+      {
+         id: id,
+      }
+   );
+
    const client = new MongoClient(dbUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -33,15 +42,33 @@ var hasMessageBeenTweeted = async function (id) {
          hasMessageBeenTweeted = true;
       }
    } catch (err) {
-      console.log(err);
+      Logger.error(
+         'helpers/mongodb.js/hasMessageBeenTweeted(): Received an error.',
+         {
+            error: err,
+         }
+      );
    } finally {
+      Logger.info(
+         'helpers/mongodb.js/hasMessageBeenTweeted(): Finished checking if message has been tweeted..',
+         {
+            id: id,
+         }
+      );
+
       await client.close();
       return hasMessageBeenTweeted;
    }
 };
 
 var markMessageAsTweeted = async function (message_id, user_id) {
-   console.log('message_id' + message_id + ', user_id' + user_id);
+   Logger.info(
+      'helpers/mongodb.js/markMessageAsTweeted(): Marking message as tweeted.',
+      {
+         messageId: message_id,
+         userId: user_id,
+      }
+   );
 
    const client = new MongoClient(dbUri, {
       useNewUrlParser: true,
@@ -62,8 +89,20 @@ var markMessageAsTweeted = async function (message_id, user_id) {
          });
       }
    } catch (err) {
-      console.log(err);
+      Logger.err(
+         'helpers/mongodb.js/markMessageAsTweeted(): Received an error.',
+         {
+            error: err,
+         }
+      );
    } finally {
+      Logger.info(
+         'helpers/mongodb.js/markMessageAsTweeted(): Finished marking message as tweeted.',
+         {
+            messageId: message_id,
+            userId: user_id,
+         }
+      );
       await client.close();
    }
 };

@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const nounpic = require(`../../../helpers/nounpic.js`);
 const getNounerInfo = require('../../../helpers/nouns/getNounerInfo');
 const createNounerEmbed = require('../../../helpers/nouns/createNounerEmbed');
-const { log: l, error: lerr } = console;
+const Logger = require('../../../helpers/logger.js');
 
 module.exports = {
    subCommand: 'nerman.address',
@@ -12,6 +12,14 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
+      Logger.info(
+         'commands/nerman/nouns/address.js: Starting to retrieve nouns address.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+         }
+      );
+
       const Nouns = interaction.client.libraries.get('Nouns');
       await interaction.deferReply({ ephemeral: true });
 
@@ -32,7 +40,14 @@ module.exports = {
       }
 
       const nounerInfo = await getNounerInfo(Nouns, queryTarget);
-      l('NOUNER INFO\n', nounerInfo);
+      Logger.info(
+         'commands/nerman/nouns/address.js: Retrieving Nouner information.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            nounerInfo: nounerInfo,
+         }
+      );
 
       // disabled we're not currently using this image url for an attachment of this tile until we find a better solution vvvvv
       // const resp = await fetch(
@@ -54,7 +69,6 @@ module.exports = {
 
       // disabled we're not currently using this image url for an attachment of this tile until we find a better solution ^^^^^^^
 
-
       const nounerEmbed = await createNounerEmbed(nounerInfo);
 
       await interaction.editReply({
@@ -62,5 +76,13 @@ module.exports = {
          embeds: [nounerEmbed],
          // ephemeral: true,
       });
+
+      Logger.info(
+         'commands/nerman/nouns/address.js: Finished retrieving nouns address.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+         }
+      );
    },
 };

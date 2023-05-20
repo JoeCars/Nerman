@@ -4,6 +4,8 @@ const codeBlock = require('discord.js').Formatters.codeBlock;
 
 const Poll = require('../../db/schemas/Poll');
 const Vote = require('../../db/schemas/Vote');
+const Logger = require('../../helpers/logger');
+
 
 const fetchPoll = async interaction => {
    let targetPoll;
@@ -13,18 +15,23 @@ const fetchPoll = async interaction => {
          {
             messageId: interaction.targetId,
             guildId: interaction.guildId,
-         },
-         'status -_id',
+         }
       )
          .populate('config')
-         .populate('_id')
-         .populate('votes')
-         .populate('abstains')
-         .populate('pollData')
-         .exec();
-   }
-   catch (err) {
-      console.log({ err });
+         .exec()
+//          .populate('_id') 
+//          .populate('votes')
+//          .populate('abstains')
+
+
+   } catch (err) {
+      Logger.error(
+         'commands/context/exportPollReasons.js/fetchPoll(): Received an error.',
+         {
+            error: err,
+         }
+      );
+     
       throw new Error(err.message);
    }
 
@@ -43,9 +50,14 @@ const fetchVotes = async targetPoll => {
       })
          .populate('user')
          .exec();
-   }
-   catch (err) {
-      console.log({ err });
+   } catch (err) {
+      Logger.error(
+         'commands/context/exportPollReasons.js/fetchVotes(): Received an error.',
+         {
+            error: err,
+         }
+      );
+
       throw new Error(err.message);
    }
 
@@ -67,6 +79,7 @@ const attachUsernames = async (interaction, votes, targetPoll) => {
 const extractPollResults = (targetPoll, votes) => {
    const status = targetPoll.status;
    const numOfAbstains = targetPoll.abstains.size;
+
 
    // This approach allows multiple choices that can be any value.
    const votesForChoice = new Map();
@@ -106,6 +119,16 @@ module.exports = {
       .setType(ApplicationCommandType.Message),
 
    async execute(interaction) {
+
+      Logger.info(
+         'commands/context/exportPollReasons.js: Attempting to export poll reasons.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            targetMessageId: interaction.targetId,
+         }
+      );
+     
       // TODO: Rename this to something more appropriate.
       const authorizedIds = process.env.BAD_BITCHES.split(',');
       if (!authorizedIds.includes(interaction.user.id)) {
@@ -123,6 +146,16 @@ module.exports = {
          content: codeBlock(markdown),
          ephemeral: true,
       });
+
+      Logger.info(
+         'commands/context/exportPollReasons.js: Successfully exported poll reasons.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            targetMessageId: interaction.targetId,
+         }
+      );
+
    },
 
    attachUsernames: attachUsernames,

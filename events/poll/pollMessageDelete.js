@@ -1,11 +1,19 @@
 const PollChannel = require('../../db/schemas/PollChannel');
 const Poll = require('../../db/schemas/Poll');
-
-const { log: l, time: t, timeEnd: te } = console;
+const Logger = require('../../helpers/logger');
 
 module.exports = {
    name: 'messageDelete',
    async execute(message) {
+      Logger.info(
+         'events/poll/pollMessageDelete.js: Attempting to delete poll.',
+         {
+            channelId: message.channelId,
+            guildId: message.guild.id,
+            messageId: message.id,
+         }
+      );
+
       const {
          client,
          channelId,
@@ -15,24 +23,22 @@ module.exports = {
          guild: { id: guildId },
       } = message;
 
-      l({ message });
-      l({ bot });
-
       if (bot === false) return;
-
-      l(!(await PollChannel.configExists(channelId)));
-      l(!(await Poll.countDocuments({ messageId })));
-
-      l(
-         !(await PollChannel.configExists(channelId)) ||
-            !(await Poll.countDocuments({ messageId }))
-      );
 
       if (
          !(await PollChannel.configExists(channelId)) ||
          !(await Poll.countDocuments({ messageId }))
-      )
+      ) {
+         Logger.info(
+            'events/poll/pollMessageDelete.js: The message was not a valid poll.',
+            {
+               channelId: message.channelId,
+               guildId: message.guild.id,
+               messageId: message.id,
+            }
+         );
          return;
+      }
 
       // todo Later on I should maybe make a new version of this that actually rebuilds the message if it's deleted, rather than simply closing the poll in the DB
       // const messagePoll = await Poll.findOneAndDelete({ messageId });
@@ -41,10 +47,12 @@ module.exports = {
          { status: 'closed' }
       );
 
-      l({ messagePoll });
-
-      l(await Poll.countDocuments({ messageId }));
-
       client.emit('dequeuePoll', messagePoll);
+
+      Logger.info('events/poll/pollMessageDelete.js: Finished deleting poll.', {
+         channelId: message.channelId,
+         guildId: message.guild.id,
+         messageId: message.id,
+      });
    },
 };

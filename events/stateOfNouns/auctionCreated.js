@@ -1,7 +1,7 @@
 const { MessageEmbed, Channel } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
 
-const { log: l } = console;
+const Logger = require('../../helpers/logger');
 
 module.exports = {
    name: 'auctionCreated',
@@ -11,13 +11,17 @@ module.exports = {
     */
    async execute(genChannel, data) {
       try {
-         l('AUCTION CREATED EVENT HANDLER');
+         Logger.info(
+            'events/stateOfNouns/auctionCreated.js: Attempting to handle an auction creation event.',
+            {
+               id: data.id,
+               startTime: data.startTime,
+               endTime: data.endTime,
+               channelId: genChannel.id,
+            }
+         );
 
          const { id, startTime, endTime } = data;
-
-         l({ genChannel });
-         l({ data });
-         l({ id, startTime, endTime });
 
          const nounsWTF = hyperlink(
             'Nouns.wtf',
@@ -36,11 +40,27 @@ module.exports = {
             .setColor('#00FFFF')
             .setTitle(`New Auction | Noun ${id}`)
             .setDescription(`${nounsWTF}\n${pronouns}\n${nounOClock}`)
-            .setImage(`https://noun.pics/${process.env.NOUNS_TOKEN_ID}.png`);
+
+            .setImage(`https://noun.pics/${id}.png`);
+
+         Logger.info(
+            'events/stateOfNouns/auctionCreated.js: Successfully handled an auction creation event.',
+            {
+               id: data.id,
+               startTime: data.startTime,
+               endTime: data.endTime,
+               channelId: genChannel.id,
+            }
+         );
 
          return await genChannel.send({ embeds: [acEmbed] });
       } catch (error) {
-         console.error(error);
+         Logger.info(
+            'events/stateOfNouns/auctionCreated.js: Received an error.',
+            {
+               error: error,
+            }
+         );
       }
    },
 };

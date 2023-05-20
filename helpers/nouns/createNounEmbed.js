@@ -1,8 +1,17 @@
 const { MessageEmbed } = require('discord.js');
 const shortenAddress = require('./shortenAddress');
-const { log: l } = console;
+const Logger = require('../logger');
 
 module.exports = async (data, attachment) => {
+   Logger.info('helpers/nouns/createNounEmbed.js: Creating Noun embed.', {
+      ownerAddress: data.ownerAddress,
+      ownerEns: data.ownerEns,
+      delegateAddress: data.delegateAddress,
+      delegateEns: data.delegateEns,
+      votingPower: data.votePower,
+      bid: data.bid,
+   });
+
    const {
       ownerAddress,
       ownerEns,
@@ -20,7 +29,6 @@ module.exports = async (data, attachment) => {
 
    let id;
 
-   l({ bid });
    const {
       date,
       amount,
@@ -34,21 +42,14 @@ module.exports = async (data, attachment) => {
       id = data.nounId;
    }
 
-   // l({ id, date, amount, ens: bidEns, address: bidAddress });
-
    // Links:
    const nounsDao = `[Nouns DAO](https://thenounsdao.com/noun/${id})`;
    const agora = `[Agora](https://www.nounsagora.com/delegate/${delegateAddress})`;
    const collective = `[Collective](https://collective.xyz/nouns/@${ownerAddress})`;
 
-   l({ ownerEns });
-   l({ ownerAddress });
-
    const testString = `This string is testing to see if coalescence is the right choice for selecting a noun thing: ${
       ownerEns ?? ownerAddress
    }`;
-
-   l({ testString });
 
    // Noun ID
    const heldBy = `Held by: [${
@@ -129,6 +130,18 @@ module.exports = async (data, attachment) => {
          )
          .setImage(attachment);
    }
+
+   Logger.info(
+      'helpers/nouns/createNounEmbed.js: Finished creating Noun embed.',
+      {
+         ownerAddress: data.ownerAddress,
+         ownerEns: data.ownerEns,
+         delegateAddress: data.delegateAddress,
+         delegateEns: data.delegateEns,
+         votingPower: data.votePower,
+         bid: data.bid,
+      }
+   );
 
    return nounEmbed;
 };
