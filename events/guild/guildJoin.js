@@ -35,14 +35,14 @@ module.exports = {
 
       // l('CHANNELS', channels.cache);
 
-      if (!guildWhitelist.includes(guildId)) {
-         Logger.debug(
-            'events/guild/guildJoin.js: The guild is not white-listed. Leaving the guild.',
-            {
-               guildId,
-            }
-         );
-      }
+//       if (!guildWhitelist.includes(guildId)) {
+//          Logger.debug(
+//             'events/guild/guildJoin.js: The guild is not white-listed. Leaving the guild.',
+//             {
+//                guildId,
+//             }
+//          );
+//       }
 
 
       let gConfigDoc;
