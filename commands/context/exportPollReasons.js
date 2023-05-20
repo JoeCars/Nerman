@@ -6,6 +6,7 @@ const Poll = require('../../db/schemas/Poll');
 const Vote = require('../../db/schemas/Vote');
 const Logger = require('../../helpers/logger');
 
+
 const fetchPoll = async interaction => {
    let targetPoll;
    try {
@@ -14,14 +15,15 @@ const fetchPoll = async interaction => {
          {
             messageId: interaction.targetId,
             guildId: interaction.guildId,
-         },
-         'status -_id'
+         }
       )
          .populate('config')
-         .populate('_id')
-         .populate('votes')
-         .populate('abstains')
-         .exec();
+         .exec()
+//          .populate('_id') 
+//          .populate('votes')
+//          .populate('abstains')
+
+
    } catch (err) {
       Logger.error(
          'commands/context/exportPollReasons.js/fetchPoll(): Received an error.',
@@ -29,6 +31,7 @@ const fetchPoll = async interaction => {
             error: err,
          }
       );
+     
       throw new Error(err.message);
    }
 
@@ -54,6 +57,7 @@ const fetchVotes = async targetPoll => {
             error: err,
          }
       );
+
       throw new Error(err.message);
    }
 
@@ -64,7 +68,8 @@ const attachUsernames = async (interaction, votes, targetPoll) => {
    for (let i = 0; i < votes.length; ++i) {
       if (targetPoll.config.anonymous) {
          votes[i].username = 'anonymous';
-      } else {
+      }
+      else {
          const guildUser = await interaction.guild.members.fetch(votes[i].user);
          votes[i].username = guildUser.user.username;
       }
@@ -75,42 +80,33 @@ const extractPollResults = (targetPoll, votes) => {
    const status = targetPoll.status;
    const numOfAbstains = targetPoll.abstains.size;
 
-   // Note. I am assuming we only have two types of votes. For and against.
-   const forVotes = [];
-   const againstVotes = [];
+
+   // This approach allows multiple choices that can be any value.
+   const votesForChoice = new Map();
+   targetPoll.pollData.choices.forEach(choice => {
+      votesForChoice.set(choice, []);
+   });
+
    for (const vote of votes) {
       for (const choice of vote.choices) {
-         if (choice === 'for') {
-            forVotes.push({ username: vote.username, reason: vote.reason });
-         } else if (choice === 'against') {
-            againstVotes.push({
-               username: vote.username,
-               reason: vote.reason,
-            });
-         }
+         votesForChoice
+            .get(choice)
+            .push({ username: vote.username, reason: vote.reason });
       }
    }
 
-   return { status, numOfAbstains, forVotes, againstVotes };
+   return { status, numOfAbstains, votesForChoice };
 };
 
-const generatePollExport = ({
-   status,
-   forVotes,
-   againstVotes,
-   numOfAbstains,
-}) => {
+const generatePollExport = ({ status, numOfAbstains, votesForChoice }) => {
    let output = `Poll Status: ${status}\n`;
 
-   output += `\n**FOR - ${forVotes.length} VOTES**\n`;
-   for (const vote of forVotes) {
-      output += `\n**${vote.username}** | *"${vote.reason}"*\n`;
-   }
-
-   output += `\n**AGAINST - ${againstVotes.length} VOTES**\n`;
-   for (const vote of againstVotes) {
-      output += `\n**${vote.username}** | *"${vote.reason}"*\n`;
-   }
+   votesForChoice.forEach((votes, choice) => {
+      output += `\n**${choice.toUpperCase()} - ${votes.length} VOTES**\n`;
+      for (const vote of votes) {
+         output += `\n**${vote.username}** | *"${vote.reason}"*\n`;
+      }
+   });
 
    output += `\n**ABSTAINS - ${numOfAbstains} VOTES**`;
 
@@ -123,6 +119,7 @@ module.exports = {
       .setType(ApplicationCommandType.Message),
 
    async execute(interaction) {
+
       Logger.info(
          'commands/context/exportPollReasons.js: Attempting to export poll reasons.',
          {
@@ -131,7 +128,7 @@ module.exports = {
             targetMessageId: interaction.targetId,
          }
       );
-
+     
       // TODO: Rename this to something more appropriate.
       const authorizedIds = process.env.BAD_BITCHES.split(',');
       if (!authorizedIds.includes(interaction.user.id)) {
@@ -158,6 +155,7 @@ module.exports = {
             targetMessageId: interaction.targetId,
          }
       );
+
    },
 
    attachUsernames: attachUsernames,

@@ -1,14 +1,52 @@
 # Nerman
-Oh Hi There!
 
-Yes, hello
+## Description
 
-Testing here
+Nerman is a Discord governance bot designed with the express purpose of improving [Nouns](https://nouns.wtf/) community interactions, encouraging participation, and notifying community members of Noun proposals and sales.
 
-Nice
+## Development
 
-### **Scopes** - Justification
+### Requirements
+
 ---
+
+To help develop Nerman, you will need the following:
+
+-  **[Git](https://git-scm.com/):** For source code version control.
+-  **[Node.js](https://nodejs.org/):** For the main development environment.
+-  **[MongoDB](https://www.mongodb.com/):** For the database.
+-  **[Discord](https://discord.com/):** To set up your own bot.
+-  **[Alchemy](https://www.alchemy.com/):** To track Nouns' blockchain activity.
+
+### Installation
+
+---
+
+To install Nerman, simply execute the following commands in the terminal:
+
+```
+git clone https://github.com/JoeCars/Nerman.git
+cd Nerman
+npm install
+```
+
+### Additional Setup
+
+---
+
+1. **Create a Discord bot:** Follow this guide on [how to setup a Discord bot](https://discordjs.guide/preparations/setting-up-a-bot-application.html#your-bot-s-token).
+2. **Setup A Database:** This can either be a cloud server or a locally-run MongoDB server.
+3. **Add Environmental Variables:** Ensure you add the appropriate environmental variables.
+
+<!-- TODO: Add examples of the environmental variables needed. -->
+
+Once everything is ready, you can start the bot using `npm start`.
+
+### Bot Scopes
+
+---
+
+For the bot to work, you need to give it the following permissions and scopes. The reasons for needing each scope is provided.
 
 <dl>
 
@@ -35,43 +73,12 @@ Nice
 
 <br />
 
-### **Permissions** - Justification
+### OAuth2 Template URL
+
 ---
 
-<dl>
+To invite the bot, you may be required to provide an OAuth2 URL. Please use the following template. Replace the `#` symbols after `client_id` with the client id value found in the Discord development portal.
 
-   <dt><strong>Send Messages:</strong></dt>
-   <dd>Needed for nerman to reply to interactions with messages.</dd>
-   <br />
-
-   <dt><strong>Create Public Threads:</strong></dt>
-   <dd>Needed for nerman to instantiate a thread attached to the Polls he generates.</dd>
-   <br />
-
-   <dt><strong>Manage Messages:</strong></dt>
-   <dd>Needed for nerman to delete messages out of the nouncil-votes channel, or whichever one harbors the generation of newProposal based polls.</dd>
-   <br />
-
-   <dt><strong>Embed Links:</strong></dt>
-   <dd>Nerman includes this so that the link returned from the */noun* and */nouner* commands will have a small preview available rather than requiring the user to folow the hyperlink to see it.</dd>
-   <br />
-
-   <dt><strong>Attach Files:</strong></dt>
-   <dd>Nerman needs to be able to attach files to messages in order to return \<MessageAttachment\> and add it to the interaction.reply() of the /noun && /nouner commands</dd>
-   <br />
-
-   <dt><strong>Use External Emojis:</strong></dt>
-   <dd>Nerman needs to be able to use the outside/custom emojis in order to perform his voting actions.</dd>
-   <br />
-
-   <dt><strong>Add Reactions:</strong></dt>
-   <dd>Nerman needs to be able to react to votes in order to invoke and prevent duplicate invocations of tweets, upon enough users holding *voter* role reaching the react threshold on a vote to tweet.</dd>
-   <br />
-
-   <dt><strong>Use Slash Commands:</strong></dt>
-   <dd>Need to bought to use the custom slash commands built for users to perform lookup actions.</dd>
-   <br />
-
-</dl>
-
-<br/>
+```
+https://discord.com/api/oauth2/authorize?client_id=##################&permissions=36507543616&redirect_uri=https%3A%2F%2Fwww.google.com&response_type=code&scope=guilds%20bot%20guilds.members.read%20applications.commands%20messages.read
+```

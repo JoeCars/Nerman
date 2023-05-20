@@ -40,6 +40,7 @@ module.exports = {
             .setColor('#00FFFF')
             .setTitle(`New Auction | Noun ${id}`)
             .setDescription(`${nounsWTF}\n${pronouns}\n${nounOClock}`)
+
             .setImage(`https://noun.pics/${id}.png`);
 
          Logger.info(
