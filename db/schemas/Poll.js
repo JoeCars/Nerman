@@ -3,6 +3,10 @@ const { model, Schema } = require('mongoose');
 
 const { PollChannel } = require('../schemas/PollChannel');
 const Logger = require('../../helpers/logger');
+// Adding this back in, for the time being. Just to keep previous logs
+// which may help debug this issue, and I don't want to re-write them 
+// with the new Logger yet, in the interest of time
+const { log: l } = console;
 
 // Building Up, start basic
 const PollSchema = new Schema(
