@@ -272,14 +272,24 @@ module.exports = {
             embedQuorum.toString();
          }
          
-          updateEmbed.fields.find(({ name }) => name === 'Quorum').value =
-            embedQuorum.toString();
 
 //          if (updateEmbed.fields[4]) {
-         if (!!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
-            updateEmbed.fields.find(({ name }) => name === 'Voting Closes').value = `<t:${Math.floor(
-               associatedPoll.timeEnd.getTime() / 1000
-            )}:f>`;
+//          if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
+//             updateEmbed.fields.find(({ name }) => name === 'Voting Closes').value = `<t:${Math.floor(
+//                associatedPoll.timeEnd.getTime() / 1000
+//             )}:f>`;
+//          }
+         
+         if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
+            const timeClose = {
+               name: 'Voting Closes',
+               value: `<t:${Math.floor(
+                  associatedPoll.timeEnd.getTime() / 1000
+               )}:f>`,
+               inline: false,
+            };
+
+            updateEmbed.spliceFields(updateEmbed.fields.length, 0, timeClose);
          }
 
          if (associatedPoll.status === 'closed') {
