@@ -16,6 +16,8 @@ const Poll = require('../../db/schemas/Poll');
 const User = require('../../db/schemas/User');
 const Vote = require('../../db/schemas/Vote');
 const Logger = require('../../helpers/logger');
+// temporary -- delete after confirming this filed is fixed
+const { log: l} = console;
 
 const { longestString } = require('../../helpers/poll');
 const ResultBar = require('../../classes/ResultBar');
