@@ -3,12 +3,13 @@ const {
    MessageEmbed,
    EmbedBuilder,
 } = require('discord.js');
-const { roleMention } = require('@discordjs/builders');
+const { roleMention, codeBlock } = require('@discordjs/builders');
 
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 
 const { initPollMessage } = require('../../../helpers/poll/initPollMessage');
+const ResultBar = require('../../../classes/ResultBar');
 const { drawBar, longestString } = require('../../../helpers/poll');
 const Logger = require('../../../helpers/logger');
 
@@ -120,7 +121,11 @@ module.exports = {
 
       const associatedPoll = await Poll.findOne()
          .byMessageId(messageId)
-         .populate('config')
+         .populate([
+            { path: 'config' },
+            { path: 'countVoters' },
+            { path: 'getVotes' },
+         ])
          .exec();
 
       if (associatedPoll === null)
@@ -198,10 +203,18 @@ module.exports = {
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
-         messageEmbed.fields[1].value = embedQuorum.toString();
+         // messageEmbed.fields[1].value = embedQuorum.toString();
+         messageEmbed.fields.find(({ name }) => name === 'Quorum').value =
+            embedQuorum.toString();
          // l('MESSAGE EMBED WITH QUORUM TOO?!\n', messageEmbed);
 
-         messageEmbed.fields[4].value = `<t:${Math.floor(
+         // messageEmbed.fields[4].value = `<t:${Math.floor(
+         // associatedPoll.timeEnd.getTime() / 1000
+         // )}:f>`;
+         
+         messageEmbed.fields.find(
+            ({ name }) => name === 'Voting Closes'
+         ).value = `<t:${Math.floor(
             associatedPoll.timeEnd.getTime() / 1000
          )}:f>`;
 
@@ -252,12 +265,19 @@ module.exports = {
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
-         if (updateEmbed.fields[1]) {
-            updateEmbed.fields[1].value = embedQuorum.toString();
+         if (!!updateEmbed.fields.find(({ name }) => name === 'Quorum')) {
+//             if (updateEmbed.fields[1]) {
+//             updateEmbed.fields[1].value = embedQuorum.toString();
+            updateEmbed.fields.find(({ name }) => name === 'Quorum').value =
+            embedQuorum.toString();
          }
+         
+          updateEmbed.fields.find(({ name }) => name === 'Quorum').value =
+            embedQuorum.toString();
 
-         if (updateEmbed.fields[4]) {
-            updateEmbed.fields[4].value = `<t:${Math.floor(
+//          if (updateEmbed.fields[4]) {
+         if (!!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
+            updateEmbed.fields.find(({ name }) => name === 'Voting Closes').value = `<t:${Math.floor(
                associatedPoll.timeEnd.getTime() / 1000
             )}:f>`;
          }
@@ -283,11 +303,33 @@ module.exports = {
                   .flatMap(arr => arr[0][0].toUpperCase() + arr[0].substring(1))
                   .join(', ')} - Tied`;
             }
+            
+            let failedChecks = [];
+            
+               console.log(
+               'nerman/admin/regeneratePollMessages.js -- jsfailedChecks before checks=> ',
+               failedChecks
+            );
+
+            if (results.quorumPass === false) {
+               failedChecks.push('quorum');
+            }
+
+            if (results.thresholdPass === false) {
+               failedChecks.push('vote threshold');
+            }
 
             const longestOption = longestString(
                associatedPoll.pollData.choices
             ).length;
-            let resultsArray = ['```', '```'];
+//             let resultsArray = ['```', '```'];
+            let resultsArray = associatedPoll.config.voteThreshold
+               ? [
+                    `Threshold: ${associatedPoll.voteThreshold} ${
+                       associatedPoll.voteThreshold > 1 ? 'votes' : 'vote'
+                    }\n`,
+                 ]
+               : [];
             let resultsOutput = [];
 
             const barWidth = 8;
@@ -299,44 +341,51 @@ module.exports = {
             ]);
             for (const key in results.distribution) {
                const label = key[0].toUpperCase() + key.substring(1);
-               let optionObj = {
-                  label,
-                  votes: results.distribution[key],
-                  room: longestOption - label.length,
-                  get spacer() {
-                     return this.room !== 0
-                        ? Array.from(
-                             { length: this.room },
-                             () => '\u200b '
-                          ).join('')
-                        : '';
-                  },
-                  get portion() {
-                     return votesMap.get('totalVotes') !== 0
-                        ? this.votes / votesMap.get('totalVotes')
-                        : 0;
-                  },
-                  get portionOutput() {
-                     // return ` ${(this.portion * 100).toFixed(1)}%`;
-                     return ` ${this.votes ?? 0} votes`;
-                  },
-                  get bar() {
-                     return drawBar(votesMap.get('maxLength'), this.portion);
-                  },
-                  get completeBar() {
-                     return [
-                        `${this.label}${this.spacer} `,
-                        this.bar,
-                        this.portionOutput,
-                     ].join('');
-                  },
-               };
+               
+               const votes = results.distribution[key];
+               const room = longestOption - label.length;
+               let optionObj = new ResultBar(label, votes, room, votesMap);
+//                let optionObj = {
+//                   label,
+//                   votes: results.distribution[key],
+//                   room: longestOption - label.length,
+//                   get spacer() {
+//                      return this.room !== 0
+//                         ? Array.from(
+//                              { length: this.room },
+//                              () => '\u200b '
+//                           ).join('')
+//                         : '';
+//                   },
+//                   get portion() {
+//                      return votesMap.get('totalVotes') !== 0
+//                         ? this.votes / votesMap.get('totalVotes')
+//                         : 0;
+//                   },
+//                   get portionOutput() {
+//                      // return ` ${(this.portion * 100).toFixed(1)}%`;
+//                      return ` ${this.votes ?? 0} votes`;
+//                   },
+//                   get bar() {
+//                      return drawBar(votesMap.get('maxLength'), this.portion);
+//                   },
+//                   get completeBar() {
+//                      return [
+//                         `${this.label}${this.spacer} `,
+//                         this.bar,
+//                         this.portionOutput,
+//                      ].join('');
+//                   },
+//                };
 
                votesMap.set(label, optionObj);
-               resultsArray.splice(-1, 0, optionObj.completeBar);
+               resultsArray.push(optionObj.completeBar);
+//                resultsArray.splice(-1, 0, optionObj.completeBar);
             }
 
-            resultsOutput = resultsArray.join('\n');
+//             resultsOutput = resultsArray.join('\n');
+            resultsOutput = codeBlock(resultsArray.join('\n'));
+
 
             // let closedEmbed = message.embeds[0];
             // console.log({ closedEmbed });
@@ -344,6 +393,21 @@ module.exports = {
             // closedEmbed.setTitle(`${closedEmbed.title}`);
 
             // console.log({ closedEmbed });
+            
+            console.log(
+               'admin/regeneratePollMessage.js -- associatedPoll.countVoters =>',
+               associatedPoll.countVoters
+            );
+            console.log(
+               'admin/regeneratePollMessage.js -- associatedPoll.countAbstains =>',
+               associatedPoll.countAbstains
+            );
+
+            const votersValue = `Quorum: ${
+               associatedPoll.voterQuorum
+            }\n\nParticipated: ${
+               associatedPoll.countVoters + associatedPoll.countAbstains
+            }\nEligible: ${eligibleVoters}`;
 
             const closedFields = [
                {
@@ -358,9 +422,7 @@ module.exports = {
                },
                {
                   name: 'VOTERS',
-                  value: codeBlock(
-                     `Quorum: ${associatedPoll.voterQuorum}\n\nEligible: ${eligibleVoters}\nSubmitted: ${associatedPoll.countVoters}\nAbstained: ${associatedPoll.countAbstains}\n\nParticipation Rate: ${associatedPoll.participation}%`
-                  ),
+                  value: codeBlock(votersValue),
                   inline: false,
                },
             ];
