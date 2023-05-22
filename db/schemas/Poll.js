@@ -220,7 +220,7 @@ PollSchema.virtual('voteThreshold').get(function () {
    Logger.debug(
       'db/schemas/Poll.js: Attempting to get the virtual voter threshold.',
       {
-         voterQuorum: voterQuorum,
+         voteThreshold: voteThreshold,
          config: this.config,
       }
    );
