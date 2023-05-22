@@ -426,25 +426,14 @@ module.exports = async client => {
                            {
                               name: 'VOTERS',
                               value: codeBlock(votersValue),
-                              // value: codeBlock(
-                              //    `Quorum: ${
-                              //       closingPoll.voterQuorum
-                              //    }\n\nParticipated: ${
-                              //       closingPoll.countVoters +
-                              //       closingPoll.countAbstains
-                              //    }\nEligible: ${eligibleVoters}\n\nParticipation Rate: ${
-                              //       closingPoll.participation
-                              //    }%`
-                              // ),
-                              // value: codeBlock(
-                              //    `Quorum: ${closingPoll.voterQuorum}\n\nEligible: ${eligibleVoters}\nSubmitted: ${closingPoll.countVoters}\nAbstained: ${closingPoll.countAbstains}\n\nParticipation Rate: ${closingPoll.participation}%`
-                              // ),
                               inline: false,
                            },
                         ];
                         
-
-+                        if (closingPoll.config.liveVisualFeed === true) {
+                         console.log('closingPoll.config => ', closingPoll.config)
+                         console.log('closingPoll.config.liveVisualFeed => ', closingPoll.config.liveVisualFeed)
+                        
++                        if(closingPoll.config.liveVisualFeed === true) {
 +                           console.log('REMOVING FIELDS');
 +                           console.log(closedEmbed);
 +                           closedEmbed.spliceFields(1, 5, closedFields);
