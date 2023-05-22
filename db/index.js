@@ -175,7 +175,7 @@ module.exports = async client => {
                            .populate([
                               {
                                  path: 'config',
-                                 select: 'channelId quorum voteThreshold',
+                                 select: 'channelId quorum voteThreshold liveVisualFeed',
                               },
                               { path: 'countVoters' },
                               { path: 'getVotes' },
@@ -442,8 +442,31 @@ module.exports = async client => {
                               inline: false,
                            },
                         ];
+                        
+                        console.log(
++                           'closingPoll.config => ',
++                           closingPoll.config
++                        );
++                        console.log(
++                           'closingPoll.config.liveVisualFeed => ',
++                           closingPoll.config.liveVisualFeed
++                        );
++                        console.log(
++                           'closingPoll.config.liveVisualFeed === true => ',
++                           closingPoll.config.liveVisualFeed === true
++                        );
++
++                        if (closingPoll.config.liveVisualFeed === true) {
++                           console.log('REMOVING FIELDS');
++                           console.log(closedEmbed);
++                           closedEmbed.spliceFields(1, 5, closedFields);
++                        } else {
++                           console.log('NOT REMOVING FIELDS');
++                           console.log(closedEmbed);
++                           closedEmbed.spliceFields(1, 4, closedFields);
++                        }
 
-                        closedEmbed.spliceFields(1, 4, closedFields);
+//                         closedEmbed.spliceFields(1, 4, closedFields);
 
                         Logger.debug('db/index.js: Checking closed Embed.', {
                            closedEmbedField: closedEmbed.fields,
