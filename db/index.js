@@ -443,19 +443,7 @@ module.exports = async client => {
                            },
                         ];
                         
-                        console.log(
-+                           'closingPoll.config => ',
-+                           closingPoll.config
-+                        );
-+                        console.log(
-+                           'closingPoll.config.liveVisualFeed => ',
-+                           closingPoll.config.liveVisualFeed
-+                        );
-+                        console.log(
-+                           'closingPoll.config.liveVisualFeed === true => ',
-+                           closingPoll.config.liveVisualFeed === true
-+                        );
-+
+
 +                        if (closingPoll.config.liveVisualFeed === true) {
 +                           console.log('REMOVING FIELDS');
 +                           console.log(closedEmbed);
