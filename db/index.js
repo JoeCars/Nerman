@@ -435,15 +435,15 @@ module.exports = async client => {
                         
                         
                         
-+                        if(closingPoll.config.liveVisualFeed === true) {
-+                           console.log('REMOVING FIELDS');
-+                           console.log(closedEmbed);
-+                           closedEmbed.spliceFields(1, 5, closedFields);
-+                        } else {
-+                           console.log('NOT REMOVING FIELDS');
-+                           console.log(closedEmbed);
-+                           closedEmbed.spliceFields(1, 4, closedFields);
-+                        }
+                        if(closingPoll.config.liveVisualFeed === true) {
+                           console.log('REMOVING FIELDS');
+                           console.log(closedEmbed);
+                           closedEmbed.spliceFields(1, 5, closedFields);
+                        } else {
+                           console.log('NOT REMOVING FIELDS');
+                           console.log(closedEmbed);
+                           closedEmbed.spliceFields(1, 4, closedFields);
+                        }
 
 //                         closedEmbed.spliceFields(1, 4, closedFields);
 
