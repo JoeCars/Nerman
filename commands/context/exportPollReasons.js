@@ -6,24 +6,16 @@ const Poll = require('../../db/schemas/Poll');
 const Vote = require('../../db/schemas/Vote');
 const Logger = require('../../helpers/logger');
 
-
 const fetchPoll = async interaction => {
    let targetPoll;
    try {
       // TODO: The poll does NOT add vote IDs to the poll's database automatically.
-      targetPoll = await Poll.findOne(
-         {
-            messageId: interaction.targetId,
-            guildId: interaction.guildId,
-         }
-      )
+      targetPoll = await Poll.findOne({
+         messageId: interaction.targetId,
+         guildId: interaction.guildId,
+      })
          .populate('config')
-         .exec()
-//          .populate('_id') 
-//          .populate('votes')
-//          .populate('abstains')
-
-
+         .exec();
    } catch (err) {
       Logger.error(
          'commands/context/exportPollReasons.js/fetchPoll(): Received an error.',
@@ -31,7 +23,7 @@ const fetchPoll = async interaction => {
             error: err,
          }
       );
-     
+
       throw new Error(err.message);
    }
 
@@ -68,8 +60,7 @@ const attachUsernames = async (interaction, votes, targetPoll) => {
    for (let i = 0; i < votes.length; ++i) {
       if (targetPoll.config.anonymous) {
          votes[i].username = 'anonymous';
-      }
-      else {
+      } else {
          const guildUser = await interaction.guild.members.fetch(votes[i].user);
          votes[i].username = guildUser.user.username;
       }
@@ -79,7 +70,6 @@ const attachUsernames = async (interaction, votes, targetPoll) => {
 const extractPollResults = (targetPoll, votes) => {
    const status = targetPoll.status;
    const numOfAbstains = targetPoll.abstains.size;
-
 
    // This approach allows multiple choices that can be any value.
    const votesForChoice = new Map();
@@ -104,6 +94,11 @@ const generatePollExport = ({ status, numOfAbstains, votesForChoice }) => {
    votesForChoice.forEach((votes, choice) => {
       output += `\n**${choice.toUpperCase()} - ${votes.length} VOTES**\n`;
       for (const vote of votes) {
+         const hasNoReason = vote.reason.trim() === '';
+         if (hasNoReason) {
+            continue;
+         }
+
          output += `\n**${vote.username}** | *"${vote.reason}"*\n`;
       }
    });
@@ -119,7 +114,6 @@ module.exports = {
       .setType(ApplicationCommandType.Message),
 
    async execute(interaction) {
-
       Logger.info(
          'commands/context/exportPollReasons.js: Attempting to export poll reasons.',
          {
@@ -128,7 +122,7 @@ module.exports = {
             targetMessageId: interaction.targetId,
          }
       );
-     
+
       // TODO: Rename this to something more appropriate.
       const authorizedIds = process.env.BAD_BITCHES.split(',');
       if (!authorizedIds.includes(interaction.user.id)) {
@@ -155,7 +149,6 @@ module.exports = {
             targetMessageId: interaction.targetId,
          }
       );
-
    },
 
    attachUsernames: attachUsernames,
