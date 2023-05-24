@@ -111,6 +111,21 @@ module.exports = {
                   )
                   .setRequired(false)
             )
+      )
+      .addSubcommand(subcommand =>
+         subcommand
+            .setName('create-test-poll')
+            .setDescription(
+               'Create a poll with a number of votes and reasons for testing purposes.'
+            )
+            .addIntegerOption(option =>
+               option
+                  .setName('number-of-votes')
+                  .setDescription(
+                     'The number of votes randomly dispersed into the poll.'
+                  )
+                  .setRequired(true)
+            )
       ),
    /**
     *
