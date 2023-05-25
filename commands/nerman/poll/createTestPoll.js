@@ -68,82 +68,30 @@ module.exports = {
 };
 
 async function createPollEmbed(interaction, newPoll) {
-   // getVotes is a little funky. Needs to always be populated first.
    newPoll = await Poll.findById(newPoll._id)
       .populate([{ path: 'getVotes' }, { path: 'countVoters' }])
       .exec();
-
    const results = await newPoll.results;
-   let winningResult = '';
-
-   if ('winner' in results) {
-      winningResult =
-         results.winner !== null
-            ? `${
-                 results.winner[0].toUpperCase() + results.winner.substring(1)
-              } - Wins`
-            : 'Literally nobody voted on this :<';
-   }
-
-   if ('tied' in results) {
-      winningResult = `${results.tied
-         .flatMap(arr => arr[0][0].toUpperCase() + arr[0].substring(1))
-         .join(', ')} - Tied`;
-   }
-
-   const longestOption = longestString(newPoll.pollData.choices).length;
-   let resultsArray = newPoll.config.voteThreshold
-      ? [
-           `Threshold: ${newPoll.voteThreshold} ${
-              newPoll.voteThreshold > 1 ? 'votes' : 'vote'
-           }\n`,
-        ]
-      : [];
-   let resultsOutput = [];
-
-   const BAR_WIDTH = 8;
-   let totalVotes = results.totalVotes;
-
-   let votesMap = new Map([
-      ['maxLength', BAR_WIDTH],
-      ['totalVotes', totalVotes],
-   ]);
-
-   Logger.debug('Checking total votes', {
-      totalVotes: totalVotes,
-   });
-
-   for (const key in results.distribution) {
-      const label = key[0].toUpperCase() + key.substring(1);
-
-      const votes = results.distribution[key];
-      const room = longestOption - label.length;
-      let optionObj = new ResultBar(label, votes, room, votesMap);
-
-      votesMap.set(label, optionObj);
-      resultsArray.push(optionObj.completeBar);
-   }
-   resultsOutput = codeBlock(resultsArray.join('\n'));
-
-   const votersValue = `Quorum: ${newPoll.voterQuorum}\n\nParticipated: ${
-      newPoll.countVoters + newPoll.countAbstains
-   }\nEligible: ${newPoll.allowedUsers.size}`;
 
    const embedFields = [
       { name: '\u200B', value: '\u200B', inline: false },
       {
          name: 'RESULTS',
-         value: codeBlock(winningResult),
+         value: codeBlock(retrieveWinningResult(results)),
          inline: false,
       },
       {
          name: 'VOTES',
-         value: resultsOutput,
+         value: retrieveResultsGraph(newPoll, results),
          inline: false,
       },
       {
          name: 'VOTERS',
-         value: codeBlock(votersValue),
+         value: codeBlock(
+            `Quorum: ${newPoll.voterQuorum}\n\nParticipated: ${
+               newPoll.countVoters + newPoll.countAbstains
+            }\nEligible: ${newPoll.allowedUsers.size}`
+         ),
          inline: false,
       },
       {
@@ -170,6 +118,55 @@ async function createPollEmbed(interaction, newPoll) {
       );
 
    return embed;
+}
+
+function retrieveResultsGraph(newPoll, results) {
+   let resultsArray = newPoll.config.voteThreshold
+      ? [
+           `Threshold: ${newPoll.voteThreshold} ${
+              newPoll.voteThreshold > 1 ? 'votes' : 'vote'
+           }\n`,
+        ]
+      : [];
+
+   const BAR_WIDTH = 8;
+   let votesMap = new Map([
+      ['maxLength', BAR_WIDTH],
+      ['totalVotes', results.totalVotes],
+   ]);
+
+   const longestOption = longestString(newPoll.pollData.choices).length;
+   for (const key in results.distribution) {
+      const label = key[0].toUpperCase() + key.substring(1);
+
+      const votes = results.distribution[key];
+      const room = longestOption - label.length;
+      let optionObj = new ResultBar(label, votes, room, votesMap);
+
+      votesMap.set(label, optionObj);
+      resultsArray.push(optionObj.completeBar);
+   }
+   return codeBlock(resultsArray.join('\n'));
+}
+
+function retrieveWinningResult(results) {
+   let winningResult = '';
+
+   if ('winner' in results) {
+      winningResult =
+         results.winner !== null
+            ? `${
+                 results.winner[0].toUpperCase() + results.winner.substring(1)
+              } - Wins`
+            : 'Literally nobody voted on this :<';
+   }
+
+   if ('tied' in results) {
+      winningResult = `${results.tied
+         .flatMap(arr => arr[0][0].toUpperCase() + arr[0].substring(1))
+         .join(', ')} - Tied`;
+   }
+   return winningResult;
 }
 
 async function generateRandomVotes(newPoll, interaction) {
@@ -257,8 +254,6 @@ function selectOptionAndReason(poll) {
    ];
 
    const choiceIndex = Math.random() >= 0.5 ? 0 : 1;
-
-   const something = ['For', 'Against'];
 
    const isForAgainst =
       poll.pollData.choices.length === 2 &&
