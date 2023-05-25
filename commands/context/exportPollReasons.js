@@ -9,12 +9,18 @@ const Logger = require('../../helpers/logger');
 const fetchPoll = async interaction => {
    let targetPoll;
    try {
-      // TODO: The poll does NOT add vote IDs to the poll's database automatically.
       targetPoll = await Poll.findOne({
          messageId: interaction.targetId,
          guildId: interaction.guildId,
       })
-         .populate('config')
+         .populate([
+            {
+               path: 'config',
+            },
+            {
+               path: 'getVotes',
+            },
+         ])
          .exec();
    } catch (err) {
       Logger.error(
@@ -34,40 +40,20 @@ const fetchPoll = async interaction => {
    return targetPoll;
 };
 
-const fetchVotes = async targetPoll => {
-   let votes;
-   try {
-      votes = await Vote.find({
-         poll: targetPoll._id,
-      })
-         .populate('user')
-         .exec();
-   } catch (err) {
-      Logger.error(
-         'commands/context/exportPollReasons.js/fetchVotes(): Received an error.',
-         {
-            error: err,
-         }
-      );
-
-      throw new Error(err.message);
-   }
-
-   return votes;
-};
-
-const attachUsernames = async (interaction, votes, targetPoll) => {
-   for (let i = 0; i < votes.length; ++i) {
+const attachUsernames = async (interaction, targetPoll) => {
+   for (let i = 0; i < targetPoll.getVotes.length; ++i) {
       if (targetPoll.config.anonymous) {
-         votes[i].username = 'anonymous';
+         targetPoll.getVotes[i].username = 'anonymous';
       } else {
-         const guildUser = await interaction.guild.members.fetch(votes[i].user);
-         votes[i].username = guildUser.user.username;
+         const guildUser = await interaction.guild.members.fetch(
+            targetPoll.getVotes[i].user
+         );
+         targetPoll.getVotes[i].username = guildUser.user.username;
       }
    }
 };
 
-const extractPollResults = (targetPoll, votes) => {
+const extractPollResults = targetPoll => {
    const status = targetPoll.status;
    const numOfAbstains = targetPoll.abstains.size;
 
@@ -77,7 +63,7 @@ const extractPollResults = (targetPoll, votes) => {
       votesForChoice.set(choice, []);
    });
 
-   for (const vote of votes) {
+   for (const vote of targetPoll.getVotes) {
       for (const choice of vote.choices) {
          votesForChoice
             .get(choice)
@@ -130,10 +116,9 @@ module.exports = {
       }
 
       const targetPoll = await fetchPoll(interaction);
-      const votes = await fetchVotes(targetPoll);
-      await attachUsernames(interaction, votes, targetPoll);
+      await attachUsernames(interaction, targetPoll);
 
-      const pollResults = extractPollResults(targetPoll, votes);
+      const pollResults = extractPollResults(targetPoll);
       const markdown = generatePollExport(pollResults);
 
       interaction.reply({
