@@ -175,16 +175,14 @@ async function createPollEmbed(interaction, newPoll) {
 async function generateRandomVotes(newPoll, interaction) {
    const numOfVotes = interaction.options.getInteger('number-of-votes');
    for (let i = 0; i < numOfVotes; ++i) {
-      const newVote = await Vote.create({
+      const choice = selectOptionAndReason(newPoll);
+
+      await Vote.create({
          _id: new mongoose.Types.ObjectId(),
          poll: newPoll._id,
          user: interaction.user.id,
-         choices:
-            Math.random() >= 0.5
-               ? [newPoll.pollData.choices[0]]
-               : [newPoll.pollData.choices[1]],
-         reason:
-            Math.random() >= 0.5 ? 'Cool lightsabers.' : 'Sword go brrr...',
+         choices: choice.option,
+         reason: choice.reason,
       });
 
       // Updating database stuff.
@@ -211,11 +209,78 @@ async function createPoll(interaction, channelConfig) {
          description: 'A test poll.',
          choices: channelConfig.forAgainst
             ? ['For', 'Against']
-            : ['jedi', 'sith'],
+            : ['Jedi', 'Sith'],
       },
       timeEnd: new Date(),
       pollNumber: testNumber++,
    });
    await newPoll.save();
    return newPoll;
+}
+
+function selectOptionAndReason(poll) {
+   const JEDI_REASONS = [
+      'Ewan McGregor. Need I say more?',
+      "Plo Koon is a pretty cool dude. Who wouldn't like him?",
+      'Yoda, my reason is.',
+      'Blue and green lightsabers are simply cooler.',
+      "They're the good guys. Why wouldn't I like them?",
+      'Ki-Adi-Mundi is pretty big brain and is the ultimate chad.',
+      "Luke's kinda alright.",
+      'Blind Kanan Jarrus looks amazing! How could you not like him?',
+      "They're like Buddhists man. They're cool.",
+      'Y-O-D-A, Yoda. Yo-Yo-Yo-Yo-Yoda.',
+   ];
+
+   const SITH_REASONS = [
+      "Darth Vader's helmet looks cool!",
+      'UNLIMITED POWER!',
+      `Did you ever hear the tragedy of Darth Plagueis The Wise? I thought not. It’s not a story the Jedi would tell you. It’s a Sith legend. Darth Plagueis was a Dark Lord of the Sith, so powerful and so wise he could use the Force to influence the midichlorians to create life… He had such a knowledge of the dark side that he could even keep the ones he cared about from dying. The dark side of the Force is a pathway to many abilities some consider to be unnatural. He became so powerful… the only thing he was afraid of was losing his power, which eventually, of course, he did. Unfortunately, he taught his apprentice everything he knew, then his apprentice killed him in his sleep. Ironic. He could save others from death, but not himself.`,
+      'Darth Revan. Need I say more?',
+      'Count Dooku was the good guy all along. Change my mind.',
+      'The Sith get all the cool Force powers.',
+      'Darth Maul has a really cool lightsaber. And horns. Did I mention the horns?',
+      'I like the colour red.',
+   ];
+
+   const GENERAL_REASONS = [
+      'I honestly just flipped a coin.',
+      'I rolled a dice to decide. What more do you want?',
+      'Oops. I miss-clicked. Please ignore this.',
+      'I know I had a good reason for my decision, but I seem to have forgotten it',
+      'Sorry, but my cat ate my reason.',
+      "Isn't it obvious why I'm going with this choice?",
+      'I came. I saw. I clicked.',
+      "Where's the money, Lebowski?",
+      "Well, that's like my opinion man.",
+      'The Dude abides.',
+   ];
+
+   const choiceIndex = Math.random() >= 0.5 ? 0 : 1;
+
+   const something = ['For', 'Against'];
+
+   const isForAgainst =
+      poll.pollData.choices.length === 2 &&
+      poll.pollData.choices[0] === 'For' &&
+      poll.pollData.choices[1] === 'Against';
+   if (isForAgainst) {
+      return {
+         option: [poll.pollData.choices[choiceIndex]],
+         reason:
+            GENERAL_REASONS[Math.floor(Math.random() * GENERAL_REASONS.length)],
+      };
+   }
+
+   if (choiceIndex === 0) {
+      return {
+         option: [poll.pollData.choices[choiceIndex]],
+         reason: JEDI_REASONS[Math.floor(Math.random() * JEDI_REASONS.length)],
+      };
+   }
+
+   return {
+      option: [poll.pollData.choices[choiceIndex]],
+      reason: SITH_REASONS[Math.floor(Math.random() * SITH_REASONS.length)],
+   };
 }
