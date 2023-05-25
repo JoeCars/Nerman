@@ -73,8 +73,6 @@ async function createPollEmbed(interaction, newPoll) {
       .populate([{ path: 'getVotes' }, { path: 'countVoters' }])
       .exec();
 
-   // Poll number is undefined.
-
    const results = await newPoll.results;
    let winningResult = '';
 
@@ -198,6 +196,8 @@ async function generateRandomVotes(newPoll, interaction) {
    }
 }
 
+let testNumber = 0;
+
 async function createPoll(interaction, channelConfig) {
    let messageId = (await interaction.fetchReply()).id;
    const newPoll = new Poll({
@@ -214,6 +214,7 @@ async function createPoll(interaction, channelConfig) {
             : ['jedi', 'sith'],
       },
       timeEnd: new Date(),
+      pollNumber: testNumber++,
    });
    await newPoll.save();
    return newPoll;
