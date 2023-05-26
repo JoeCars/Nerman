@@ -12,9 +12,12 @@ const {
 } = require('@discordjs/builders');
 
 const { Types } = require('mongoose');
-const Poll = require('../../../../db/schemas/Poll');
-const User = require('../../../../db/schemas/User');
-const Vote = require('../../../../db/schemas/Vote');
+const Poll = require('../../db/schemas/Poll');
+const User = require('../../db/schemas/User');
+const Vote = require('../../db/schemas/Vote');
+const Logger = require('../../helpers/logger');
+// temporary -- delete after confirming this filed is fixed
+const { log: l } = console;
 
 const { longestString } = require('../../../../helpers/poll');
 const ResultBar = require('../../../../structures/ResultBar');
@@ -25,22 +28,23 @@ const doppelId = process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
 
 const guildNouncilIds = [nouncilId, jtsNouncilId, doppelId];
 
-const { log: l, error: lerr } = console;
-
 module.exports = {
    name: 'modalSubmit',
    /**
     * @param {ModalSubmitInteraction} interaction
     */
    async execute(modal) {
+      Logger.info('events/poll/pollVote.js: Attempting to submit vote.', {
+         guildId: modal.guildId,
+         channelId: modal.channelId,
+         userId: modal.member.user.id,
+         modalCustomId: modal.customId,
+      });
+
       if (modal.customId !== 'vote-modal') return;
 
       await modal.deferReply({ ephemeral: true });
 
-      console.log('CUSTOM ID: \n', modal.customId);
-
-      console.log('pollVote.js -- modal', { modal });
-      // {
       const {
          client,
          guildId,
@@ -57,14 +61,10 @@ module.exports = {
 
       const pollStatus = await Poll.findOne(
          { messageId },
-         'status pollData.voteAllowance pollData.choices config'
+         'status pollData.voteAllowance pollData.choices config',
       ).exec();
 
       const pollOptions = await pollStatus.pollOptions();
-
-      !pollOptions.anonymous && console.log({ modal });
-      console.log({ pollStatus });
-      console.log({ pollOptions });
 
       let voteArray = modal.getTextInputValue('votingSelect');
 
@@ -82,25 +82,28 @@ module.exports = {
       }
 
       let incorrectOptions = voteArray.filter(
-         vote => !pollStatus.pollData.choices.includes(vote)
+         vote => !pollStatus.pollData.choices.includes(vote),
       );
 
-      console.log({ incorrectOptions });
+      Logger.debug(
+         'events/poll/pollVote.js: Checking incorrect voting options.',
+         {
+            guildId: modal.guildId,
+            channelId: modal.channelId,
+            userId: modal.member.user.id,
+            modalCustomId: modal.customId,
+            incorrectOptions: incorrectOptions,
+         },
+      );
 
       if (incorrectOptions.length) {
          return modal.editReply({
             content: `Invalid choice(s):\n\n${incorrectOptions.join(
-               ' '
+               ' ',
             )}\n\nPlease check you spelling when selecting your options.`,
             ephermeral: true,
          });
       }
-
-      console.log('voteArray.length', voteArray.length);
-      console.log(
-         'pollStatus.pollData.voteAllowance',
-         pollStatus.pollData.voteAllowance
-      );
 
       if (voteArray.length !== pollStatus.pollData.voteAllowance) {
          return modal.editReply({
@@ -112,8 +115,6 @@ module.exports = {
       // disabled until DJS SELECT MENUS Modal supported
       // const voteArray = modal.getSelectMenuValues('votingSelect');
       const voteReason = modal.getTextInputValue('voteReason');
-
-      console.log({ voteReason });
 
       if (pollStatus.status === 'closed') {
          return modal.editReply({
@@ -148,23 +149,25 @@ module.exports = {
       let votingUser = await User.findOne().byDiscordId(userId, guildId).exec();
 
       if (!votingUser) {
-         l(
-            '/////////////// !votingUser ///////////////\nGetting eligibleChannels...'
-         );
-         const eligibleChannels = await User.findEligibleChannels(
-            memberRoleCache,
-            pollOptions.anonymous
+         Logger.warn(
+            'events/poll/pollVote.js: User cannot vote here. Attempting to find eligible voting channels.',
+            {
+               guildId: modal.guildId,
+               channelId: modal.channelId,
+               messageOd: modal.message.id,
+               userId: modal.member.user.id,
+            },
          );
 
-         !pollOptions.anonymous && l({ eligibleChannels });
+         const eligibleChannels = await User.findEligibleChannels(
+            memberRoleCache,
+            pollOptions.anonymous,
+         );
 
          votingUser = await User.createUser(guildId, userId, eligibleChannels);
       }
 
       const updatedPoll = await Poll.findAndSetVoted(messageId, userId);
-
-      console.log({ channelId });
-      !pollOptions.anonymous && console.log('votingUser => ', { votingUser });
 
       votingUser.incParticipation(channelId);
 
@@ -184,12 +187,12 @@ module.exports = {
 
       console.log(
          'events/poll/pollVote.js -- longestOption => ',
-         longestOption
+         longestOption,
       );
 
       console.log(
          'events/poll/pollVote.js -- updatedPoll.config => ',
-         updatedPoll.config
+         updatedPoll.config,
       );
       // let resultsArray = ['```', '```'];
       let resultsArray = pollStatus.config.voteThreshold
@@ -217,7 +220,7 @@ module.exports = {
          console.log('db/index.js -- label.length => ', label.length);
          console.log(
             'db/index.js -- logging :  longestOption - label.length => ',
-            longestOption - label.length
+            longestOption - label.length,
          );
          const votes = results.distribution[key];
          const room = longestOption - label.length;
@@ -259,10 +262,13 @@ module.exports = {
       l('events/poll/pollVote.js  -- pollOptions.config => ', pollOptions);
       l(
          'events/poll/pollVote.js  -- pollOptions.liveVisualFeed => ',
-         pollOptions.liveVisualFeed
+         pollOptions.liveVisualFeed,
       );
 
       const updateEmbed = new MessageEmbed(message.embeds[0]);
+
+      l('PRE SPLICE updateEmbed => ', updateEmbed);
+      l('PRE SPLICE updateEmbed.fields => ', updateEmbed.fields);
 
       updateEmbed.spliceFields(
          updateEmbed.fields.findIndex(({ name }) => name === 'Voters'),
@@ -271,46 +277,72 @@ module.exports = {
             name: 'Voters',
             value: `${updatedPoll.countVoters}`,
             inline: true,
-         }
+         },
       );
+
+      l(
+         '***********************************\nCHECKING TO SEE IF QUORUM FIELD IS PRESENT\n***********************************',
+      );
+
+      if (!updateEmbed.fields.find(({ name }) => name === 'Quorum')) {
+         l(
+            '***********************************\nQUORUM FIELD WAS NOT FOUND\n***********************************',
+         );
+
+         updateEmbed.spliceFields(
+            updateEmbed.fields.findIndex(({ name }) => name === 'Voters'),
+            0,
+            {
+               name: 'Quorum',
+               value: `${updatedPoll.voterQuorum}`,
+               inline: true,
+            },
+         );
+      }
+
+      l('POST SPLICE updateEmbed => ', updateEmbed);
+      l('POST SPLICE updateEmbed.fields => ', updateEmbed.fields);
 
       l('events/poll/pollVote.js  -- updateEmbed => ', updateEmbed);
       l(
          'events/poll/pollVote.js  -- updatedPoll.config.liveVisualFeed => ',
-         pollOptions.liveVisualFeed
+         pollOptions.liveVisualFeed,
       );
 
       if (pollOptions.liveVisualFeed) {
          // if (updatedPoll.config.liveVisualFeed) {
          l(
-            'events/poll/pollVote.js  -- inside if (updatedPoll.config.liveVisualFeed) =>  SUCCESS'
+            'events/poll/pollVote.js  -- inside if (updatedPoll.config.liveVisualFeed) =>  SUCCESS',
          );
 
-         updateEmbed.spliceFields(1, 1, {
-            name: 'Results',
-            value: resultsOutput,
-            inline: false,
-         });
+         // !testing OLD
+
+         // updateEmbed.spliceFields(1, 1, {
+         //    name: 'Results',
+         //    value: resultsOutput,
+         //    inline: false,
+         // });
+
+         // !testing NEW
+         updateEmbed.spliceFields(
+            updateEmbed.fields.findIndex(({ name }) => name === 'Results'),
+            1,
+            {
+               name: 'Results',
+               value: resultsOutput,
+               inline: false,
+            },
+         );
       }
 
       message.edit({ embeds: [updateEmbed] });
-
-      l({ propRegExp });
-      l(updatedPoll.pollData.title);
 
       if (propRegExp.test(updatedPoll.pollData.title)) {
          try {
             const matches = updatedPoll.pollData.title.match(propRegExp);
 
-            l({ matches });
-            l(matches[0]);
-            l(matches[1]);
-
             const propText = matches[0];
             const propId = matches[1];
-
-            l({ propText });
-            l({ propId });
 
             const threadEmbed = new MessageEmbed()
                .setColor('#00FFFF')
@@ -327,11 +359,9 @@ module.exports = {
                         : inlineCode(voteArray.join(' '))
                   } on ${hyperlink(
                      propText,
-                     `https://nouns.wtf/vote/${propId}`
-                  )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+                     `https://nouns.wtf/vote/${propId}`,
+                  )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`,
                );
-
-            console.log(voteArray.join(' ').toUpperCase());
             // .setDescription(
             //    `${
             //       !pollOptions.anonymous
@@ -353,13 +383,13 @@ module.exports = {
             //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
             // );
 
-            l({ threadEmbed });
-
             const thread = await message.thread.fetch();
             // await message.thread.fetch();
             await thread.send({ embeds: [threadEmbed] });
          } catch (error) {
-            l({ error });
+            Logger.error('events/poll/pollVote.js: Received an error.', {
+               error: error,
+            });
          }
       } else {
          try {
@@ -400,7 +430,7 @@ module.exports = {
                      pollOptions.forAgainst
                         ? inlineCode(voteArray.join(' ').toUpperCase())
                         : inlineCode(voteArray.join(' '))
-                  }.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
+                  }.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`,
                );
             //    .setDescription(
             //       `${
@@ -429,17 +459,22 @@ module.exports = {
             //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
             // );
 
-            l({ threadEmbed });
-
             const thread = await message.thread.fetch();
             // await message.thread.fetch();
             await thread.send({ embeds: [threadEmbed] });
          } catch (error) {
-            l({ error });
+            Logger.error('events/poll/pollVote.js: Received an error.', {
+               error: error,
+            });
          }
       }
 
-      console.log('pollVote.js -- userVote', { userVote });
+      Logger.info('events/poll/pollVote.js: Successfully submitted vote.', {
+         guildId: modal.guildId,
+         channelId: modal.channelId,
+         userId: modal.member.user.id,
+         userVote: userVote,
+      });
 
       return modal.editReply({
          content: 'Your vote has been submitted',

@@ -4,8 +4,7 @@ const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const { ApplicationCommandType } = require('discord-api-types/v9');
 
 const Poll = require('../../db/schemas/Poll');
-
-const { log: l } = console;
+const Logger = require('../../helpers/logger');
 
 // fixme will need to remove these after we figure out a better permission control for admin command
 const authorizedIds = process.env.BAD_BITCHES.split(',');
@@ -21,6 +20,15 @@ module.exports = {
     * @param {ContextMenuInteraction} interaction
     */
    async execute(interaction) {
+      Logger.info(
+         'commands/context/cancelPoll.js: Attempting to cancel the poll.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            targetMessageId: interaction.targetId,
+         }
+      );
+
       try {
          // todo Maybe make sure that when participation is being calculated or regenerated for users, to check for poll.status === 'cancelled', as well as whether or not the users are simply included in the poll.allowedUsers Map?
          const {
@@ -28,10 +36,8 @@ module.exports = {
             targetId,
             guildId,
             memberPermissions,
-            user: {id: userId}
+            user: { id: userId },
          } = interaction;
-
-         l({ targetId, guildId });
 
          if (!authorizedIds.includes(userId)) {
             throw new Error('You do not have permission to use this command.');
@@ -51,8 +57,6 @@ module.exports = {
             },
             'status -_id'
          ).exec();
-
-         l({ targetPoll });
 
          if (!targetPoll) {
             throw new Error(
@@ -82,8 +86,20 @@ module.exports = {
             client: client,
             interaction: interaction,
          });
+
+         Logger.info(
+            'commands/context/cancelPoll.js: Successfully cancelled the poll.',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               targetMessageId: interaction.targetId,
+               pollId: targetPoll._id,
+            }
+         );
       } catch (error) {
-         l({ error });
+         Logger.error('commands/context/cancelPoll.js: Received an error.', {
+            error: error,
+         });
 
          throw new Error(error.message);
       }

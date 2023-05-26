@@ -1,5 +1,7 @@
 const { ButtonInteraction } = require('discord.js');
 
+const Logger = require('../helpers/logger');
+
 module.exports = {
    name: 'interactionCreate',
    /**
@@ -8,7 +10,16 @@ module.exports = {
    execute(interaction) {
       if (!interaction.isButton()) return;
 
-      console.log('buttonInteraction.js -- BUTTON INTERACTION');
+      Logger.info(
+         'events/buttonInteraction.js: Handling a button interaction.',
+         {
+            customId: interaction.customId,
+            memberPermissions: interaction.member.permissions,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+            userId: interaction.user.id,
+         }
+      );
 
       const {
          client,
@@ -17,16 +28,20 @@ module.exports = {
       } = interaction;
 
 
-      console.log('buttonInteraction.js -- customId', { customId });
-      console.log('buttonInteraction.js -- permissions', { permissions });
-      // console.log(client.buttons);
-      // console.log(client.buttons.get(customId));
-
       const button = client.buttons.get(customId);
 
-      console.log('buttonInteraction.js -- button', { button });
-
       if (button.permission && !permissions.has(button.permission)) {
+         Logger.warn(
+            'events/buttonInteraction.js: User does not have the permissions to interact with this button.',
+            {
+               customId: interaction.customId,
+               memberPermissions: interaction.member.permissions,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+               userId: interaction.user.id,
+            }
+         );
+
          return interaction.reply({
             content: 'You lack the permissions to interact with this button',
             ephemeral: true,
@@ -34,5 +49,16 @@ module.exports = {
       }
 
       button.execute(interaction);
+
+      Logger.info(
+         'events/buttonInteraction.js: Finished handling a button interaction.',
+         {
+            customId: interaction.customId,
+            memberPermissions: interaction.member.permissions,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+            userId: interaction.user.id,
+         }
+      );
    },
 };

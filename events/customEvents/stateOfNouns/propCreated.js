@@ -1,7 +1,7 @@
 const { MessageEmbed, Message } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
 
-const { log: l } = console;
+const Logger = require('../../helpers/logger');
 
 const nounsGovId = process.env.NOUNS_GOV_ID;
 
@@ -12,8 +12,14 @@ module.exports = {
     */
    async execute(message, proposal, proposalId) {
       try {
-         l('PROP CREATED EVENT HANDLER');
-
+         Logger.info(
+            'events/stateOfNouns/propCreated.js: Handling a proposal creation event.',
+            {
+               proposalId: proposalId,
+               proposalTitle: proposal.pollData.title,
+               proposalDescription: proposal.pollData.description,
+            }
+         );
 
          const {
             guild: {
@@ -24,34 +30,50 @@ module.exports = {
          const {
             pollData: { title, description },
          } = proposal;
-         l('PROP CREATED EVENT HANDLER');
 
          const nounsGovChannel = await cache.get(nounsGovId);
-
-         l({ nounsGovChannel });
-         l({ message });
-         l({ proposal });
-
-         l({ proposalId, title, description });
 
          const propUrl = `https://nouns.wtf/vote/${proposalId}`;
          const titleHyperlink = hyperlink(title, propUrl);
          const shortDescription = `${description.substring(0, 200)}...`;
          const readMoreHyperlink = hyperlink('Read Full Propposal', propUrl);
 
-         l({ shortDescription, readMoreHyperlink });
+         Logger.debug(
+            'events/stateOfNouns/propCreated.js: Checking description.',
+            {
+               proposalId: proposalId,
+               proposalTitle: proposal.pollData.title,
+               proposalDescription: proposal.pollData.description,
+               shortDescription: shortDescription,
+               readMoreHyperlink: readMoreHyperlink,
+            }
+         );
 
          const propCreatedEmbed = new MessageEmbed()
             .setTitle(title)
             .setURL(propUrl)
             .setDescription(`${shortDescription}\n\n--> ${readMoreHyperlink}`);
 
+         Logger.info(
+            'events/stateOfNouns/propCreated.js: Successfully handled a proposal creation event.',
+            {
+               proposalId: proposalId,
+               proposalTitle: proposal.pollData.title,
+               proposalDescription: proposal.pollData.description,
+            }
+         );
+
          return await message.edit({
             content: null,
             embeds: [propCreatedEmbed],
          });
       } catch (error) {
-         console.error(error);
+         Logger.error(
+            'events/stateOfNouns/propCreated.js: Received an error.',
+            {
+               error: error,
+            }
+         );
       }
    },
 };

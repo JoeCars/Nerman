@@ -4,9 +4,9 @@ const {
    CommandInteraction,
 } = require('discord.js');
 const fetch = require('node-fetch');
-const { log: l, table: t } = console;
 const getNounInfo = require('../../../helpers/nouns/getNounInfo');
 const createNounEmbed = require('../../../helpers/nouns/createNounEmbed');
+const Logger = require('../../../helpers/logger');
 
 module.exports = {
    subCommand: 'nerman.noun',
@@ -15,6 +15,14 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
+      Logger.info(
+         'commands/nerman/nouns/noun.js: Starting to retrieve nouns.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+         }
+      );
+
       await interaction.deferReply({ ephemeral: true });
       const Nouns = interaction.client.libraries.get('Nouns');
       // const nounRegex = /^\d{1,6}$/; // 1 to 6 digits. This may need to go higher as new ones are created daily.
@@ -22,10 +30,11 @@ module.exports = {
       const nounNum = interaction.options.getInteger('int');
 
       if (nounNum < 0) {
-         throw new Error('You must choose a Noun ID that is a positive integer.')
+         throw new Error(
+            'You must choose a Noun ID that is a positive integer.'
+         );
       }
 
-      console.time('nounShit');
       const promises = [];
       // const nounInfo = getNounInfo(Nouns, nounNum);
       // const nounInfo = await getNounInfo(Nouns, nounNum);
@@ -42,13 +51,14 @@ module.exports = {
       );
       // promises.push({nounInfo}, resp);
       // const resp = await fetch(`https://noun.pics/${nounNum}.png`);
-      // console.timeEnd('nounShit');
-
-      // l(resp);
 
       const [nounInfo, resp] = await Promise.all(promises);
-      l('NOUN INFO HERE BABYYYYYYYY',{nounInfo});
-      console.timeEnd('nounShit');
+
+      Logger.debug('commands/nerman/nouns/noun.js: Retrieved noun info.', {
+         userId: interaction.user.id,
+         guildId: interaction.guildId,
+         nounInfo: nounInfo,
+      });
 
       if (!resp.ok) {
          throw new Error(
@@ -81,8 +91,6 @@ module.exports = {
 
       const nounEmbed = await createNounEmbed(nounInfo, imgUrl);
 
-      console.log(nounEmbed);
-
       await interaction.editReply({
          // content: 'not empty?',
          embeds: [nounEmbed],
@@ -94,5 +102,13 @@ module.exports = {
       //    content: `Noun ${nounNum}`,
       //    ephermeral: true,
       // });
+
+      Logger.info(
+         'commands/nerman/nouns/noun.js: Finished to retrieving nouns.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+         }
+      );
    },
 };

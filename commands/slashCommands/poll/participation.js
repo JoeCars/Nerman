@@ -5,8 +5,8 @@ const { Types } = require('mongoose');
 const User = require('../../../db/schemas/User');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
+const Logger = require('../../../helpers/logger');
 
-const { log: l } = console;
 module.exports = {
    subCommand: 'nerman.participation',
    /**
@@ -14,6 +14,15 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
+      Logger.info(
+         'commands/nerman/poll/participation.js: Starting to retrieve poll participation.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
+
       const {
          channelId,
          channel: {
@@ -40,7 +49,6 @@ module.exports = {
          interaction.options.getString('discord-id') ??
          interaction.member.user.id;
 
-      l({ voterId });
       const {
          nickname,
          user: { username, discriminator },
@@ -50,21 +58,31 @@ module.exports = {
       const voterDoc = await User.findOne()
          .byDiscordId(voterId, guildId)
          .exec();
-      l({ voterDoc });
-      // const { eligiblePolls: witnessed, participatedPolls: participated } =
-      //    voterDoc.eligibleChannels.get(channelId);
-
-      // l({ witnessed, participated });
 
       if (!voterDoc) {
-         l('[...memberRoles.keys()]', [...memberRoles.keys()]);
+         Logger.debug(
+            'commands/nerman/poll/participation.js: Checking member role keys',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+               memberRolesKeys: [...memberRoles.keys()],
+            }
+         );
 
          const { eligiblePolls: witnessed, participatedPolls: participated } =
             voterDoc.eligibleChannels.get(channelId);
 
          const hasVotingRole = await User.checkVotingRoles(memberRoles);
-
-         console.log({ hasVotingRole });
+         Logger.debug(
+            'commands/nerman/poll/participation.js: Checking voting role',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+               hasVotingRole: hasVotingRole,
+            }
+         );
 
          if (!hasVotingRole)
             throw new Error(
@@ -78,7 +96,14 @@ module.exports = {
             voterId,
             eligibleChannels
          );
-         l({ newUser });
+         Logger.debug(
+            'commands/nerman/poll/participation.js: Created new user.',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+            }
+         );
 
          const participation = await newUser.participation(channelId);
 
@@ -114,5 +139,14 @@ module.exports = {
 
          interaction.reply({ content: response, ephemeral: true });
       }
+
+      Logger.info(
+         'commands/nerman/poll/participation.js: Finished retrieving poll participation.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
    },
 };

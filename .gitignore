@@ -14,3 +14,4 @@ events/react-test.js
 scratchcode/
 scratchcode/*
 validation/
+utils/remindSheet.js

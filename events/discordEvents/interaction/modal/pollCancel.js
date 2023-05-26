@@ -6,9 +6,8 @@ const {
    MessageEmbed,
 } = require('discord.js');
 
-const Poll = require('../../../../db/schemas/Poll');
-
-const { log: l } = console;
+const Poll = require('../../db/schemas/Poll');
+const Logger = require('../../helpers/logger');
 
 module.exports = {
    name: 'modalSubmit',
@@ -17,6 +16,10 @@ module.exports = {
     * @param {ModalSubmitInteraction} modal
     */
    async execute(modal) {
+      Logger.info('events/poll/pollCancel.js: Attempting to cancel poll.', {
+         guildId: modal.guild.id,
+      });
+
       const rCustomId = new RegExp(/^cancel-modal-\d{19}$/);
 
       if (!rCustomId.test(modal.customId)) return;
@@ -34,7 +37,10 @@ module.exports = {
             modal.getTextInputValue('confirmCancel').toLowerCase() ===
             'confirm';
 
-         l('CONFIRMED:', confirm);
+         Logger.debug('events/poll/pollCancel.js: Checking confirmation.', {
+            guildId: modal.guild.id,
+            confirm: confirm,
+         });
 
          if (!confirm) {
             throw new Error(
@@ -44,8 +50,10 @@ module.exports = {
 
          const messageId = modal.customId.substring(modal.customId.length - 19);
 
-         l({ messageId });
-         l({ guildId });
+         Logger.debug('events/poll/pollCanel.js: Checking message id.', {
+            guildId: modal.guild.id,
+            messageId: messageId,
+         });
 
          const targetMessage = await messages.fetch(messageId);
          const targetPoll = await Poll.findOne({
@@ -84,6 +92,10 @@ module.exports = {
          modal.editReply({
             content: 'Poll has been cancelled!',
             ephemeral: true,
+         });
+
+         Logger.info('events/poll/pollCanel.js: Finished cancelling poll.', {
+            guildId: modal.guild.id,
          });
       } catch (error) {
          modal.editReply({ content: error.message });

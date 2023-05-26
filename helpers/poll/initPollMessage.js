@@ -1,6 +1,8 @@
 const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 const { roleMention } = require('@discordjs/builders');
 
+const Logger = require('../logger');
+
 const initPollMessage = async ({
    // propId,
    title,
@@ -8,18 +10,11 @@ const initPollMessage = async ({
    channelConfig,
    everyoneId,
 }) => {
-   // const { propId, title, description, channelConfig, everyoneId } = data;
-
-   // if (propId) {
-   //    title = `Prop ${propId}: ${title}`
-   // }
-
-   // console.log('LOGGING PROP NUMBER', { propIdT });
-   console.log('LOGGING PROP DATA', {
-      title,
-      description,
-      channelConfig,
-      everyoneId,
+   Logger.info('helpers/poll/initPollMessage.js: Initializing poll message.', {
+      proposalTitle: title,
+      proposalDescription: description,
+      channelConfig: channelConfig,
+      everyoneId: everyoneId,
    });
 
    const mentions = await channelConfig.allowedRoles
@@ -50,11 +45,10 @@ const initPollMessage = async ({
       { name: 'Voting Closes', value: '...', inline: false },
    ];
 
-   console.log('/////////////////////// EMBED FIELDS ///////////////////////');
-   console.log(embedFields);
-
-   console.log(channelConfig);
-   console.log(channelConfig.voteThreshold);
+   Logger.debug('helpers/poll/initPollMessage.js: Checking embed fields.', {
+      proposalTitle: title,
+      embedFields: embedFields,
+   });
 
    // disabled until Joel decides if we need this here
    // if (channelConfig.voteThreshold > 0) {
@@ -66,9 +60,6 @@ const initPollMessage = async ({
    //       inline: true,
    //    });
    // }
-
-   console.log('/////////////////////// EMBED FIELDS ///////////////////////');
-   console.log(embedFields);
 
    const embed = new MessageEmbed()
       .setColor('#ffffff')
@@ -83,6 +74,13 @@ const initPollMessage = async ({
       // .addField('Poll Results:', resultsOutput)
       // .setTimestamp()
       .setFooter('Submitted by ...');
+
+   Logger.debug(
+      'helpers/poll/initPollMessage.js: Finished initializing poll message.',
+      {
+         proposalTitle: title,
+      }
+   );
 
    return {
       content: mentions,

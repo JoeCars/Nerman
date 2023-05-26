@@ -2,6 +2,7 @@ const { CommandInteraction } = require('discord.js');
 const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
+const Logger = require('../../../helpers/logger');
 
 // fixme will need to remove these after we figure out a better permission control for admin command
 const authorizedIds = process.env.BAD_BITCHES.split(',');
@@ -12,6 +13,15 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
+      Logger.info(
+         'commands/nerman/poll/createPoll.js: Starting to create polls.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
+
       const {
          channelId,
          client,
@@ -22,11 +32,16 @@ module.exports = {
          memberPermissions,
       } = interaction;
 
-      // console.log('STATE OF NOUNS FROM SUBCOMMAND CREATEPOLL\n', stateOfNouns);
-
       const configExists = await PollChannel.configExists(channelId);
-
-      console.log('CREATE', { configExists });
+      Logger.debug(
+         'commands/nerman/poll/createPoll.js: Checking config existence.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+            configExists: configExists,
+         }
+      );
 
       // Test existence of channel configuration
       if (!configExists) {
@@ -44,7 +59,6 @@ module.exports = {
          { channelId },
          'maxUserProposal voteAllowance forAgainst'
       ).exec();
-
 
       const countedPolls = await Poll.countDocuments({
          config: channelConfig._id,
@@ -86,7 +100,11 @@ module.exports = {
          .setCustomId('modal-create-poll')
          .setTitle('Create Poll');
 
-      console.log({ modal });
+      Logger.debug('commands/nerman/poll/createPoll.js: Created Modal', {
+         userId: interaction.user.id,
+         guildId: interaction.guildId,
+         channelId: interaction.channelId,
+      });
 
       // const channelOptions = channelConfigs.map(
       //    ({ channelId, channelName }) => ({
@@ -148,8 +166,15 @@ module.exports = {
          createPollComponents.push(pollChoices);
       }
 
-
-      console.log(channelConfig.voteAllowance);
+      Logger.debug(
+         'commands/nerman/poll/createPoll.js: Checking vote allowance.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+            voteAllowance: channelConfig.voteAllowance,
+         }
+      );
 
       if (channelConfig.voteAllowance) {
          const pollAllowance = new TextInputComponent()
@@ -164,12 +189,8 @@ module.exports = {
          createPollComponents.push(pollAllowance);
       }
 
-      console.log({ createPollComponents });
-
       // modal.addComponents(pollType, pollTitle, pollDescription, pollChoices);
       modal.addComponents(createPollComponents);
-
-      console.log({ modal });
 
       // console.log({ modal });
       // console.log(modal.components[1], modal.components[1].components[0]);
@@ -184,5 +205,14 @@ module.exports = {
       // content: 'This is nerman2 create-poll',
       // ephemeral: true,
       // });
+
+      Logger.info(
+         'commands/nerman/poll/createPoll.js: Finished creating poll.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
    },
 };

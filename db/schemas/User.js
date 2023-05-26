@@ -1,7 +1,8 @@
 const { model, Schema, Types } = require('mongoose');
 const PollChannel = require('./PollChannel');
 const Poll = require('./Poll');
-const { log: l, trace: tr, error: lerr, group: gr, groupEnd: grE } = console;
+
+const Logger = require('../../helpers/logger');
 
 const userSchema = new Schema(
    {
@@ -13,19 +14,19 @@ const userSchema = new Schema(
          unique: false,
          validate: {
             validator: async function (discordId) {
-               gr('User - discordId validator');
                const userExists = await this.schema.statics.userExists(
                   this.guildId,
                   discordId
                );
 
-               // tr({ userExists });
+               Logger.debug(
+                  'db/schemas/User.js: In user Discord ID validation.',
+                  {
+                     discordId: discordId,
+                     thisEqualsUser: this.equals(userExists),
+                  }
+               );
 
-               // l('this => :\n', this);
-               // l('userExists => :\n', userExists);
-               l('this.equals(userExists) :\n', this.equals(userExists));
-
-               grE('User - discordId validator');
                if (userExists === null) {
                   return true;
                }
@@ -80,7 +81,15 @@ const userSchema = new Schema(
                      ).length,
                   };
 
-                  l({ statsObject });
+                  Logger.debug(
+                     'db/schemas/User.js: In user static create user.',
+                     {
+                        guildId: guildId,
+                        voterId: voterId,
+                        eligibleChannels: eligibleChannels,
+                        statsObject: statsObject,
+                     }
+                  );
 
                   eligibleMap.set(channel.channelId, statsObject);
                }
@@ -92,8 +101,11 @@ const userSchema = new Schema(
                   eligibleChannels: eligibleMap,
                });
             } catch (error) {
-               l('IS THIS THE ERROR?');
-               l({ error });
+               Logger.error('db/schemas/User.js: Retrieved an error ' + error, {
+                  guildId: guildId,
+                  voterId: voterId,
+                  eligibleChannels: eligibleChannels,
+               });
             }
          },
          async checkVotingRoles(memberRoles) {
@@ -105,7 +117,13 @@ const userSchema = new Schema(
          },
          async findEligibleChannels(memberRoles, anon = false) {
             if (!anon) {
-               l('[...memberRoles.keys()]', [...memberRoles.keys()]);
+               Logger.debug(
+                  'db/schemas/User.js: Checking member role keys in User.findEligibleChannels()',
+                  {
+                     memberRolesKeys: [...memberRoles.keys()],
+                     anon: anon,
+                  }
+               );
             }
             const eligibleChannels = await PollChannel.find({
                allowedRoles: { $in: [...memberRoles.keys()] },
@@ -117,30 +135,47 @@ const userSchema = new Schema(
             return eligibleChannels;
          },
          async logAttr() {
-            l(this.schema.statics);
-            l(this.schema.methods);
-            l(this.schema.query);
+            console.log(this.schema.statics);
+            console.log(this.schema.methods);
+            console.log(this.schema.query);
          },
          async userExists(guildId, discordId, anon = false) {
-            l('MODEL => User : STATIC => userExists:');
+            Logger.info('db/schemas/User.js: In User.userExists()', {
+               anon: anon,
+            });
 
             if (!anon) {
-               l({ guildId });
-               l({ discordId });
+               Logger.debug(
+                  'db/schemas/User.js: In User.userExists(). Logging extra info if not anonymous.',
+                  {
+                     anon: anon,
+                     guildId: guildId,
+                     discordId: discordId,
+                  }
+               );
             }
-            // const userDoc = await this.findOne()
-            //    .byDiscordId(guildId, discordId)
-            //    .exec();
+
             const userDoc = await model('User')
                .findOne()
                .byDiscordId(discordId, guildId)
                .exec();
 
             if (!anon) {
-               l({ userDoc });
+               Logger.debug(
+                  'db/schemas/User.js: In User.userExists(). Checking user doc if not anonymous.',
+                  {
+                     anon: anon,
+                     userDoc: userDoc,
+                  }
+               );
             }
 
-            l('User doc found? => ', !!userDoc);
+            Logger.debug(
+               'db/schemas/User.js: In User.userExists(). Check if a user doc was found.',
+               {
+                  hasFoundUserDoc: !!userDoc,
+               }
+            );
 
             return userDoc;
          },
@@ -159,48 +194,42 @@ const userSchema = new Schema(
             )
                ? eligibleChannels.get(channelId)
                : null;
-            // console.log(this);
-            // console.log({ channelId });
-            // console.log({ eligibleChannels });
-            // console.log(eligibleChannels[channelId]);
-            // console.log(
-            //    eligibleChannels[channelId].participatedPolls /
-            //       eligibleChannels[channelId].eligibleChannels
-            // );
 
-            // console.log({ eligiblePolls, participatedPolls });
-
-            console.log(
-               Math.round((participatedPolls / eligiblePolls) * 100).toFixed(2)
+            Logger.debug(
+               'db/schemas/User.js: Checking participation percentage.',
+               {
+                  channelId: channelId,
+                  participationPercentage: Math.round(
+                     (participatedPolls / eligiblePolls) * 100
+                  ).toFixed(2),
+               }
             );
 
             if (eligiblePolls === 0)
                return 'User has not yet been a party to an eligible poll';
             if (participatedPolls === 0) return '0%';
 
-            // console.log(
-            //    'FROM USER PARTICIPATION METHOD\n',
-            //    typeof `${Math.round(
-            //       (participatedPolls / eligiblePolls) * 100
-            //    ).toFixed(2)}%`
-            // );
-
             return `${Math.round(
                (participatedPolls / eligiblePolls) * 100
             ).toFixed(2)}%`;
          },
          async incParticipation(channelId, configId, anon = false) {
-            gr('DOCUMENT => User : METHOD => incParticipation:');
-
-            l(
-               '!this.eligibleChannels.has(channelId) => ',
-               !this.eligibleChannels.has(channelId)
-            );
+            Logger.debug('db/schemas/User.js: Checking channelId', {
+               channelId: channelId,
+               configId: configId,
+               anon: anon,
+               notEligibleChannelsHaveId: !this.eligibleChannels.has(channelId),
+            });
 
             try {
                if (!this.eligibleChannels.has(channelId)) {
-                  l(
-                     `Channel key ${channelId} does NOT exist!\n Creating new participationObject for this channel...`
+                  Logger.warn(
+                     "db/schemas/User.js: Channel key doesn't exist. Creating a new participation object.",
+                     {
+                        channelId: channelId,
+                        configId: configId,
+                        anon: anon,
+                     }
                   );
 
                   // if configId is not provided in the code, we find and return it with a query
@@ -230,7 +259,15 @@ const userSchema = new Schema(
                   };
 
                   if (!anon) {
-                     l(`New participation object => `, { participationObject });
+                     Logger.debug(
+                        'db/schemas/User.js: Checking new participation object.',
+                        {
+                           channelId: channelId,
+                           configId: configId,
+                           anon: anon,
+                           participationObject: participationObject,
+                        }
+                     );
                   }
 
                   await this.updateOne(
@@ -243,14 +280,17 @@ const userSchema = new Schema(
                      { new: true }
                   ).exec();
                } else {
-                  l(`Channel key ${channelId} exists!`);
-
                   const newParticipation = this.eligibleChannels.get(channelId);
 
                   if (!anon) {
-                     l(
-                        'channelParticiation before incrementation : ',
-                        newParticipation
+                     Logger.debug(
+                        'db/schemas/User.js: Channel participation before increment.',
+                        {
+                           channelId: channelId,
+                           configId: configId,
+                           anon: anon,
+                           participationObject: newParticipation,
+                        }
                      );
                   }
 
@@ -267,17 +307,23 @@ const userSchema = new Schema(
                   ).exec();
 
                   if (!anon) {
-                     l(
-                        'channelParticiation after incrementation : ',
-                        this.eligibleChannels.get(channelId)
+                     Logger.debug(
+                        'db/schemas/User.js: Channel participation after increment.',
+                        {
+                           channelId: channelId,
+                           configId: configId,
+                           anon: anon,
+                           participationObject:
+                              this.eligibleChannels.get(channelId),
+                        }
                      );
                   }
                }
             } catch (error) {
-               l(':::ERROR IN PARTICIPATION INCREMENTATION:::');
-               lerr(error);
+               Logger.error('db/schemas/User.js: Error.', {
+                  error: error,
+               });
             }
-            grE('DOCUMENT => User : METHOD => incParticipation:');
             return;
          },
       },
@@ -289,7 +335,9 @@ const userSchema = new Schema(
                   guildId: new RegExp(guildId, 'i'),
                });
             } catch (error) {
-               console.trace({ error });
+               Logger.error('db/schemas/User.js: Error.', {
+                  error: error,
+               });
                throw new Error(
                   `Unable to fulfill member lookup:\n INFO:\n${error.message}`
                );

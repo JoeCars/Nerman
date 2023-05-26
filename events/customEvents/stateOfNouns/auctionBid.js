@@ -1,9 +1,8 @@
 const { MessageEmbed, Channel } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
 
-const shortenAddress = require('../../../helpers/nouns/shortenAddress');
-
-const { log: l } = console;
+const shortenAddress = require('../../helpers/nouns/shortenAddress');
+const Logger = require('../../helpers/logger');
 
 module.exports = {
    name: 'auctionBid',
@@ -13,7 +12,10 @@ module.exports = {
     */
    async execute(auctionChannel, data) {
       try {
-         l('AUCTION BID EVENT HANDLER');
+         Logger.info(
+            'events/stateOfNouns/auctionBid.js: Attempting to start an auction bid.',
+            { id: data.id, amount: data.amount, bidderId: data.bidder.id }
+         );
 
          const {
             id,
@@ -23,9 +25,6 @@ module.exports = {
          } = data;
 
          const Nouns = auctionChannel.client.libraries.get('Nouns');
-
-         l({ data });
-         l({ id, amount, extended, bidderId });
 
          const bigNumString = amount.toString();
 
@@ -50,9 +49,15 @@ module.exports = {
             .setTitle(`Auction Bid`)
             .setDescription(`${bidderLink} bid ${amountNew}Ξ on ${nounsLink}`);
 
+         Logger.info(
+            'events/stateOfNouns/auctionBid.js: Successfully started an auction bid.',
+            { id: data.id, amount: data.amount, bidderId: data.bidder.id }
+         );
          return await auctionChannel.send({ embeds: [bidEmbed] });
       } catch (error) {
-         console.error(error);
+         Logger.info('events/stateOfNouns/auctionBid.js: Received an error.', {
+            error: error,
+         });
       }
    },
 };

@@ -3,9 +3,8 @@ const { inlineCode, hyperlink } = require('@discordjs/builders');
 
 const Poll = require('../../../db/schemas/Poll');
 
-const shortenAddress = require('../../../helpers/nouns/shortenAddress');
-
-const { log: l } = console;
+const shortenAddress = require('../../helpers/nouns/shortenAddress');
+const Logger = require('../../helpers/logger');
 
 const nounsGovId = process.env.NOUNS_GOV_ID;
 
@@ -16,7 +15,16 @@ module.exports = {
     */
    async execute(message, vote) {
       try {
-         l('PROP VOTE CAST EVENT HANDLER');
+         Logger.info(
+            'events/stateOfNouns/propVoteCast.js: Handling a proposal vote event.',
+            {
+               proposalId: vote.proposalId,
+               voterId: vote.voter.id,
+               votes: vote.votes,
+               reason: vote.reason,
+            }
+         );
+
          const {
             guild: {
                channels: { cache },
@@ -33,7 +41,6 @@ module.exports = {
             // proposal: { description },
          } = vote;
 
-         l('PROP VOTE CAST EVENT HANDLER');
          const Nouns = await message.client.libraries.get('Nouns');
          const nounsGovChannel = await cache.get(nounsGovId);
          const supportEnum = ['AGAINST', 'FOR', 'ABSTAIN'];
@@ -53,8 +60,6 @@ module.exports = {
          let pollChannelId;
          let pollMessage = null;
 
-         l('targetPoll => ', targetPoll);
-
          if (targetPoll) {
             pollChannelId = targetPoll.config.channelId;
             pollMessage = await (client.channels.cache
@@ -63,27 +68,22 @@ module.exports = {
                client.channels.cache
                   .get(pollChannelId)
                   .messages.fetch(targetPoll.messageId));
-
-            l('propVoteCast -- TARGET POLL\n', targetPoll);
          } else {
+            Logger.warn(
+               'events/stateOfNouns/propVoteCast.js: Unable to find the associated poll.',
+               {
+                  proposalId: vote.proposalId,
+                  voterId: vote.voter.id,
+                  votes: vote.votes,
+                  reason: vote.reason,
+               }
+            );
             return message.delete();
          }
 
          // const pollMessage = await (client.channels.cache
 
-         l('propVoteCast.js : \n', { message });
-         l('propVoteCast.js : \n', { vote });
-         l('propVoteCast.js : \n', { nounsGovChannel });
-
          // const titleRegex = new RegExp(/^#+\s+.+\n/);
-
-         l('propVoteCast.js : \n', { proposalId });
-         l(Number(proposalId));
-         l('propVoteCast.js : \n', { votes });
-         l(Number(votes));
-
-         // l('propVoteCast.js : \n', { targetPolls });
-         l('propVoteCast.js : \n', { targetPoll });
 
          const titleRegex = new RegExp(
             /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/
@@ -108,19 +108,24 @@ module.exports = {
          // const titleFromFind = targetPolls[0].pollData.title;
          const titleFromPoll = targetPoll?.pollData.title ?? 'No poll title';
 
-         // l('propVoteCast.js : \n', { titleFromFind });
-         l('propVoteCast.js : \n', { titleFromPoll });
+         Logger.debug(
+            'events/stateOfNouns/propVoteCast.js: Checking poll title.',
+            {
+               proposalId: vote.proposalId,
+               voterId: vote.voter.id,
+               votes: vote.votes,
+               reason: vote.reason,
+               title: titleFromPoll,
+            }
+         );
 
          const titleUrl = `https://nouns.wtf/vote/${proposalId}`;
 
          const voter =
             (await Nouns.ensReverseLookup(voterId)) ??
             (await shortenAddress(voterId));
-         l('propVoteCast.js : \n', { voter });
          const voterUrl = `https://etherscan.io/address/${voterId}`;
-         l('propVoteCast.js : \n', { voterUrl });
          const voterHyperlink = `[${voter}](${voterUrl})`;
-         l('propVoteCast.js : \n', { voterHyperlink });
          const propHyperlink = hyperlink(
             `Prop ${proposalId}`,
             `https://nouns.wtf/vote/${proposalId}`
@@ -204,21 +209,6 @@ module.exports = {
                }`
             );
 
-         // l('VOTE EMBED FIND\n', voteEmbedFind);
-         l('propVoteCast.js : \n', { pollMessage });
-         // l(
-         //    'propVoteCast.js -- pollMessage.hasThread: \n',
-         //    pollMessage.hasThread
-         // );
-         l('propVoteCast.js -- pollMessage.thread: \n', pollMessage.thread);
-         l(
-            'propVoteCast.js -- pollMessage.thread.fetch(): \n',
-            await pollMessage.thread.fetch()
-         );
-
-         l('VOTE EMBED\n', voteEmbed);
-         l('THREAD EMBED\n', threadEmbed);
-
          // const pollData = {
          //    title,
          //    description,
@@ -234,13 +224,27 @@ module.exports = {
             });
          }
 
+         Logger.info(
+            'events/stateOfNouns/propVoteCast.js: Finished handling a proposal vote event.',
+            {
+               proposalId: vote.proposalId,
+               voterId: vote.voter.id,
+               votes: vote.votes,
+               reason: vote.reason,
+            }
+         );
+
          return await message.edit({
             content: null,
             embeds: [voteEmbed],
          });
       } catch (error) {
-         // console.log('BIG FAT FUCKN ERROR, BRUH');
-         console.error(error);
+         Logger.error(
+            'events/stateOfNouns/propVoteCast.js: Received an error.',
+            {
+               error: error,
+            }
+         );
       }
    },
 };

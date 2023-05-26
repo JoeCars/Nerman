@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const testProposal = require('../../../dummyData/testGraphSample.json');
 const PollChannel = require('../../../db/schemas/PollChannel');
-const { log: l, time: t, timeEnd: te } = console;
+const Logger = require('../../../helpers/logger');
 
 const propChannelId =
    process.env.DEPLOY_STAGE === 'staging'
@@ -19,6 +19,13 @@ module.exports = {
       ),
 
    async execute(interaction) {
+      Logger.info(
+         'commands/nerman/poll/emit-test-proposal.js: Starting to emit a test proposal',
+         {
+            userId: interaction.user.id,
+         }
+      );
+
       const {
          client,
          user: { id: userId },
@@ -63,5 +70,12 @@ module.exports = {
          content: `Dummy proposal emitted, check #${propChannel.name} to see if the poll has been generated.`,
          ephemeral: true,
       });
+
+      Logger.info(
+         'commands/nerman/poll/emit-test-proposal.js: Finished emitting a test proposal',
+         {
+            userId: interaction.user.id,
+         }
+      );
    },
 };

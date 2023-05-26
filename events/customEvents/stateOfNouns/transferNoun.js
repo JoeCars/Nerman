@@ -1,9 +1,8 @@
 const { MessageEmbed, Channel } = require('discord.js');
 const { inlineCode, hyperlink } = require('@discordjs/builders');
 
-const shortenAddress = require('../../../helpers/nouns/shortenAddress');
-
-const { log: l } = console;
+const shortenAddress = require('../../helpers/nouns/shortenAddress');
+const Logger = require('../../helpers/logger');
 
 const mintId = '0x0000000000000000000000000000000000000000';
 // const mintId = '0x55e1490a1878D0B61811726e2cB96560022E764c';
@@ -17,7 +16,14 @@ module.exports = {
     */
    async execute(tokenChannel, data) {
       try {
-         l('NOUN TRANSFER EVENT HANDLER');
+         Logger.info(
+            'events/stateOfNouns/transferNoun.js: Handling a noun transfer event.',
+            {
+               senderId: data.from.id,
+               receiverId: data.to.id,
+               tokenId: data.tokenId,
+            }
+         );
 
          const {
             // tokenId,
@@ -35,15 +41,6 @@ module.exports = {
          // const tokenChannel =
          //    (await cache.get(nounsGovId)) ?? (await channels.fetch(nounsGovId));
 
-         l({ tokenChannel });
-         l({ data });
-         l({ tokenId });
-         l({ fromId });
-         l({ toId });
-
-         l('shortenAddress(fromId) => ', await shortenAddress(fromId));
-         l('shortenAddress(toId) => ', await shortenAddress(toId));
-
          const fromDisplay =
             (await Nouns.ensReverseLookup(fromId)) ??
             (await shortenAddress(fromId));
@@ -51,12 +48,8 @@ module.exports = {
             (await Nouns.ensReverseLookup(toId)) ??
             (await shortenAddress(toId));
 
-         l({ fromDisplay });
-         l({ toDisplay });
-
          let transferEmbed = new MessageEmbed().setColor('#00FFFF');
 
-         l('fromId === toId ? =>', fromId === toId);
          if (fromId === toId) {
             // transferEmbed = new MessageEmbed()
             transferEmbed
@@ -83,9 +76,23 @@ module.exports = {
                .setImage(`https://noun.pics/${tokenId}.png`);
          }
 
+         Logger.info(
+            'events/stateOfNouns/transferNoun.js: Finished handling a noun transfer event.',
+            {
+               senderId: data.from.id,
+               receiverId: data.to.id,
+               tokenId: data.tokenId,
+            }
+         );
+
          return await tokenChannel.send({ embeds: [transferEmbed] });
       } catch (error) {
-         console.error(error);
+         Logger.error(
+            'events/stateOfNouns/transferNoun.js: Received an error.',
+            {
+               error: error,
+            }
+         );
       }
    },
 };

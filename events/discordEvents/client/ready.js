@@ -1,7 +1,7 @@
 const { Collection } = require('discord.js');
 
-const PollChannel = require('../../../db/schemas/PollChannel');
-const GuildConfig = require('../../../db/schemas/GuildConfig');
+const PollChannel = require('../db/schemas/PollChannel');
+const GuildConfig = require('../db/schemas/GuildConfig');
 
 const { Types } = require('mongoose');
 
@@ -11,12 +11,10 @@ module.exports = {
    name: 'ready',
    once: true,
    async execute(client) {
-      Logger.info(
-         `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.NODE_ENV} mode.`,
-      );
+      l(`Ready! Logged in as ${client.user.tag}: ` + process.env.NODE_ENV);
 
-      await require('../../../db/index.js')(client);
-      await require('../../../utils/remindSheet.js')(client);
+      await require('../db/index.js')(client);
+      await require('../utils/remindSheet.js')(client);
 
       // const _StateOfNouns = import('stateofnouns');
       const _nerman = import('stateofnouns');
@@ -64,7 +62,7 @@ module.exports = {
                   vote.reason
             );
 
-            const message = await nounsGovChannel.send({
+            let message = await nounsGovChannel.send({
                content: 'Generating vote data...',
             });
 
@@ -73,22 +71,21 @@ module.exports = {
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
             data.description = data.description.substring(0, 150);
-
-            Logger.info(
-               'events/ready.js: On ProposalCreatedWithRequirements.',
-               {
-                  id: data.id,
-                  proposer: data.proposer.id,
-                  startBlock: data.startBlock,
-                  endBlock: data.endBlock,
-                  quorumVotes: data.quorumVotes,
-                  proposalThreshold: data.proposalThreshold,
-                  description: data.description,
-                  targets: data.targets,
-                  values: data.values,
-                  signatures: data.signatures,
-                  calldatas: data.calldatas,
-               },
+            l(
+               'NounsDAO | ProposalCreatedWithRequirements | id:' +
+                  data.id +
+                  ', proposer: ' +
+                  data.proposer.id +
+                  ', startBlock: ' +
+                  data.startBlock +
+                  ', endBlock: ' +
+                  data.endBlock +
+                  'quorumVotes ' +
+                  data.quorumVotes +
+                  ', proposalThreshold: ' +
+                  data.proposalThreshold +
+                  ', description: ' +
+                  data.description
             );
 
             l('targets: ' + JSON.stringify(data.targets));
@@ -108,13 +105,7 @@ module.exports = {
                channelId: propChannelId,
             }).exec());
             if (!configExists) {
-               Logger.warn(
-                  'events/ready.js: On ProposalCreatedWithRequirements. No config. Exiting.',
-                  {
-                     id: data.id,
-                     proposer: data.proposer.id,
-                  },
-               );
+               l('NO CHANNEL CONFIG ---- RETURNING');
                return;
             }
 
@@ -386,30 +377,6 @@ module.exports = {
             client.emit('auctionBid', nounsAuctionChannel, data);
          });
 
-         Nouns.on('NounCreated', async data => {
-            // todo check with Joel to see if this is the actual event, or if he's looking for auctionCreated and I'm simply handling thast differently. I may not need this additonal listener if thats the case
-            const nogglesGuildId = process.env.NOGGLES_DISCORD_ID;
-            const nogglesChannelId = process.env.NOGGLES_CHANNEL_ID;
-            const nogglesChannel = await guildCache
-               .get(nogglesGuildId)
-               .channels.cache.get(nogglesChannelId);
-            console.log(
-               'NounsToken | NounCreated | id:' +
-                  data.id +
-                  ', seed: ' +
-                  JSON.stringify(data.seed)
-            );
-
-            console.log('data => ', data);
-            console.log('data.id => ', data.id);
-            console.log(
-               'JSON.stringify(data.seed) => ',
-               JSON.stringify(data.seed)
-            );
-
-            client.emit('nounCreated', nogglesChannel, data);
-         });
-
          // *************************************************************
          //
          // EXAMPLE METADATA
@@ -442,14 +409,19 @@ module.exports = {
                delegateAddress
             );
 
-                 Logger.debug('events/ready.js: Checking owner information', {
-                    nounId: nounId,
-                    ownerAddress: ownerAddress,
-                    ownerEns: ownerEns ?? 'not found',
-                    delegateAddress: delegateAddress,
-                    delegateEns: delegateEns ?? 'not found',
-                    votingPower: votingPower,
-                 });
+            l('Owner: ' + ownerAddress);
+            if (ownerEns) {
+               l('ENS found: ' + ownerEns);
+            }
+            l('Delegate: ' + delegateAddress);
+            if (delegateEns) {
+               l('ENS found: ' + delegateEns);
+            }
+            l('Voting Power:');
+            l('typeof votingPower: => ', typeof votingPower);
+            l('votingPower: => ', votingPower);
+            l('votingPower.toNumber() => ',  votingPower.toNumber());
+            l('Number(votingPower) => ',  Number(votingPower));
 
             // Get Final Bid Data
 

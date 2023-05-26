@@ -1,5 +1,3 @@
-const { log: l } = console;
-
 module.exports = async client => {
    const {
       guilds: { cache: gCache },

@@ -2,29 +2,31 @@ const { Collection } = require('discord.js');
 // todo can use for cvlaidation later on, not right now though
 // const { Events } = require('../validation/eventNames');
 const { getFiles } = require('../utils/functions');
+const Logger = require('../helpers/logger');
 
 module.exports = async (client, reload) => {
-   // const { client } = nerman;
+   Logger.info('handlers/events.js: Beginning to register events.');
+
    client.events = new Collection();
 
-   // console.log('LOGGING EVENTS')
-   // console.log(Events)
-
    let eventFiles = await getFiles('events', '.js');
-   // let eventFiles = await getFiles('../events', '.js');
 
    if (eventFiles.length === 0) {
-      console.log(`No event files to load.`);
+      Logger.debug('handlers/events.js: No event files to load.', {
+         numOfFiles: eventFiles.length,
+      });
       throw `No event files to load.`;
    }
 
    eventFiles.forEach(file => {
       try {
-         console.log({ file });
-         if (reload) delete require.cache[require.resolve(file)];
-         // if (reload) delete require.cache[require.resolve(`../events/${file}`)];
+         Logger.debug('handlers/events.js: Checking files.', {
+            numOfFiles: eventFiles.length,
+            file: file,
+         });
 
-         // const event = require(`../events/${file}`);
+         if (reload) delete require.cache[require.resolve(file)];
+
          const event = require(`../${file}`);
 
          // if (!Events.includes)
@@ -38,7 +40,7 @@ module.exports = async (client, reload) => {
             client.events.set(event.name, event);
          } else {
             throw new TypeError(
-               `The event: ${file} failed to load because it doesn't have a name property`
+               `The event: ${file} failed to load because it doesn't have a name property`,
             );
          }
          if (event.once) {
@@ -50,6 +52,8 @@ module.exports = async (client, reload) => {
          console.log(error);
       }
    });
+
+   Logger.info('handlers/events.js: Finished registering events.');
 };
 
 // function triggerEventHandler(nerman, event, ...args) {

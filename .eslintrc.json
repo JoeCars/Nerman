@@ -15,6 +15,7 @@
             "after": true
          }
       ],
+      "no-unused-vars": ["off"],
       "brace-style": [
          "error",
          "stroustrup",
@@ -28,7 +29,7 @@
       "curly": ["error", "multi-line", "consistent"],
       "dot-location": ["error", "property"],
       "handle-callback-err": "off",
-      "indent": ["error", "3"],
+      "indent": ["error", 3, { "SwitchCase": 1 }, { "ObjectExpression": 1 }],
       "keyword-spacing": "error",
       "max-nested-callbacks": [
          "error",

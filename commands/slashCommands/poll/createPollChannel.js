@@ -3,6 +3,7 @@ const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
+const Logger = require('../../../helpers/logger');
 
 // fixme will need to remove these after we figure out a better permission control for admin command
 const authorizedIds = process.env.BAD_BITCHES.split(',');
@@ -13,7 +14,15 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
-      console.log({ interaction });
+      Logger.info(
+         'commands/nerman/poll/createPollChannel.js: Starting to create poll channel.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
+
       const {
          channelId,
          channel,
@@ -35,11 +44,6 @@ module.exports = {
          },
          memberPermissions,
       } = interaction;
-      // console.timeEnd('destruct')'
-
-      console.log('commandInteraction -- create-poll', { channelId });
-      // console.log('isTextBased', channel.isText());
-      // console.log('isDMBased', channel.isDM());
 
       if (!authorizedIds.includes(userId)) {
          throw new Error('You do not have permission to use this command.');
@@ -76,7 +80,6 @@ module.exports = {
       }
 
       const channelConfig = await PollChannel.configExists(channelId);
-      // console.log({ channelConfig });
 
       if (channelConfig)
          return interaction.reply({
@@ -139,7 +142,14 @@ module.exports = {
                   value: id,
                }))
          )
-         .catch(err => console.error(err));
+         .catch(err => {
+            Logger.error(
+               'commands/nerman/poll/createPollChannel.js: Received an error.',
+               {
+                  error: err,
+               }
+            );
+         });
       // const roleOptions = roleCache
       //    .filter(({ id }) => id !== everyoneId)
       //    .map(({ id, name }) => ({ label: name, value: id }));
@@ -176,7 +186,16 @@ module.exports = {
 
       // console.log({ pollChannel });
 
-      console.log('roleOptions.length => ', roleOptions.length);
+
+      Logger.debug(
+         'commands/nerman/poll/createPollChannel.js: Checking length of role options',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+            roleOptionsLength: roleOptions.length,
+         }
+      );
 
       const votingRoles = new TextInputComponent()
          .setCustomId('votingRoles')
@@ -194,7 +213,14 @@ module.exports = {
       //    .setMinValues(1)
       //    .setMaxValues(roleOptions.length);
 
-      console.log({ votingRoles });
+      Logger.debug(
+         'commands/nerman/poll/createPollChannel.js: Created voting roles component',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
 
       // todo DURATION REGEX THEN PARSE- DURATION MAX OUT 999 hours
       const pollDuration = new TextInputComponent()
@@ -279,5 +305,14 @@ module.exports = {
          client: interaction.client,
          interaction: interaction,
       });
+
+      Logger.info(
+         'commands/nerman/poll/createPollChannel.js: Finished creating poll channel.',
+         {
+            userId: interaction.user.id,
+            guildId: interaction.guildId,
+            channelId: interaction.channelId,
+         }
+      );
    },
 };

@@ -7,6 +7,7 @@ const {
 const { ButtonInteraction } = require('discord.js');
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
+const Logger = require('../helpers/logger');
 
 module.exports = {
    id: 'vote',
@@ -15,6 +16,13 @@ module.exports = {
     * @param {ButtonInteraction} interaction
     */
    async execute(interaction) {
+      Logger.info('buttons/vote.js: Attempting to press the vote button.', {
+         userId: interaction.user.id,
+         guildId: interaction.guildId,
+         channelId: interaction.channelId,
+         messageId: interaction.message.id,
+      });
+
       if (!interaction.isButton()) {
          // console.log('VOTE BUTTON -- isButton: false', { interaction });
          return;
@@ -40,14 +48,23 @@ module.exports = {
       ).exec();
 
       if (!anon) {
-         console.log({ joinedTimestamp });
-         console.log(new Date(joinedTimestamp));
+         Logger.debug('buttons/vote.js: Checking joined time stamp.', {
+            joinedTimestamp: joinedTimestamp,
+         });
       }
 
       // console.log({ allowedRoles });
 
       if (!roleCache.hasAny(...allowedRoles)) {
-         console.log('USER DOES NOT HAS DA SPESHUL ROLL');
+         Logger.info(
+            'buttons/vote.js: User does not have eligible roles to vote on this poll',
+            {
+               userId: interaction.user.id,
+               guildId: interaction.guildId,
+               channelId: interaction.channelId,
+               messageId: interaction.message.id,
+            }
+         );
          return interaction.reply({
             content: 'You do not have a role eligible to vote on this poll.',
             ephemeral: true,
@@ -57,7 +74,6 @@ module.exports = {
       const attachedPoll = await Poll.findOne({ messageId })
          .populate([{ path: 'config' }])
          .exec();
-
 
       // enabled disabled for testing
 
@@ -123,20 +139,22 @@ module.exports = {
 
       modal.addComponents(selectOptions, reason);
 
-      console.log(modal.components);
-      console.log(modal.components[0]);
-      console.log(modal.components[0].components[0]);
-      // console.log({modal)
-
       try {
          await showModal(modal, {
             client: interaction.client,
             interaction: interaction,
          });
       } catch (error) {
-         console.error(error);
+         Logger.error('buttons/vote.js: Received an error.', {
+            error: error,
+         });
       }
 
-      !anon && console.log({ modal });
+      Logger.info('buttons/vote.js: Finished pressing the vote button.', {
+         userId: interaction.user.id,
+         guildId: interaction.guildId,
+         channelId: interaction.channelId,
+         messageId: interaction.message.id,
+      });
    },
 };

@@ -4,6 +4,8 @@ const { UserManager } = require('discord.js');
 const mime = require('mime');
 let twitEnabled = true;
 
+const Logger = require('./logger');
+
 var T = new Twit({
    consumer_key: process.env.TWITTER_API_KEY,
    consumer_secret: process.env.TWITTER_API_KEY_SECRET,
@@ -17,11 +19,15 @@ try {
    T.get('account/verify_credentials', { skip_status: true }).catch(function (
       err
    ) {
-      console.log({ err });
+      Logger.error('helpers/twitter.js: Received an error.', {
+         error: err,
+      });
       twitEnabled = false;
    });
 } catch (e) {
-   console.log({ e });
+   Logger.error('helpers/twitter.js: Received an error.', {
+      error: e,
+   });
    twitEnabled = false;
 }
 
@@ -120,7 +126,9 @@ async function post(content, mediaUrls) {
 function tPost(params, callback) {
    T.post('statuses/update', params, function (err, data, response) {
       if (err) {
-         console.log(err);
+         Logger.error('helpers/twitter.js/tPost(): Received an error.', {
+            error: err,
+         });
       }
 
       if (typeof callback === 'function') {

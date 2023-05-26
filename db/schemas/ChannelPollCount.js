@@ -1,5 +1,7 @@
 const { model, Schema, Types } = require('mongoose');
 
+const Logger = require('../../helpers/logger');
+
 const ChannelPollCountSchema = new Schema(
    {
       _id: Schema.Types.ObjectId,
@@ -12,10 +14,13 @@ const ChannelPollCountSchema = new Schema(
             return await this.exists({ channelId: new RegExp(channelId, 'i') });
          },
          async createCount(channelId) {
-            console.log('outside trycatch', { channelId });
+            Logger.debug(
+               'db/schemas/ChannelPollCount.js: Attempting to create channel poll count.',
+               {
+                  channelId: channelId,
+               }
+            );
             try {
-               console.log('inside trycatch', { channelId });
-
                const newPollCount = await this.create(
                   [
                      {
@@ -27,19 +32,28 @@ const ChannelPollCountSchema = new Schema(
                   { new: true }
                ).then(x => x[0]);
 
-               console.log('from static', { newPollCount });
+               Logger.debug(
+                  'db/schemas/ChannelPollCount.js: Attempting to create channel poll count.',
+                  {
+                     channelId: channelId,
+                     pollCount: newPollCount,
+                  }
+               );
 
                return newPollCount;
             } catch (error) {
-               console.error(error);
+               Logger.error(
+                  'db/schemas/ChannelPollCount.js: Error when creating count.',
+                  {
+                     error: error,
+                  }
+               );
             }
          },
       },
       methods: {
          async increment() {
-            console.log('this', this);
             this.$inc('pollsCreated', 1);
-            console.log('this AFTER',this);
             return await this.save();
          },
       },

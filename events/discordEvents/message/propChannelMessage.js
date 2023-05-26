@@ -4,8 +4,8 @@ const propChannelId =
    process.env.DEPLOY_STAGE === 'development'
       ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
       : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
-const { log: l } = console;
-const { lc } = require('../../../utils/functions');
+
+const Logger = require('../../helpers/logger');
 
 module.exports = {
    name: 'messageCreate',
@@ -14,8 +14,16 @@ module.exports = {
     * @param {Message} message
     */
    async execute(message) {
-      l({ message });
-      l('message.interaction => ', message.interaction);
+      Logger.info(
+         'events/poll/propChannelMessage.js: Attempting to delete invalid messages in the proposal channel.',
+         {
+            authorId: message.author.id,
+            channelId: message.channelId,
+            guildId: message.guildId,
+            messageId: message.id,
+         }
+      );
+
       const {
          client,
          client: {
@@ -27,18 +35,37 @@ module.exports = {
          author: { id: authorId },
       } = message;
 
-      lc('client', '79', client);
-      lc('user', '85', user);
-
       const configExists = await PollChannel.configExists(channelId);
 
       // if (channelId !== propChannelId || botId === authorId) return;
-      if (!configExists || botId === authorId) return;
+      if (!configExists || botId === authorId) {
+         Logger.info(
+            'events/poll/propChannelMessage.js: Message was not invalid, so it was not deleted.',
+            {
+               authorId: message.author.id,
+               channelId: message.channelId,
+               guildId: message.guildId,
+               messageId: message.id,
+            }
+         );
+         return;
+      }
 
       try {
-         message.delete();
+         await message.delete();
+         Logger.info(
+            'events/poll/propChannelMessage.js: Successfully deleted invalid messages in the proposal channel.',
+            {
+               authorId: message.author.id,
+               channelId: message.channelId,
+               guildId: message.guildId,
+               messageId: message.id,
+            }
+         );
       } catch (error) {
-         console.trace('TRACE\n', { error });
+         Logger.info('events/poll/propChannelMessage.js: Received error.', {
+            error: error,
+         });
       }
    },
 };

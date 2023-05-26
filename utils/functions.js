@@ -1,5 +1,5 @@
 const { readdir } = require('fs').promises;
-// const { log: l, error: lerr, info: inf, trace: tr, table: tbl} = console;
+const Logger = require('../helpers/logger');
 
 const getFiles = async (path, ending) => {
    let fileList = [];
@@ -17,13 +17,15 @@ const getFiles = async (path, ending) => {
             ...fileList,
             ...(await getFiles(`${path}/${file.name}`, '.js')),
          ];
-      } else {
-         if (file.name.endsWith(ending)) {
-            fileList.push(`${path}/${file.name}`);
-         }
+      } else if (file.name.endsWith(ending)) {
+         // if (file.name.endsWith(ending)) {
+         fileList.push(`${path}/${file.name}`);
+         // }
       }
    }
-   console.log({ fileList });
+   Logger.debug('utils/functions.js/getFiles(): Checking file list.', {
+      fileList,
+   });
 
    return fileList;
 };
