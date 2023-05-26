@@ -75,7 +75,6 @@ module.exports = {
          .populate([{ path: 'config' }])
          .exec();
 
-
       // enabled disabled for testing
 
       if (attachedPoll.allowedUsers.get(userId) === true) {
