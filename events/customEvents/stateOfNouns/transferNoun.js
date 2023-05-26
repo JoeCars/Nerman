@@ -1,7 +1,7 @@
 const { MessageEmbed, Channel } = require('discord.js');
 const { inlineCode, hyperlink } = require('@discordjs/builders');
 
-const shortenAddress = require('../../helpers/nouns/shortenAddress');
+const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 
 const { log: l } = console;
 
@@ -72,11 +72,7 @@ module.exports = {
             // transferEmbed = new MessageEmbed()
             transferEmbed
                .setTitle(
-                  `${
-                     fromId === mintId
-                        ? 'Mint'
-                        : 'Transfer'
-                  } | Noun ${tokenId}`
+                  `${fromId === mintId ? 'Mint' : 'Transfer'} | Noun ${tokenId}`
                )
                .setDescription(
                   `From ${hyperlink(

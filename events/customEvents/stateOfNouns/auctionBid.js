@@ -1,7 +1,7 @@
 const { MessageEmbed, Channel } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
 
-const shortenAddress = require('../../helpers/nouns/shortenAddress');
+const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 
 const { log: l } = console;
 

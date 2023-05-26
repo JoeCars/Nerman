@@ -1,4 +1,4 @@
-const nThreshold = require(`../../../helpers/nThreshold.js`);
+const nThreshold = require(`../../../helpers/twitter/nThreshold.js`);
 
 module.exports = {
 	subCommand: 'nerman.threshold',

@@ -1,17 +1,21 @@
-const { logToObject } = require('../utils/functions');
+const { logToObject } = require('../../../../utils/functions');
 const { log: l } = console;
 
+// todo I should probably split this so that slash commands and context menu commands are housed in separate places.
 module.exports = {
    name: 'interactionCreate',
    async execute(interaction) {
       if (!interaction.isCommand() && !interaction.isContextMenu()) return;
+
+      l('interaction.isCommand() => ', interaction.isCommand());
+      l('interaction.isContextMenu() => ', interaction.isContextMenu());
 
       const { client } = interaction;
 
       const command = client.commands.get(interaction.commandName);
 
       if (!command) return;
-      console.log({ interaction });
+      // console.log({ interaction });
       console.log(interaction.options);
       // console.log(interaction.options.getSubcommand() ?? 'No subcommands');
       const subCommand = interaction.options?.getSubcommand(false);

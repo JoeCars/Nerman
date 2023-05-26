@@ -73,7 +73,7 @@ const initPollMessage = async ({
    const embed = new MessageEmbed()
       .setColor('#ffffff')
       .setTitle(title)
-      .setDescription(description)
+      // .setDescription(description)
       .addFields(embedFields)
       // .addField('\u200B', '\u200B')
       // .addField('Quorum', '...', true)

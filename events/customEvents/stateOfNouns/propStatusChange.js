@@ -1,9 +1,9 @@
 const { MessageEmbed, Message } = require('discord.js');
 const { inlineCode } = require('@discordjs/builders');
 
-const Poll = require('../../db/schemas/Poll');
+const Poll = require('../../../db/schemas/Poll');
 
-const shortenAddress = require('../../helpers/nouns/createNounEmbed');
+const shortenAddress = require('../../../helpers/nouns/createNounEmbed');
 
 const { log: l } = console;
 
@@ -37,7 +37,7 @@ module.exports = {
          l({ data });
          // l({ nounsGovChannel });
 
-         l(`${Number(proposalId)}`)
+         l(`${Number(proposalId)}`);
 
          const propRegExp = new RegExp(`^prop\\s${Number(proposalId)}`, 'i');
 
@@ -47,7 +47,9 @@ module.exports = {
          // Poll.find({ 'pollData.title': { $regex: propRegExp })
          const targetPoll = await Poll.findOne({
             'pollData.title': { $regex: propRegExp },
-         }).populate('config').exec();
+         })
+            .populate('config')
+            .exec();
 
          l({ targetPoll });
          const propChannel =

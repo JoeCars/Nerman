@@ -1,9 +1,9 @@
 const { MessageEmbed, Message } = require('discord.js');
 const { inlineCode, hyperlink } = require('@discordjs/builders');
 
-const Poll = require('../../db/schemas/Poll');
+const Poll = require('../../../db/schemas/Poll');
 
-const shortenAddress = require('../../helpers/nouns/shortenAddress');
+const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 
 const { log: l } = console;
 

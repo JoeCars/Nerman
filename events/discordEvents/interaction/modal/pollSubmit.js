@@ -2,16 +2,16 @@ const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
 const { roleMention, codeBlock } = require('@discordjs/builders');
-const { initPollMessage } = require('../../helpers/poll/initPollMessage');
-const ResultBar = require('../../classes/ResultBar');
-const User = require('../../db/schemas/User');
-const Poll = require('../../db/schemas/Poll');
-const PollChannel = require('../../db/schemas/PollChannel');
-const PollCount = require('../../db/schemas/ChannelPollCount');
+const { initPollMessage } = require('../../../../helpers/poll/initPollMessage');
+const ResultBar = require('../../../../structures/ResultBar');
+const User = require('../../../../db/schemas/User');
+const Poll = require('../../../../db/schemas/Poll');
+const PollChannel = require('../../../../db/schemas/PollChannel');
+const PollCount = require('../../../../db/schemas/ChannelPollCount');
 
 const { log: l } = console;
-const { drawBar, longestString } = require('../../helpers/poll');
-const { logToObject, formatDate } = require('../../utils/functions');
+const { drawBar, longestString } = require('../../../../helpers/poll');
+const { logToObject, formatDate } = require('../../../../utils/functions');
 
 // const { create}
 
@@ -532,7 +532,11 @@ module.exports = {
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : embedQuorum > 0 ? 1 : 0;
 
-         updatedEmbed.fields[1].value = embedQuorum.toString(); // quorum
+         // disabled for meow
+         // updatedEmbed.fields[1].value = embedQuorum.toString(); // quorum
+
+         updatedEmbed.fields.find(({ name }) => name === 'Quorum').value =
+            embedQuorum.toString();
 
          // if (updatedEmbed.fields.length === 6) {
          //    const votesAmount = Math.floor(
@@ -543,9 +547,14 @@ module.exports = {
          //       newPoll.timeEnd.getTime() / 1000
          //    )}:f>`; // timeEnd
          // } else {
-         updatedEmbed.fields[4].value = `<t:${Math.floor(
-            newPoll.timeEnd.getTime() / 1000
-         )}:f>`; // timeEnd
+         //disabled for meow
+         // updatedEmbed.fields[4].value = `<t:${Math.floor(
+         //    newPoll.timeEnd.getTime() / 1000
+         // )}:f>`; // timeEnd
+
+         updatedEmbed.fields.find(
+            ({ name }) => name === 'Voting Closes'
+         ).value = `<t:${Math.floor(newPoll.timeEnd.getTime() / 1000)}:f>`;
          // }
 
          /**

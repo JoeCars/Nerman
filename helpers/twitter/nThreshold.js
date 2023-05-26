@@ -16,10 +16,10 @@ function calcThreshold(x) {
 
    // for testing purposes
    return 1;
-   return 2;
-   return Math.ceil(y);
+   // return 2;
+   // return Math.ceil(y);
 }
 
-module.exports.getThreshold = function (usersOnline) {
+module.exports.getThreshold = function(usersOnline) {
    return getThreshold(usersOnline);
 };

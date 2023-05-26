@@ -6,6 +6,11 @@ const getFiles = async (path, ending) => {
 
    const files = await readdir(path, { withFileTypes: true });
 
+   console.log(
+      '//////////////////////////////////////////\nFILES\n//////////////////////////////////////////',
+      files
+   );
+
    for (const file of files) {
       if (file.isDirectory()) {
          fileList = [
@@ -167,9 +172,7 @@ const formatDate = (date, format) => {
 // encodeURI();
 
 const lc = (label, bg, data) => {
-   console.log(
-      `${label}\n\x1b[48;5;${bg}m${data}\x1b[0m]`
-   );
+   console.log(`${label}\n\x1b[48;5;${bg}m${data}\x1b[0m]`);
 };
 
 module.exports = {

@@ -4,7 +4,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 // Personal Imports
 const { drawBar, longestString } = require('../helpers/poll');
-const ResultBar = require('../classes/ResultBar');
+const ResultBar = require('../structures/ResultBar');
 // const { encodeURI } = require('../utils/functions');
 const Poll = require('../db/schemas/Poll');
 const { lc } = require('../utils/functions');
@@ -219,7 +219,7 @@ module.exports = async client => {
                            .populate([
                               {
                                  path: 'config',
-                                 select: 'channelId quorum voteThreshold',
+                                 select: 'channelId quorum voteThreshold liveVisualFeed',
                               },
                               { path: 'countVoters' },
                               { path: 'getVotes' },
@@ -388,6 +388,7 @@ module.exports = async client => {
                            ['maxLength', barWidth],
                            ['totalVotes', totalVotes],
                         ]);
+
                         for (const key in results.distribution) {
                            const label =
                               key[0].toUpperCase() + key.substring(1);
@@ -541,7 +542,29 @@ module.exports = async client => {
                            },
                         ];
 
-                        closedEmbed.spliceFields(1, 4, closedFields);
+                        console.log(
+                           'closingPoll.config => ',
+                           closingPoll.config
+                        );
+                        console.log(
+                           'closingPoll.config.liveVisualFeed => ',
+                           closingPoll.config.liveVisualFeed
+                        );
+                        console.log(
+                           'closingPoll.config.liveVisualFeed === true => ',
+                           closingPoll.config.liveVisualFeed === true
+                        );
+
+                        if (closingPoll.config.liveVisualFeed === true) {
+                           console.log('REMOVING FIELDS');
+                           console.log(closedEmbed);
+                           closedEmbed.spliceFields(1, 5, closedFields);
+                        } else {
+                           console.log('NOT REMOVING FIELDS');
+                           console.log(closedEmbed);
+                           closedEmbed.spliceFields(1, 4, closedFields);
+                        }
+
                         console.log('closedEmbed.fields');
                         console.log(closedEmbed.fields);
 

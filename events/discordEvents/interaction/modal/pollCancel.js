@@ -6,7 +6,7 @@ const {
    MessageEmbed,
 } = require('discord.js');
 
-const Poll = require('../../db/schemas/Poll');
+const Poll = require('../../../../db/schemas/Poll');
 
 const { log: l } = console;
 

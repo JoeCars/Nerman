@@ -1,6 +1,6 @@
 const { Guild } = require('discord.js');
 const { Types } = require('mongoose');
-const GuildConfig = require('../../db/schemas/GuildConfig');
+const GuildConfig = require('../../../db/schemas/GuildConfig');
 const { log: l } = console;
 
 module.exports = {

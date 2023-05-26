@@ -176,7 +176,7 @@ module.exports = {
 
       // console.log({ pollChannel });
 
-      console.log(roleOptions.length);
+      console.log('roleOptions.length => ', roleOptions.length);
 
       const votingRoles = new TextInputComponent()
          .setCustomId('votingRoles')

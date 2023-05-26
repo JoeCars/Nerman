@@ -19,31 +19,35 @@ module.exports = async (client, reload) => {
    }
 
    eventFiles.forEach(file => {
-      console.log({ file });
-      if (reload) delete require.cache[require.resolve(file)];
-      // if (reload) delete require.cache[require.resolve(`../events/${file}`)];
+      try {
+         console.log({ file });
+         if (reload) delete require.cache[require.resolve(file)];
+         // if (reload) delete require.cache[require.resolve(`../events/${file}`)];
 
-      // const event = require(`../events/${file}`);
-      const event = require(`../${file}`);
+         // const event = require(`../events/${file}`);
+         const event = require(`../${file}`);
 
-      // if (!Events.includes)
-      // client.events.set(event.name, event);
+         // if (!Events.includes)
+         // client.events.set(event.name, event);
 
-      //    if (!reload)
-      //       console.log(`The event: ${file} loaded`)
-      //       initEvents(nerman);
+         //    if (!reload)
+         //       console.log(`The event: ${file} loaded`)
+         //       initEvents(nerman);
 
-      if (event.name && typeof event.name === 'string') {
-         client.events.set(event.name, event);
-      } else {
-         throw new TypeError(
-            `The event: ${file} failed to load because it doesn't have a name property`
-         );
-      }
-      if (event.once) {
-         client.once(event.name, (...args) => event.execute(...args));
-      } else {
-         client.on(event.name, (...args) => event.execute(...args));
+         if (event.name && typeof event.name === 'string') {
+            client.events.set(event.name, event);
+         } else {
+            throw new TypeError(
+               `The event: ${file} failed to load because it doesn't have a name property`
+            );
+         }
+         if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args));
+         } else {
+            client.on(event.name, (...args) => event.execute(...args));
+         }
+      } catch (error) {
+         console.log(error);
       }
    });
 };

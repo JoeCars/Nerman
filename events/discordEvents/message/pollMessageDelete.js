@@ -1,5 +1,6 @@
-const PollChannel = require('../../db/schemas/PollChannel');
-const Poll = require('../../db/schemas/Poll');
+const PollChannel = require('../../../db/schemas/PollChannel');
+// const PollChannel = require('../../db/schemas/PollChannel');
+const Poll = require('../../../db/schemas/Poll');
 
 const { log: l, time: t, timeEnd: te } = console;
 

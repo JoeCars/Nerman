@@ -1,8 +1,8 @@
 const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
-const PollChannel = require('../../db/schemas/PollChannel');
+const PollChannel = require('../../../../db/schemas/PollChannel');
 // const GuildConfig = require('../../db/schemas/GuildConfig');
-const { logToObject } = require('../../utils/functions');
+const { logToObject } = require('../../../../utils/functions');
 
 const { log: l } = console;
 
@@ -12,6 +12,8 @@ module.exports = {
     * @param {Modal} modal
     */
    async execute(modal) {
+      console.log('HI MOM');
+
       if (modal.customId !== 'modal-create-poll-channel') return;
 
       await modal.deferReply({ ephemeral: true });

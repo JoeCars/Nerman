@@ -12,12 +12,12 @@ const {
 } = require('@discordjs/builders');
 
 const { Types } = require('mongoose');
-const Poll = require('../../db/schemas/Poll');
-const User = require('../../db/schemas/User');
-const Vote = require('../../db/schemas/Vote');
+const Poll = require('../../../../db/schemas/Poll');
+const User = require('../../../../db/schemas/User');
+const Vote = require('../../../../db/schemas/Vote');
 
-const { longestString } = require('../../helpers/poll');
-const ResultBar = require('../../classes/ResultBar');
+const { longestString } = require('../../../../helpers/poll');
+const ResultBar = require('../../../../structures/ResultBar');
 
 const nouncilId = process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 const jtsNouncilId = process.env.JTS_NOUNCIL_ID;
