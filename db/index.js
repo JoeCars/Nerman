@@ -30,7 +30,8 @@ module.exports = async client => {
    //       : 'mongodb://localhost:27017/polls-test';
 
    const mongoURI =
-      process.env.NODE_ENV === 'production'
+      process.env.NODE_ENV === 'production' ||
+      process.env.NODE_ENV === 'staging'
          ? process.env.MONGODB_URI
          : 'mongodb://localhost:27017/polls-test';
 
