@@ -6,8 +6,8 @@ const {
    MessageEmbed,
 } = require('discord.js');
 
-const Poll = require('../../db/schemas/Poll');
-const Logger = require('../../helpers/logger');
+const Poll = require('../../../../db/schemas/Poll');
+const Logger = require('../../../../helpers/logger');
 
 module.exports = {
    name: 'modalSubmit',

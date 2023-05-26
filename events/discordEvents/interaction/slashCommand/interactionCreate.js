@@ -1,4 +1,4 @@
-const Logger = require('../helpers/logger');
+const Logger = require('../../../../helpers/logger');
 
 // todo I should probably split this so that slash commands and context menu commands are housed in separate places.
 module.exports = {

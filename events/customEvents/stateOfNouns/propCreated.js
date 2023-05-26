@@ -1,7 +1,7 @@
 const { MessageEmbed, Message } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
 
-const Logger = require('../../helpers/logger');
+const Logger = require('../../../helpers/logger');
 
 const nounsGovId = process.env.NOUNS_GOV_ID;
 

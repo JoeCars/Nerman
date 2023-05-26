@@ -1,6 +1,6 @@
-const PollChannel = require('../../db/schemas/PollChannel');
-const Poll = require('../../db/schemas/Poll');
-const Logger = require('../../helpers/logger');
+const PollChannel = require('../../../db/schemas/PollChannel');
+const Poll = require('../../../db/schemas/Poll');
+const Logger = require('../../../helpers/logger');
 
 module.exports = {
    name: 'messageDelete',

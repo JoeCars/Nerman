@@ -1,5 +1,5 @@
 const { Guild } = require('discord.js');
-const Logger = require('../../helpers/logger');
+const Logger = require('../../../helpers/logger');
 
 module.exports = {
    name: 'guildDelete',

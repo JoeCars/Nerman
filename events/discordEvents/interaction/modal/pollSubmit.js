@@ -2,16 +2,16 @@ const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
 const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
 const { roleMention, codeBlock } = require('@discordjs/builders');
-const { initPollMessage } = require('../../helpers/poll/initPollMessage');
-const ResultBar = require('../../classes/ResultBar');
-const User = require('../../db/schemas/User');
-const Poll = require('../../db/schemas/Poll');
-const PollChannel = require('../../db/schemas/PollChannel');
-const PollCount = require('../../db/schemas/ChannelPollCount');
-const Logger = require('../../helpers/logger');
+const { initPollMessage } = require('../../../../helpers/poll/initPollMessage');
+const ResultBar = require('../../../../structures/ResultBar');
+const User = require('../../../../db/schemas/User');
+const Poll = require('../../../../db/schemas/Poll');
+const PollChannel = require('../../../../db/schemas/PollChannel');
+const PollCount = require('../../../../db/schemas/ChannelPollCount');
+const Logger = require('../../../../helpers/logger');
 
-const { drawBar, longestString } = require('../../helpers/poll');
-const { logToObject, formatDate } = require('../../utils/functions');
+const { drawBar, longestString } = require('../../../../helpers/poll');
+const { logToObject, formatDate } = require('../../../../utils/functions');
 
 // const { create}
 

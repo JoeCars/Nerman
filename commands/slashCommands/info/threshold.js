@@ -1,4 +1,4 @@
-const nThreshold = require(`../../../helpers/nThreshold.js`);
+const nThreshold = require(`../../../helpers/twitter/nThreshold.js`);
 const Logger = require('../../../helpers/logger.js');
 
 module.exports = {

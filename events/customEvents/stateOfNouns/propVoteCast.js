@@ -3,8 +3,8 @@ const { inlineCode, hyperlink } = require('@discordjs/builders');
 
 const Poll = require('../../../db/schemas/Poll');
 
-const shortenAddress = require('../../helpers/nouns/shortenAddress');
-const Logger = require('../../helpers/logger');
+const shortenAddress = require('../../../helpers/nouns/shortenAddress');
+const Logger = require('../../../helpers/logger');
 
 const nounsGovId = process.env.NOUNS_GOV_ID;
 

@@ -5,7 +5,7 @@ const propChannelId =
       ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
       : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 
-const Logger = require('../../helpers/logger');
+const Logger = require('../../../helpers/logger');
 
 module.exports = {
    name: 'messageCreate',

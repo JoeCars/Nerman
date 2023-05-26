@@ -1,7 +1,7 @@
 const { MessageEmbed, Channel } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
 
-const Logger = require('../../helpers/logger');
+const Logger = require('../../../helpers/logger');
 
 module.exports = {
    name: 'auctionCreated',

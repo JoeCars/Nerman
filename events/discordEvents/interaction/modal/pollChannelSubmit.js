@@ -2,7 +2,7 @@ const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
 const PollChannel = require('../../../../db/schemas/PollChannel');
 // const GuildConfig = require('../../db/schemas/GuildConfig');
-const Logger = require('../../helpers/logger');
+const Logger = require('../../../../helpers/logger');
 
 module.exports = {
    name: 'modalSubmit',

@@ -1,8 +1,8 @@
 const { Guild } = require('discord.js');
 const { Types } = require('mongoose');
 
-const GuildConfig = require('../../db/schemas/GuildConfig');
-const Logger = require('../../helpers/logger');
+const GuildConfig = require('../../../db/schemas/GuildConfig');
+const Logger = require('../../../helpers/logger');
 
 module.exports = {
    name: 'guildCreate',

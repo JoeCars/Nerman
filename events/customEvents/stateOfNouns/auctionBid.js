@@ -1,8 +1,8 @@
 const { MessageEmbed, Channel } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
 
-const shortenAddress = require('../../helpers/nouns/shortenAddress');
-const Logger = require('../../helpers/logger');
+const shortenAddress = require('../../../helpers/nouns/shortenAddress');
+const Logger = require('../../../helpers/logger');
 
 module.exports = {
    name: 'auctionBid',

@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const { drawBar, longestString } = require('../helpers/poll');
 
 const Logger = require('../helpers/logger');
-const ResultBar = require('../classes/ResultBar');
+const ResultBar = require('../structures/ResultBar');
 
 const Poll = require('../db/schemas/Poll');
 const { lc } = require('../utils/functions');
@@ -19,7 +19,7 @@ module.exports = async client => {
    // const usernameSegment = encodeURI(process.env.MONGODB_DEV_USER);
    // const passwordSegment = encodeURI(process.env.MONGODB_DEV_PASSWORD);
    // const mongoCloudURI = process.env.MONGODB_URI_BASE.replace(
-   //    /<username>/,
+      // /<username>/,
    //    usernameSegment
    // ).replace(/<password>/, passwordSegment);
 

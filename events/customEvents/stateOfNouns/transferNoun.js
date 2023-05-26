@@ -1,8 +1,8 @@
 const { MessageEmbed, Channel } = require('discord.js');
 const { inlineCode, hyperlink } = require('@discordjs/builders');
 
-const shortenAddress = require('../../helpers/nouns/shortenAddress');
-const Logger = require('../../helpers/logger');
+const shortenAddress = require('../../../helpers/nouns/shortenAddress');
+const Logger = require('../../../helpers/logger');
 
 const mintId = '0x0000000000000000000000000000000000000000';
 // const mintId = '0x55e1490a1878D0B61811726e2cB96560022E764c';
