@@ -1,7 +1,7 @@
 const { Collection } = require('discord.js');
 
-const PollChannel = require('../db/schemas/PollChannel');
-const GuildConfig = require('../db/schemas/GuildConfig');
+const PollChannel = require('../../../db/schemas/PollChannel');
+const GuildConfig = require('../../../db/schemas/GuildConfig');
 
 const { Types } = require('mongoose');
 
