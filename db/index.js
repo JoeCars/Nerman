@@ -4,8 +4,9 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 // Personal Imports
 const { drawBar, longestString } = require('../helpers/poll');
+
 const Logger = require('../helpers/logger');
-const ResultBar = require('../classes/ResultBar');
+const ResultBar = require('../structures/ResultBar');
 
 const Poll = require('../db/schemas/Poll');
 const { lc } = require('../utils/functions');
@@ -18,7 +19,7 @@ module.exports = async client => {
    // const usernameSegment = encodeURI(process.env.MONGODB_DEV_USER);
    // const passwordSegment = encodeURI(process.env.MONGODB_DEV_PASSWORD);
    // const mongoCloudURI = process.env.MONGODB_URI_BASE.replace(
-   //    /<username>/,
+   // /<username>/,
    //    usernameSegment
    // ).replace(/<password>/, passwordSegment);
 
@@ -29,7 +30,8 @@ module.exports = async client => {
    //       : 'mongodb://localhost:27017/polls-test';
 
    const mongoURI =
-      process.env.NODE_ENV === 'production'
+      process.env.NODE_ENV === 'production' ||
+      process.env.NODE_ENV === 'staging'
          ? process.env.MONGODB_URI
          : 'mongodb://localhost:27017/polls-test';
 
@@ -68,7 +70,7 @@ module.exports = async client => {
                .populate('config', 'channelId')
                .then(foundPolls => {
                   const sortedPolls = foundPolls.sort(
-                     (a, b) => a.timeEnd - b.timeEnd
+                     (a, b) => a.timeEnd - b.timeEnd,
                   );
 
                   const sortedPollsLogMap = sortedPolls.map(
@@ -77,7 +79,7 @@ module.exports = async client => {
                         pollNumber,
                         timeEnd,
                         status,
-                     })
+                     }),
                   );
 
                   return foundPolls.sort((a, b) => a.timeEnd - b.timeEnd);
@@ -87,8 +89,8 @@ module.exports = async client => {
                      'db/index.js: Encountered an error in the index.',
                      {
                         error: err,
-                     }
-                  )
+                     },
+                  ),
                );
 
             client.on('enqueuePoll', newPoll => {
@@ -101,7 +103,7 @@ module.exports = async client => {
                      pollNumber,
                      timeEnd,
                      status,
-                  })
+                  }),
                );
 
                Logger.info('db/index.js: New poll added to queue', {
@@ -134,7 +136,7 @@ module.exports = async client => {
                      pollNumber,
                      timeEnd,
                      status,
-                  })
+                  }),
                );
 
                Logger.info('db/index.js: Poll dequeued. New open polls list.', {
@@ -161,7 +163,7 @@ module.exports = async client => {
                      }
 
                      Logger.info(
-                        'db/index.js: Inside interval function. Welcome to the app.'
+                        'db/index.js: Inside interval function. Welcome to the app.',
                      );
 
                      const closingPoll =
@@ -170,12 +172,13 @@ module.exports = async client => {
                            {
                               status: 'closed',
                            },
-                           { new: true }
+                           { new: true },
                         )
                            .populate([
                               {
                                  path: 'config',
-                                 select: 'channelId quorum voteThreshold liveVisualFeed',
+                                 select:
+                                    'channelId quorum voteThreshold liveVisualFeed',
                               },
                               { path: 'countVoters' },
                               { path: 'getVotes' },
@@ -196,7 +199,7 @@ module.exports = async client => {
                               closingPoll: closingPoll,
                               config: closingPoll.config,
                               messageId: closingPoll.messageId,
-                           }
+                           },
                         );
 
                         const message = await (client.channels.cache
@@ -238,7 +241,7 @@ module.exports = async client => {
                               .flatMap(
                                  arr =>
                                     arr[0][0].toUpperCase() +
-                                    arr[0].substring(1)
+                                    arr[0].substring(1),
                               )
                               .join(', ')} - Tied\nPoll inconclusive.`;
 
@@ -273,13 +276,13 @@ module.exports = async client => {
                            {
                               failedChecks: failedChecks,
                               conclusive: closingPoll.conclusive,
-                           }
+                           },
                         );
 
                         if (failedChecks.length) {
                            closingPoll.pollSucceeded = false;
                            winningResult = `Poll failed to meet ${failedChecks.join(
-                              ' and '
+                              ' and ',
                            )}.`;
                         } else {
                            closingPoll.pollSucceeded = true;
@@ -290,13 +293,13 @@ module.exports = async client => {
                            {
                               failedChecks: failedChecks,
                               conclusive: closingPoll.conclusive,
-                           }
+                           },
                         );
 
                         await closingPoll.save();
 
                         const longestOption = longestString(
-                           closingPoll.pollData.choices
+                           closingPoll.pollData.choices,
                         ).length;
 
                         Logger.debug('db/index.js: Longest option.', {
@@ -321,6 +324,7 @@ module.exports = async client => {
                            ['maxLength', barWidth],
                            ['totalVotes', totalVotes],
                         ]);
+
                         for (const key in results.distribution) {
                            const label =
                               key[0].toUpperCase() + key.substring(1);
@@ -330,53 +334,15 @@ module.exports = async client => {
                               labelLength: label.length,
                               distanceFromLongest: longestOption - label.length,
                            });
-                          
+
                            const votes = results.distribution[key];
                            const room = longestOption - label.length;
                            let optionObj = new ResultBar(
                               label,
                               votes,
                               room,
-                              votesMap
+                              votesMap,
                            );
-
-
-                           //disabled for testing
-                           // let optionObj = {
-                           //    label,
-                           //    votes: results.distribution[key],
-                           //    room: longestOption - label.length,
-                           //    get spacer() {
-                           //       return this.room !== 0
-                           //          ? Array.from(
-                           //               { length: this.room },
-                           //               () => '\u200b '
-                           //            ).join('')
-                           //          : '';
-                           //    },
-                           //    get portion() {
-                           //       return votesMap.get('totalVotes') !== 0
-                           //          ? this.votes / votesMap.get('totalVotes')
-                           //          : 0;
-                           //    },
-                           //    get portionOutput() {
-                           //       // return ` ${(this.portion * 100).toFixed(1)}%`;
-                           //       return ` ${this.votes ?? 0} votes`;
-                           //    },
-                           //    get bar() {
-                           //       return drawBar(
-                           //          votesMap.get('maxLength'),
-                           //          this.portion
-                           //       );
-                           //    },
-                           //    get completeBar() {
-                           //       return [
-                           //          `${this.label}${this.spacer} `,
-                           //          this.bar,
-                           //          this.portionOutput,
-                           //       ].join('');
-                           //    },
-                           // };
 
                            votesMap.set(label, optionObj);
                            // resultsArray.splice(-1, 0, optionObj.completeBar);
@@ -384,7 +350,7 @@ module.exports = async client => {
                         }
 
                         resultsArray.push(
-                           `\nAbstains: ${closingPoll.abstains.size}`
+                           `\nAbstains: ${closingPoll.abstains.size}`,
                         );
                         resultsOutput = codeBlock(resultsArray.join('\n'));
 
@@ -429,13 +395,8 @@ module.exports = async client => {
                               inline: false,
                            },
                         ];
-                        
-                         console.log('closingPoll.config => ', closingPoll.config);
-                         console.log('closingPoll.config.liveVisualFeed => ', closingPoll.config.liveVisualFeed);
-                        
-                        
-                        
-                        if(closingPoll.config.liveVisualFeed === true) {
+
+                        if (closingPoll.config.liveVisualFeed === true) {
                            console.log('REMOVING FIELDS');
                            console.log(closedEmbed);
                            closedEmbed.spliceFields(1, 5, closedFields);
@@ -444,8 +405,6 @@ module.exports = async client => {
                            console.log(closedEmbed);
                            closedEmbed.spliceFields(1, 4, closedFields);
                         }
-
-//                         closedEmbed.spliceFields(1, 4, closedFields);
 
                         Logger.debug('db/index.js: Checking closed Embed.', {
                            closedEmbedField: closedEmbed.fields,
@@ -456,7 +415,6 @@ module.exports = async client => {
                            embeds: [closedEmbed],
                            components: [],
                         });
-
                      } else if (
                         closingPoll !== null &&
                         closingPoll.config === null
@@ -468,37 +426,33 @@ module.exports = async client => {
                            {
                               closingPoll,
                               message,
-                           }
+                           },
                         );
                      }
 
                      openPolls.shift();
 
-                     Logger.debug('db/index.ks: Logging end time.', {
-                        endTime,
-                     });
-
                      if (openPolls.length) {
                         endTime = openPolls[0].timeEnd.getTime();
+
+                        Logger.debug(
+                           'db/index.js: Logging next Poll end time.',
+                           {
+                              endTime: endTime.getTime(),
+                           },
+                        );
                      } else {
                         clearInterval(intervalId);
                      }
-
-                     Logger.debug('db/index.ks: Logging end time. Again.', {
-                        endTime,
-                     });
                   }
                }, 1000);
-               // };
             };
 
             if (openPolls.length) {
                intervalFunction();
             }
-            // background: ESC[48;5;#m
-            // console.log(`openPolls\n\x1b[48;5;162m${openPolls}\x1b[0m`);
-            // console.log(`openPolls\n\x1b[46m${openPolls}\x1b[0m`);
          });
+
          await mongoose.connect(mongoURI, options);
       } catch (error) {
          Logger.error('db/index.js', { error: error });
