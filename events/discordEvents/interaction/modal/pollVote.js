@@ -16,8 +16,7 @@ const Poll = require('../../../../db/schemas/Poll');
 const User = require('../../../../db/schemas/User');
 const Vote = require('../../../../db/schemas/Vote');
 const Logger = require('../../../../helpers/logger');
-// temporary -- delete after confirming this filed is fixed
-const { log: l } = console;
+
 
 const { longestString } = require('../../../../helpers/poll');
 const ResultBar = require('../../../../structures/ResultBar');
@@ -194,7 +193,7 @@ module.exports = {
          'events/poll/pollVote.js -- updatedPoll.config => ',
          updatedPoll.config,
       );
-      // let resultsArray = ['```', '```'];
+
       let resultsArray = pollStatus.config.voteThreshold
          ? [
               `Threshold: ${updatedPoll.voteThreshold} ${
@@ -257,18 +256,7 @@ module.exports = {
          .get(channelId)
          .messages.fetch(messageId);
 
-      l('events/poll/pollVote.js  -- resultsOutput => ', resultsOutput);
-      l('events/poll/pollVote.js  -- updatedPoll => ', updatedPoll);
-      l('events/poll/pollVote.js  -- pollOptions.config => ', pollOptions);
-      l(
-         'events/poll/pollVote.js  -- pollOptions.liveVisualFeed => ',
-         pollOptions.liveVisualFeed,
-      );
-
       const updateEmbed = new MessageEmbed(message.embeds[0]);
-
-      l('PRE SPLICE updateEmbed => ', updateEmbed);
-      l('PRE SPLICE updateEmbed.fields => ', updateEmbed.fields);
 
       updateEmbed.spliceFields(
          updateEmbed.fields.findIndex(({ name }) => name === 'Voters'),
@@ -280,15 +268,9 @@ module.exports = {
          },
       );
 
-      l(
-         '***********************************\nCHECKING TO SEE IF QUORUM FIELD IS PRESENT\n***********************************',
-      );
-
+      // NOTE: This is just to fix open polls without Voting Closes fields
+      // todo remove later when I find out the specific root of this issue
       if (!updateEmbed.fields.find(({ name }) => name === 'Quorum')) {
-         l(
-            '***********************************\nQUORUM FIELD WAS NOT FOUND\n***********************************',
-         );
-
          updateEmbed.spliceFields(
             updateEmbed.fields.findIndex(({ name }) => name === 'Voters'),
             0,
@@ -300,21 +282,24 @@ module.exports = {
          );
       }
 
-      l('POST SPLICE updateEmbed => ', updateEmbed);
-      l('POST SPLICE updateEmbed.fields => ', updateEmbed.fields);
+      // NOTE: This is just to fix open polls without Voting Closes fields
+      // todo remove later when I find out the specific root of this issue
+      if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
 
-      l('events/poll/pollVote.js  -- updateEmbed => ', updateEmbed);
-      l(
-         'events/poll/pollVote.js  -- updatedPoll.config.liveVisualFeed => ',
-         pollOptions.liveVisualFeed,
-      );
+         updateEmbed.spliceFields(
+            updateEmbed.fields.findIndex(({ name }) => name === 'Abstains') + 1,
+            0,
+            {
+               name: 'Voting Closes',
+               value: `<t:${Math.floor(
+                  updatedPoll.timeEnd.getTime() / 1000,
+               )}:f>`,
+               inline: false,
+            },
+         );
+      }
 
       if (pollOptions.liveVisualFeed) {
-         // if (updatedPoll.config.liveVisualFeed) {
-         l(
-            'events/poll/pollVote.js  -- inside if (updatedPoll.config.liveVisualFeed) =>  SUCCESS',
-         );
-
          // !testing OLD
 
          // updateEmbed.spliceFields(1, 1, {
