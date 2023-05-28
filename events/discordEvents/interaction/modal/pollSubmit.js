@@ -55,7 +55,7 @@ module.exports = {
          {
             channelId,
          },
-         'allowedRoles forAgainst voteThreshold liveVisualFeed'
+         'allowedRoles forAgainst voteThreshold liveVisualFeed',
       );
 
       const intRegex = new RegExp(/^\d*$/);
@@ -90,7 +90,7 @@ module.exports = {
                   .getTextInputValue('pollChoices')
                   .split(',')
                   .map(x => x.trim().toLowerCase())
-                  .filter(v => v !== '')
+                  .filter(v => v !== ''),
             ),
          ];
       }
@@ -424,7 +424,7 @@ module.exports = {
                   // l(member.roles.cache);
                   const memberRoles = member.roles.cache;
                   const eligibleChannels = await User.findEligibleChannels(
-                     memberRoles
+                     memberRoles,
                   );
                   // l('ERIGIBIRU FROM POLLSUBMIT', await eligibleChannels);
                   user = await User.createUser(guildId, key, eligibleChannels);
@@ -455,7 +455,7 @@ module.exports = {
                user.markModified('eligibleChannels');
                return await user.save();
                // return user;
-            }
+            },
          );
 
          await Promise.all(updateVoterPromise);
@@ -474,11 +474,11 @@ module.exports = {
          updatedEmbed.setFooter(
             `Poll #${newPoll.pollNumber} submitted by ${
                nickname ?? username
-            }#${discriminator}`
+            }#${discriminator}`,
          );
 
          let embedQuorum = Math.ceil(
-            newPoll.allowedUsers.size * (quorum / 100)
+            newPoll.allowedUsers.size * (quorum / 100),
          );
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : embedQuorum > 0 ? 1 : 0;
@@ -499,9 +499,9 @@ module.exports = {
          //    )}:f>`; // timeEnd
          // } else {
 
-         updatedEmbed.fields.find(({name}) => name === 'Voting Closes').value = `<t:${Math.floor(
-            newPoll.timeEnd.getTime() / 1000
-         )}:f>`; // timeEnd
+         updatedEmbed.fields.find(
+            ({ name }) => name === 'Voting Closes',
+         ).value = `<t:${Math.floor(newPoll.timeEnd.getTime() / 1000)}:f>`; // timeEnd
          // }
 
          /**
@@ -518,12 +518,12 @@ module.exports = {
          if (channelConfig.liveVisualFeed) {
             const results = newPoll.results;
             const longestOption = longestString(
-               newPoll.pollData.choices
+               newPoll.pollData.choices,
             ).length;
 
             console.log(
                'events/poll/pollVote.js -- longestOption => ',
-               longestOption
+               longestOption,
             );
             // let resultsArray = ['```', '```'];
             let resultsArray = newPoll.config.voteThreshold
@@ -552,7 +552,7 @@ module.exports = {
                console.log('db/index.js -- label.length => ', label.length);
                console.log(
                   'db/index.js -- logging :  longestOption - label.length => ',
-                  longestOption - label.length
+                  longestOption - label.length,
                );
                const votes = results.distribution[key];
                const room = longestOption - label.length;
