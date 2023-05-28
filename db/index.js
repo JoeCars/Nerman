@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const { drawBar, longestString } = require('../helpers/poll');
 
 const Logger = require('../helpers/logger');
-const ResultBar = require('../structures/ResultBar');
+const ResultBar = require('../classes/ResultBar');
 
 const Poll = require('../db/schemas/Poll');
 const { lc } = require('../utils/functions');
