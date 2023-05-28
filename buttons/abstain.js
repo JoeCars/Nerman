@@ -116,6 +116,23 @@ module.exports = {
          }
       );
 
+      // NOTE: This is just to fix open polls without Voting Closes fields
+      // todo remove later when I find out the specific root of this issue
+      if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
+
+         updateEmbed.spliceFields(
+            updateEmbed.fields.findIndex(({ name }) => name === 'Abstains') + 1,
+            0,
+            {
+               name: 'Voting Closes',
+               value: `<t:${Math.floor(
+                  updatedPoll.timeEnd.getTime() / 1000,
+               )}:f>`,
+               inline: false,
+            },
+         );
+      }
+
       message.edit({ embeds: [updateEmbed] });
 
       await interaction.editReply({
