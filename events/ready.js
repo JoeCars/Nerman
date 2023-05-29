@@ -40,9 +40,9 @@ module.exports = {
 
          Nouns.on('VoteCast', async vote => {
             Logger.info('events/ready.js: On VoteCast.', {
-               proposalId: vote.proposalId,
+               proposalId: Number(vote.proposalId),
                voterId: vote.voter.id,
-               votes: vote.votes,
+               votes: Number(vote.votes),
                supportDetailed: vote.supportDetailed,
                reason: vote.reason,
             });
@@ -306,7 +306,7 @@ module.exports = {
             const nogglesChannel = await guildCache
                .get(guildId)
                .channels.cache.get(channelId);
-            
+
             console.log(
                'NounsToken | NounCreated | id:' +
                   data.id +
