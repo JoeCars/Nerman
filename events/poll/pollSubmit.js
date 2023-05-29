@@ -335,13 +335,10 @@ module.exports = {
                   });
                } else {
                   const member = memberCache.get(key);
-                  // l('MISSING USER', { member });
-                  // l(member.roles.cache);
                   const memberRoles = member.roles.cache;
                   const eligibleChannels = await User.findEligibleChannels(
                      memberRoles,
                   );
-                  // l('ERIGIBIRU FROM POLLSUBMIT', await eligibleChannels);
                   user = await User.createUser(guildId, key, eligibleChannels);
 
                   return user;
@@ -404,11 +401,6 @@ module.exports = {
                newPoll.pollData.choices,
             ).length;
 
-            console.log(
-               'events/poll/pollVote.js -- longestOption => ',
-               longestOption,
-            );
-            // let resultsArray = ['```', '```'];
             let resultsArray = newPoll.config.voteThreshold
                ? [
                     `Threshold: ${newPoll.voteThreshold} ${
@@ -421,7 +413,6 @@ module.exports = {
 
             const barWidth = 8;
             let totalVotes = results.totalVotes;
-            // let totalVotes = newPoll.results.totalVotes;
 
             let votesMap = new Map([
                ['maxLength', barWidth],
@@ -430,30 +421,17 @@ module.exports = {
 
             for (const key in results.distribution) {
                const label = key[0].toUpperCase() + key.substring(1);
-
-               console.log('db/index.js -- label => ', label);
-               console.log('db/index.js -- label.length => ', label.length);
-               console.log(
-                  'db/index.js -- logging :  longestOption - label.length => ',
-                  longestOption - label.length,
-               );
                const votes = results.distribution[key];
                const room = longestOption - label.length;
                let optionObj = new ResultBar(label, votes, room, votesMap);
 
-               console.log('optionObj => ', optionObj);
-               console.log('optionObj.completeBar => ', optionObj.completeBar);
 
                votesMap.set(label, optionObj);
-               // resultsArray.splice(-1, 0, optionObj.completeBar);
                resultsArray.push(optionObj.completeBar);
             }
 
             resultsArray.push(`\nAbstains: ${newPoll.abstains.size}`);
 
-            // console.log(votesMap);
-
-            // resultsOutput = resultsArray.join('\n');
             resultsOutput = codeBlock(resultsArray.join('\n'));
 
             updatedEmbed.spliceFields(1, 0, {
