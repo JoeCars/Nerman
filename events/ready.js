@@ -77,7 +77,7 @@ module.exports = {
                   values: data.values,
                   signatures: data.signatures,
                   calldatas: data.calldatas,
-               }
+               },
             );
 
             const propChannelId =
@@ -271,7 +271,6 @@ module.exports = {
                toId: data.to.id,
                tokenId: data.tokenId,
             });
-
             const guildId = process.env.DISCORD_GUILD_ID;
             const nounsTokenId = process.env.NOUNS_TOKEN_ID;
             const nounsTokenChannel = await guildCache
@@ -295,10 +294,31 @@ module.exports = {
                .channels.cache.get(genId);
 
             Logger.info(
-               `events/ready.js: Transfer from ${data.from.id} to ${data.to.id} with token id ${data.tokenId}`
+               `events/ready.js: Transfer from ${data.from.id} to ${data.to.id} with token id ${data.tokenId}`,
             );
 
             client.emit('auctionCreated', genChannel, auction);
+         });
+
+         Nouns.on('NounCreated', async data => {
+            const guildId = process.env.NOGGLES_DISCORD_ID;
+            const channelId = process.env.NOGGLES_CHANNEL_ID;
+            const nogglesChannel = await guildCache
+               .get(guildId)
+               .channels.cache.get(channelId);
+            
+            console.log(
+               'NounsToken | NounCreated | id:' +
+                  data.id +
+                  ', seed: ' +
+                  JSON.stringify(data.seed),
+            );
+
+            Logger.info('events/ready.js: On NounCreated.', {
+               nounId: data.id,
+            });
+
+            client.emit('nounCreated', nogglesChannel, data);
          });
 
          Nouns.on('AuctionBid', async data => {
@@ -332,7 +352,7 @@ module.exports = {
 
             // Look up Owner of Noun by id
             const ownerAddress = await Nouns.NounsToken.Contract.ownerOf(
-               nounId
+               nounId,
             );
 
             // Look up ENS from address
@@ -340,7 +360,7 @@ module.exports = {
 
             // Look up delegate from ownerAddress
             const delegateAddress = await Nouns.NounsToken.Contract.delegates(
-               ownerAddress
+               ownerAddress,
             );
 
             // Look up ENS from address
@@ -348,7 +368,7 @@ module.exports = {
 
             // Look up current votes for ownerAddress
             const votingPower = await Nouns.NounsToken.Contract.getCurrentVotes(
-               delegateAddress
+               delegateAddress,
             );
 
             Logger.debug('events/ready.js: Checking owner information', {
@@ -387,7 +407,7 @@ module.exports = {
          }
       }
 
-      runNouns().catch(err => {
+      runNouns().catch(error => {
          Logger.error('events/ready.js: Received an error.', {
             error: error,
          });

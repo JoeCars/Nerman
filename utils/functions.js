@@ -12,10 +12,10 @@ const getFiles = async (path, ending) => {
             ...fileList,
             ...(await getFiles(`${path}/${file.name}`, '.js')),
          ];
-      } else {
-         if (file.name.endsWith(ending)) {
-            fileList.push(`${path}/${file.name}`);
-         }
+      } else if (file.name.endsWith(ending)) {
+         // if (file.name.endsWith(ending)) {
+         fileList.push(`${path}/${file.name}`);
+         // }
       }
    }
    Logger.debug('utils/functions.js/getFiles(): Checking file list.', {

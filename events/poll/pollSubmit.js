@@ -55,7 +55,7 @@ module.exports = {
          {
             channelId,
          },
-         'allowedRoles forAgainst voteThreshold liveVisualFeed'
+         'allowedRoles forAgainst voteThreshold liveVisualFeed',
       );
 
       const intRegex = new RegExp(/^\d*$/);
@@ -90,7 +90,7 @@ module.exports = {
                   .getTextInputValue('pollChoices')
                   .split(',')
                   .map(x => x.trim().toLowerCase())
-                  .filter(v => v !== '')
+                  .filter(v => v !== ''),
             ),
          ];
       }
@@ -171,97 +171,12 @@ module.exports = {
       // const channel = client.channels.cache.get(pollingChannelID);
       const channel = client.channels.cache.get(channelId);
 
-      //disabled vvvvvv disabling this bar output for the live voting until we decide how best to manage this later
-      // const longestOption = longestString(options).length;
-      // let resultsArray = ['```', '```'];
-      // let resultsOutput = [];
-
-      // const barWidth = 8;
-      // let totalVotes = 0;
-
-      // let votesMap = new Map([
-      //    ['maxLength', barWidth],
-      //    ['totalVotes', totalVotes],
-      // ]);
-
-      // options.forEach(option => {
-      //    const label = option;
-      //    let optionObj = {
-      //       label,
-      //       votes: 0,
-      //       room: longestOption - label.length,
-      //       get spacer() {
-      //          return this.room !== 0
-      //             ? Array.from({ length: this.room }, () => '\u200b ').join('')
-      //             : '';
-      //       },
-      //       get portion() {
-      //          return votesMap.get('totalVotes') !== 0
-      //             ? this.votes / votesMap.get('totalVotes')
-      //             : 0;
-      //       },
-      //       get portionOutput() {
-      //          return ` ${(this.portion * 100).toFixed(1)}%`;
-      //       },
-      //       get bar() {
-      //          return drawBar(votesMap.get('maxLength'), this.portion);
-      //       },
-      //       get completeBar() {
-      //          return [
-      //             `${this.label}${this.spacer} `,
-      //             this.bar,
-      //             this.portionOutput,
-      //          ].join('');
-      //       },
-      //    };
-
-      //    votesMap.set(label, optionObj);
-      //    resultsArray.splice(-1, 0, optionObj.completeBar);
-      // });
-
-      // console.log(votesMap);
-      // resultsOutput = resultsArray.join('\n');
-
-      // disabled ^^^^^^^^^^
-
       const messageObject = await initPollMessage({
          title,
          description,
          channelConfig,
          everyoneId,
       });
-
-      // const voteActionRow = new MessageActionRow();
-      // const voteBtn = new MessageButton()
-      //    .setCustomId('vote')
-      //    .setLabel('Vote')
-      //    .setStyle('PRIMARY');
-
-      // const abstainBtn = new MessageButton()
-      //    .setCustomId('abstain')
-      //    .setLabel('Abstain')
-      //    .setStyle('SECONDARY');
-
-      // voteActionRow.addComponents(voteBtn, abstainBtn);
-
-      // const embed = new MessageEmbed()
-      //    .setColor('#ffffff')
-      //    .setTitle(`${title}`)
-      //    .setDescription(description)
-      //    .addField('\u200B', '\u200B')
-      //    .addField('Quorum', '...', true)
-      //    .addField('Voters', '0', true)
-      //    .addField('Abstains', '0', true)
-      //    .addField('Voting Closes', '...', true)
-      //    // .addField('Poll Results:', resultsOutput)
-      //    // .setTimestamp()
-      //    .setFooter('Submitted by ...');
-
-      // const mentions = channelConfig.allowedRoles
-      //    .map(role => (role !== everyoneId ? roleMention(role) : '@everyone'))
-      //    .join(' ');
-
-      // console.log({ mentions });
 
       Logger.debug('events/poll/pollSubmit.js: Checking vote options.', {
          channelId: modal.channelId,
@@ -420,70 +335,39 @@ module.exports = {
                   });
                } else {
                   const member = memberCache.get(key);
-                  // l('MISSING USER', { member });
-                  // l(member.roles.cache);
                   const memberRoles = member.roles.cache;
                   const eligibleChannels = await User.findEligibleChannels(
-                     memberRoles
+                     memberRoles,
                   );
-                  // l('ERIGIBIRU FROM POLLSUBMIT', await eligibleChannels);
                   user = await User.createUser(guildId, key, eligibleChannels);
 
                   return user;
                }
 
-               // l(user.eligibleChannels);
-
-               // l(newPoll);
-               // mystery ID 383705280174620704
-               // doppelnouncil 1017403835913863260
-
-               // l({ newPoll });
-
-               // l(user.eligibleChannels.get(newPoll.config.channelId));
-               // const newEligibility = user.eligibleChannels.get(
-               //    newPoll.config.channelId
-               // );
-               // l({ newEligibility });
-               // newEligibility.eligiblePolls++;
-               // l({ newEligibility });
-               // l(user);
-
-               // user.eligibleChannels.set
-               // l({ participation });
-
                user.markModified('eligibleChannels');
                return await user.save();
                // return user;
-            }
+            },
          );
 
          await Promise.all(updateVoterPromise);
 
          let updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
 
-         // const timeEndMilli = new Date(
-         //    newPoll.timeCreated.getTime() + durationMs
-
-         //    // !testing switching the time for testing purposes
-         //    // savedPoll.timeCreated.getTime() + 30000
-         // );
-         // newPoll.timeEnd = timeEndMilli.toISOString();
-         // await newPoll.save();
-
          updatedEmbed.setFooter(
             `Poll #${newPoll.pollNumber} submitted by ${
                nickname ?? username
-            }#${discriminator}`
+            }#${discriminator}`,
          );
 
          let embedQuorum = Math.ceil(
-            newPoll.allowedUsers.size * (quorum / 100)
+            newPoll.allowedUsers.size * (quorum / 100),
          );
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : embedQuorum > 0 ? 1 : 0;
 
-         updatedEmbed.fields[1].value = embedQuorum.toString(); // quorum
+         updatedEmbed.fields.find(({ name }) => name === 'Quorum').value =
+            embedQuorum.toString();
 
          // if (updatedEmbed.fields.length === 6) {
          //    const votesAmount = Math.floor(
@@ -495,9 +379,9 @@ module.exports = {
          //    )}:f>`; // timeEnd
          // } else {
 
-         updatedEmbed.fields.find(({name}) => name === 'Voting Closes').value = `<t:${Math.floor(
-            newPoll.timeEnd.getTime() / 1000
-         )}:f>`; // timeEnd
+         updatedEmbed.fields.find(
+            ({ name }) => name === 'Voting Closes',
+         ).value = `<t:${Math.floor(newPoll.timeEnd.getTime() / 1000)}:f>`; // timeEnd
          // }
 
          /**
@@ -514,14 +398,9 @@ module.exports = {
          if (channelConfig.liveVisualFeed) {
             const results = newPoll.results;
             const longestOption = longestString(
-               newPoll.pollData.choices
+               newPoll.pollData.choices,
             ).length;
 
-            console.log(
-               'events/poll/pollVote.js -- longestOption => ',
-               longestOption
-            );
-            // let resultsArray = ['```', '```'];
             let resultsArray = newPoll.config.voteThreshold
                ? [
                     `Threshold: ${newPoll.voteThreshold} ${
@@ -534,7 +413,6 @@ module.exports = {
 
             const barWidth = 8;
             let totalVotes = results.totalVotes;
-            // let totalVotes = newPoll.results.totalVotes;
 
             let votesMap = new Map([
                ['maxLength', barWidth],
@@ -543,30 +421,17 @@ module.exports = {
 
             for (const key in results.distribution) {
                const label = key[0].toUpperCase() + key.substring(1);
-
-               console.log('db/index.js -- label => ', label);
-               console.log('db/index.js -- label.length => ', label.length);
-               console.log(
-                  'db/index.js -- logging :  longestOption - label.length => ',
-                  longestOption - label.length
-               );
                const votes = results.distribution[key];
                const room = longestOption - label.length;
                let optionObj = new ResultBar(label, votes, room, votesMap);
 
-               console.log('optionObj => ', optionObj);
-               console.log('optionObj.completeBar => ', optionObj.completeBar);
 
                votesMap.set(label, optionObj);
-               // resultsArray.splice(-1, 0, optionObj.completeBar);
                resultsArray.push(optionObj.completeBar);
             }
 
             resultsArray.push(`\nAbstains: ${newPoll.abstains.size}`);
 
-            // console.log(votesMap);
-
-            // resultsOutput = resultsArray.join('\n');
             resultsOutput = codeBlock(resultsArray.join('\n'));
 
             updatedEmbed.spliceFields(1, 0, {
@@ -604,65 +469,6 @@ module.exports = {
             error: error,
          });
       }
-
-      // const newPoll = await Poll.create({
-      //    _id: new Types.ObjectId(),
-      //    guildId,
-      //    creatorId: user.id,
-      //    messageId: id,
-      //    // config: config._id,
-      //    config: _id,
-      //    pollData,
-      //    votes: undefined,
-      //    abstains: undefined,
-      //    allowedUsers: snapshotMap,
-      //    status: 'open',
-      // })
-      //    .then(savedPoll => {
-      //       // savedPoll = savedPoll.populate('config').exec();
-      //       let updateEmbed = new MessageEmbed(embed);
-      //       console.log({ savedPoll });
-
-      //       const timeEndMilli = new Date(
-      //          savedPoll.timeCreated.getTime() + durationMs
-
-      //          // !testing switching the time for testing purposes
-      //          // savedPoll.timeCreated.getTime() + 30000
-      //       );
-
-      //       savedPoll.timeEnd = timeEndMilli.toISOString();
-
-      //       updateEmbed.setFooter(
-      //          `Submitted by ${nickname ?? username}#${discriminator}`
-      //          // `Submitted by ${message.author.username}#${message.author.discriminator}`
-      //       );
-
-      //       // updateEmbed.fields[1].value = savedPoll.voterQuorum; // quorum
-      //       let embedQuorum = Math.floor(
-      //          savedPoll.allowedUsers.size * (quorum / 100)
-      //       );
-
-      //       embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
-
-      //       updateEmbed.fields[1].value = embedQuorum.toString(); // quorum
-      //       // updateEmbed.fields[1].value = Math.floor(
-      //       //    savedPoll.allowedUsers.size * (quorum / 100)
-      //       // ).toString(); // quorum
-      //       // updateEmbed.fields[4].value = formatDate(savedPoll.timeEnd); // timeEnd
-
-      //       //todo Maybe switch this to a Poll.create({...},{new: true}) then modify approach
-      //       updateEmbed.fields[4].value = `<t:${Math.floor(
-      //          savedPoll.timeEnd.getTime() / 1000
-      //       )}:f>`; // timeEnd
-
-      //       message.edit({ embeds: [updateEmbed] });
-      //       return savedPoll.save();
-      //    })
-      //    .catch(err => console.error(err));
-
-      // Emit an event to trigger adding a new poll to the db poll interval queue
-
-      // const reply = await modal.editReply({
 
       // todo add button vomponents in AFTER initial DB commit of the poll
 
