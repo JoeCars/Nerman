@@ -7,6 +7,8 @@ const propChannelId =
 
 const Logger = require('../../../helpers/logger');
 
+const nermanIds = process.env.NERMAN_BOT_IDS.split(',');
+
 module.exports = {
    name: 'messageCreate',
    /**
@@ -21,7 +23,7 @@ module.exports = {
             channelId: message.channelId,
             guildId: message.guildId,
             messageId: message.id,
-         }
+         },
       );
 
       const {
@@ -38,7 +40,8 @@ module.exports = {
       const configExists = await PollChannel.configExists(channelId);
 
       // if (channelId !== propChannelId || botId === authorId) return;
-      if (!configExists || botId === authorId) {
+      if (!configExists || nermanIds.includes(botId)) {
+         // if (!configExists || botId === authorId) {
          Logger.info(
             'events/poll/propChannelMessage.js: Message was not invalid, so it was not deleted.',
             {
@@ -46,7 +49,7 @@ module.exports = {
                channelId: message.channelId,
                guildId: message.guildId,
                messageId: message.id,
-            }
+            },
          );
          return;
       }
@@ -60,7 +63,7 @@ module.exports = {
                channelId: message.channelId,
                guildId: message.guildId,
                messageId: message.id,
-            }
+            },
          );
       } catch (error) {
          Logger.info('events/poll/propChannelMessage.js: Received error.', {
