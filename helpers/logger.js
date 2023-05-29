@@ -69,44 +69,43 @@ function stringifyDate() {
 
 class Logger {
    static info(message, context = {}) {
-      let date = stringifyDate();
-      let contextString = stringifyContext(context);
+      if (isEmptyObject(context)) {
+         context = '';
+      }
 
-      console.info(`${date} ${blue('[INFO]')} ${message} ${contextString}`);
+      console.info(stringifyDate(), blue('[INFO]'), white(message), context);
    }
 
    static debug(message, context = {}) {
-      let date = stringifyDate();
-      let contextString = stringifyContext(context);
+      if (isEmptyObject(context)) {
+         context = '';
+      }
 
-      console.debug(`${date} ${green('[DEBUG]')} ${message} ${contextString}`);
+      console.debug(stringifyDate(), green('[DEBUG]'), white(message), context);
    }
 
    static warn(message, context = {}) {
-      let date = stringifyDate();
-      let contextString = stringifyContext(context);
+      if (isEmptyObject(context)) {
+         context = '';
+      }
 
-      console.warn(`${date} ${yellow('[WARN]')} ${message} ${contextString}`);
-
-      checkForErrors(context);
+      console.warn(stringifyDate(), yellow('[WARN]'), white(message), context);
    }
 
    static error(message, context = {}) {
-      let date = stringifyDate();
-      let contextString = stringifyContext(context);
+      if (isEmptyObject(context)) {
+         context = '';
+      }
 
-      console.error(`${date} ${red('[ERROR]')} ${message} ${contextString}`);
-
-      checkForErrors(context);
+      console.error(stringifyDate(), red('[ERROR]'), white(message), context);
    }
 
    static fatal(message, context = {}) {
-      let date = stringifyDate();
-      let contextString = stringifyContext(context);
+      if (isEmptyObject(context)) {
+         context = '';
+      }
 
-      console.error(`${date} ${red('[FATAL]')} ${message} ${contextString}`);
-
-      checkForErrors(context);
+      console.error(stringifyDate(), red('[FATAL]'), white(message), context);
    }
 }
 
