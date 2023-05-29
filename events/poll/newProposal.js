@@ -15,9 +15,9 @@ const Logger = require('../../helpers/logger');
 
 // todo I will need to change this to the new Nouncil channel once Joel gives the go-ahead
 const propChannelId =
-   process.env.DEPLOY_STAGE === 'staging'
-      ? process.env.TESTNERMAN_NOUNCIL_CHAN_ID
-      : process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
+   process.env.DEPLOY_STAGE === 'development'
+      ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
+      : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 
 const nounsGovId = process.env.NOUNS_GOV_ID;
 
@@ -90,7 +90,7 @@ module.exports = {
          {
             channelId: propChannelId,
          },
-         '_id allowedRoles quorum duration forAgainst'
+         '_id allowedRoles quorum duration forAgainst',
       ).exec();
 
       Logger.debug('events/poll/newProposal.js: Checking roles and IDs.', {
@@ -216,7 +216,7 @@ module.exports = {
 
                if (!user) {
                   Logger.warn(
-                     'events/poll/newProposal.js: User does not exist yet. Creating new user.'
+                     'events/poll/newProposal.js: User does not exist yet. Creating new user.',
                   );
 
                   const {
@@ -224,21 +224,21 @@ module.exports = {
                   } = allowedUsers.get(key);
 
                   const eligibleChannels = await User.findEligibleChannels(
-                     userRoleCache
+                     userRoleCache,
                   );
 
                   user = await User.createUser(guildId, key, eligibleChannels);
 
                   Logger.debug(
                      'events/poll/newProposal.js: Successfully created new user.',
-                     { user: user }
+                     { user: user },
                   );
                } else if (
                   user.eligibleChannels !== null &&
                   user.eligibleChannels.has(newPoll.config.channelId)
                ) {
                   Logger.debug(
-                     'events/poll/newProposal.js: User exists and has channel key!'
+                     'events/poll/newProposal.js: User exists and has channel key!',
                   );
 
                   user.eligibleChannels.get(newPoll.config.channelId)
@@ -248,7 +248,7 @@ module.exports = {
                      'events/poll/newProposal.js: User did not have the appropriate key. Attempting to set key.',
                      {
                         key: newPoll.config.channelId,
-                     }
+                     },
                   );
 
                   user.eligibleChannels.set(newPoll.config.channelId, {
@@ -259,7 +259,7 @@ module.exports = {
 
                user.markModified('eligibleChannels');
                return await user.save();
-            }
+            },
          );
 
          await Promise.all(updateVoterPromise);
@@ -278,11 +278,11 @@ module.exports = {
          updatedEmbed.setFooter(
             `Poll #${newPoll.pollNumber} submitted by ${
                nickname ?? username
-            }#${discriminator}`
+            }#${discriminator}`,
          );
 
          let embedQuorum = Math.ceil(
-            newPoll.allowedUsers.size * (channelConfig.quorum / 100)
+            newPoll.allowedUsers.size * (channelConfig.quorum / 100),
          );
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
@@ -290,7 +290,7 @@ module.exports = {
          updatedEmbed.fields[1].value = embedQuorum.toString(); // quorum
 
          updatedEmbed.fields[4].value = `<t:${Math.floor(
-            newPoll.timeEnd.getTime() / 1000
+            newPoll.timeEnd.getTime() / 1000,
          )}:f>`; // timeEnd
 
          messageObject.embeds[0] = updatedEmbed;
