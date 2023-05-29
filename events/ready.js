@@ -300,6 +300,27 @@ module.exports = {
             client.emit('auctionCreated', genChannel, auction);
          });
 
+         Nouns.on('NounCreated', async data => {
+            const guildId = process.env.NOGGLES_DISCORD_ID;
+            const channelId = process.env.NOGGLES_CHANNEL_ID;
+            const nogglesChannel = await guildCache
+               .get(guildId)
+               .channels.cache.get(channelId);
+            
+            console.log(
+               'NounsToken | NounCreated | id:' +
+                  data.id +
+                  ', seed: ' +
+                  JSON.stringify(data.seed),
+            );
+
+            Logger.info('events/ready.js: On NounCreated.', {
+               nounId: data.id,
+            });
+
+            client.emit('nounCreated', nogglesChannel, data);
+         });
+
          Nouns.on('AuctionBid', async data => {
             Logger.info('events/ready.js: On AuctionBid.', {
                nounId: data.id,
