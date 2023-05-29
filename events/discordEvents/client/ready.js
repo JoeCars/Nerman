@@ -387,7 +387,7 @@ module.exports = {
          }
       }
 
-      runNouns().catch(err => {
+      runNouns().catch(error => {
          Logger.error('events/ready.js: Received an error.', {
             error: error,
          });
