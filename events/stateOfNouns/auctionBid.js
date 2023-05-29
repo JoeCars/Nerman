@@ -14,7 +14,7 @@ module.exports = {
       try {
          Logger.info(
             'events/stateOfNouns/auctionBid.js: Attempting to start an auction bid.',
-            { id: data.id, amount: data.amount, bidderId: data.bidder.id }
+            { id: `${data.id}`, amount: `${data.amount}`, bidderId: `${data.bidder.id}` }
          );
 
          const {
@@ -51,7 +51,7 @@ module.exports = {
 
          Logger.info(
             'events/stateOfNouns/auctionBid.js: Successfully started an auction bid.',
-            { id: data.id, amount: data.amount, bidderId: data.bidder.id }
+            { id: `${data.id}`, amount: amountNew, bidderId: `${data.bidder.id}` }
          );
          return await auctionChannel.send({ embeds: [bidEmbed] });
       } catch (error) {

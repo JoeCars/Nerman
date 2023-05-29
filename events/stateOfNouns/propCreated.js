@@ -15,7 +15,7 @@ module.exports = {
          Logger.info(
             'events/stateOfNouns/propCreated.js: Handling a proposal creation event.',
             {
-               proposalId: proposalId,
+               proposalId: `${proposalId}`,
                proposalTitle: proposal.pollData.title,
                proposalDescription: proposal.pollData.description,
             }
@@ -41,7 +41,7 @@ module.exports = {
          Logger.debug(
             'events/stateOfNouns/propCreated.js: Checking description.',
             {
-               proposalId: proposalId,
+               proposalId: `${proposalId}`,
                proposalTitle: proposal.pollData.title,
                proposalDescription: proposal.pollData.description,
                shortDescription: shortDescription,
@@ -57,7 +57,7 @@ module.exports = {
          Logger.info(
             'events/stateOfNouns/propCreated.js: Successfully handled a proposal creation event.',
             {
-               proposalId: proposalId,
+               proposalId: `${proposalId}`,
                proposalTitle: proposal.pollData.title,
                proposalDescription: proposal.pollData.description,
             }

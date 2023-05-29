@@ -14,7 +14,7 @@ module.exports = {
          Logger.info(
             'events/stateOfNouns/auctionCreated.js: Attempting to handle an auction creation event.',
             {
-               id: data.id,
+               id: `${data.id}`,
                startTime: data.startTime,
                endTime: data.endTime,
                channelId: genChannel.id,

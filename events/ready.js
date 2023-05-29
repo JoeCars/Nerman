@@ -11,7 +11,7 @@ module.exports = {
    once: true,
    async execute(client) {
       Logger.info(
-         `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.NODE_ENV} mode.`
+         `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.NODE_ENV} mode.`,
       );
 
       await require('../db/index.js')(client);
@@ -66,17 +66,17 @@ module.exports = {
             Logger.info(
                'events/ready.js: On ProposalCreatedWithRequirements.',
                {
-                  id: data.id,
-                  proposer: data.proposer.id,
+                  id: `${data.id}`,
+                  proposer: `${data.proposer.id}`,
                   startBlock: data.startBlock,
                   endBlock: data.endBlock,
-                  quorumVotes: data.quorumVotes,
-                  proposalThreshold: data.proposalThreshold,
+                  quorumVotes: `${data.quorumVotes}`,
+                  proposalThreshold: `${data.proposalThreshold}`,
                   description: data.description,
-                  targets: data.targets,
-                  values: data.values,
-                  signatures: data.signatures,
-                  calldatas: data.calldatas,
+                  targets: `${data.targets}`,
+                  values: `${data.values}`,
+                  signatures: `${data.signatures}`,
+                  calldatas: `${data.calldatas}`,
                },
             );
 
@@ -95,9 +95,9 @@ module.exports = {
                Logger.warn(
                   'events/ready.js: On ProposalCreatedWithRequirements. No config. Exiting.',
                   {
-                     id: data.id,
-                     proposer: data.proposer.id,
-                  }
+                     id: `${data.id}`,
+                     proposer: `${data.proposer.id}`,
+                  },
                );
                return;
             }
@@ -181,7 +181,7 @@ module.exports = {
          //    (data: nerman.EventData.ProposalCanceled) => {
          Nouns.on('ProposalCanceled', async data => {
             Logger.info('events/ready.js: On ProposalCanceled.', {
-               id: data.id,
+               id: `${data.id}`,
             });
 
             const nounsGovId = process.env.NOUNS_GOV_ID;
@@ -202,8 +202,8 @@ module.exports = {
          // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
          Nouns.on('ProposalQueued', async data => {
             Logger.info('events/ready.js: On ProposalQueued.', {
-               id: data.id,
-               eta: data.eta,
+               id: `${data.id}`,
+               eta: `${data.eta}`,
             });
 
             const nounsGovId = process.env.NOUNS_GOV_ID;
@@ -224,7 +224,7 @@ module.exports = {
          // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
          Nouns.on('ProposalVetoed', async data => {
             Logger.info('events/ready.js: On ProposalVetoed.', {
-               id: data.id,
+               id: `${data.id}`,
             });
 
             const nounsGovId = process.env.NOUNS_GOV_ID;
@@ -247,7 +247,7 @@ module.exports = {
          //    (data: nerman.EventData.ProposalExecuted) => {
          Nouns.on('ProposalExecuted', async data => {
             Logger.info('events/ready.js: On ProposalExecuted.', {
-               id: data.id,
+               id: `${data.id}`,
             });
 
             const nounsGovId = process.env.NOUNS_GOV_ID;
@@ -267,9 +267,9 @@ module.exports = {
 
          Nouns.on('Transfer', async data => {
             Logger.info('events/ready.js: On Transfer.', {
-               fromId: data.from.id,
-               toId: data.to.id,
-               tokenId: data.tokenId,
+               fromId: `${data.from.id}`,
+               toId: `${data.to.id}`,
+               tokenId: `${data.tokenId}`,
             });
             const guildId = process.env.DISCORD_GUILD_ID;
             const nounsTokenId = process.env.NOUNS_TOKEN_ID;
@@ -282,9 +282,9 @@ module.exports = {
 
          Nouns.on('AuctionCreated', async auction => {
             Logger.info('events/ready.js: On AuctionCreated.', {
-               auctionId: auction.id,
-               auctionStartTime: auction.startTime,
-               auctionEndTime: auctionEndTime,
+               auctionId: `${auction.id}`,
+               auctionStartTime: `${auction.startTime}`,
+               auctionEndTime: `${auctionEndTime}`,
             });
 
             const guildId = process.env.DISCORD_GUILD_ID;
@@ -315,7 +315,7 @@ module.exports = {
             );
 
             Logger.info('events/ready.js: On NounCreated.', {
-               nounId: data.id,
+               nounId: `${data.id}`,
             });
 
             client.emit('nounCreated', nogglesChannel, data);
@@ -323,10 +323,10 @@ module.exports = {
 
          Nouns.on('AuctionBid', async data => {
             Logger.info('events/ready.js: On AuctionBid.', {
-               nounId: data.id,
-               walletAddress: data.bidder.id,
-               ethereumWeiAmount: data.amount,
-               dataExtended: data.extended,
+               nounId: `${data.id}`,
+               walletAddress: `${data.bidder.id}`,
+               ethereumWeiAmount: `${data.amount}`,
+               dataExtended: `${data.extended}`,
             });
 
             const guildId = process.env.DISCORD_GUILD_ID;
@@ -347,7 +347,7 @@ module.exports = {
 
          async function testing(nounId) {
             Logger.info('events/ready.js: Testing noun retrieval.', {
-               nounId: nounId,
+               nounId: `${nounId}`,
             });
 
             // Look up Owner of Noun by id
@@ -372,12 +372,12 @@ module.exports = {
             );
 
             Logger.debug('events/ready.js: Checking owner information', {
-               nounId: nounId,
-               ownerAddress: ownerAddress,
+               nounId: `${nounId}`,
+               ownerAddress: `${ownerAddress}`,
                ownerEns: ownerEns ?? 'not found',
                delegateAddress: delegateAddress,
                delegateEns: delegateEns ?? 'not found',
-               votingPower: votingPower,
+               votingPower: `${votingPower}`,
             });
 
             // Get Final Bid Data
@@ -397,9 +397,9 @@ module.exports = {
                const name = bid.ens != null ? bid.ens : bid.address;
 
                Logger.debug('events/ready.js: Checking bid information', {
-                  nounId: nounId,
-                  bidId: bid.id,
-                  bidAmount: bid.amount,
+                  nounId: `${nounId}`,
+                  bidId: `${bid.id}`,
+                  bidAmount: `${bid.amount}`,
                   newOwner: name,
                   dateOfBid: bid.date.toLocaleString(),
                });

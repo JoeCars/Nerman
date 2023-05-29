@@ -11,12 +11,10 @@ module.exports = {
     */
    async execute(nogglesChannel, data) {
       try {
-         l('NOUN CREATED EVENT HANDLER');
-
          const { id } = data;
 
          Logger.info('nounCreated.js', {
-            nounId: data.id,
+            nounId: `${data.id}`,
             nogglesChannel: nogglesChannel,
          });
 

@@ -19,9 +19,9 @@ module.exports = {
          Logger.info(
             'events/stateOfNouns/transferNoun.js: Handling a noun transfer event.',
             {
-               senderId: data.from.id,
-               receiverId: data.to.id,
-               tokenId: data.tokenId,
+               senderId: `${data.from.id}`,
+               receiverId: `${data.to.id}`,
+               tokenId: `${data.tokenId}`,
             }
          );
 
@@ -79,9 +79,9 @@ module.exports = {
          Logger.info(
             'events/stateOfNouns/transferNoun.js: Finished handling a noun transfer event.',
             {
-               senderId: data.from.id,
-               receiverId: data.to.id,
-               tokenId: data.tokenId,
+               senderId: `${data.from.id}`,
+               receiverId: `${data.to.id}`,
+               tokenId: `${data.tokenId}`,
             }
          );
 

@@ -18,7 +18,7 @@ module.exports = {
          Logger.info(
             'events/stateOfNouns/propStatusChange.js: Handling a proposal change event.',
             {
-               proposalId: data.id,
+               proposalId: `${data.id}`,
             }
          );
 
@@ -123,7 +123,7 @@ module.exports = {
          Logger.info(
             'events/stateOfNouns/propStatusChange.js: Finished handling a proposal change event.',
             {
-               proposalId: data.id,
+               proposalId: `${data.id}`,
             }
          );
 

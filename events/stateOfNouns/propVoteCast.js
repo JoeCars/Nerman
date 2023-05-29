@@ -72,9 +72,9 @@ module.exports = {
             Logger.warn(
                'events/stateOfNouns/propVoteCast.js: Unable to find the associated poll.',
                {
-                  proposalId: vote.proposalId,
+                  proposalId: `${vote.proposalId}`,
                   voterId: vote.voter.id,
-                  votes: vote.votes,
+                  votes: `${vote.votes}`,
                   reason: vote.reason,
                }
             );
@@ -111,9 +111,9 @@ module.exports = {
          Logger.debug(
             'events/stateOfNouns/propVoteCast.js: Checking poll title.',
             {
-               proposalId: vote.proposalId,
+               proposalId: `${vote.proposalId}`,
                voterId: vote.voter.id,
-               votes: vote.votes,
+               votes: `${vote.votes}`,
                reason: vote.reason,
                title: titleFromPoll,
             }
@@ -227,9 +227,9 @@ module.exports = {
          Logger.info(
             'events/stateOfNouns/propVoteCast.js: Finished handling a proposal vote event.',
             {
-               proposalId: vote.proposalId,
+               proposalId: `${vote.proposalId}`,
                voterId: vote.voter.id,
-               votes: vote.votes,
+               votes: `${vote.votes}`,
                reason: vote.reason,
             }
          );
