@@ -66,13 +66,6 @@ const initPollMessage = async ({
       .setTitle(title)
       .setDescription(description)
       .addFields(embedFields)
-      // .addField('\u200B', '\u200B')
-      // .addField('Quorum', '...', true)
-      // .addField('Voters', '0', true)
-      // .addField('Abstains', '0', true)
-      // .addField('Voting Closes', '...', true)
-      // .addField('Poll Results:', resultsOutput)
-      // .setTimestamp()
       .setFooter('Submitted by ...');
 
    Logger.debug(
