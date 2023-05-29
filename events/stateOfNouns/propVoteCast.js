@@ -18,9 +18,9 @@ module.exports = {
          Logger.info(
             'events/stateOfNouns/propVoteCast.js: Handling a proposal vote event.',
             {
-               proposalId: vote.proposalId,
+               proposalId: Number(vote.proposalId),
                voterId: vote.voter.id,
-               votes: vote.votes,
+               votes: Number(vote.votes),
                reason: vote.reason,
             }
          );
