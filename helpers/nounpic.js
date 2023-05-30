@@ -15,12 +15,10 @@ async function fetchNouner(endpoint, includeDelegates) {
    const attachment = new MessageAttachment(
       address,
       `nouner-tile-${endpoint}.png`,
-      data
+      data,
    );
 
    return attachment;
 }
 
-module.exports.fetchNouner = async function (endpoint, includeDelegates) {
-   return fetchNouner(endpoint, includeDelegates);
-};
+module.exports.fetchNouner = fetchNouner;

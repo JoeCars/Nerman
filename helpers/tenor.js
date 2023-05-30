@@ -9,6 +9,4 @@ const getGifURL = async embeds => {
    return gifURL;
 };
 
-module.exports.getGifURL = async embeds => {
-   return await getGifURL(embeds);
-};
+module.exports.getGifURL = getGifURL;
