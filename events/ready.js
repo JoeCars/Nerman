@@ -284,7 +284,7 @@ module.exports = {
             Logger.info('events/ready.js: On AuctionCreated.', {
                auctionId: `${auction.id}`,
                auctionStartTime: `${auction.startTime}`,
-               auctionEndTime: `${auctionEndTime}`,
+               auctionEndTime: `${auction.endTime}`,
             });
 
             const guildId = process.env.DISCORD_GUILD_ID;
