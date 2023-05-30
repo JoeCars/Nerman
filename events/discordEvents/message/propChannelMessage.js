@@ -40,7 +40,7 @@ module.exports = {
       const configExists = await PollChannel.configExists(channelId);
 
       // if (channelId !== propChannelId || botId === authorId) return;
-      if (!configExists || nermanIds.includes(botId)) {
+      if (!configExists || nermanIds.includes(authorId)) {
          // if (!configExists || botId === authorId) {
          Logger.info(
             'events/poll/propChannelMessage.js: Message was not invalid, so it was not deleted.',
