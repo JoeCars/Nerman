@@ -35,15 +35,14 @@ module.exports = {
 
       // l('CHANNELS', channels.cache);
 
-//       if (!guildWhitelist.includes(guildId)) {
-//          Logger.debug(
-//             'events/guild/guildJoin.js: The guild is not white-listed. Leaving the guild.',
-//             {
-//                guildId,
-//             }
-//          );
-//       }
-
+      //       if (!guildWhitelist.includes(guildId)) {
+      //          Logger.debug(
+      //             'events/guild/guildJoin.js: The guild is not white-listed. Leaving the guild.',
+      //             {
+      //                guildId,
+      //             }
+      //          );
+      //       }
 
       let gConfigDoc;
 
@@ -51,10 +50,13 @@ module.exports = {
          try {
             gConfigDoc =
                (await GuildConfig.findGuildConfig(guildId)) ??
-               (await GuildConfig.create({
-                  _id: new Types.ObjectId(),
-                  guildId,
-               }));
+               (await GuildConfig.create(
+                  {
+                     _id: new Types.ObjectId(),
+                     guildId,
+                  },
+                  { new: true },
+               ));
          } catch (error) {
             Logger.error('events/guild/guildJoin.js: Error.', { error: error });
          }
@@ -70,7 +72,7 @@ module.exports = {
             gConfigDoc: gConfigDoc,
             guildConfigs: guildConfigs,
             guildId: guild.id,
-         }
+         },
       );
    },
 };
