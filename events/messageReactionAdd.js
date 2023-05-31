@@ -12,15 +12,15 @@ const Logger = require('../helpers/logger.js');
 
 // role allowed for nerman tweet functions - for now env based on DEPLOY_STAGE
 const allowedRoles =
-   process.env.DEPLOY_STAGE === 'staging'
-      ? process.env.TESTNERMAN_NOUNCIL_ROLE_ID
-      : process.env.DEVNERMAN_VOTER_ID;
+   process.env.DEPLOY_STAGE === 'development'
+      ? process.env.DEVNERMAN_VOTER_ID
+      : process.env.TESTNERMAN_NOUNCIL_ROLE_ID;
 
 // nerman emoji ID - for now env based on DEPLOY_STAGE
 const nermanEmojiId =
-   process.env.DEPLOY_STAGE === 'staging'
-      ? process.env.TESTNERMAN_EMOJI_ID
-      : process.env.DEVNERMAN_EMOJI_ID;
+   process.env.DEPLOY_STAGE === 'development'
+      ? process.env.DEVNERMAN_EMOJI_ID
+      : process.env.TESTNERMAN_EMOJI_ID;
 
 module.exports = {
    name: 'messageReactionAdd',
@@ -34,7 +34,7 @@ module.exports = {
             emoji: reaction.emoji,
             count: reaction.count,
             authorId: reaction.message.author.id,
-         }
+         },
       );
 
       const {
@@ -63,7 +63,7 @@ module.exports = {
                   emoji: reaction.emoji,
                   count: reaction.count,
                   authorId: reaction.message.author.id,
-               }
+               },
             );
             return;
          }
@@ -77,7 +77,7 @@ module.exports = {
                   count: reaction.count,
                   authorId: reaction.message.author.id,
                   deployStage: process.env.DEPLOY_STAGE,
-               }
+               },
             );
             return;
          } else {
@@ -88,7 +88,7 @@ module.exports = {
                   count: reaction.count,
                   authorId: reaction.message.author.id,
                   deployStage: process.env.DEPLOY_STAGE,
-               }
+               },
             );
          }
 
@@ -107,7 +107,7 @@ module.exports = {
          //    .filter(member => member.roles.cache.find(role => role == Role)).size;
 
          const nouncillors = membersCache.filter(member =>
-            member.roles.cache.find(role => role == Role)
+            member.roles.cache.find(role => role == Role),
          ).size;
 
          // disabled - writing a temporary new version below
@@ -122,7 +122,7 @@ module.exports = {
                count: reaction.count,
                authorId: reaction.message.author.id,
                voteThreshold: voteThreshold,
-            }
+            },
          );
 
          let msgAttachmentUrls = [];
@@ -139,7 +139,7 @@ module.exports = {
          let tweetContent = await nTwitter.formatTweet(
             content,
             authorName,
-            mappedMentions
+            mappedMentions,
          );
 
          // let messageTweeted = await reactionsCache.get('931919315010220112'); //check for NermanBlast
@@ -193,7 +193,7 @@ module.exports = {
                emoji: reaction.emoji,
                count: reaction.count,
                authorId: reaction.message.author.id,
-            }
+            },
          );
       } catch (error) {
          Logger.error('events/messageReactionAdd.js: Received an error.', {

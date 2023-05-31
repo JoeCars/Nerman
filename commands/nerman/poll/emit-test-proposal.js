@@ -4,9 +4,9 @@ const PollChannel = require('../../../db/schemas/PollChannel');
 const Logger = require('../../../helpers/logger');
 
 const propChannelId =
-   process.env.DEPLOY_STAGE === 'staging'
-      ? process.env.TESTNERMAN_NOUNCIL_CHAN_ID
-      : process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
+   process.env.DEPLOY_STAGE === 'development'
+      ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
+      : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 
 // const adminId = process.env.NERMAN_G_ADMIN_ID;
 const authorizedIds = process.env.BAD_BITCHES.split(',');
@@ -15,7 +15,7 @@ module.exports = {
    data: new SlashCommandBuilder()
       .setName('emit-test-proposal')
       .setDescription(
-         'Mimic a new proposal event from the blockchain to test the output to the nouncil-voting channel.'
+         'Mimic a new proposal event from the blockchain to test the output to the nouncil-voting channel.',
       ),
 
    async execute(interaction) {
@@ -23,7 +23,7 @@ module.exports = {
          'commands/nerman/poll/emit-test-proposal.js: Starting to emit a test proposal',
          {
             userId: interaction.user.id,
-         }
+         },
       );
 
       const {
@@ -56,7 +56,7 @@ module.exports = {
          {
             channelId: propChannelId,
          },
-         '_id allowedRoles quorum duration'
+         '_id allowedRoles quorum duration',
       ).exec();
 
       let message = await propChannel.send({
@@ -75,7 +75,7 @@ module.exports = {
          'commands/nerman/poll/emit-test-proposal.js: Finished emitting a test proposal',
          {
             userId: interaction.user.id,
-         }
+         },
       );
    },
 };

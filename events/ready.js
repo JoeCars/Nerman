@@ -81,9 +81,9 @@ module.exports = {
             );
 
             const propChannelId =
-               process.env.DEPLOY_STAGE === 'staging'
-                  ? process.env.TESTNERMAN_NOUNCIL_CHAN_ID
-                  : process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
+               process.env.DEPLOY_STAGE === 'development'
+                  ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
+                  : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 
             const propChannel = await guildCache
                .get(process.env.DISCORD_GUILD_ID)
