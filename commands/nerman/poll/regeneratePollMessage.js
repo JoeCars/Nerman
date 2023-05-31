@@ -28,7 +28,7 @@ module.exports = {
             userId: interaction.user.id,
             guildId: interaction.guildId,
             channelId: interaction.channelId,
-         }
+         },
       );
 
       const {
@@ -64,7 +64,7 @@ module.exports = {
                userId: interaction.user.id,
                guildId: interaction.guildId,
                channelId: interaction.channelId,
-            }
+            },
          );
          throw new Error('You do not have permission to access this command.');
       }
@@ -81,7 +81,7 @@ module.exports = {
             guildId: interaction.guildId,
             channelId: interaction.channelId,
             configExists: configExists,
-         }
+         },
       );
 
       // Test existence of channel configuration
@@ -100,7 +100,7 @@ module.exports = {
       // Actually retrieve configuration
       const channelConfig = await PollChannel.findOne(
          { channelId },
-         'allowedRoles maxUserProposal voteAllowance quorum'
+         'allowedRoles maxUserProposal voteAllowance quorum',
       ).exec();
 
       const messageId = interaction.options.getString('message-id');
@@ -116,7 +116,7 @@ module.exports = {
             channelId: interaction.channelId,
             noChannelMessage: noChannelMessage,
             messageId: messageId,
-         }
+         },
       );
 
       const associatedPoll = await Poll.findOne()
@@ -149,7 +149,7 @@ module.exports = {
                guildId: interaction.guildId,
                channelId: interaction.channelId,
                messageToUpdate: messageToUpdate,
-            }
+            },
          );
       }
 
@@ -169,7 +169,7 @@ module.exports = {
                userId: interaction.user.id,
                guildId: interaction.guildId,
                channelId: interaction.channelId,
-            }
+            },
          );
 
          const {
@@ -186,19 +186,19 @@ module.exports = {
                nickname: nickname,
                username: username,
                discriminator: discriminator,
-            }
+            },
          );
 
          messageEmbed.setFooter(
             `Poll #${associatedPoll.pollNumber} submitted by ${
                nickname ?? username
-            }#${discriminator}`
+            }#${discriminator}`,
          );
 
          // l('MESSAGE EMBED WITH FOOTER WOW\n', messageEmbed);
 
          let embedQuorum = await Math.floor(
-            associatedPoll.allowedUsers.size * (channelConfig.quorum / 100)
+            associatedPoll.allowedUsers.size * (channelConfig.quorum / 100),
          );
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
@@ -211,11 +211,11 @@ module.exports = {
          // messageEmbed.fields[4].value = `<t:${Math.floor(
          // associatedPoll.timeEnd.getTime() / 1000
          // )}:f>`;
-         
+
          messageEmbed.fields.find(
-            ({ name }) => name === 'Voting Closes'
+            ({ name }) => name === 'Voting Closes',
          ).value = `<t:${Math.floor(
-            associatedPoll.timeEnd.getTime() / 1000
+            associatedPoll.timeEnd.getTime() / 1000,
          )}:f>`;
 
          messageObject.embeds[0] = messageEmbed;
@@ -238,7 +238,7 @@ module.exports = {
                guildId: interaction.guildId,
                channelId: interaction.channelId,
                newMessage: newMessage,
-            }
+            },
          );
 
          associatedPoll.messageId = newMsg.id;
@@ -248,43 +248,54 @@ module.exports = {
             messageToUpdate.delete();
          }
       } else {
+         
+         const {
+            nickname,
+            user: { username, discriminator },
+         } = await memberCache.get(creatorId);
+
          const updateEmbed = new MessageEmbed(messageToUpdate.embeds[0]);
          const embedTitle = associatedPoll.pollData.title;
 
          const mentions = await channelConfig.allowedRoles
             .map(role =>
-               role !== everyoneId ? roleMention(role) : '@everyone'
+               role !== everyoneId ? roleMention(role) : '@everyone',
             )
             .join(' ');
 
          updateEmbed.setTitle(embedTitle);
 
+         updateEmbed.setFooter(
+            `Poll #${associatedPoll.pollNumber} submitted by ${
+               nickname ?? username
+            }#${discriminator}`,
+         );
+
          let embedQuorum = Math.floor(
-            associatedPoll.allowedUsers.size * (channelConfig.quorum / 100)
+            associatedPoll.allowedUsers.size * (channelConfig.quorum / 100),
          );
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
          if (!!updateEmbed.fields.find(({ name }) => name === 'Quorum')) {
-//             if (updateEmbed.fields[1]) {
-//             updateEmbed.fields[1].value = embedQuorum.toString();
+            //             if (updateEmbed.fields[1]) {
+            //             updateEmbed.fields[1].value = embedQuorum.toString();
             updateEmbed.fields.find(({ name }) => name === 'Quorum').value =
-            embedQuorum.toString();
+               embedQuorum.toString();
          }
-         
 
-//          if (updateEmbed.fields[4]) {
-//          if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
-//             updateEmbed.fields.find(({ name }) => name === 'Voting Closes').value = `<t:${Math.floor(
-//                associatedPoll.timeEnd.getTime() / 1000
-//             )}:f>`;
-//          }
-         
+         //          if (updateEmbed.fields[4]) {
+         //          if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
+         //             updateEmbed.fields.find(({ name }) => name === 'Voting Closes').value = `<t:${Math.floor(
+         //                associatedPoll.timeEnd.getTime() / 1000
+         //             )}:f>`;
+         //          }
+
          if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
             const timeClose = {
                name: 'Voting Closes',
                value: `<t:${Math.floor(
-                  associatedPoll.timeEnd.getTime() / 1000
+                  associatedPoll.timeEnd.getTime() / 1000,
                )}:f>`,
                inline: false,
             };
@@ -313,12 +324,12 @@ module.exports = {
                   .flatMap(arr => arr[0][0].toUpperCase() + arr[0].substring(1))
                   .join(', ')} - Tied`;
             }
-            
+
             let failedChecks = [];
-            
-               console.log(
+
+            console.log(
                'nerman/admin/regeneratePollMessages.js -- jsfailedChecks before checks=> ',
-               failedChecks
+               failedChecks,
             );
 
             if (results.quorumPass === false) {
@@ -330,9 +341,9 @@ module.exports = {
             }
 
             const longestOption = longestString(
-               associatedPoll.pollData.choices
+               associatedPoll.pollData.choices,
             ).length;
-//             let resultsArray = ['```', '```'];
+            //             let resultsArray = ['```', '```'];
             let resultsArray = associatedPoll.config.voteThreshold
                ? [
                     `Threshold: ${associatedPoll.voteThreshold} ${
@@ -351,51 +362,50 @@ module.exports = {
             ]);
             for (const key in results.distribution) {
                const label = key[0].toUpperCase() + key.substring(1);
-               
+
                const votes = results.distribution[key];
                const room = longestOption - label.length;
                let optionObj = new ResultBar(label, votes, room, votesMap);
-//                let optionObj = {
-//                   label,
-//                   votes: results.distribution[key],
-//                   room: longestOption - label.length,
-//                   get spacer() {
-//                      return this.room !== 0
-//                         ? Array.from(
-//                              { length: this.room },
-//                              () => '\u200b '
-//                           ).join('')
-//                         : '';
-//                   },
-//                   get portion() {
-//                      return votesMap.get('totalVotes') !== 0
-//                         ? this.votes / votesMap.get('totalVotes')
-//                         : 0;
-//                   },
-//                   get portionOutput() {
-//                      // return ` ${(this.portion * 100).toFixed(1)}%`;
-//                      return ` ${this.votes ?? 0} votes`;
-//                   },
-//                   get bar() {
-//                      return drawBar(votesMap.get('maxLength'), this.portion);
-//                   },
-//                   get completeBar() {
-//                      return [
-//                         `${this.label}${this.spacer} `,
-//                         this.bar,
-//                         this.portionOutput,
-//                      ].join('');
-//                   },
-//                };
+               //                let optionObj = {
+               //                   label,
+               //                   votes: results.distribution[key],
+               //                   room: longestOption - label.length,
+               //                   get spacer() {
+               //                      return this.room !== 0
+               //                         ? Array.from(
+               //                              { length: this.room },
+               //                              () => '\u200b '
+               //                           ).join('')
+               //                         : '';
+               //                   },
+               //                   get portion() {
+               //                      return votesMap.get('totalVotes') !== 0
+               //                         ? this.votes / votesMap.get('totalVotes')
+               //                         : 0;
+               //                   },
+               //                   get portionOutput() {
+               //                      // return ` ${(this.portion * 100).toFixed(1)}%`;
+               //                      return ` ${this.votes ?? 0} votes`;
+               //                   },
+               //                   get bar() {
+               //                      return drawBar(votesMap.get('maxLength'), this.portion);
+               //                   },
+               //                   get completeBar() {
+               //                      return [
+               //                         `${this.label}${this.spacer} `,
+               //                         this.bar,
+               //                         this.portionOutput,
+               //                      ].join('');
+               //                   },
+               //                };
 
                votesMap.set(label, optionObj);
                resultsArray.push(optionObj.completeBar);
-//                resultsArray.splice(-1, 0, optionObj.completeBar);
+               //                resultsArray.splice(-1, 0, optionObj.completeBar);
             }
 
-//             resultsOutput = resultsArray.join('\n');
+            //             resultsOutput = resultsArray.join('\n');
             resultsOutput = codeBlock(resultsArray.join('\n'));
-
 
             // let closedEmbed = message.embeds[0];
             // console.log({ closedEmbed });
@@ -403,14 +413,14 @@ module.exports = {
             // closedEmbed.setTitle(`${closedEmbed.title}`);
 
             // console.log({ closedEmbed });
-            
+
             console.log(
                'admin/regeneratePollMessage.js -- associatedPoll.countVoters =>',
-               associatedPoll.countVoters
+               associatedPoll.countVoters,
             );
             console.log(
                'admin/regeneratePollMessage.js -- associatedPoll.countAbstains =>',
-               associatedPoll.countAbstains
+               associatedPoll.countAbstains,
             );
 
             const votersValue = `Quorum: ${
@@ -477,7 +487,7 @@ module.exports = {
             userId: interaction.user.id,
             guildId: interaction.guildId,
             channelId: interaction.channelId,
-         }
+         },
       );
    },
 };
