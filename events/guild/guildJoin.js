@@ -47,8 +47,7 @@ module.exports = {
 
       let gConfigDoc;
 
-      Logger.info('mongoURI: ', { uri: process.env.MONGODB_URI });
-      if (!guildConfigs.has(guildId)) {
+      if (!guildConfigs.has(guildId) || guildConfigs.get(guildId) === null) {
          Logger.info(
             `events/guild/guildJoin.js: guildConfig does not exist, attempting to create new one for guildId ${guildId} => `,
             { gConfigDoc },
