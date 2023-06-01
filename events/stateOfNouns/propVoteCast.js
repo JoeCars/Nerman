@@ -22,7 +22,7 @@ module.exports = {
                voterId: vote.voter.id,
                votes: Number(vote.votes),
                reason: vote.reason,
-            }
+            },
          );
 
          const {
@@ -51,6 +51,19 @@ module.exports = {
          //    'pollData.title': { $regex: propRegExp },
          // });
          // Poll.find({ 'pollData.title': { $regex: propRegExp })
+         Logger.info(
+            'events/stateOfNouns/propVoteCast.js: Checking vote data, proposalId and proposal RegExp.',
+            {
+               vote: vote,
+               proposalId: {
+                  propIdRaw: proposalId ?? 'Unable to log',
+                  propIdNum: Number(proposalId) ?? 'Unable to log',
+                  propIdStr: `${proposalId ?? 'Unable to log'}`,
+               },
+               propRegExp: propRegExp,
+            },
+         );
+
          const targetPoll = await Poll.findOne({
             'pollData.title': { $regex: propRegExp },
          })
@@ -76,7 +89,7 @@ module.exports = {
                   voterId: vote.voter.id,
                   votes: `${vote.votes}`,
                   reason: vote.reason,
-               }
+               },
             );
             return message.delete();
          }
@@ -86,7 +99,7 @@ module.exports = {
          // const titleRegex = new RegExp(/^#+\s+.+\n/);
 
          const titleRegex = new RegExp(
-            /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/
+            /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/,
          );
          // const titleRegex = new RegExp(
          //    /^(\#\s(\w+\s)+\s(\w+\s)+(\w+\s+\n?))/
@@ -116,7 +129,7 @@ module.exports = {
                votes: `${vote.votes}`,
                reason: vote.reason,
                title: titleFromPoll,
-            }
+            },
          );
 
          const titleUrl = `https://nouns.wtf/vote/${proposalId}`;
@@ -128,7 +141,7 @@ module.exports = {
          const voterHyperlink = `[${voter}](${voterUrl})`;
          const propHyperlink = hyperlink(
             `Prop ${proposalId}`,
-            `https://nouns.wtf/vote/${proposalId}`
+            `https://nouns.wtf/vote/${proposalId}`,
          );
 
          // const title =
@@ -191,22 +204,22 @@ module.exports = {
             .setURL(titleUrl)
             .setDescription(
                `${voterHyperlink} voted ${inlineCode(
-                  supportEnum[supportDetailed]
+                  supportEnum[supportDetailed],
                )} with ${inlineCode(Number(votes))} votes. ${
                   !!reason.trim() ? `\n\n${reason}` : ''
-               }`
+               }`,
             );
 
          const threadEmbed = new MessageEmbed()
             .setColor('#00FFFF')
             .setDescription(
                `${voterHyperlink} voted ${inlineCode(
-                  supportEnum[supportDetailed]
+                  supportEnum[supportDetailed],
                )} with ${inlineCode(
-                  Number(votes)
+                  Number(votes),
                )} votes on ${propHyperlink}. ${
                   !!reason.trim() ? `\n\n${reason}` : ''
-               }`
+               }`,
             );
 
          // const pollData = {
@@ -231,7 +244,7 @@ module.exports = {
                voterId: vote.voter.id,
                votes: `${vote.votes}`,
                reason: vote.reason,
-            }
+            },
          );
 
          return await message.edit({
@@ -243,7 +256,7 @@ module.exports = {
             'events/stateOfNouns/propVoteCast.js: Received an error.',
             {
                error: error,
-            }
+            },
          );
       }
    },
