@@ -53,6 +53,10 @@ module.exports = {
             { gConfigDoc },
          );
          try {
+            Logger.info(
+               'events/guild/guildJoin.js: logging to see if trycatch scope is interfering with accessing guildId',
+               { guildId: guildId ?? 'No id accessible' },
+            );
             gConfigDoc =
                (await GuildConfig.findGuildConfig(guildId)) ??
                (await GuildConfig.create(
