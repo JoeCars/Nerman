@@ -17,21 +17,22 @@ const GuildConfigSchema = new Schema(
                'db/schemas/GuildConfig.js: Attempting to find guild config.',
                {
                   guildId: guildId,
-               }
+               },
             );
 
             const guildConfig = await this.findOne({ guildId: guildId })
                .populate('pollChannels')
                .exec();
 
-            Logger.info('db/schemas/GuildConfig.js: Retrieved guild config.', {
+            Logger.info('db/schemas/GuildConfig.js: Does this config exist?.', {
                guildId: guildId,
+               guildConfig: guildConfig,
             });
 
             return guildConfig;
          },
       },
-   }
+   },
 );
 
 GuildConfigSchema.virtual('pollChannels', {
