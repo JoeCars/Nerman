@@ -59,6 +59,7 @@ module.exports = {
                   propIdRaw: proposalId ?? 'Unable to log',
                   propIdNum: Number(proposalId) ?? 'Unable to log',
                   propIdStr: `${proposalId ?? 'Unable to log'}`,
+                  propIdNumToStr: `${Number(proposalId) ?? 'Unable to log'}`,
                },
                propRegExp: propRegExp,
             },
