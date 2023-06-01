@@ -172,7 +172,7 @@ module.exports = {
          Logger.debug('events/poll/pollChannelSubmit.js: Checking 0 Quorum', {
             guildId: modal.guild.id,
             channelId: modal.channelId,
-            quorum: Math.floor(50 * (pollQuorum / 100)),
+            quorum: Math.ceil(50 * (pollQuorum / 100)),
          });
 
          if (!durRegex.test(pollDuration)) {

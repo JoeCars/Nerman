@@ -197,7 +197,7 @@ module.exports = {
 
          // l('MESSAGE EMBED WITH FOOTER WOW\n', messageEmbed);
 
-         let embedQuorum = await Math.floor(
+         let embedQuorum = await Math.ceil(
             associatedPoll.allowedUsers.size * (channelConfig.quorum / 100),
          );
 
@@ -248,7 +248,7 @@ module.exports = {
             messageToUpdate.delete();
          }
       } else {
-         
+
          const {
             nickname,
             user: { username, discriminator },
@@ -271,7 +271,7 @@ module.exports = {
             }#${discriminator}`,
          );
 
-         let embedQuorum = Math.floor(
+         let embedQuorum = Math.ceil(
             associatedPoll.allowedUsers.size * (channelConfig.quorum / 100),
          );
 
