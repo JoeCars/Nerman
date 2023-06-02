@@ -438,7 +438,7 @@ module.exports = async client => {
                         Logger.debug(
                            'db/index.js: Logging next Poll end time.',
                            {
-                              endTime: endTime.getTime(),
+                              endTime: endTime,
                            },
                         );
                      } else {
