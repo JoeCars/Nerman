@@ -2,6 +2,13 @@ module.exports = (() => {
    const eventDataMap = new Map();
 
    eventDataMap.set('auctionCreated', null);
+   eventDataMap.set('propVoteCast', {
+      proposalId: 999,
+      voter: { id: '0xC66AcE54a394f9Cd2D9EA94C9Ede671D86C44479' },
+      votes: 2,
+      supportDetailed: 0,
+      reason: 'I LOOOOOOVE REASONS!',
+   });
    eventDataMap.set('auctionBid', {
       id: 612,
       bidder: { id: '0xC66AcE54a394f9Cd2D9EA94C9Ede671D86C44479' },
@@ -27,6 +34,12 @@ module.exports = (() => {
       proposalExecuted: {
          id: 9004, // BigNum
       },
+   });
+   eventDataMap.set('nounCreatedNoun', {
+      id: 222
+   });
+   eventDataMap.set('nounCreatedNounder', {
+      id: 220
    });
 
    return eventDataMap;
