@@ -19,10 +19,12 @@ module.exports = {
             'events/stateOfNouns/propStatusChange.js: Handling a proposal change event.',
             {
                proposalId: `${data.id}`,
-            }
+            },
          );
 
          const {
+            channelId,
+            guildId,
             guild: {
                channels,
                channels: { cache },
@@ -47,96 +49,73 @@ module.exports = {
             .populate('config')
             .exec();
 
-         const propChannel =
-            (await cache.get(targetPoll.config.channelId)) ??
-            (await channels.fetch(targetPoll.config.channelId));
-
-         const propMessage = await propChannel.messages.fetch(
-            targetPoll.messageId
-         );
-
-         const messageThread = await propMessage.thread.fetch();
-
          const titleFromFindOne = targetPoll.pollData.title;
 
          Logger.debug(
             "events/stateOfNouns/propStatusChange.js: Checking the target poll's title.",
             {
                title: titleFromFindOne,
-            }
+               poll: targetPoll,
+            },
          );
 
-         // const { id } = data;
-         // const titleRegex = new RegExp(/^#+\s+.+\n/);
+         // !testing conditional , will use empty var instead
+         // const voteEmbedFindOne = new MessageEmbed()
+         let voteEmbedFindOne;
 
-         // const titleRegex = new RegExp(
-         //    /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/
-         // );
+         if (channelId !== process.env.AGORA_CHANNEL_ID) {
+            voteEmbedFindOne = new MessageEmbed()
+               .setColor('#000000')
+               .setTitle(titleFromFindOne)
+               .setDescription(
+                  `https://www.nounsagora.com/proposals/${proposalId}\n${statusChange}`,
+               );
+         } else {
+            voteEmbedFindOne = new MessageEmbed()
+               .setColor('#000000')
+               .setTitle(titleFromFindOne)
+               .setDescription(
+                  `https://nouns.wtf/vote/${proposalId}\n${statusChange}`,
+               );
+         }
 
-         // const title = description
-         //    .match(titleRegex)[0]
-         //    .replaceAll(/^(#\s)|(\n+)$/g, '');
-         // l({ title });
+         if (guildId === process.env.DISCORD_GUILD_ID) {
+            const propChannel =
+               (await cache.get(targetPoll.config.channelId)) ??
+               (await channels.fetch(targetPoll.config.channelId));
 
-         // const titleHyperlink = `Prop ${proposalId} - [${voter}](https://nouns.wtf/vote/${proposalId})`;
-         // const description = `https://nouns.wtf/vote/${propId}`;
-         // l({ titleHyperlink });
-
-         // const intRegex = new RegExp(/^\d*$/);
-
-         // console.log({ everyoneId });
-         // console.log(channelConfig.allowedRoles);
-
-         // const messageObject = await initPollMessage({
-         //    propId,
-         //    title,
-         //    description,
-         //    channelConfig,
-         //    everyoneId,
-         // });
-
-         // console.log(
-         //    '-----------------------------------------------\n',
-         //    messageObject.embeds,
-         //    '-----------------------------------------------\n'
-         // );
-
-         // const voteEmbedFind = new MessageEmbed()
-         //    .setTitle(titleFromFind)
-         //    .setDescription(
-         //       `https://nouns.wtf/vote/${proposalId}\n${statusChange}`
-         //    );
-         const voteEmbedFindOne = new MessageEmbed()
-            .setTitle(titleFromFindOne)
-            .setDescription(
-               `https://nouns.wtf/vote/${proposalId}\n${statusChange}`
+            const propMessage = await propChannel.messages.fetch(
+               targetPoll.messageId,
             );
 
-         const pollThreadEmbed = new MessageEmbed()
-            .setColor('#00FFFF')
-            .setDescription(
-               `Proposal status changed to ${inlineCode(statusChange)}`
-            );
+            const messageThread = await propMessage.thread.fetch();
 
-         await messageThread.send({ embeds: [pollThreadEmbed] });
+            const pollThreadEmbed = new MessageEmbed()
+               .setColor('#00FFFF')
+               .setDescription(
+                  `Proposal status changed to ${inlineCode(statusChange)}`,
+               );
+
+            await messageThread.send({ embeds: [pollThreadEmbed] });
+         }
+
+         await message.edit({
+            content: null,
+            embeds: [voteEmbedFindOne],
+         });
 
          Logger.info(
             'events/stateOfNouns/propStatusChange.js: Finished handling a proposal change event.',
             {
                proposalId: `${data.id}`,
-            }
+            },
          );
-
-         return await message.edit({
-            content: null,
-            embeds: [voteEmbedFindOne],
-         });
       } catch (error) {
          Logger.error(
             'events/stateOfNouns/propStatusChange.js: Received an error.',
             {
                error: error,
-            }
+            },
          );
       }
    },

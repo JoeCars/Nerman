@@ -29,6 +29,7 @@ module.exports = {
             guild: {
                channels: { cache },
             },
+            channelId, // for evaluating embedTitle
             client,
          } = message;
 
@@ -133,7 +134,17 @@ module.exports = {
             },
          );
 
-         const titleUrl = `https://nouns.wtf/vote/${proposalId}`;
+         // todo change this back when we have the config stuff sorted out
+         // const titleUrl = `https://nouns.wtf/vote/${proposalId}`;
+         let titleUrl;
+         // todo change this DEPLOY_STAGE to 'production' when testing passes
+         // if (process.env.DEPLOY_STAGE === 'development') {
+         if (process.env.DEPLOY_STAGE === 'production') {
+            titleUrl =
+               channelId !== process.env.AGORA_CHANNEL_ID
+                  ? `https://nouns.wtf/vote/${proposalId}`
+                  : `https://www.nounsagora.com/proposals/${proposalId}`;
+         }
 
          const voter =
             (await Nouns.ensReverseLookup(voterId)) ??

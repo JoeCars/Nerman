@@ -49,15 +49,81 @@ module.exports = {
 
             const nounsGovId = process.env.NOUNS_GOV_ID;
 
-            const nounsGovChannel = guildCache
-               .get(process.env.DISCORD_GUILD_ID)
-               .channels.cache.get(nounsGovId);
+            // todo we have to come back later and change this when we make the actual configs so we don't need to rely on this sort of messy logic
+            // todo also make sure to change this back to 'production' before pushing
+            // if (process.env.DEPLOY_STAGE === 'development') {
+            if (process.env.DEPLOY_STAGE === 'production') {
+               try {
+                  const ncdGuildId = process.env.NCD_GUILD_ID;
+                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
 
-            let message = await nounsGovChannel.send({
-               content: 'Generating vote data...',
-            });
+                  const agoraGuildId = process.env.AGORA_GUILD_ID;
+                  const agoraChannelId = process.env.AGORA_CHANNEL_ID;
 
-            client.emit('propVoteCast', message, vote);
+                  // Nouncil
+                  const nounsGovChannel = guildCache
+                     .get(process.env.DISCORD_GUILD_ID)
+                     .channels.cache.get(nounsGovId);
+
+                  // Nouns Community Discord
+                  const ncdChannel = guildCache
+                     .get(ncdGuildId)
+                     .channels.cache.get(ncdChannelId);
+
+                  // Agora
+                  const agoraChannel = guildCache
+                     .get(agoraGuildId)
+                     .channels.cache.get(agoraChannelId);
+
+                  Logger.info(
+                     'events/ready.js: On VoteCast. DEPLOY_STAGE = "production"',
+                     {
+                        nounsGuildId:
+                           process.env.DISCORD_GUILD_ID ?? 'Not Found',
+                        nounsChannelId: nounsGovId ?? 'Not Found',
+                        ncdGuildId: ncdGuildId ?? 'Not Found',
+                        ncdChannelId: ncdChannelId ?? 'Not Found',
+                        agoraGuildId: agoraGuildId ?? 'Not Found',
+                        agoraChannelId: agoraChannelId ?? 'Not Found',
+                     },
+                  );
+
+                  const channelList = [
+                     nounsGovChannel,
+                     ncdChannel,
+                     agoraChannel,
+                  ];
+
+                  const promises = channelList.map(async channel => {
+                     let message = await channel.send({
+                        content: 'Generating vote data...',
+                     });
+
+                     return message;
+                  });
+
+                  const resolved = await Promise.all(promises);
+
+                  resolved.forEach(message => {
+                     client.emit('propVoteCast', message, vote);
+                  });
+               } catch (error) {
+                  Logger.error(
+                     'events/ready.js: On VoteCast. Encountered an error',
+                     { error },
+                  );
+               }
+            } else {
+               const nounsGovChannel = guildCache
+                  .get(process.env.DISCORD_GUILD_ID)
+                  .channels.cache.get(nounsGovId);
+
+               let message = await nounsGovChannel.send({
+                  content: 'Generating vote data...',
+               });
+
+               client.emit('propVoteCast', message, vote);
+            }
          });
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
@@ -80,6 +146,7 @@ module.exports = {
                },
             );
 
+            // todo fix these silly ternaries, I hate them, they're no longer needed
             const propChannelId =
                process.env.DEPLOY_STAGE === 'development'
                   ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
@@ -88,97 +155,117 @@ module.exports = {
             const propChannel = await guildCache
                .get(process.env.DISCORD_GUILD_ID)
                .channels.cache.get(propChannelId);
-            const configExists = !!(await PollChannel.countDocuments({
-               channelId: propChannelId,
-            }).exec());
-            if (!configExists) {
-               Logger.warn(
-                  'events/ready.js: On ProposalCreatedWithRequirements. No config. Exiting.',
-                  {
-                     id: `${data.id}`,
-                     proposer: `${data.proposer.id}`,
-                  },
-               );
-               return;
-            }
 
             const { id: propId, description: desc } = data;
 
-            // todo finetune thew regexp to extract title from any possible markdown
-            // const titleRegex = new RegExp(
-            //    /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*\/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/
-            // );
-
-            // const titleRegex = new RegExp(/^\N+/);
             const titleRegex = new RegExp(/^(\#\s(?:\S+\s?)+(?:\S+\n?))/);
 
             const title = desc
                .match(titleRegex)[0]
                .replaceAll(/^(#\s)|(\n+)$/g, '');
-            const description = `https://nouns.wtf/vote/${propId}`;
+            // const description = `https://nouns.wtf/vote/${propId}`;
+            let description;
 
-            let message = await propChannel.send({
-               content: 'Generating proposal...',
-            });
+            // todo switch this to production when finished testing
+            // if (process.env.DEPLOY_STAGE === 'development') {
+            if (process.env.DEPLOY_STAGE === 'production') {
+               // Nouncil
+               const nounsGovChannel = guildCache
+                  .get(process.env.DISCORD_GUILD_ID)
+                  .channels.cache.get(nounsGovId);
 
-            client.emit('newProposal', message, data);
+               // NCD
+               const ncdGuildId = process.env.NCD_GUILD_ID;
+               const ncdChannelId = process.env.NCD_CHANNEL_ID;
+               const ncdChannel = guildCache
+                  .get(ncdGuildId)
+                  .channels.cache.get(ncdChannelId);
+
+               // Agora
+               const agoraGuildId = process.env.AGORA_GUILD_ID;
+               const agoraChannelId = process.env.AGORA_CHANNEL_ID;
+               const agoraChannel = guildCache
+                  .get(agoraGuildId)
+                  .channels.cache.get(agoraChannelId);
+
+               // List of channels to output events to, can't wait for config
+               const channelList = [nounsGovChannel, ncdChannel, agoraChannel];
+
+               const configExists = !!(await PollChannel.countDocuments({
+                  channelId: propChannelId,
+               }).exec());
+
+               if (!configExists) {
+                  Logger.warn(
+                     'events/ready.js: On ProposalCreatedWithRequirements. No config. Aborting output of Proposal Poll.',
+                     {
+                        id: `${data.id}`,
+                        proposer: `${data.proposer.id}`,
+                     },
+                  );
+                  // return;
+               } else {
+                  let message = await propChannel.send({
+                     content: 'Generating proposal...',
+                  });
+
+                  client.emit('newProposal', message, data);
+               }
+
+               const promises = channelList.map(async channel => {
+                  let message = await channel.send({
+                     content: 'New proposal data...',
+                  });
+
+                  return message;
+               });
+
+               const resolved = await Promise.all(promises);
+
+               resolved.forEach(message => {
+                  client.emit('propCreated', message, data);
+               });
+            } else {
+               const configExists = !!(await PollChannel.countDocuments({
+                  channelId: propChannelId,
+               }).exec());
+
+               if (!configExists) {
+                  Logger.warn(
+                     'events/ready.js: On ProposalCreatedWithRequirements. Aborting output of Proposal Poll.',
+                     {
+                        id: `${data.id}`,
+                        proposer: `${data.proposer.id}`,
+                     },
+                  );
+                  return;
+               }
+
+               // const { id: propId, description: desc } = data;
+
+               // todo finetune thew regexp to extract title from any possible markdown
+               // const titleRegex = new RegExp(
+               //    /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*\/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/
+               // );
+
+               // const titleRegex = new RegExp(/^\N+/);
+               // const titleRegex = new RegExp(/^(\#\s(?:\S+\s?)+(?:\S+\n?))/);
+
+               // const title = desc
+               //    .match(titleRegex)[0]
+               //    .replaceAll(/^(#\s)|(\n+)$/g, '');
+               // const description = `https://nouns.wtf/vote/${propId}`;
+
+               let message = await propChannel.send({
+                  content: 'Generating proposal...',
+               });
+
+               // todo I should rename these events to be less confusing
+               client.emit('newProposal', message, data);
+               // client.emit('propCreated', message, data);
+            }
          });
 
-         // Nouns.on(
-         //    'ProposalCreatedWithRequirements',
-         //    (data: nerman.EventData.ProposalCreatedWithRequirements) => {
-         // Nouns.on('ProposalCreatedWithRequirements', async data => {
-         //    l('ready.js -- NOUNS.ON : PROPOSAL CREATED WITH REQUIREMENTS');
-         //    l(data);
-
-         //    l({
-         //       'prop id': data.id,
-         //       'proposer address': data.proposer.id,
-         //       startBlock: data.startBlock,
-         //       endBlock: data.endBlock,
-         //       quorumVotes: data.quorumVotes,
-         //       proposalThreshold: data.proposalThreshold,
-         //       description: data.description,
-         //       // values: data.values, // (add these to get total ETH?)
-         //    });
-         //    // prop id: data.id
-         //    // proposer address:data.proposer.id
-         //    // data.startBlock, data.endBlock
-         //    // data.quorumVotes
-         //    // data.proposalThreshold
-         //    // description: data.description);
-         //    // data.values (add these to get total ETH?)
-         // });
-
-         // Nouns.on('VoteCast', (vote: nerman.EventData.VoteCast) => {
-         // Nouns.on('VoteCast', async vote => {
-         //    l('ready.js -- NOUNS.ON : VOTE CAST');
-         //    // Prop Id:          vote.proposalId
-         //    // Voter Address:    vote.voter.id
-         //    // Vote:             vote.votes
-         //    // supportDetailed:  vote.supportDetailed 0=against, 1=for, 2=abstain
-         //    // Reason:           vote.reason
-
-         //    l({
-         //       'Prop Id': vote.proposalId,
-         //       'Voter Address': vote.voter.id,
-         //       Vote: vote.votes,
-         //       supportDetailed: vote.supportDetailed, // 0=against, 1=for, 2=abstain,
-         //       Reason: vote.reason,
-         //    });
-
-         //    tbl({
-         //       'Prop Id': vote.proposalId,
-         //       'Voter Address': vote.voter.id,
-         //       Vote: vote.votes,
-         //       supportDetailed: vote.supportDetailed, // 0=against, 1=for, 2=abstain,
-         //       Reason: vote.reason,
-         //    });
-         // });
-
-         // Nouns.on(
-         //    'ProposalCanceled',
-         //    (data: nerman.EventData.ProposalCanceled) => {
          Nouns.on('ProposalCanceled', async data => {
             Logger.info('events/ready.js: On ProposalCanceled.', {
                id: `${data.id}`,
@@ -192,11 +279,57 @@ module.exports = {
 
             const status = 'Canceled';
 
-            let message = await nounsGovChannel.send({
-               content: 'Proposal status changed...',
-            });
+            // todo change to production after testing
+            // if (process.env.DEPLOY_STAGE === 'development') {
+            if (process.env.DEPLOY_STAGE === 'production') {
+               try {
+                  // NCD
+                  const ncdGuildId = process.env.NCD_GUILD_ID;
+                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
+                  const ncdChannel = guildCache
+                     .get(ncdGuildId)
+                     .channels.cache.get(ncdChannelId);
 
-            client.emit('propStatusChange', message, status, data);
+                  // Agora
+                  const agoraGuildId = process.env.AGORA_GUILD_ID;
+                  const agoraChannelId = process.env.AGORA_CHANNEL_ID;
+                  const agoraChannel = guildCache
+                     .get(agoraGuildId)
+                     .channels.cache.get(agoraChannelId);
+
+                  // List of channels to output events to, can't wait for config
+                  const channelList = [
+                     nounsGovChannel,
+                     ncdChannel,
+                     agoraChannel,
+                  ];
+
+                  const promises = channelList.map(async channel => {
+                     let message = await channel.send({
+                        content: 'Proposal status changed...',
+                     });
+
+                     return message;
+                  });
+
+                  const resolved = await Promise.all(promises);
+
+                  resolved.forEach(message => {
+                     client.emit('propStatusChange', message, status, data);
+                  });
+               } catch (error) {
+                  Logger.error(
+                     'events/ready.js: ProposalCanceled - an error has occurred',
+                     { error },
+                  );
+               }
+            } else {
+               let message = await nounsGovChannel.send({
+                  content: 'Proposal status changed...',
+               });
+
+               client.emit('propStatusChange', message, status, data);
+            }
          });
 
          // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
@@ -214,11 +347,57 @@ module.exports = {
 
             const status = 'Queued';
 
-            let message = await nounsGovChannel.send({
-               content: 'Proposal status changed...',
-            });
+            // todo change to production after testing
+            // if (process.env.DEPLOY_STAGE === 'development') {
+            if (process.env.DEPLOY_STAGE === 'production') {
+               try {
+                  // NCD
+                  const ncdGuildId = process.env.NCD_GUILD_ID;
+                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
+                  const ncdChannel = guildCache
+                     .get(ncdGuildId)
+                     .channels.cache.get(ncdChannelId);
 
-            client.emit('propStatusChange', message, status, data);
+                  // Agora
+                  const agoraGuildId = process.env.AGORA_GUILD_ID;
+                  const agoraChannelId = process.env.AGORA_CHANNEL_ID;
+                  const agoraChannel = guildCache
+                     .get(agoraGuildId)
+                     .channels.cache.get(agoraChannelId);
+
+                  // List of channels to output events to, can't wait for config
+                  const channelList = [
+                     nounsGovChannel,
+                     ncdChannel,
+                     agoraChannel,
+                  ];
+
+                  const promises = channelList.map(async channel => {
+                     let message = await channel.send({
+                        content: 'Proposal status changed...',
+                     });
+
+                     return message;
+                  });
+
+                  const resolved = await Promise.all(promises);
+
+                  resolved.forEach(message => {
+                     client.emit('propStatusChange', message, status, data);
+                  });
+               } catch (error) {
+                  Logger.error(
+                     'events/ready.js: ProposalQueued - an error has occurred',
+                     { error },
+                  );
+               }
+            } else {
+               let message = await nounsGovChannel.send({
+                  content: 'Proposal status changed...',
+               });
+
+               client.emit('propStatusChange', message, status, data);
+            }
          });
 
          // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
@@ -235,11 +414,57 @@ module.exports = {
 
             const status = 'Vetoed';
 
-            let message = await nounsGovChannel.send({
-               content: 'Proposal status changed...',
-            });
+            // todo change to production after testing
+            // if (process.env.DEPLOY_STAGE === 'development') {
+            if (process.env.DEPLOY_STAGE === 'production') {
+               try {
+                  // NCD
+                  const ncdGuildId = process.env.NCD_GUILD_ID;
+                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
+                  const ncdChannel = guildCache
+                     .get(ncdGuildId)
+                     .channels.cache.get(ncdChannelId);
 
-            client.emit('propStatusChange', message, status, data);
+                  // Agora
+                  const agoraGuildId = process.env.AGORA_GUILD_ID;
+                  const agoraChannelId = process.env.AGORA_CHANNEL_ID;
+                  const agoraChannel = guildCache
+                     .get(agoraGuildId)
+                     .channels.cache.get(agoraChannelId);
+
+                  // List of channels to output events to, can't wait for config
+                  const channelList = [
+                     nounsGovChannel,
+                     ncdChannel,
+                     agoraChannel,
+                  ];
+
+                  const promises = channelList.map(async channel => {
+                     let message = await channel.send({
+                        content: 'Proposal status changed...',
+                     });
+
+                     return message;
+                  });
+
+                  const resolved = await Promise.all(promises);
+
+                  resolved.forEach(message => {
+                     client.emit('propStatusChange', message, status, data);
+                  });
+               } catch (error) {
+                  Logger.error(
+                     'events/ready.js: ProposalVetoed - an error has occurred',
+                     { error },
+                  );
+               }
+            } else {
+               let message = await nounsGovChannel.send({
+                  content: 'Proposal status changed...',
+               });
+
+               client.emit('propStatusChange', message, status, data);
+            }
          });
 
          // Nouns.on(
@@ -258,11 +483,57 @@ module.exports = {
 
             const status = 'Executed';
 
-            let message = await nounsGovChannel.send({
-               content: 'Proposal status changed...',
-            });
+            // todo change to production after testing
+            // if (process.env.DEPLOY_STAGE === 'development') {
+            if (process.env.DEPLOY_STAGE === 'production') {
+               try {
+                  // NCD
+                  const ncdGuildId = process.env.NCD_GUILD_ID;
+                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
+                  const ncdChannel = guildCache
+                     .get(ncdGuildId)
+                     .channels.cache.get(ncdChannelId);
 
-            client.emit('propStatusChange', message, status, data);
+                  // Agora
+                  const agoraGuildId = process.env.AGORA_GUILD_ID;
+                  const agoraChannelId = process.env.AGORA_CHANNEL_ID;
+                  const agoraChannel = guildCache
+                     .get(agoraGuildId)
+                     .channels.cache.get(agoraChannelId);
+
+                  // List of channels to output events to, can't wait for config
+                  const channelList = [
+                     nounsGovChannel,
+                     ncdChannel,
+                     agoraChannel,
+                  ];
+
+                  const promises = channelList.map(async channel => {
+                     let message = await channel.send({
+                        content: 'Proposal status changed...',
+                     });
+
+                     return message;
+                  });
+
+                  const resolved = await Promise.all(promises);
+
+                  resolved.forEach(message => {
+                     client.emit('propStatusChange', message, status, data);
+                  });
+               } catch (error) {
+                  Logger.error(
+                     'events/ready.js: ProposalExecuted - an error has occurred',
+                     { error },
+                  );
+               }
+            } else {
+               let message = await nounsGovChannel.send({
+                  content: 'Proposal status changed...',
+               });
+
+               client.emit('propStatusChange', message, status, data);
+            }
          });
 
          Nouns.on('Transfer', async data => {
@@ -301,24 +572,47 @@ module.exports = {
          });
 
          Nouns.on('NounCreated', async data => {
-            const guildId = process.env.NOGGLES_DISCORD_ID;
-            const channelId = process.env.NOGGLES_CHANNEL_ID;
-            const nogglesChannel = await guildCache
-               .get(guildId)
-               .channels.cache.get(channelId);
-
-            console.log(
-               'NounsToken | NounCreated | id:' +
-                  data.id +
-                  ', seed: ' +
-                  JSON.stringify(data.seed),
-            );
+            // console.log(
+            //    'NounsToken | NounCreated | id:' +
+            //       data.id +
+            //       ', seed: ' +
+            //       JSON.stringify(data.seed),
+            // );
 
             Logger.info('events/ready.js: On NounCreated.', {
                nounId: `${data.id}`,
             });
 
-            client.emit('nounCreated', nogglesChannel, data);
+            const nogGuildId = process.env.NOGGLES_DISCORD_ID;
+            const nogChanId = process.env.NOGGLES_CHANNEL_ID;
+            const nogglesChannel = await guildCache
+               .get(nogGuildId)
+               .channels.cache.get(nogChanId);
+
+            // todo switch to production
+            // if (process.env.DEPLOY_STAGE === 'development') {
+            if (process.env.DEPLOY_STAGE === 'production') {
+               try {
+                  const ncdGuildId = process.env.NCD_GUILD_ID;
+                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
+                  const ncdChannel = guildCache
+                     .get(ncdGuildId)
+                     .channels.cache.get(ncdChannelId);
+
+                  const channelList = [nogglesChannel, ncdChannel];
+
+                  channelList.forEach(channel => {
+                     client.emit('nounCreated', channel, data);
+                  });
+               } catch (error) {
+                  Logger.error(
+                     'events/ready.js: nounCreated - Encountered an erro!',
+                     { error },
+                  );
+               }
+            } else {
+               client.emit('nounCreated', nogglesChannel, data);
+            }
          });
 
          Nouns.on('AuctionBid', async data => {
@@ -336,7 +630,32 @@ module.exports = {
                .get(guildId)
                .channels.cache.get(nounsAuctionId);
 
-            client.emit('auctionBid', nounsAuctionChannel, data);
+            // todo change to production after testing
+            // if (process.env.DEPLOY_STAGE === 'development') {
+            if (process.env.DEPLOY_STAGE === 'production') {
+               try {
+                  // NCD
+                  const ncdGuildId = process.env.NCD_GUILD_ID;
+                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
+                  const ncdChannel = guildCache
+                     .get(ncdGuildId)
+                     .channels.cache.get(ncdChannelId);
+
+                  // List of channels to output events to, can't wait for config
+                  const channelList = [nounsAuctionChannel, ncdChannel];
+
+                  channelList.forEach(channel => {
+                     channel.client.emit('auctionBid', channel, data);
+                  });
+               } catch (error) {
+                  Logger.error(
+                     'events/ready.js: ProposalExecuted - an error has occurred',
+                     { error },
+                  );
+               }
+            } else {
+               client.emit('auctionBid', nounsAuctionChannel, data);
+            }
          });
 
          // *************************************************************

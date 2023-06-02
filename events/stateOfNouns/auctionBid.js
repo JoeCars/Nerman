@@ -35,6 +35,7 @@ module.exports = {
 
          const bidderLink = hyperlink(bidderENS, `${ethBaseUrl}${bidderId}`);
 
+
          const nounsLink = hyperlink(
             `Noun ${id}`,
             `https://nouns.wtf/noun/${id}`

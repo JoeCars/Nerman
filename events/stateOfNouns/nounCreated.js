@@ -11,6 +11,7 @@ module.exports = {
     */
    async execute(nogglesChannel, data) {
       try {
+         console.log(data);
          const { id } = data;
 
          Logger.info('nounCreated.js', {

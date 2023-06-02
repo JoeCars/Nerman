@@ -1,3 +1,4 @@
+// todo I should rename newProposal to reduce confusion maybe? Will workshop it
 const {
    MessageEmbed,
    MessageButton,
@@ -309,11 +310,11 @@ module.exports = {
 
          client.emit('enqueuePoll', newPoll);
 
-         let nounsGovMessage = await nounsGovChannel.send({
-            content: 'New proposal data...',
-         });
+         // let nounsGovMessage = await nounsGovChannel.send({
+         //    content: 'New proposal data...',
+         // });
 
-         client.emit('propCreated', nounsGovMessage, newPoll, propId);
+         // client.emit('propCreated', nounsGovMessage, newPoll, propId);
 
          Logger.info('events/poll/newProposal.js: Finished creating proposal.');
       } catch (error) {
