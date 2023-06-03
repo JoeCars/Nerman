@@ -12,6 +12,7 @@ const ResultBar = require('../../../structures/ResultBar');
 const { initPollMessage } = require('../../../helpers/poll/initPollMessage');
 const { drawBar, longestString } = require('../../../helpers/poll');
 
+const Logger = require('../../../helpers/logger');
 const { log: l } = console;
 
 // fixme change this once we have a better way of nailing down the guild's admin permissions
