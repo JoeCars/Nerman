@@ -99,12 +99,50 @@ module.exports = {
                         content: 'Generating vote data...',
                      });
 
+                     Logger.info(
+                        'events/ready.js: On VoteCast. Mapping message `promises`...\nThis message info:',
+                        {
+                           messageId: message.id,
+                           messageContent: message.content,
+                           authorId: message.author.id,
+                           authorUsername: message.author.username,
+                           member: {
+                              id: message.member.id,
+                              displayName: message.member.displayName,
+                              userName: message.member.user.username,
+                           },
+                           channelId: message.channelId,
+                           channelName: message.channel.name,
+                           guildId: message.guildId,
+                           guildName: message.guild.name,
+                        },
+                     );
+
                      return message;
                   });
 
                   const resolved = await Promise.all(promises);
 
                   resolved.forEach(message => {
+                     Logger.info(
+                        'events/ready.js: On VoteCast. `resolved`.forEach(message =>{})...\nThis message info:',
+                        {
+                           messageId: message.id,
+                           messageContent: message.content,
+                           authorId: message.author.id,
+                           authorUsername: message.author.username,
+                           member: {
+                              id: message.member.id,
+                              displayName: message.member.displayName,
+                              userName: message.member.user.username,
+                           },
+                           channelId: message.channelId,
+                           channelName: message.channel.name,
+                           guildId: message.guildId,
+                           guildName: message.guild.name,
+                        },
+                     );
+
                      client.emit('propVoteCast', message, vote);
                   });
                } catch (error) {
