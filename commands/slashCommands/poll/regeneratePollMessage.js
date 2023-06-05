@@ -315,14 +315,16 @@ module.exports = {
                'commands/slashCommands/poll/regeneratePollMessage.js: \nif(!embedResults) => ',
                !embedResults,
             );
+
+            // todo Once again, I need to abstract this whole mess here. I'm basically salivating for the chance to, but right now I just have to move fast on other things.
             if (!embedResults) {
                console.log(
                   'commands/slashCommands/poll/regeneratePollMessage.js: \nif(!embedResults)\nTRUE -- accessing if() clausee',
                );
 
-               const results = updatedPoll.results;
+               const results = associatedPoll.results;
                const longestOption = longestString(
-                  updatedPoll.pollData.choices,
+                  associatedPoll.pollData.choices,
                ).length;
 
                console.log(
@@ -331,14 +333,14 @@ module.exports = {
                );
 
                console.log(
-                  'events/poll/pollVote.js -- updatedPoll.config => ',
-                  updatedPoll.config,
+                  'events/poll/pollVote.js -- associatedPoll.config => ',
+                  associatedPoll.config,
                );
 
                let resultsArray = pollStatus.config.voteThreshold
                   ? [
-                       `Threshold: ${updatedPoll.voteThreshold} ${
-                          updatedPoll.voteThreshold > 1 ? 'votes' : 'vote'
+                       `Threshold: ${associatedPoll.voteThreshold} ${
+                          associatedPoll.voteThreshold > 1 ? 'votes' : 'vote'
                        }\n`,
                     ]
                   : [];
@@ -347,7 +349,7 @@ module.exports = {
 
                const barWidth = 8;
                let totalVotes = results.totalVotes;
-               // let totalVotes = updatedPoll.results.totalVotes;
+               // let totalVotes = associatedPoll.results.totalVotes;
 
                let votesMap = new Map([
                   ['maxLength', barWidth],
@@ -377,7 +379,7 @@ module.exports = {
                   resultsArray.push(optionObj.completeBar);
                }
 
-               resultsArray.push(`\nAbstains: ${updatedPoll.abstains.size}`);
+               resultsArray.push(`\nAbstains: ${associatedPoll.abstains.size}`);
 
                // console.log(votesMap);
 
