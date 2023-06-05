@@ -302,10 +302,78 @@ module.exports = {
          ];
 
          if (associatedPoll.config.liveVisualFeed === true) {
-            const embedResults =
+            let embedResults =
                messageToUpdate.embeds[0]?.fields.find(
                   ({ name }) => name === 'Results',
-               ).value ?? 'WEEEE';
+               )?.value;
+
+            if (!!embedResults) {
+               const results = updatedPoll.results;
+               const longestOption = longestString(
+                  updatedPoll.pollData.choices,
+               ).length;
+
+               console.log(
+                  'events/poll/pollVote.js -- longestOption => ',
+                  longestOption,
+               );
+
+               console.log(
+                  'events/poll/pollVote.js -- updatedPoll.config => ',
+                  updatedPoll.config,
+               );
+
+               let resultsArray = pollStatus.config.voteThreshold
+                  ? [
+                       `Threshold: ${updatedPoll.voteThreshold} ${
+                          updatedPoll.voteThreshold > 1 ? 'votes' : 'vote'
+                       }\n`,
+                    ]
+                  : [];
+
+               let resultsOutput = [];
+
+               const barWidth = 8;
+               let totalVotes = results.totalVotes;
+               // let totalVotes = updatedPoll.results.totalVotes;
+
+               let votesMap = new Map([
+                  ['maxLength', barWidth],
+                  ['totalVotes', totalVotes],
+               ]);
+               for (const key in results.distribution) {
+                  const label = key[0].toUpperCase() + key.substring(1);
+
+                  console.log('db/index.js -- label => ', label);
+                  console.log('db/index.js -- label.length => ', label.length);
+                  console.log(
+                     'db/index.js -- logging :  longestOption - label.length => ',
+                     longestOption - label.length,
+                  );
+                  const votes = results.distribution[key];
+                  const room = longestOption - label.length;
+                  let optionObj = new ResultBar(label, votes, room, votesMap);
+
+                  console.log('optionObj => ', optionObj);
+                  console.log(
+                     'optionObj.completeBar => ',
+                     optionObj.completeBar,
+                  );
+
+                  votesMap.set(label, optionObj);
+                  // resultsArray.splice(-1, 0, optionObj.completeBar);
+                  resultsArray.push(optionObj.completeBar);
+               }
+
+               resultsArray.push(`\nAbstains: ${updatedPoll.abstains.size}`);
+
+               // console.log(votesMap);
+
+               // resultsOutput = resultsArray.join('\n');
+               resultsOutput = codeBlock(resultsArray.join('\n'));
+
+               embedResults = resultsOutput;
+            }
 
             newEmbedFields.splice(1, 0, {
                name: 'Results',
