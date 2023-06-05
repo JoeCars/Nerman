@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const { drawBlock, drawSpace } = require('../../helpers/poll');
+const { drawBlock, drawSpace, drawBar } = require('../../helpers/poll');
 
 describe('helpers/poll.js tests', function () {
    describe('drawBlock() tests', function () {
@@ -58,6 +58,36 @@ describe('helpers/poll.js tests', function () {
 
          expect(results1).to.equal('');
          expect(results2).to.equal('');
+      });
+   });
+
+   describe('drawBar() tests', function () {
+      it("should draw a bar of 8 that's 60% full", function () {
+         const results = drawBar(8, 0.6);
+
+         expect(results).to.equal('▏████\u200b \u200b \u200b \u200b ▕');
+      });
+
+      it("should draw a bar of 6 that's 50% full", function () {
+         const results = drawBar(6, 0.5);
+
+         expect(results).to.equal('▏███\u200b \u200b \u200b ▕');
+      });
+
+      it("should draw a bar of 5 that's 80% full", function () {
+         const results = drawBar(5, 0.8);
+
+         expect(results).to.equal('▏████\u200b ▕');
+      });
+
+      it("should draw a bar of 8 that's 55% full", function () {
+         const results = drawBar(8, 0.55);
+
+         // NOTE: I feel like the fractional logic in drawBar() is
+         // needlessly complex and accomplishes nothing.
+         // Why not just have it be Floor(8 * 0.55) solid bars
+         // with the remaining space filled with empty space?
+         expect(results).to.equal('▏████\u200b \u200b \u200b \u200b ▕');
       });
    });
 });
