@@ -15,7 +15,7 @@ const getFiles = async (path, ending) => {
       if (file.isDirectory()) {
          fileList = [
             ...fileList,
-            ...(await getFiles(`${path}/${file.name}`, '.js')),
+            ...(await getFiles(`${path}/${file.name}`, ending)),
          ];
       } else if (file.name.endsWith(ending)) {
          // if (file.name.endsWith(ending)) {
