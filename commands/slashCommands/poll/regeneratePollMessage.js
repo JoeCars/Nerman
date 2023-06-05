@@ -239,7 +239,7 @@ module.exports = {
                userId: interaction.user.id,
                guildId: interaction.guildId,
                channelId: interaction.channelId,
-               newMessage: newMessage,
+               newMessage: newMsg,
             },
          );
 
@@ -264,11 +264,11 @@ module.exports = {
          // disabled for meow
          // updateEmbed.setTitle(embedTitle);
 
-         updateEmbed.setFooter(
-            `Poll #${associatedPoll.pollNumber} submitted by ${
-               nickname ?? username
-            }#${discriminator}`,
-         );
+         // updateEmbed.setFooter(
+         //    `Poll #${associatedPoll.pollNumber} submitted by ${
+         //       nickname ?? username
+         //    }#${discriminator}`,
+         // );
 
          let embedQuorum = Math.ceil(
             associatedPoll.allowedUsers.size * (channelConfig.quorum / 100),
