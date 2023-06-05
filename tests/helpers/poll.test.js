@@ -5,6 +5,7 @@ const {
    drawSpace,
    drawBar,
    longestString,
+   randomNumber,
 } = require('../../helpers/poll');
 
 describe('helpers/poll.js tests', function () {
@@ -120,6 +121,27 @@ describe('helpers/poll.js tests', function () {
          const results = longestString([]);
 
          expect(results).to.be.undefined;
+      });
+   });
+
+   // TODO: Random number shouldn't be async.
+   describe('randomNumber() tests', function () {
+      it('should stay within the limit', async function () {
+         for (let i = 0; i < 100; ++i) {
+            expect(await randomNumber(10)).to.be.within(0, 9);
+         }
+      });
+
+      it('should be 0 when the limit is 0', async function () {
+         for (let i = 0; i < 100; ++i) {
+            expect(await randomNumber(0)).to.equal(0);
+         }
+      });
+
+      it('should be weird when the limit is negative', async function () {
+         for (let i = 0; i < 100; ++i) {
+            expect(await randomNumber(-10)).to.be.within(-10, -1);
+         }
       });
    });
 });
