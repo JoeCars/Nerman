@@ -337,7 +337,7 @@ module.exports = {
                   associatedPoll.config,
                );
 
-               let resultsArray = pollStatus.config.voteThreshold
+               let resultsArray = associatedPoll.config.voteThreshold
                   ? [
                        `Threshold: ${associatedPoll.voteThreshold} ${
                           associatedPoll.voteThreshold > 1 ? 'votes' : 'vote'
