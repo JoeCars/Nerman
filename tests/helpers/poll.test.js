@@ -1,6 +1,11 @@
 const { expect } = require('chai');
 
-const { drawBlock, drawSpace, drawBar } = require('../../helpers/poll');
+const {
+   drawBlock,
+   drawSpace,
+   drawBar,
+   longestString,
+} = require('../../helpers/poll');
 
 describe('helpers/poll.js tests', function () {
    describe('drawBlock() tests', function () {
@@ -88,6 +93,33 @@ describe('helpers/poll.js tests', function () {
          // Why not just have it be Floor(8 * 0.55) solid bars
          // with the remaining space filled with empty space?
          expect(results).to.equal('▏████\u200b \u200b \u200b \u200b ▕');
+      });
+   });
+
+   describe('longestString() tests', function () {
+      it('should return longest string', function () {
+         const strings = ['Monika', 'Natsuki', 'Sayori', 'Yuri'];
+
+         const result = longestString(strings);
+
+         expect(result).to.equal('Natsuki');
+      });
+
+      it('should return first longest string', function () {
+         const strings1 = ['Jorge', 'Emile', 'Kat', 'Jun', 'Six'];
+         const strings2 = ['Emile', 'Jorge', 'Kat', 'Jun', 'Six'];
+
+         const result1 = longestString(strings1);
+         const result2 = longestString(strings2);
+
+         expect(result1).to.equal('Jorge');
+         expect(result2).to.equal('Emile');
+      });
+
+      it('should be undefined if empty', function () {
+         const results = longestString([]);
+
+         expect(results).to.be.undefined;
       });
    });
 });
