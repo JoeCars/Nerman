@@ -302,12 +302,24 @@ module.exports = {
          ];
 
          if (associatedPoll.config.liveVisualFeed === true) {
-            let embedResults =
-               messageToUpdate.embeds[0]?.fields.find(
-                  ({ name }) => name === 'Results',
-               )?.value;
+            let embedResults = messageToUpdate.embeds[0]?.fields.find(
+               ({ name }) => name === 'Results',
+            )?.value;
 
+            console.log(
+               'commands/slashCommands/poll/regeneratePollMessage.js: \nif(liveVisualFeed === true)\nembedResults => ',
+               embedResults,
+            );
+
+            console.log(
+               'commands/slashCommands/poll/regeneratePollMessage.js: \nif(!!embedResults) => ',
+               !!embedResults,
+            );
             if (!!embedResults) {
+               console.log(
+                  'commands/slashCommands/poll/regeneratePollMessage.js: \nif(!!embedResults)\nTRUE -- accessing if() clausee',
+               );
+
                const results = updatedPoll.results;
                const longestOption = longestString(
                   updatedPoll.pollData.choices,
@@ -373,6 +385,11 @@ module.exports = {
                resultsOutput = codeBlock(resultsArray.join('\n'));
 
                embedResults = resultsOutput;
+
+               console.log(
+                  'commands/slashCommands/poll/regeneratePollMessage.js: \nif(liveVisualFeed === true)\nif(!!embedResults) TRUE\nnewly created embedResults => ',
+                  embedResults,
+               );
             }
 
             newEmbedFields.splice(1, 0, {
