@@ -1,9 +1,134 @@
 const { expect } = require('chai');
-const { formatDate } = require('../../utils/functions');
+const fsp = require('fs').promises;
+const path = require('path');
+
+const { formatDate, getFiles } = require('../../utils/functions');
 
 describe('utils/functions.js tests', function () {
    describe('getFiles() tests', function () {
-      it('should ');
+      this.afterEach(async function () {
+         // o get a behavior similar to the rm -rf Unix command, use fsPromises.rm() with options { recursive: true, force: true }.
+         try {
+            await fsp.rm(path.join(__dirname, 'test-docs'), {
+               recursive: true,
+               force: true,
+            });
+         } catch (error) {
+            console.error(error);
+            return;
+         }
+      });
+
+      it('should find files in the directory', async function () {
+         try {
+            await fsp.mkdir(path.join(__dirname, 'test-docs'));
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'file1.txt'),
+               'test1',
+            );
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'file2.txt'),
+               'test2',
+            );
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'file3.txt'),
+               'test3',
+            );
+         } catch (error) {
+            console.error(error);
+            return;
+         }
+
+         const files = await getFiles(path.join(__dirname, 'test-docs'), 'txt');
+
+         expect(files).to.eql([
+            path.join(__dirname, 'test-docs') + '/file1.txt',
+            path.join(__dirname, 'test-docs') + '/file2.txt',
+            path.join(__dirname, 'test-docs') + '/file3.txt',
+         ]);
+      });
+
+      it('should find files in the recursive directory', async function () {
+         try {
+            await fsp.mkdir(path.join(__dirname, 'test-docs'));
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'file1.txt'),
+               'test1',
+            );
+            await fsp.mkdir(path.join(__dirname, 'test-docs', 'recursive-1'));
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'recursive-1', 'file2.txt'),
+               'test2',
+            );
+            await fsp.mkdir(
+               path.join(__dirname, 'test-docs', 'recursive-1', 'recursive-2'),
+            );
+            await fsp.writeFile(
+               path.join(
+                  __dirname,
+                  'test-docs',
+                  'recursive-1',
+                  'recursive-2',
+                  'file3.txt',
+               ),
+               'test3',
+            );
+         } catch (error) {
+            console.error(error);
+            return;
+         }
+
+         const files = await getFiles(path.join(__dirname, 'test-docs'), 'txt');
+
+         expect(files).to.eql([
+            path.join(__dirname, 'test-docs') + '/file1.txt',
+            path.join(__dirname, 'test-docs') + '/recursive-1' + '/file2.txt',
+            path.join(__dirname, 'test-docs') +
+               '/recursive-1' +
+               '/recursive-2' +
+               '/file3.txt',
+         ]);
+      });
+
+      it('should only return the correct endings in the directory', async function () {
+         try {
+            await fsp.mkdir(path.join(__dirname, 'test-docs'));
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'file1.txt'),
+               'test1',
+            );
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'file2.js'),
+               'test2',
+            );
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'file3.py'),
+               'test3',
+            );
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'file4.txt'),
+               'test4',
+            );
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'file5.c'),
+               'test5',
+            );
+            await fsp.writeFile(
+               path.join(__dirname, 'test-docs', 'file6.php'),
+               'test6',
+            );
+         } catch (error) {
+            console.error(error);
+            return;
+         }
+
+         const files = await getFiles(path.join(__dirname, 'test-docs'), 'txt');
+
+         expect(files).to.eql([
+            path.join(__dirname, 'test-docs') + '/file1.txt',
+            path.join(__dirname, 'test-docs') + '/file4.txt',
+         ]);
+      });
    });
 
    describe('formatDate() tests', function () {
