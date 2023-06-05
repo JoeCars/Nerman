@@ -70,12 +70,12 @@ const drawBar = function (maxLength, portion) {
 
    if (difference < 0) {
       let abs = Math.abs(difference);
-      fracIndex = abs >= 0.5 ? 4 : 0
+      fracIndex = abs >= 0.5 ? 4 : 0;
    }
 
    if (difference > 0) {
       let abs = Math.abs(difference);
-      fracIndex = abs <= 0.5 ? 4 : 0
+      fracIndex = abs <= 0.5 ? 4 : 0;
    }
 
    // disabled for testing
@@ -112,6 +112,9 @@ const longestString = array => {
 const randomNumber = async limit => Math.floor(Math.random() * limit);
 
 module.exports = {
+   drawBlock,
+   drawSpace,
    drawBar,
    longestString,
+   randomNumber,
 };
