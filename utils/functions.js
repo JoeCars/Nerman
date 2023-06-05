@@ -8,7 +8,7 @@ const getFiles = async (path, ending) => {
 
    console.log(
       '//////////////////////////////////////////\nFILES\n//////////////////////////////////////////',
-      files
+      files,
    );
 
    for (const file of files) {
@@ -37,9 +37,9 @@ const logToObject = async target => {
          JSON.stringify(
             target,
             (key, value) =>
-               typeof value === 'bigint' ? value.toString() : value // return everything else unchanged
-         )
-      )
+               typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
+         ),
+      ),
    );
 
    // return await JSON.parse(
