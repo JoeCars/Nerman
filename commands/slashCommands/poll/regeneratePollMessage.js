@@ -312,12 +312,12 @@ module.exports = {
             );
 
             console.log(
-               'commands/slashCommands/poll/regeneratePollMessage.js: \nif(!!embedResults) => ',
-               !!embedResults,
+               'commands/slashCommands/poll/regeneratePollMessage.js: \nif(!embedResults) => ',
+               !embedResults,
             );
-            if (!!embedResults) {
+            if (!embedResults) {
                console.log(
-                  'commands/slashCommands/poll/regeneratePollMessage.js: \nif(!!embedResults)\nTRUE -- accessing if() clausee',
+                  'commands/slashCommands/poll/regeneratePollMessage.js: \nif(!embedResults)\nTRUE -- accessing if() clausee',
                );
 
                const results = updatedPoll.results;
@@ -387,7 +387,7 @@ module.exports = {
                embedResults = resultsOutput;
 
                console.log(
-                  'commands/slashCommands/poll/regeneratePollMessage.js: \nif(liveVisualFeed === true)\nif(!!embedResults) TRUE\nnewly created embedResults => ',
+                  'commands/slashCommands/poll/regeneratePollMessage.js: \nif(liveVisualFeed === true)\nif(!embedResults) TRUE\nnewly created embedResults => ',
                   embedResults,
                );
             }
