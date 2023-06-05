@@ -125,7 +125,7 @@ const formatDate = (date, format) => {
 
    const months = [
       'Jan',
-      'Febr',
+      'Feb',
       'Mar',
       'Apr',
       'May',
