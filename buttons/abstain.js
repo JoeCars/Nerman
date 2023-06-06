@@ -3,6 +3,7 @@ const User = require('../db/schemas/User');
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
 const Logger = require('../helpers/logger');
+const { checkUserEligibility } = require('../helpers/buttonEligibility');
 
 module.exports = {
    id: 'abstain',
@@ -41,11 +42,17 @@ module.exports = {
          'allowedRoles',
       ).exec();
 
+      const pollStatus = await Poll.findOne(
+         { messageId },
+         'status allowedUsers',
+      );
+
       const eligibility = await checkUserEligibility(
          roleCache,
          allowedRoles,
+         pollStatus,
          userId,
-         messageId,
+         interaction.member.joinedTimestamp,
       );
 
       if (!eligibility.isEligible) {
@@ -89,41 +96,6 @@ module.exports = {
       );
    },
 };
-
-async function checkUserEligibility(
-   roleCache,
-   allowedRoles,
-   userId,
-   messageId,
-) {
-   if (!roleCache.hasAny(...allowedRoles)) {
-      return {
-         message: 'You do not have the role, dummy',
-         isEligible: false,
-      };
-   }
-
-   const pollStatus = await Poll.findOne({ messageId }, 'status allowedUsers');
-
-   if (!pollStatus.allowedUsers.has(userId)) {
-      return {
-         message: 'You are not eligible to participate in this poll, square',
-         isEligible: false,
-      };
-   }
-
-   if (pollStatus.allowedUsers.get(userId) === true) {
-      return {
-         message: 'You have already used up your vote allowance.',
-         isEligible: false,
-      };
-   }
-
-   return {
-      message: 'You are eligible to participate in this pole.',
-      isEligible: true,
-   };
-}
 
 async function createAbstainingUser(roleCache, anon, guildId, userId) {
    const eligibleChannels = await User.findEligibleChannels(roleCache, anon);
