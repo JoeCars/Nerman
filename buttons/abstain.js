@@ -103,8 +103,6 @@ async function checkUserEligibility(
       };
    }
 
-   let x = 0;
-
    const pollStatus = await Poll.findOne({ messageId }, 'status allowedUsers');
 
    if (!pollStatus.allowedUsers.has(userId)) {
