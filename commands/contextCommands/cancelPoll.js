@@ -6,9 +6,6 @@ const { ApplicationCommandType } = require('discord-api-types/v9');
 const Poll = require('../../db/schemas/Poll');
 const Logger = require('../../helpers/logger');
 
-// fixme will need to remove these after we figure out a better permission control for admin command
-const authorizedIds = process.env.BAD_BITCHES.split(',');
-
 module.exports = {
    data: new ContextMenuCommandBuilder()
       .setName('Cancel Poll')
@@ -26,7 +23,7 @@ module.exports = {
             userId: interaction.user.id,
             guildId: interaction.guildId,
             targetMessageId: interaction.targetId,
-         }
+         },
       );
 
       try {
@@ -39,7 +36,7 @@ module.exports = {
             user: { id: userId },
          } = interaction;
 
-         if (!authorizedIds.includes(userId)) {
+         if (!isUserAuthorized(userId)) {
             throw new Error('You do not have permission to use this command.');
          }
 
@@ -55,32 +52,16 @@ module.exports = {
                messageId: targetId,
                guildId: guildId,
             },
-            'status -_id'
+            'status -_id',
          ).exec();
 
-         if (!targetPoll) {
-            throw new Error(
-               'There is no poll associated with this message ID.'
-            );
+         const pollValidity = checkPollValidity(targetPoll);
+
+         if (!pollValidity.isValid) {
+            throw new Error(pollValidity.message);
          }
 
-         if (['closed', 'cancelled'].includes(targetPoll.status)) {
-            throw new Error('This poll is already closed or cancelled');
-         }
-
-         const confirmModal = new Modal()
-            .setCustomId(`cancel-modal-${targetId}`)
-            .setTitle('Cancel Poll?');
-
-         const confirmCancel = new TextInputComponent()
-            .setCustomId('confirmCancel')
-            .setLabel(`Type 'confirm' (no quotes) then submit.`)
-            .setPlaceholder('confirm')
-            .setStyle('SHORT')
-            .setMaxLength(100)
-            .setRequired(true);
-
-         confirmModal.addComponents(confirmCancel);
+         const confirmModal = createConfirmationModal(targetId);
 
          await showModal(confirmModal, {
             client: client,
@@ -94,7 +75,7 @@ module.exports = {
                guildId: interaction.guildId,
                targetMessageId: interaction.targetId,
                pollId: targetPoll._id,
-            }
+            },
          );
       } catch (error) {
          Logger.error('commands/context/cancelPoll.js: Received an error.', {
@@ -105,3 +86,47 @@ module.exports = {
       }
    },
 };
+
+function isUserAuthorized(userId) {
+   // FIXME: will need to remove these after we figure out a better permission control for admin command
+   const authorizedIds = process.env.BAD_BITCHES.split(',');
+   return authorizedIds.includes(userId);
+}
+
+function checkPollValidity(targetPoll) {
+   if (!targetPoll) {
+      return {
+         isValid: false,
+         message: 'There is no poll associated with this message ID.',
+      };
+   }
+
+   if (['closed', 'cancelled'].includes(targetPoll.status)) {
+      return {
+         isValid: false,
+         message: 'This poll is already closed or cancelled',
+      };
+   }
+
+   return {
+      isValid: true,
+      message: 'This poll is valid.',
+   };
+}
+
+function createConfirmationModal(targetId) {
+   const confirmModal = new Modal()
+      .setCustomId(`cancel-modal-${targetId}`)
+      .setTitle('Cancel Poll?');
+
+   const confirmCancel = new TextInputComponent()
+      .setCustomId('confirmCancel')
+      .setLabel(`Type 'confirm' (no quotes) then submit.`)
+      .setPlaceholder('confirm')
+      .setStyle('SHORT')
+      .setMaxLength(100)
+      .setRequired(true);
+
+   confirmModal.addComponents(confirmCancel);
+   return confirmModal;
+}
