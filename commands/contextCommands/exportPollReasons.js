@@ -5,6 +5,7 @@ const codeBlock = require('discord.js').Formatters.codeBlock;
 const Poll = require('../../db/schemas/Poll');
 const Vote = require('../../db/schemas/Vote');
 const Logger = require('../../helpers/logger');
+const { isUserAuthorized } = require('../../helpers/authorization');
 
 const fetchPoll = async interaction => {
    let targetPoll;
@@ -109,9 +110,7 @@ module.exports = {
          },
       );
 
-      // TODO: Rename this to something more appropriate.
-      const authorizedIds = process.env.BAD_BITCHES.split(',');
-      if (!authorizedIds.includes(interaction.user.id)) {
+      if (!isUserAuthorized(interaction.user.id)) {
          throw new Error('You do not have permission to use this command.');
       }
 
