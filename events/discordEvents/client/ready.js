@@ -3,6 +3,12 @@ const { Collection } = require('discord.js');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const Logger = require('../../../helpers/logger');
+const {
+   getTitle,
+   getUrl,
+   proposalStatusUpdateMessage,
+   temporaryProposalVoteMessage,
+} = require('../../../helpers/proposalHelpers');
 
 const { Types } = require('mongoose');
 
@@ -96,7 +102,7 @@ module.exports = {
 
                   const promises = channelList.map(async channel => {
                      let message = await channel.send({
-                        content: 'Generating vote data...',
+                        content: temporaryProposalVoteMessage(vote),
                      });
 
                      return message;
@@ -119,7 +125,7 @@ module.exports = {
                   .channels.cache.get(nounsGovId);
 
                let message = await nounsGovChannel.send({
-                  content: 'Generating vote data...',
+                  content: temporaryProposalVoteMessage(vote),
                });
 
                client.emit('propVoteCast', message, vote);
@@ -206,7 +212,10 @@ module.exports = {
                   // return;
                } else {
                   let message = await propChannel.send({
-                     content: 'Generating proposal...',
+                     content: ```
+                     Generating ${getTitle(data)}\n
+                     ${getUrl(data)}
+                     ```,
                   });
 
                   client.emit('newProposal', message, data);
@@ -214,7 +223,11 @@ module.exports = {
 
                const promises = channelList.map(async channel => {
                   let message = await channel.send({
-                     content: 'New proposal data...',
+                     content: ```
+                     New proposal data...\n
+                     ${getTitle(data)}\n
+                     ${getUrl(data)}
+                     ```,
                   });
 
                   return message;
@@ -257,7 +270,10 @@ module.exports = {
                // const description = `https://nouns.wtf/vote/${propId}`;
 
                let message = await propChannel.send({
-                  content: 'Generating proposal...',
+                  content: ```
+                  Generating ${getTitle(data)}\n
+                  ${getUrl(data)}
+                  ```,
                });
 
                // todo I should rename these events to be less confusing
@@ -306,7 +322,7 @@ module.exports = {
 
                   const promises = channelList.map(async channel => {
                      let message = await channel.send({
-                        content: 'Proposal status changed...',
+                        content: proposalStatusUpdateMessage(data, status),
                      });
 
                      return message;
@@ -325,7 +341,7 @@ module.exports = {
                }
             } else {
                let message = await nounsGovChannel.send({
-                  content: 'Proposal status changed...',
+                  content: proposalStatusUpdateMessage(data, status),
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -374,7 +390,7 @@ module.exports = {
 
                   const promises = channelList.map(async channel => {
                      let message = await channel.send({
-                        content: 'Proposal status changed...',
+                        content: proposalStatusUpdateMessage(data, status),
                      });
 
                      return message;
@@ -393,7 +409,7 @@ module.exports = {
                }
             } else {
                let message = await nounsGovChannel.send({
-                  content: 'Proposal status changed...',
+                  content: proposalStatusUpdateMessage(data, status),
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -441,7 +457,7 @@ module.exports = {
 
                   const promises = channelList.map(async channel => {
                      let message = await channel.send({
-                        content: 'Proposal status changed...',
+                        content: proposalStatusUpdateMessage(data, status),
                      });
 
                      return message;
@@ -460,7 +476,7 @@ module.exports = {
                }
             } else {
                let message = await nounsGovChannel.send({
-                  content: 'Proposal status changed...',
+                  content: proposalStatusUpdateMessage(data, status),
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -510,7 +526,7 @@ module.exports = {
 
                   const promises = channelList.map(async channel => {
                      let message = await channel.send({
-                        content: 'Proposal status changed...',
+                        content: proposalStatusUpdateMessage(data, status),
                      });
 
                      return message;
@@ -529,7 +545,7 @@ module.exports = {
                }
             } else {
                let message = await nounsGovChannel.send({
-                  content: 'Proposal status changed...',
+                  content: proposalStatusUpdateMessage(data, status),
                });
 
                client.emit('propStatusChange', message, status, data);
