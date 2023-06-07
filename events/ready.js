@@ -1,6 +1,7 @@
 const { Collection } = require('discord.js');
 
 const PollChannel = require('../db/schemas/PollChannel');
+const Poll = require('../db/schemas/Poll');
 const GuildConfig = require('../db/schemas/GuildConfig');
 const Logger = require('../helpers/logger');
 
@@ -14,8 +15,8 @@ module.exports = {
          `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.NODE_ENV} mode.`,
       );
 
-      await require('../db/index.js')(client);
-      await require('../utils/remindSheet.js')(client);
+      await require('../../../db/index.js')(client);
+      await require('../../../utils/remindSheet.js')(client);
 
       // const _StateOfNouns = import('stateofnouns');
       const _nerman = import('stateofnouns');
@@ -53,7 +54,27 @@ module.exports = {
             // todo also make sure to change this back to 'production' before pushing
             // if (process.env.DEPLOY_STAGE === 'development') {
             if (process.env.DEPLOY_STAGE === 'production') {
+               /**
+                * Support variables for outputting formatting
+                */
+
+               const supportEnum = ['AGAINST', 'FOR', 'ABSTAIN'];
+               const propRegExp = new RegExp(
+                  `^prop\\s${Number(proposalId)}`,
+                  'i',
+               );
+               const {
+                  supportDetailed,
+                  proposalId,
+                  reason,
+                  votes,
+                  voter: { id: voterId },
+               } = vote;
+
                try {
+                  /**
+                   * Channels Data
+                   */
                   const ncdGuildId = process.env.NCD_GUILD_ID;
                   const ncdChannelId = process.env.NCD_CHANNEL_ID;
 
@@ -88,62 +109,141 @@ module.exports = {
                      },
                   );
 
+                  /**
+                   * Support variables for outputting formatting
+                   */
+
+                  // const supportEnum = ['AGAINST', 'FOR', 'ABSTAIN'];
+                  // const propRegExp = new RegExp(
+                  //    `^prop\\s${Number(proposalId)}`,
+                  //    'i',
+                  // );
+
+                  const targetPoll = await Poll.findOne({
+                     'pollData.title': { $regex: propRegExp },
+                  })
+                     .populate('config')
+                     .exec();
+
                   const channelList = [
                      nounsGovChannel,
                      ncdChannel,
                      agoraChannel,
                   ];
 
-                  const promises = channelList.map(async channel => {
+                  // const promises = channelList.map(async channel => {
+                  //    let message = await channel.send({
+                  //       content: 'Generating vote data...',
+                  //    });
+
+                  //    return message;
+                  // });
+                  // const promises = channelList.map(async channel => {
+                  // const promises = channelList.map(async channel => {
+                  //    let message = await channel.send({
+                  //       content: `[]()`,
+                  //    });
+
+                  //    return message;
+                  // });
+
+                  // const resolved = await Promise.all(promises);
+                  let pollChannelId;
+                  let pollMessage = null;
+
+                  if (targetPoll) {
+                     // retrieve poll output channelId
+                     pollChannelId = targetPoll.config.channelId;
+
+                     // try to get pollMessage from cash, failing that fetch it
+                     pollMessage = await (client.channels.cache
+                        .get(pollChannelId)
+                        .messages.cache.get(targetPoll.messageId) ??
+                        client.channels.cache
+                           .get(pollChannelId)
+                           .messages.fetch(targetPoll.messageId));
+                  } else {
+                     // If there is no poll then delete the message to keep channel clear of failed artifacts
+                     Logger.warn(
+                        'events/stateOfNouns/propVoteCast.js: Unable to find the associated poll.',
+                        {
+                           proposalId: `${vote.proposalId}`,
+                           voterId: vote.voter.id,
+                           votes: `${vote.votes}`,
+                           reason: vote.reason,
+                        },
+                     );
+                     return message.delete();
+                  }
+
+                  const titleFromPoll =
+                     targetPoll?.pollData.title ?? 'No poll title';
+
+                  channelList.forEach(async channel => {
+                     const { id: channelId } = channel;
+                     let titleUrl;
+
+                     titleUrl =
+                        channelId !== process.env.AGORA_CHANNEL_ID
+                           ? `https://nouns.wtf/vote/${proposalId}`
+                           : `https://www.nounsagora.com/proposals/${proposalId}`;
+
+                     const voter =
+                        (await Nouns.ensReverseLookup(voterId)) ??
+                        (await shortenAddress(voterId));
+                     const voterUrl = `https://etherscan.io/address/${voterId}`;
+                     const voterHyperlink = `[${voter}](${voterUrl})`;
+                     const propHyperlink = hyperlink(
+                        `Prop ${proposalId}`,
+                        `https://nouns.wtf/vote/${proposalId}`,
+                     );
+
+                     const voteEmbed = new MessageEmbed()
+                        .setColor('#00FFFF')
+                        .setTitle(`${titleFromPoll}`)
+                        .setURL(titleUrl)
+                        .setDescription(
+                           `${voterHyperlink} voted ${inlineCode(
+                              supportEnum[supportDetailed],
+                           )} with ${inlineCode(Number(votes))} votes. ${
+                              !!reason.trim() ? `\n\n${reason}` : ''
+                           }`,
+                        );
+
+                     const threadEmbed = new MessageEmbed()
+                        .setColor('#00FFFF')
+                        .setDescription(
+                           `${voterHyperlink} voted ${inlineCode(
+                              supportEnum[supportDetailed],
+                           )} with ${inlineCode(
+                              Number(votes),
+                           )} votes on ${propHyperlink}. ${
+                              !!reason.trim() ? `\n\n${reason}` : ''
+                           }`,
+                        );
+
+                     if (pollMessage !== null) {
+                        pollMessage.thread.send({
+                           content: null,
+                           embeds: [threadEmbed],
+                        });
+                     }
+
+                     Logger.info(
+                        'events/stateOfNouns/propVoteCast.js: Finished handling a proposal vote event.',
+                        {
+                           proposalId: `${vote.proposalId}`,
+                           voterId: vote.voter.id,
+                           votes: `${vote.votes}`,
+                           reason: vote.reason,
+                        },
+                     );
+
                      let message = await channel.send({
-                        content: 'Generating vote data...',
+                        content: null,
+                        embeds: [voteEmbed],
                      });
-
-                     Logger.info(
-                        'events/ready.js: On VoteCast. Mapping message `promises`...\nThis message info:',
-                        {
-                           messageId: message.id,
-                           messageContent: message.content,
-                           authorId: message.author.id,
-                           authorUsername: message.author.username,
-                           member: {
-                              id: message.member.id,
-                              displayName: message.member.displayName,
-                              userName: message.member.user.username,
-                           },
-                           channelId: message.channelId,
-                           channelName: message.channel.name,
-                           guildId: message.guildId,
-                           guildName: message.guild.name,
-                        },
-                     );
-
-                     return message;
-                  });
-
-                  const resolved = await Promise.all(promises);
-
-                  resolved.forEach(message => {
-                     Logger.info(
-                        'events/ready.js: On VoteCast. `resolved`.forEach(message =>{})...\nThis message info:',
-                        {
-                           messageId: message.id,
-                           messageContent: message.content,
-                           authorId: message.author.id,
-                           authorUsername: message.author.username,
-                           member: {
-                              id: message.member.id,
-                              displayName: message.member.displayName,
-                              userName: message.member.user.username,
-                           },
-                           channelId: message.channelId,
-                           channelName: message.channel.name,
-                           guildId: message.guildId,
-                           guildName: message.guild.name,
-                        },
-                     );
-
-                     client.emit('propVoteCast', message, vote);
+                     // client.emit('propVoteCast', message, vote);
                   });
                } catch (error) {
                   Logger.error(
@@ -152,15 +252,105 @@ module.exports = {
                   );
                }
             } else {
+               const {
+                  supportDetailed,
+                  proposalId,
+                  reason,
+                  votes,
+                  votes: {
+                     voter: { id: voterId },
+                  },
+               } = vote;
+
                const nounsGovChannel = guildCache
                   .get(process.env.DISCORD_GUILD_ID)
                   .channels.cache.get(nounsGovId);
 
+               const targetPoll = await Poll.findOne({
+                  'pollData.title': { $regex: propRegExp },
+               })
+                  .populate('config')
+                  .exec();
+
+               let pollChannelId;
+               let pollMessage = null;
+
+               // if poll exists
+               if (targetPoll) {
+                  // retrieve poll output channelId
+                  pollChannelId = targetPoll.config.channelId;
+
+                  // try to get pollMessage from cash, failing that fetch it
+                  pollMessage = await (client.channels.cache
+                     .get(pollChannelId)
+                     .messages.cache.get(targetPoll.messageId) ??
+                     client.channels.cache
+                        .get(pollChannelId)
+                        .messages.fetch(targetPoll.messageId));
+               } else {
+                  Logger.warn(
+                     'events/stateOfNouns/propVoteCast.js: Unable to find the associated poll.',
+                     {
+                        proposalId: `${vote.proposalId}`,
+                        voterId: vote.voter.id,
+                        votes: `${vote.votes}`,
+                        reason: vote.reason,
+                     },
+                  );
+               }
+
+               const titleFromPoll =
+                  targetPoll?.pollData.title ?? 'No poll title';
+
+               let titleUrl = `https://nouns.wtf/vote/${proposalId}`;
+
+               const voter =
+                  (await Nouns.ensReverseLookup(voterId)) ??
+                  (await shortenAddress(voterId));
+               const voterUrl = `https://etherscan.io/address/${voterId}`;
+               const voterHyperlink = `[${voter}](${voterUrl})`;
+               const propHyperlink = hyperlink(
+                  `Prop ${proposalId}`,
+                  `https://nouns.wtf/vote/${proposalId}`,
+               );
+
+               const voteEmbed = new MessageEmbed()
+                  .setColor('#00FFFF')
+                  .setTitle(`${titleFromPoll}`)
+                  .setURL(titleUrl)
+                  .setDescription(
+                     `${voterHyperlink} voted ${inlineCode(
+                        supportEnum[supportDetailed],
+                     )} with ${inlineCode(Number(votes))} votes. ${
+                        !!reason.trim() ? `\n\n${reason}` : ''
+                     }`,
+                  );
+
+               const threadEmbed = new MessageEmbed()
+                  .setColor('#00FFFF')
+                  .setDescription(
+                     `${voterHyperlink} voted ${inlineCode(
+                        supportEnum[supportDetailed],
+                     )} with ${inlineCode(
+                        Number(votes),
+                     )} votes on ${propHyperlink}. ${
+                        !!reason.trim() ? `\n\n${reason}` : ''
+                     }`,
+                  );
+
+               if (pollMessage !== null) {
+                  pollMessage.thread.send({
+                     content: null,
+                     embeds: [threadEmbed],
+                  });
+               }
+
                let message = await nounsGovChannel.send({
-                  content: 'Generating vote data...',
+                  content: null,
+                  embeds: [voteEmbed],
                });
 
-               client.emit('propVoteCast', message, vote);
+               // client.emit('propVoteCast', message, vote);
             }
          });
 
