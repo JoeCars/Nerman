@@ -212,10 +212,7 @@ module.exports = {
                   // return;
                } else {
                   let message = await propChannel.send({
-                     content: ```
-                     Generating ${getTitle(data)}\n
-                     ${getUrl(data)}
-                     ```,
+                     content: temporaryNewProposalMessage(data),
                   });
 
                   client.emit('newProposal', message, data);
@@ -223,11 +220,7 @@ module.exports = {
 
                const promises = channelList.map(async channel => {
                   let message = await channel.send({
-                     content: ```
-                     New proposal data...\n
-                     ${getTitle(data)}\n
-                     ${getUrl(data)}
-                     ```,
+                     content: temporaryNewProposalMessage(data),
                   });
 
                   return message;
@@ -270,10 +263,7 @@ module.exports = {
                // const description = `https://nouns.wtf/vote/${propId}`;
 
                let message = await propChannel.send({
-                  content: ```
-                  Generating ${getTitle(data)}\n
-                  ${getUrl(data)}
-                  ```,
+                  content: temporaryNewProposalMessage(data),
                });
 
                // todo I should rename these events to be less confusing
