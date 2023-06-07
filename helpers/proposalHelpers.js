@@ -17,8 +17,16 @@ exports.proposalStatusUpdateMessage = function (proposal, proposalStatus) {
 
 exports.temporaryProposalVoteMessage = function (vote) {
    return `
-      Generating vote data for Prop ${vote.proposalId}.\n
+      Prop ${vote.proposalId}.\n
       ${vote.voter.id} voted ${vote.supportDetailed} with ${vote.votes}.\n
       ${vote.reason}
+   `;
+};
+
+exports.temporaryNewProposalMessage = function (proposal) {
+   return `
+      New Proposal\n
+      ${getTitle(proposal)}\n
+      ${getUrl(proposal)}
    `;
 };
