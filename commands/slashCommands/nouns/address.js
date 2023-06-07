@@ -17,7 +17,7 @@ module.exports = {
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
-         }
+         },
       );
 
       const Nouns = interaction.client.libraries.get('Nouns');
@@ -35,7 +35,7 @@ module.exports = {
 
       if (!walletRegex.test(queryTarget) && !ensRegex.test(queryTarget)) {
          throw new Error(
-            `${queryTarget} is not a valid ENS name or wallet address format.\nWallet format: 0x<40 alphanumeric characters>\nENS example: <ensname>.eth`
+            `${queryTarget} is not a valid ENS name or wallet address format.\nWallet format: 0x<40 alphanumeric characters>\nENS example: <ensname>.eth`,
          );
       }
 
@@ -46,7 +46,7 @@ module.exports = {
             userId: interaction.user.id,
             guildId: interaction.guildId,
             nounerInfo: nounerInfo,
-         }
+         },
       );
 
       // disabled we're not currently using this image url for an attachment of this tile until we find a better solution vvvvv
@@ -82,7 +82,7 @@ module.exports = {
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
-         }
+         },
       );
    },
 };
