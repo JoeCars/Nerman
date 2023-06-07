@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const testProposal = require('../../../dummyData/testGraphSample.json');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const Logger = require('../../../helpers/logger');
+const { isUserAuthorized } = require('../../../helpers/authorization');
 
 const propChannelId =
    process.env.DEPLOY_STAGE === 'development'
@@ -9,9 +10,6 @@ const propChannelId =
       : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 
 const nounsGovId = process.env.NOUNS_GOV_ID;
-
-// const adminId = process.env.NERMAN_G_ADMIN_ID;
-const authorizedIds = process.env.BAD_BITCHES.split(',');
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -43,8 +41,8 @@ module.exports = {
          },
       } = interaction;
 
-      if (!authorizedIds.includes(userId)) {
-         throw new Error('You lack the permissions to use this commmand.');
+      if (!isUserAuthorized(userId)) {
+         throw new Error('You lack the permissions to use this command.');
       }
 
       await interaction.deferReply({ ephemeral: true });
@@ -91,33 +89,7 @@ module.exports = {
 
       // if (process.env.DEPLOY_STAGE === 'development') {
       if (process.env.DEPLOY_STAGE === 'production') {
-         // AGORA + NCD TESTS
-         const ncdChannelId = process.env.NCD_CHANNEL_ID;
-         const agoraChannelId = process.env.AGORA_CHANNEL_ID;
-
-         const ncdChannel = guildCache
-            .get(guildId)
-            .channels.cache.get(ncdChannelId);
-
-         const agoraChannel = guildCache
-            .get(guildId)
-            .channels.cache.get(agoraChannelId);
-
-         const channelList = [nounsGovChannel, ncdChannel, agoraChannel];
-
-         const promises = channelList.map(async channel => {
-            let message = await channel.send({
-               content: 'New proposal data...',
-            });
-
-            return message;
-         });
-
-         const resolved = await Promise.all(promises);
-
-         resolved.forEach(message => {
-            client.emit('propCreated', message, testProposal);
-         });
+         await emitProposals(guildCache, guildId, nounsGovChannel, client);
       }
 
       interaction.editReply({
@@ -133,3 +105,31 @@ module.exports = {
       );
    },
 };
+
+async function emitProposals(guildCache, guildId, nounsGovChannel, client) {
+   // AGORA + NCD TESTS
+   const ncdChannelId = process.env.NCD_CHANNEL_ID;
+   const agoraChannelId = process.env.AGORA_CHANNEL_ID;
+
+   const ncdChannel = guildCache.get(guildId).channels.cache.get(ncdChannelId);
+
+   const agoraChannel = guildCache
+      .get(guildId)
+      .channels.cache.get(agoraChannelId);
+
+   const channelList = [nounsGovChannel, ncdChannel, agoraChannel];
+
+   const promises = channelList.map(async channel => {
+      let message = await channel.send({
+         content: 'New proposal data...',
+      });
+
+      return message;
+   });
+
+   const resolved = await Promise.all(promises);
+
+   resolved.forEach(message => {
+      client.emit('propCreated', message, testProposal);
+   });
+}
