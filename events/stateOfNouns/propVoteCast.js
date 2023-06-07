@@ -18,20 +18,10 @@ module.exports = {
          Logger.info(
             'events/stateOfNouns/propVoteCast.js: Handling a proposal vote event.',
             {
-               outputMessageData: {
-                  guildId: message.guildId,
-                  guildName: message.guild.name,
-                  channelId: message.channelId,
-                  channelName: message.channel.name,
-                  messageId: message.id,
-                  messageContent: message.content,
-               },
-               vote: {
-                  proposalId: Number(vote.proposalId),
-                  voterId: vote.voter.id,
-                  votes: Number(vote.votes),
-                  reason: vote.reason,
-               },
+               proposalId: Number(vote.proposalId),
+               voterId: vote.voter.id,
+               votes: Number(vote.votes),
+               reason: vote.reason,
             },
          );
 
@@ -136,22 +126,10 @@ module.exports = {
          Logger.debug(
             'events/stateOfNouns/propVoteCast.js: Checking poll title.',
             {
-               outputMessageData: {
-                  guildId: message.guildId,
-                  guildName: message.guild.name,
-                  channelId: message.channelId,
-                  channelName: message.channel.name,
-                  messageId: message.id,
-                  messageContent: message.content,
-               },
-
-               vote: {
-                  proposalId: Number(vote.proposalId),
-                  voterId: vote.voter.id,
-                  votes: Number(vote.votes),
-                  reason: vote.reason,
-               },
-
+               proposalId: `${vote.proposalId}`,
+               voterId: vote.voter.id,
+               votes: `${vote.votes}`,
+               reason: vote.reason,
                title: titleFromPoll,
             },
          );
@@ -271,52 +249,25 @@ module.exports = {
             });
          }
 
-         await message.edit({
-            content: null,
-            embeds: [voteEmbed],
-         });
-
          Logger.info(
             'events/stateOfNouns/propVoteCast.js: Finished handling a proposal vote event.',
             {
-               outputMessageData: {
-                  guildId: message.guildId,
-                  guildName: message.guild.name,
-                  channelId: message.channelId,
-                  channelName: message.channel.name,
-                  messageId: message.id,
-                  messageContent: message.content,
-               },
-
-               vote: {
-                  proposalId: Number(vote.proposalId),
-                  voterId: vote.voter.id,
-                  votes: Number(vote.votes),
-                  reason: vote.reason,
-               },
+               proposalId: `${vote.proposalId}`,
+               voterId: vote.voter.id,
+               votes: `${vote.votes}`,
+               reason: vote.reason,
             },
          );
+
+         return await message.edit({
+            content: null,
+            embeds: [voteEmbed],
+         });
       } catch (error) {
          Logger.error(
             'events/stateOfNouns/propVoteCast.js: Received an error.',
             {
                error: error,
-
-               outputMessageData: {
-                  guildId: message.guildId,
-                  guildName: message.guild.name,
-                  channelId: message.channelId,
-                  channelName: message.channel.name,
-                  messageId: message.id,
-                  messageContent: message.content,
-               },
-
-               vote: {
-                  proposalId: Number(vote.proposalId),
-                  voterId: vote.voter.id,
-                  votes: Number(vote.votes),
-                  reason: vote.reason,
-               },
             },
          );
       }
