@@ -1,5 +1,4 @@
 const { CommandInteraction, MessageEmbed } = require('discord.js');
-const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const User = require('../../../db/schemas/User');
 const PollChannel = require('../../../db/schemas/PollChannel');
@@ -9,6 +8,7 @@ const mongoose = require('mongoose');
 const { longestString } = require('../../../helpers/poll');
 const ResultBar = require('../../../structures/ResultBar');
 const { codeBlock } = require('@discordjs/builders');
+const { isUserAuthorized } = require('../../../helpers/authorization');
 
 module.exports = {
    subCommand: 'nerman.create-test-poll',
@@ -18,7 +18,7 @@ module.exports = {
     */
    async execute(interaction) {
       Logger.info(
-         'commands/nerman/poll/createPoll.js: Starting to create polls.',
+         'commands/slashCommands/poll/createPoll.js: Starting to create polls.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -39,8 +39,7 @@ module.exports = {
          });
       }
 
-      const authorizedIds = process.env.BAD_BITCHES.split(',');
-      if (!authorizedIds.includes(interaction.user.id)) {
+      if (!isUserAuthorized(interaction.user.id)) {
          throw new Error('You do not have permission to use this command.');
       }
 
@@ -57,7 +56,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/nerman/poll/createPoll.j`s: Finished creating poll.',
+         'commands/slashCommands/poll/createPoll.j`s: Finished creating poll.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
