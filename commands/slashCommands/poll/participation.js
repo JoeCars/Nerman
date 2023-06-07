@@ -15,12 +15,12 @@ module.exports = {
     */
    async execute(interaction) {
       Logger.info(
-         'commands/nerman/poll/participation.js: Starting to retrieve poll participation.',
+         'commands/slashCommands/poll/participation.js: Starting to retrieve poll participation.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
             channelId: interaction.channelId,
-         }
+         },
       );
 
       const {
@@ -37,10 +37,9 @@ module.exports = {
       } = interaction;
 
       const configExists = await PollChannel.configExists(channelId);
-
       if (!configExists) {
          throw new Error(
-            'There are no configurations registered to this channel. You may only register from a channel in which polling has been configured.'
+            'There are no configurations registered to this channel. You may only register from a channel in which polling has been configured.',
          );
       }
 
@@ -49,104 +48,90 @@ module.exports = {
          interaction.options.getString('discord-id') ??
          interaction.member.user.id;
 
-      const {
-         nickname,
-         user: { username, discriminator },
-         roles: { cache: memberRoles },
-      } = mCache.get(voterId) ?? (await members.fetch(voterId));
+      const response = await createParticipationStats(
+         mCache,
+         voterId,
+         members,
+         guildId,
+         channelName,
+         channelId,
+      );
 
-      const voterDoc = await User.findOne()
-         .byDiscordId(voterId, guildId)
-         .exec();
-
-      if (!voterDoc) {
-         Logger.debug(
-            'commands/nerman/poll/participation.js: Checking member role keys',
-            {
-               userId: interaction.user.id,
-               guildId: interaction.guildId,
-               channelId: interaction.channelId,
-               memberRolesKeys: [...memberRoles.keys()],
-            }
-         );
-
-         const { eligiblePolls: witnessed, participatedPolls: participated } =
-            voterDoc.eligibleChannels.get(channelId);
-
-         const hasVotingRole = await User.checkVotingRoles(memberRoles);
-         Logger.debug(
-            'commands/nerman/poll/participation.js: Checking voting role',
-            {
-               userId: interaction.user.id,
-               guildId: interaction.guildId,
-               channelId: interaction.channelId,
-               hasVotingRole: hasVotingRole,
-            }
-         );
-
-         if (!hasVotingRole)
-            throw new Error(
-               'This member has no voting roles. Their participation can not be gauged, because they are unable to participate.'
-            );
-
-         const eligibleChannels = await User.findEligibleChannels(memberRoles);
-
-         const newUser = await User.createUser(
-            guildId,
-            voterId,
-            eligibleChannels
-         );
-         Logger.debug(
-            'commands/nerman/poll/participation.js: Created new user.',
-            {
-               userId: interaction.user.id,
-               guildId: interaction.guildId,
-               channelId: interaction.channelId,
-            }
-         );
-
-         const participation = await newUser.participation(channelId);
-
-         const header = `**#${channelName} | ${
-            nickname ?? username
-         }#${discriminator} vote participation**\n`;
-
-         const stats = codeBlock(
-            `${witnessed} votes witnessed\n${participated} votes participated\n${participation} participation rate`
-         );
-
-         const response = `${header}${stats}`;
-
-         return interaction.reply({
-            content: response,
-            ephemeral: true,
-         });
-      } else {
-         const { eligiblePolls: witnessed, participatedPolls: participated } =
-            voterDoc.eligibleChannels.get(channelId);
-
-         const participation = await voterDoc.participation(channelId);
-
-         const header = `**#${channelName} | ${
-            nickname ?? username
-         }#${discriminator} vote participation**\n`;
-
-         const stats = codeBlock(
-            `${witnessed} votes witnessed\n${participated} votes participated\n${participation} participation rate`
-         );
-
-         const response = `${header}${stats}`;
-
-         interaction.reply({ content: response, ephemeral: true });
-      }
+      return interaction.reply({
+         content: response,
+         ephemeral: true,
+      });
 
       Logger.info(
-         'commands/nerman/poll/participation.js: Finished retrieving poll participation.',
+         'commands/slashCommands/poll/participation.js: Finished retrieving poll participation.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
             channelId: interaction.channelId,
-         }
+         },
       );
    },
 };
+
+async function createParticipationStats(
+   mCache,
+   voterId,
+   members,
+   guildId,
+   channelName,
+   channelId,
+) {
+   const {
+      nickname,
+      user: { username, discriminator },
+      roles: { cache: memberRoles },
+   } = mCache.get(voterId) ?? (await members.fetch(voterId));
+
+   let voterDoc = await User.findOne().byDiscordId(voterId, guildId).exec();
+
+   if (!voterDoc) {
+      voterDoc = await createNewUser(memberRoles, voterDoc, guildId, voterId);
+   }
+
+   const header = createHeader(channelName, discriminator, username, nickname);
+
+   const { eligiblePolls: witnessed, participatedPolls: participated } =
+      voterDoc.eligibleChannels.get(channelId);
+
+   const participation = await voterDoc.participation(channelId);
+
+   const stats = createStats(witnessed, participated, participation);
+
+   return `${header}${stats}`;
+}
+
+async function createNewUser(memberRoles, voterDoc, guildId, voterId) {
+   const hasVotingRole = await User.checkVotingRoles(memberRoles);
+
+   if (!hasVotingRole) {
+      throw new Error(
+         'This member has no voting roles. Their participation can not be gauged, because they are unable to participate.',
+      );
+   }
+
+   const eligibleChannels = await User.findEligibleChannels(memberRoles);
+
+   return await User.createUser(guildId, voterId, eligibleChannels);
+}
+
+function createHeader(
+   channelName,
+   discriminator,
+   username,
+   nickname = undefined,
+) {
+   return `**#${channelName} | ${
+      nickname ?? username
+   }#${discriminator} vote participation**\n`;
+}
+
+function createStats(witnessed, participated, participation) {
+   return codeBlock(
+      `${witnessed} votes witnessed\n${participated} votes participated\n${participation} participation rate`,
+   );
+}
