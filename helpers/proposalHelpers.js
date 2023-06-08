@@ -31,6 +31,8 @@ exports.createInitialVoteEmbed = async function (vote, nouns) {
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);
+
+   return voteEmbed;
 };
 
 exports.temporaryNewProposalMessage = function (proposal) {
