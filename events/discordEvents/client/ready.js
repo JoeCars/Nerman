@@ -100,9 +100,13 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
+                     const voteEmbed = await createInitialVoteEmbed(
+                        vote,
+                        Nouns,
+                     );
                      let message = await channel.send({
                         content: null,
-                        embeds: [await createInitialVoteEmbed(vote, Nouns)],
+                        embeds: [voteEmbed],
                      });
 
                      return message;
@@ -124,9 +128,11 @@ module.exports = {
                   .get(process.env.DISCORD_GUILD_ID)
                   .channels.cache.get(nounsGovId);
 
+               const voteEmbed = await createInitialVoteEmbed(vote, Nouns);
+
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [await createInitialVoteEmbed(vote, Nouns)],
+                  embeds: [voteEmbed],
                });
 
                client.emit('propVoteCast', message, vote);
