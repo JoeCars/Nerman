@@ -11,11 +11,16 @@ exports.getUrl = function (proposal) {
    return `https://nouns.wtf/vote/${proposal.id}`;
 };
 
-exports.proposalStatusUpdateMessage = function (proposal, proposalStatus) {
-   return `
-		Proposal ${proposal.id} status changed to ${proposalStatus}.\n
-		${getUrl(proposal)}
-	`;
+exports.createProposalStatusEmbed = function (proposal, proposalStatus) {
+   const title = `Proposal ${proposal.id} status changed to ${proposalStatus}.`;
+   const description = getUrl(proposal);
+
+   const proposalEmbed = new MessageEmbed()
+      .setColor('#00FFFF')
+      .setTitle(title)
+      .setDescription(description);
+
+   return proposalEmbed;
 };
 
 exports.createInitialVoteEmbed = async function (vote, nouns) {

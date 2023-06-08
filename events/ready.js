@@ -4,7 +4,7 @@ const PollChannel = require('../db/schemas/PollChannel');
 const GuildConfig = require('../db/schemas/GuildConfig');
 const Logger = require('../helpers/logger');
 const {
-   proposalStatusUpdateMessage,
+   createProposalStatusEmbed,
    createInitialVoteEmbed,
    createNewProposalEmbed,
 } = require('../helpers/proposalHelpers');
@@ -316,7 +316,8 @@ module.exports = {
 
                   const promises = channelList.map(async channel => {
                      let message = await channel.send({
-                        content: proposalStatusUpdateMessage(data, status),
+                        content: null,
+                        embeds: [createProposalStatusEmbed(data, status)],
                      });
 
                      return message;
@@ -335,7 +336,8 @@ module.exports = {
                }
             } else {
                let message = await nounsGovChannel.send({
-                  content: proposalStatusUpdateMessage(data, status),
+                  content: null,
+                  embeds: [createProposalStatusEmbed(data, status)],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -384,7 +386,8 @@ module.exports = {
 
                   const promises = channelList.map(async channel => {
                      let message = await channel.send({
-                        content: proposalStatusUpdateMessage(data, status),
+                        content: null,
+                        embeds: [createProposalStatusEmbed(data, status)],
                      });
 
                      return message;
@@ -403,7 +406,8 @@ module.exports = {
                }
             } else {
                let message = await nounsGovChannel.send({
-                  content: proposalStatusUpdateMessage(data, status),
+                  content: null,
+                  embeds: [createProposalStatusEmbed(data, status)],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -451,7 +455,8 @@ module.exports = {
 
                   const promises = channelList.map(async channel => {
                      let message = await channel.send({
-                        content: proposalStatusUpdateMessage(data, status),
+                        content: null,
+                        embeds: [createProposalStatusEmbed(data, status)],
                      });
 
                      return message;
@@ -470,7 +475,8 @@ module.exports = {
                }
             } else {
                let message = await nounsGovChannel.send({
-                  content: proposalStatusUpdateMessage(data, status),
+                  content: null,
+                  embeds: [createProposalStatusEmbed(data, status)],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -520,7 +526,8 @@ module.exports = {
 
                   const promises = channelList.map(async channel => {
                      let message = await channel.send({
-                        content: proposalStatusUpdateMessage(data, status),
+                        content: null,
+                        embeds: [createProposalStatusEmbed(data, status)],
                      });
 
                      return message;
@@ -539,7 +546,8 @@ module.exports = {
                }
             } else {
                let message = await nounsGovChannel.send({
-                  content: proposalStatusUpdateMessage(data, status),
+                  content: null,
+                  embeds: [createProposalStatusEmbed(data, status)],
                });
 
                client.emit('propStatusChange', message, status, data);
