@@ -1,4 +1,4 @@
-const { Collection } = require('discord.js');
+const { Collection, Client } = require('discord.js');
 
 const PollChannel = require('../../../db/schemas/PollChannel');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
@@ -9,6 +9,10 @@ const { Types } = require('mongoose');
 module.exports = {
    name: 'ready',
    once: true,
+   /**
+    *
+    * @param {Client} client
+    */
    async execute(client) {
       Logger.info(
          `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.NODE_ENV} mode.`,
