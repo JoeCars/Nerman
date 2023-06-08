@@ -1,3 +1,6 @@
+const shortenAddress = require('./nouns/shortenAddress');
+const { MessageEmbed } = require('discord.js');
+
 exports.getTitle = function (proposal) {
    return `Prop ${proposal.id}: ${proposal.description
       .match(/^#+\s+.+\n/)[0]
@@ -15,12 +18,19 @@ exports.proposalStatusUpdateMessage = function (proposal, proposalStatus) {
 	`;
 };
 
-exports.temporaryProposalVoteMessage = function (vote) {
-   return `
-      Prop ${vote.proposalId}.\n
-      ${vote.voter.id} voted ${vote.supportDetailed} with ${vote.votes}.\n
-      ${vote.reason}
-   `;
+exports.createInitialVoteEmbed = async function (vote, nouns) {
+   const voter =
+      (await nouns.ensReverseLookup(vote.voter.id)) ??
+      (await shortenAddress(vote.voter.id));
+   const choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
+
+   const title = `Prop ${vote.proposalId}.`;
+   const description = `${voter} voted ${choice} with ${vote.votes} votes.\n${vote.reason}`;
+
+   const voteEmbed = new MessageEmbed()
+      .setColor('#00FFFF')
+      .setTitle(title)
+      .setDescription(description);
 };
 
 exports.temporaryNewProposalMessage = function (proposal) {
