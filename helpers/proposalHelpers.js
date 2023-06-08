@@ -35,10 +35,14 @@ exports.createInitialVoteEmbed = async function (vote, nouns) {
    return voteEmbed;
 };
 
-exports.temporaryNewProposalMessage = function (proposal) {
-   return `
-      New Proposal\n
-      ${getTitle(proposal)}\n
-      ${getUrl(proposal)}
-   `;
+exports.createNewProposalEmbed = function (proposal) {
+   const title = `New Proposal - ${getTitle(proposal)}`;
+   const description = getUrl(proposal);
+
+   const proposalEmbed = new MessageEmbed()
+      .setColor('#00FFFF')
+      .setTitle(title)
+      .setDescription(description);
+
+   return proposalEmbed;
 };
