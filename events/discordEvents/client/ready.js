@@ -6,7 +6,7 @@ const Logger = require('../../../helpers/logger');
 const {
    proposalStatusUpdateMessage,
    createInitialVoteEmbed,
-   temporaryNewProposalMessage,
+   createNewProposalEmbed,
 } = require('../../../helpers/proposalHelpers');
 
 const { Types } = require('mongoose');
@@ -213,7 +213,8 @@ module.exports = {
                   // return;
                } else {
                   let message = await propChannel.send({
-                     content: temporaryNewProposalMessage(data),
+                     content: null,
+                     embeds: [createNewProposalEmbed(data)],
                   });
 
                   client.emit('newProposal', message, data);
@@ -221,7 +222,8 @@ module.exports = {
 
                const promises = channelList.map(async channel => {
                   let message = await channel.send({
-                     content: temporaryNewProposalMessage(data),
+                     content: null,
+                     embeds: [createNewProposalEmbed(data)],
                   });
 
                   return message;
@@ -264,7 +266,8 @@ module.exports = {
                // const description = `https://nouns.wtf/vote/${propId}`;
 
                let message = await propChannel.send({
-                  content: temporaryNewProposalMessage(data),
+                  content: null,
+                  embeds: [createNewProposalEmbed(data)],
                });
 
                // todo I should rename these events to be less confusing
