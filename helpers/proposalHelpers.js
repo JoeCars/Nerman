@@ -12,8 +12,8 @@ exports.getUrl = function (proposal) {
 };
 
 exports.createProposalStatusEmbed = function (proposal, proposalStatus) {
-   const title = `Proposal ${proposal.id} status changed to ${proposalStatus}.`;
-   const description = getUrl(proposal);
+   const title = `Proposal ${proposal.id}: ${proposal.description}`;
+   const description = `${getUrl(proposal)}\n${proposalStatus}`;
 
    const proposalEmbed = new MessageEmbed()
       .setColor('#00FFFF')
