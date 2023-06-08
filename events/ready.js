@@ -4,10 +4,8 @@ const PollChannel = require('../db/schemas/PollChannel');
 const GuildConfig = require('../db/schemas/GuildConfig');
 const Logger = require('../helpers/logger');
 const {
-   getTitle,
-   getUrl,
    proposalStatusUpdateMessage,
-   temporaryProposalVoteMessage,
+   createInitialVoteEmbed,
 } = require('../helpers/proposalHelpers');
 
 const { Types } = require('mongoose');
@@ -102,7 +100,8 @@ module.exports = {
 
                   const promises = channelList.map(async channel => {
                      let message = await channel.send({
-                        content: temporaryProposalVoteMessage(vote),
+                        content: null,
+                        embeds: [await createInitialVoteEmbed(vote, Nouns)],
                      });
 
                      return message;
@@ -125,7 +124,8 @@ module.exports = {
                   .channels.cache.get(nounsGovId);
 
                let message = await nounsGovChannel.send({
-                  content: temporaryProposalVoteMessage(vote),
+                  content: null,
+                  embeds: [await createInitialVoteEmbed(vote, Nouns)],
                });
 
                client.emit('propVoteCast', message, vote);
