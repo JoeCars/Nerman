@@ -51,13 +51,16 @@ exports.createInitialVoteEmbed = async function (vote, nouns) {
 };
 
 exports.createNewProposalEmbed = function (proposal) {
-   const title = `New Proposal - ${getTitle(proposal)}`;
-   const description = getUrl(proposal);
+   const title = 'New Proposal!';
+   const description = `Proposal ${proposal.id}: ${proposal.description
+      .match(/^#+\s+.+\n/)[0]
+      .replaceAll(/^(#\s)|(\n+)$/g, '')}`;
+   const descriptionUrl = `https://nouns.wtf/vote/${propId}`;
 
    const proposalEmbed = new MessageEmbed()
       .setColor('#00FFFF')
       .setTitle(title)
-      .setDescription(description);
+      .setDescription(`${description}\n\n${descriptionUrl}`);
 
    return proposalEmbed;
 };
