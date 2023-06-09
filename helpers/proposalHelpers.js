@@ -14,7 +14,7 @@ exports.getUrl = function (proposal) {
 
 exports.createProposalStatusEmbed = function (proposal, proposalStatus) {
    const title = `Proposal ${proposal.id}: ${proposal.description}`;
-   const description = `${getUrl(proposal)}\n${proposalStatus}`;
+   const description = `${`https://nouns.wtf/vote/${proposal.id}`}\n${proposalStatus}`;
 
    const proposalEmbed = new MessageEmbed()
       .setColor('#00FFFF')
