@@ -1,5 +1,6 @@
 const shortenAddress = require('./nouns/shortenAddress');
 const { MessageEmbed } = require('discord.js');
+const Poll = require('../db/schemas/Poll');
 
 exports.getTitle = function (proposal) {
    return `Prop ${proposal.id}: ${proposal.description
