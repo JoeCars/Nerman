@@ -1,15 +1,9 @@
 const { readdir } = require('fs').promises;
-const Logger = require('../helpers/logger');
 
 const getFiles = async (path, ending) => {
    let fileList = [];
 
    const files = await readdir(path, { withFileTypes: true });
-
-   console.log(
-      '//////////////////////////////////////////\nFILES\n//////////////////////////////////////////',
-      files,
-   );
 
    for (const file of files) {
       if (file.isDirectory()) {
@@ -23,9 +17,6 @@ const getFiles = async (path, ending) => {
          // }
       }
    }
-   Logger.debug('utils/functions.js/getFiles(): Checking file list.', {
-      fileList,
-   });
 
    return fileList;
 };
