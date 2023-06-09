@@ -159,6 +159,8 @@ module.exports = {
                },
             );
 
+            const nounsGovId = process.env.NOUNS_GOV_ID;
+
             // todo fix these silly ternaries, I hate them, they're no longer needed
             const propChannelId =
                process.env.DEPLOY_STAGE === 'development'
