@@ -1,6 +1,3 @@
-// Globals
-const Logger = require('./logger');
-
 // Block arrays to denote blocks of progress beginning at 0 and increasing in steps of 0.125
 const step = 0.125;
 const complete = '█';
@@ -14,26 +11,12 @@ const barEnd = '▕';
 
 // Functions:
 const drawBlock = (fracIndex, completeBlocks) => {
-   Logger.info('helpers/poll.js/drawBlock(): Drawing a block for the poll.', {
-      fracIndex: fracIndex,
-      completeBlocks: completeBlocks,
-   });
-
    // const drawBlock = function (fracIndex, completeBlocks) {
    let blocks = '';
 
    for (let i = 0; i < completeBlocks; i++) {
       blocks += complete;
-      Logger.debug('helpers/poll.js/drawBlock(): Checking blocks.', {
-         index: i,
-         blocks: blocks,
-      });
    }
-
-   Logger.debug('helpers/poll.js/drawBlock(): Checking current fraction.', {
-      currentFracIndex: uniXBlockArray[fracIndex],
-      nextFracIndex: blocks + uniXBlockArray[fracIndex],
-   });
 
    blocks += uniXBlockArray[fracIndex];
 
