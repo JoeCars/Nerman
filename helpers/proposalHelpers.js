@@ -56,7 +56,7 @@ exports.createNewProposalEmbed = function (proposal) {
    const description = `Proposal ${proposal.id}: ${proposal.description
       .match(/^#+\s+.+\n/)[0]
       .replaceAll(/^(#\s)|(\n+)$/g, '')}`;
-   const descriptionUrl = `https://nouns.wtf/vote/${propId}`;
+   const descriptionUrl = `https://nouns.wtf/vote/${proposal.id}`;
 
    const proposalEmbed = new MessageEmbed()
       .setColor('#00FFFF')
