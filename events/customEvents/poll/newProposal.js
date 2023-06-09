@@ -1,10 +1,5 @@
 // todo I should rename newProposal to reduce confusion maybe? Will workshop it
-const {
-   MessageEmbed,
-   MessageButton,
-   MessageActionRow,
-   Message,
-} = require('discord.js');
+const { MessageEmbed, Message } = require('discord.js');
 const { roleMention } = require('@discordjs/builders');
 const { Types } = require('mongoose');
 
@@ -52,19 +47,12 @@ module.exports = {
       });
 
       const propChannel = await cache.get(propChannelId);
-      // const nounsGovChannel = guildCache
-      //    .get(process.env.DISCORD_GUILD_ID)
-      //    .channels.cache.get(nounsGovId);
-      const nounsGovChannel = await cache.get(nounsGovId);
-      // const testConExists = await PollChannel.configExists(propChannel.id);
-      // console.log({ testConExists });
       const configExists = await PollChannel.configExists(propChannel.id);
       Logger.debug('events/poll/newProposal.js: Checking config exists.', {
          configExists: configExists,
          guildId: guildId,
          member: username,
       });
-
       if (!configExists) {
          Logger.info('events/poll/newProposal.js: No config exists. Exiting.', {
             guildId: guildId,
@@ -74,10 +62,9 @@ module.exports = {
       }
 
       const { id: propId, description: desc } = proposal;
-      const titleRegex = new RegExp(/^#+\s+.+\n/);
 
       const title = `Prop ${propId}: ${desc
-         .match(titleRegex)[0]
+         .match(new RegExp(/^#+\s+.+\n/))[0]
          .replaceAll(/^(#\s)|(\n+)$/g, '')}`;
       const description = `https://nouns.wtf/vote/${propId}`;
 
@@ -114,10 +101,7 @@ module.exports = {
          title,
          description,
          voteAllowance: 1,
-         choices:
-            channelConfig.forAgainst === true
-               ? ['for', 'against']
-               : ['yes', 'no'],
+         choices: channelConfig.forAgainst ? ['for', 'against'] : ['yes', 'no'],
       };
 
       const snapshotMap = new Map();
@@ -126,26 +110,17 @@ module.exports = {
       // todo also this should be done via fetching the config
       let allowedUsers;
       try {
-         // const allowedUsers = await message.guild.members
-         // const allowedUsers = await interaction.guild.members
          allowedUsers = await interaction.guild.members
             .fetch({
                withPresences: true,
             })
             .then(fetchedMembers => {
-               // console.log(fetchedMembers);
                return fetchedMembers.filter(member => {
-                  // console.log(member);
                   return (
+                     //    member.presence?.status === 'online' && //disabled not worrying about the online presence
                      !member.user.bot &&
                      member?.roles.cache.hasAny(...channelConfig.allowedRoles)
                   );
-                  //disabled not worrying about the online presence
-                  // return (
-                  //    member.presence?.status === 'online' &&
-                  //    !member.user.bot &&
-                  //    member?.roles.cache.hasAny(...channelConfig.allowedRoles)
-                  // );
                });
             });
 
@@ -311,6 +286,10 @@ module.exports = {
 
          client.emit('enqueuePoll', newPoll);
 
+         // const nounsGovChannel = guildCache
+         //    .get(process.env.DISCORD_GUILD_ID)
+         //    .channels.cache.get(nounsGovId);
+         // const nounsGovChannel = await cache.get(nounsGovId);
          // let nounsGovMessage = await nounsGovChannel.send({
          //    content: 'New proposal data...',
          // });
