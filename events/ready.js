@@ -590,10 +590,6 @@ module.exports = {
                .get(guildId)
                .channels.cache.get(genId);
 
-            Logger.info(
-               `events/ready.js: Transfer from ${data.from.id} to ${data.to.id} with token id ${data.tokenId}`,
-            );
-
             client.emit('auctionCreated', genChannel, auction);
          });
 
