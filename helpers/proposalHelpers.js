@@ -1,6 +1,7 @@
 const shortenAddress = require('./nouns/shortenAddress');
 const { MessageEmbed } = require('discord.js');
 const Poll = require('../db/schemas/Poll');
+const Logger = require('./logger');
 
 exports.getTitle = function (proposal) {
    return `Prop ${proposal.id}: ${proposal.description
@@ -12,8 +13,19 @@ exports.getUrl = function (proposal) {
    return `https://nouns.wtf/vote/${proposal.id}`;
 };
 
-exports.createProposalStatusEmbed = function (proposal, proposalStatus) {
-   const title = `Proposal ${proposal.id}: ${proposal.description}`;
+exports.createProposalStatusEmbed = async function (proposal, proposalStatus) {
+   let title = `Proposal ${proposal.id}`;
+   try {
+      const targetPoll = await Poll.findOne({
+         'pollData.title': {
+            $regex: new RegExp(`^prop\\s${Number(proposal.id)}`, 'i'),
+         },
+      }).exec();
+      title = targetPoll.pollData.title;
+   } catch (error) {
+      Logger.error('Unable to find poll for status change.');
+   }
+
    const description = `${`https://nouns.wtf/vote/${proposal.id}`}\n${proposalStatus}`;
 
    const proposalEmbed = new MessageEmbed()
