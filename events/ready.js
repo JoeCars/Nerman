@@ -323,9 +323,14 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
+                     const statusEmbed = await createProposalStatusEmbed(
+                        data,
+                        status,
+                     );
+
                      let message = await channel.send({
                         content: null,
-                        embeds: [createProposalStatusEmbed(data, status)],
+                        embeds: [statusEmbed],
                      });
 
                      return message;
@@ -343,9 +348,14 @@ module.exports = {
                   );
                }
             } else {
+               const statusEmbed = await createProposalStatusEmbed(
+                  data,
+                  status,
+               );
+
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [createProposalStatusEmbed(data, status)],
+                  embeds: [statusEmbed],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -393,9 +403,14 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
+                     const statusEmbed = await createProposalStatusEmbed(
+                        data,
+                        status,
+                     );
+
                      let message = await channel.send({
                         content: null,
-                        embeds: [createProposalStatusEmbed(data, status)],
+                        embeds: [statusEmbed],
                      });
 
                      return message;
@@ -413,9 +428,14 @@ module.exports = {
                   );
                }
             } else {
+               const statusEmbed = await createProposalStatusEmbed(
+                  data,
+                  status,
+               );
+
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [createProposalStatusEmbed(data, status)],
+                  embeds: [statusEmbed],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -462,9 +482,14 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
+                     const statusEmbed = await createProposalStatusEmbed(
+                        data,
+                        status,
+                     );
+
                      let message = await channel.send({
                         content: null,
-                        embeds: [createProposalStatusEmbed(data, status)],
+                        embeds: [statusEmbed],
                      });
 
                      return message;
@@ -482,9 +507,14 @@ module.exports = {
                   );
                }
             } else {
+               const statusEmbed = await createProposalStatusEmbed(
+                  data,
+                  status,
+               );
+
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [createProposalStatusEmbed(data, status)],
+                  embeds: [statusEmbed],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -533,9 +563,14 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
+                     const statusEmbed = await createProposalStatusEmbed(
+                        data,
+                        status,
+                     );
+
                      let message = await channel.send({
                         content: null,
-                        embeds: [createProposalStatusEmbed(data, status)],
+                        embeds: [statusEmbed],
                      });
 
                      return message;
@@ -553,9 +588,14 @@ module.exports = {
                   );
                }
             } else {
+               const statusEmbed = await createProposalStatusEmbed(
+                  data,
+                  status,
+               );
+
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [createProposalStatusEmbed(data, status)],
+                  embeds: [statusEmbed],
                });
 
                client.emit('propStatusChange', message, status, data);
