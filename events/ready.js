@@ -52,6 +52,11 @@ module.exports = {
                reason: vote.reason,
             });
 
+            if (Number(vote.votes) === 0) {
+               Logger.info('On VoteCast. Received 0 votes. Exiting.');
+               return;
+            }
+
             const nounsGovId = process.env.NOUNS_GOV_ID;
 
             // todo we have to come back later and change this when we make the actual configs so we don't need to rely on this sort of messy logic
