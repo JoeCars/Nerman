@@ -33,10 +33,6 @@ module.exports = {
 
          const { id: proposalId } = data;
 
-         const Nouns = await message.client.libraries.get('Nouns');
-         const nounsGovChannel =
-            (await cache.get(nounsGovId)) ?? (await channels.fetch(nounsGovId));
-
          const propRegExp = new RegExp(`^prop\\s${Number(proposalId)}`, 'i');
 
          // const targetPolls = await Poll.find({
