@@ -109,12 +109,6 @@ module.exports = {
          },
       );
 
-      // TODO: Rename this to something more appropriate.
-      const authorizedIds = process.env.BAD_BITCHES.split(',');
-      if (!authorizedIds.includes(interaction.user.id)) {
-         throw new Error('You do not have permission to use this command.');
-      }
-
       const targetPoll = await fetchPoll(interaction);
       await attachUsernames(interaction, targetPoll);
 
