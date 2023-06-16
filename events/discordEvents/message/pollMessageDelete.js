@@ -8,13 +8,10 @@ module.exports = {
       Logger.info(
          'events/poll/pollMessageDelete.js: Attempting to delete poll.',
          {
-            guildId: message.guild.id,
-            guildName: message.guild.name,
             channelId: message.channelId,
-            channelName: message.channel.name,
+            guildId: message.guild.id,
             messageId: message.id,
-            messageContent: message.content,
-         },
+         }
       );
 
       const {
@@ -35,13 +32,10 @@ module.exports = {
          Logger.info(
             'events/poll/pollMessageDelete.js: The message was not a valid poll.',
             {
-               guildId: message.guild.id,
-               guildName: message.guild.name,
                channelId: message.channelId,
-               channelName: message.channel.name,
+               guildId: message.guild.id,
                messageId: message.id,
-               messageContent: message.content,
-            },
+            }
          );
          return;
       }
@@ -50,21 +44,15 @@ module.exports = {
       // const messagePoll = await Poll.findOneAndDelete({ messageId });
       const messagePoll = await Poll.findOneAndUpdate(
          { messageId, guildId },
-         { status: 'closed' },
-         { new: true },
+         { status: 'closed' }
       );
-
-
 
       client.emit('dequeuePoll', messagePoll);
 
       Logger.info('events/poll/pollMessageDelete.js: Finished deleting poll.', {
-         guildId: message.guild.id,
-         guildName: message.guild.name,
          channelId: message.channelId,
-         channelName: message.channel.name,
+         guildId: message.guild.id,
          messageId: message.id,
-         messagePoll: messagePoll,
       });
    },
 };

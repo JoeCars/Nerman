@@ -11,27 +11,17 @@ const nounsGovId = process.env.NOUNS_GOV_ID;
 module.exports = {
    name: 'propVoteCast',
    /**
-    * @param {Message} interaction
+    * @param {Message} message
     */
    async execute(message, vote) {
       try {
          Logger.info(
             'events/stateOfNouns/propVoteCast.js: Handling a proposal vote event.',
             {
-               outputMessageData: {
-                  guildId: message.guildId,
-                  guildName: message.guild.name,
-                  channelId: message.channelId,
-                  channelName: message.channel.name,
-                  messageId: message.id,
-                  messageContent: message.content,
-               },
-               vote: {
-                  proposalId: Number(vote.proposalId),
-                  voterId: vote.voter.id,
-                  votes: Number(vote.votes),
-                  reason: vote.reason,
-               },
+               proposalId: Number(vote.proposalId),
+               voterId: vote.voter.id,
+               votes: Number(vote.votes),
+               reason: vote.reason,
             },
          );
 
@@ -136,22 +126,10 @@ module.exports = {
          Logger.debug(
             'events/stateOfNouns/propVoteCast.js: Checking poll title.',
             {
-               outputMessageData: {
-                  guildId: message.guildId,
-                  guildName: message.guild.name,
-                  channelId: message.channelId,
-                  channelName: message.channel.name,
-                  messageId: message.id,
-                  messageContent: message.content,
-               },
-
-               vote: {
-                  proposalId: Number(vote.proposalId),
-                  voterId: vote.voter.id,
-                  votes: Number(vote.votes),
-                  reason: vote.reason,
-               },
-
+               proposalId: `${vote.proposalId}`,
+               voterId: vote.voter.id,
+               votes: `${vote.votes}`,
+               reason: vote.reason,
                title: titleFromPoll,
             },
          );
@@ -263,60 +241,36 @@ module.exports = {
          //    choices: ['yes', 'no', 'abstain'],
          // };
 
-         // l(pollMessage?.thread.hasThread);
-         if (pollMessage !== null) {
+         // Checking if this is intended for Nouncil or not.
+         if (
+            pollMessage !== null &&
+            message.guildId === process.env.DISCORD_GUILD_ID
+         ) {
             pollMessage.thread.send({
                content: null,
                embeds: [threadEmbed],
             });
          }
 
-         await message.edit({
-            content: null,
-            embeds: [voteEmbed],
-         });
-
          Logger.info(
             'events/stateOfNouns/propVoteCast.js: Finished handling a proposal vote event.',
             {
-               outputMessageData: {
-                  guildId: message.guildId,
-                  guildName: message.guild.name,
-                  channelId: message.channelId,
-                  channelName: message.channel.name,
-                  messageId: message.id,
-                  messageContent: message.content,
-               },
-
-               vote: {
-                  proposalId: Number(vote.proposalId),
-                  voterId: vote.voter.id,
-                  votes: Number(vote.votes),
-                  reason: vote.reason,
-               },
+               proposalId: `${vote.proposalId}`,
+               voterId: vote.voter.id,
+               votes: `${vote.votes}`,
+               reason: vote.reason,
             },
          );
+
+         return await message.edit({
+            content: null,
+            embeds: [voteEmbed],
+         });
       } catch (error) {
          Logger.error(
             'events/stateOfNouns/propVoteCast.js: Received an error.',
             {
                error: error,
-
-               outputMessageData: {
-                  guildId: message.guildId,
-                  guildName: message.guild.name,
-                  channelId: message.channelId,
-                  channelName: message.channel.name,
-                  messageId: message.id,
-                  messageContent: message.content,
-               },
-
-               vote: {
-                  proposalId: Number(vote.proposalId),
-                  voterId: vote.voter.id,
-                  votes: Number(vote.votes),
-                  reason: vote.reason,
-               },
             },
          );
       }
