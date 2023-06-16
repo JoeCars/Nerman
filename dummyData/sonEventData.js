@@ -22,7 +22,7 @@ module.exports = (() => {
    });
    eventDataMap.set('propStatusChange', {
       proposalCanceled: {
-         id: 9001, //BigNum
+         id: 9001, // BigNum
       },
       proposalQueued: {
          id: 9002, // BigNum
@@ -36,10 +36,10 @@ module.exports = (() => {
       },
    });
    eventDataMap.set('nounCreatedNoun', {
-      id: 222
+      id: 222,
    });
    eventDataMap.set('nounCreatedNounder', {
-      id: 220
+      id: 220,
    });
 
    return eventDataMap;

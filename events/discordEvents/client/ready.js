@@ -328,6 +328,7 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
+                    
                      const statusEmbed = await createProposalStatusEmbed(
                         data,
                         status,
