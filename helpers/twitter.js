@@ -17,7 +17,7 @@ var T = new Twit({
 
 try {
    T.get('account/verify_credentials', { skip_status: true }).catch(function (
-      err
+      err,
    ) {
       Logger.error('helpers/twitter.js: Received an error.', {
          error: err,
@@ -62,7 +62,7 @@ async function formatTweet(content, user, mentions) {
       `${user}${lineBreak}` +
       `${formatCustomEmojis(formattedContent).substring(
          0,
-         messageLimit
+         messageLimit,
       )} ${lineBreak}` +
       `${hash}`;
 
@@ -180,12 +180,12 @@ function uploadImagesToTwitter(mediaDataArray, mediaIdArray, callback_final) {
                      uploadImagesToTwitter(
                         mediaDataArray,
                         mediaIdArray,
-                        callback_final
+                        callback_final,
                      );
                   }
-               }
+               },
             );
-         }
+         },
       );
    }
 }
@@ -196,6 +196,4 @@ module.exports.post = async function (content, mediaUrls) {
    }
 };
 
-module.exports.formatTweet = async function (content, user, mentions) {
-   return await formatTweet(content, user, mentions);
-};
+module.exports.formatTweet = formatTweet;

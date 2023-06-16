@@ -119,6 +119,7 @@ module.exports = {
       // NOTE: This is just to fix open polls without Voting Closes fields
       // todo remove later when I find out the specific root of this issue
       if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
+
          updateEmbed.spliceFields(
             updateEmbed.fields.findIndex(({ name }) => name === 'Abstains') + 1,
             0,
