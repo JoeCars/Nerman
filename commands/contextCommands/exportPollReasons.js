@@ -5,6 +5,7 @@ const codeBlock = require('discord.js').Formatters.codeBlock;
 const Poll = require('../../db/schemas/Poll');
 const Vote = require('../../db/schemas/Vote');
 const Logger = require('../../helpers/logger');
+const { isUserAuthorized } = require('../../helpers/authorization');
 
 const fetchPoll = async interaction => {
    let targetPoll;

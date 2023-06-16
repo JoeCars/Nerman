@@ -1,21 +1,15 @@
 const { readdir } = require('fs').promises;
-const Logger = require('../helpers/logger');
 
 const getFiles = async (path, ending) => {
    let fileList = [];
 
    const files = await readdir(path, { withFileTypes: true });
 
-   console.log(
-      '//////////////////////////////////////////\nFILES\n//////////////////////////////////////////',
-      files
-   );
-
    for (const file of files) {
       if (file.isDirectory()) {
          fileList = [
             ...fileList,
-            ...(await getFiles(`${path}/${file.name}`, '.js')),
+            ...(await getFiles(`${path}/${file.name}`, ending)),
          ];
       } else if (file.name.endsWith(ending)) {
          // if (file.name.endsWith(ending)) {
@@ -23,9 +17,6 @@ const getFiles = async (path, ending) => {
          // }
       }
    }
-   Logger.debug('utils/functions.js/getFiles(): Checking file list.', {
-      fileList,
-   });
 
    return fileList;
 };
@@ -37,9 +28,9 @@ const logToObject = async target => {
          JSON.stringify(
             target,
             (key, value) =>
-               typeof value === 'bigint' ? value.toString() : value // return everything else unchanged
-         )
-      )
+               typeof value === 'bigint' ? value.toString() : value, // return everything else unchanged
+         ),
+      ),
    );
 
    // return await JSON.parse(
@@ -125,7 +116,7 @@ const formatDate = (date, format) => {
 
    const months = [
       'Jan',
-      'Febr',
+      'Feb',
       'Mar',
       'Apr',
       'May',
