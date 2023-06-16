@@ -9,6 +9,7 @@ if (stahp === false) {
 const nMongoDB = require(`../../../../helpers/mongodb.js`);
 const nThreshold = require(`../../../../helpers/twitter/nThreshold.js`);
 const tenor = require(`../../../../helpers/tenor.js`);
+const Logger = require('../../../../helpers/logger.js');
 
 // role allowed for nerman tweet functions - for now env based on DEPLOY_STAGE
 const allowedRoles =

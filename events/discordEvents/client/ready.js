@@ -52,6 +52,11 @@ module.exports = {
                reason: vote.reason,
             });
 
+            if (Number(vote.votes) === 0) {
+               Logger.info('On VoteCast. Received 0 votes. Exiting.');
+               return;
+            }
+
             const nounsGovId = process.env.NOUNS_GOV_ID;
 
             // todo we have to come back later and change this when we make the actual configs so we don't need to rely on this sort of messy logic
@@ -158,6 +163,8 @@ module.exports = {
                   calldatas: `${data.calldatas}`,
                },
             );
+
+            const nounsGovId = process.env.NOUNS_GOV_ID;
 
             // todo fix these silly ternaries, I hate them, they're no longer needed
             const propChannelId =
@@ -321,9 +328,15 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
+                    
+                     const statusEmbed = await createProposalStatusEmbed(
+                        data,
+                        status,
+                     );
+
                      let message = await channel.send({
                         content: null,
-                        embeds: [createProposalStatusEmbed(data, status)],
+                        embeds: [statusEmbed],
                      });
 
                      return message;
@@ -341,9 +354,14 @@ module.exports = {
                   );
                }
             } else {
+               const statusEmbed = await createProposalStatusEmbed(
+                  data,
+                  status,
+               );
+
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [createProposalStatusEmbed(data, status)],
+                  embeds: [statusEmbed],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -391,9 +409,14 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
+                     const statusEmbed = await createProposalStatusEmbed(
+                        data,
+                        status,
+                     );
+
                      let message = await channel.send({
                         content: null,
-                        embeds: [createProposalStatusEmbed(data, status)],
+                        embeds: [statusEmbed],
                      });
 
                      return message;
@@ -411,9 +434,14 @@ module.exports = {
                   );
                }
             } else {
+               const statusEmbed = await createProposalStatusEmbed(
+                  data,
+                  status,
+               );
+
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [createProposalStatusEmbed(data, status)],
+                  embeds: [statusEmbed],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -460,9 +488,14 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
+                     const statusEmbed = await createProposalStatusEmbed(
+                        data,
+                        status,
+                     );
+
                      let message = await channel.send({
                         content: null,
-                        embeds: [createProposalStatusEmbed(data, status)],
+                        embeds: [statusEmbed],
                      });
 
                      return message;
@@ -480,9 +513,14 @@ module.exports = {
                   );
                }
             } else {
+               const statusEmbed = await createProposalStatusEmbed(
+                  data,
+                  status,
+               );
+
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [createProposalStatusEmbed(data, status)],
+                  embeds: [statusEmbed],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -531,9 +569,14 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
+                     const statusEmbed = await createProposalStatusEmbed(
+                        data,
+                        status,
+                     );
+
                      let message = await channel.send({
                         content: null,
-                        embeds: [createProposalStatusEmbed(data, status)],
+                        embeds: [statusEmbed],
                      });
 
                      return message;
@@ -551,9 +594,14 @@ module.exports = {
                   );
                }
             } else {
+               const statusEmbed = await createProposalStatusEmbed(
+                  data,
+                  status,
+               );
+
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [createProposalStatusEmbed(data, status)],
+                  embeds: [statusEmbed],
                });
 
                client.emit('propStatusChange', message, status, data);
