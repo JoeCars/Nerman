@@ -239,7 +239,7 @@ module.exports = {
                userId: interaction.user.id,
                guildId: interaction.guildId,
                channelId: interaction.channelId,
-               newMessage: newMessage,
+               newMessage: newMsg,
             },
          );
 
@@ -264,11 +264,11 @@ module.exports = {
          // disabled for meow
          // updateEmbed.setTitle(embedTitle);
 
-         updateEmbed.setFooter(
-            `Poll #${associatedPoll.pollNumber} submitted by ${
-               nickname ?? username
-            }#${discriminator}`,
-         );
+         // updateEmbed.setFooter(
+         //    `Poll #${associatedPoll.pollNumber} submitted by ${
+         //       nickname ?? username
+         //    }#${discriminator}`,
+         // );
 
          let embedQuorum = Math.ceil(
             associatedPoll.allowedUsers.size * (channelConfig.quorum / 100),
@@ -302,10 +302,97 @@ module.exports = {
          ];
 
          if (associatedPoll.config.liveVisualFeed === true) {
-            const embedResults =
-               messageToUpdate.embeds[0]?.fields.find(
-                  ({ name }) => name === 'Results',
-               ).value ?? 'WEEEE';
+            let embedResults = messageToUpdate.embeds[0]?.fields.find(
+               ({ name }) => name === 'Results',
+            )?.value;
+
+            console.log(
+               'commands/slashCommands/poll/regeneratePollMessage.js: \nif(liveVisualFeed === true)\nembedResults => ',
+               embedResults,
+            );
+
+            console.log(
+               'commands/slashCommands/poll/regeneratePollMessage.js: \nif(!embedResults) => ',
+               !embedResults,
+            );
+
+            // todo Once again, I need to abstract this whole mess here. I'm basically salivating for the chance to, but right now I just have to move fast on other things.
+            if (!embedResults) {
+               console.log(
+                  'commands/slashCommands/poll/regeneratePollMessage.js: \nif(!embedResults)\nTRUE -- accessing if() clausee',
+               );
+
+               const results = associatedPoll.results;
+               const longestOption = longestString(
+                  associatedPoll.pollData.choices,
+               ).length;
+
+               console.log(
+                  'events/poll/pollVote.js -- longestOption => ',
+                  longestOption,
+               );
+
+               console.log(
+                  'events/poll/pollVote.js -- associatedPoll.config => ',
+                  associatedPoll.config,
+               );
+
+               let resultsArray = associatedPoll.config.voteThreshold
+                  ? [
+                       `Threshold: ${associatedPoll.voteThreshold} ${
+                          associatedPoll.voteThreshold > 1 ? 'votes' : 'vote'
+                       }\n`,
+                    ]
+                  : [];
+
+               let resultsOutput = [];
+
+               const barWidth = 8;
+               let totalVotes = results.totalVotes;
+               // let totalVotes = associatedPoll.results.totalVotes;
+
+               let votesMap = new Map([
+                  ['maxLength', barWidth],
+                  ['totalVotes', totalVotes],
+               ]);
+               for (const key in results.distribution) {
+                  const label = key[0].toUpperCase() + key.substring(1);
+
+                  console.log('db/index.js -- label => ', label);
+                  console.log('db/index.js -- label.length => ', label.length);
+                  console.log(
+                     'db/index.js -- logging :  longestOption - label.length => ',
+                     longestOption - label.length,
+                  );
+                  const votes = results.distribution[key];
+                  const room = longestOption - label.length;
+                  let optionObj = new ResultBar(label, votes, room, votesMap);
+
+                  console.log('optionObj => ', optionObj);
+                  console.log(
+                     'optionObj.completeBar => ',
+                     optionObj.completeBar,
+                  );
+
+                  votesMap.set(label, optionObj);
+                  // resultsArray.splice(-1, 0, optionObj.completeBar);
+                  resultsArray.push(optionObj.completeBar);
+               }
+
+               resultsArray.push(`\nAbstains: ${associatedPoll.abstains.size}`);
+
+               // console.log(votesMap);
+
+               // resultsOutput = resultsArray.join('\n');
+               resultsOutput = codeBlock(resultsArray.join('\n'));
+
+               embedResults = resultsOutput;
+
+               console.log(
+                  'commands/slashCommands/poll/regeneratePollMessage.js: \nif(liveVisualFeed === true)\nif(!embedResults) TRUE\nnewly created embedResults => ',
+                  embedResults,
+               );
+            }
 
             newEmbedFields.splice(1, 0, {
                name: 'Results',

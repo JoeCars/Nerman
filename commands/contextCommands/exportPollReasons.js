@@ -54,7 +54,7 @@ const attachUsernames = async (interaction, targetPoll) => {
    }
 };
 
-const extractPollResults = targetPoll => {
+const extractPollResults = async targetPoll => {
    const status = targetPoll.status;
    const numOfAbstains = targetPoll.abstains.size;
 
@@ -72,11 +72,28 @@ const extractPollResults = targetPoll => {
       }
    }
 
-   return { status, numOfAbstains, votesForChoice };
+   const winner = await retrieveWinner(targetPoll);
+
+   let title = `Poll Status: ${status}\n`;
+   if (targetPoll.pollData && targetPoll.pollData.title) {
+      title = targetPoll.pollData.title;
+   }
+
+   return { status, numOfAbstains, votesForChoice, winner, title };
 };
 
-const generatePollExport = ({ status, numOfAbstains, votesForChoice }) => {
-   let output = `Poll Status: ${status}\n`;
+const generatePollExport = ({
+   status,
+   numOfAbstains,
+   votesForChoice,
+   winner,
+   title,
+}) => {
+   let output = `${title}\n`;
+
+   output += `\nThe poll is ${status}.\n`;
+
+   output += `\n${winner}\n`;
 
    votesForChoice.forEach((votes, choice) => {
       output += `\n**${choice.toUpperCase()} - ${votes.length} VOTES**\n`;
@@ -110,14 +127,10 @@ module.exports = {
          },
       );
 
-      if (!isUserAuthorized(interaction.user.id)) {
-         throw new Error('You do not have permission to use this command.');
-      }
-
       const targetPoll = await fetchPoll(interaction);
       await attachUsernames(interaction, targetPoll);
 
-      const pollResults = extractPollResults(targetPoll);
+      const pollResults = await extractPollResults(targetPoll);
       const markdown = generatePollExport(pollResults);
 
       interaction.reply({
@@ -139,3 +152,36 @@ module.exports = {
    extractPollResults: extractPollResults,
    generatePollExport: generatePollExport,
 };
+
+async function retrieveWinner(targetPoll) {
+   const results = await targetPoll.results;
+   let winningResult = 'Literally nobody voted on this :<';
+
+   if (results.winner) {
+      winningResult = `${
+         results.winner[0].toUpperCase() + results.winner.substring(1)
+      } - Wins`;
+   }
+
+   if (results.tied) {
+      winningResult = `${results.tied
+         .flatMap(arr => arr[0][0].toUpperCase() + arr[0].substring(1))
+         .join(', ')} - Tied\nPoll inconclusive.`;
+   }
+
+   let failedChecks = [];
+
+   if (results.quorumPass === false) {
+      failedChecks.push('quorum');
+   }
+
+   if (results.thresholdPass === false) {
+      failedChecks.push('vote threshold');
+   }
+
+   if (failedChecks.length > 0) {
+      winningResult = `Poll failed to meet ${failedChecks.join(' and ')}.`;
+   }
+
+   return winningResult;
+}

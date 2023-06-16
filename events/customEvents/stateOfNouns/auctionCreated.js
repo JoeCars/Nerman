@@ -17,23 +17,22 @@ module.exports = {
                id: `${data.id}`,
                startTime: data.startTime,
                endTime: data.endTime,
-               channelId: genChannel.id,
-            }
+            },
          );
 
          const { id, startTime, endTime } = data;
 
          const nounsWTF = hyperlink(
             'Nouns.wtf',
-            `https://nouns.wtf/noun/${id}`
+            `https://nouns.wtf/noun/${id}`,
          );
          const pronouns = hyperlink(
             'Pronouns.gg',
-            `https://pronouns.gg/noun/${id}`
+            `https://pronouns.gg/noun/${id}`,
          );
          const nounOClock = hyperlink(
             'Nounoclock.app',
-            `https://www.nounoclock.app/`
+            `https://www.nounoclock.app/`,
          );
 
          const acEmbed = new MessageEmbed()
@@ -49,8 +48,7 @@ module.exports = {
                id: data.id,
                startTime: data.startTime,
                endTime: data.endTime,
-               channelId: genChannel.id,
-            }
+            },
          );
 
          return await genChannel.send({ embeds: [acEmbed] });
@@ -59,7 +57,7 @@ module.exports = {
             'events/stateOfNouns/auctionCreated.js: Received an error.',
             {
                error: error,
-            }
+            },
          );
       }
    },
