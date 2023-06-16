@@ -1,13 +1,13 @@
 const { Collection } = require('discord.js');
 
-const PollChannel = require('../db/schemas/PollChannel');
-const GuildConfig = require('../db/schemas/GuildConfig');
-const Logger = require('../helpers/logger');
+const PollChannel = require('../../../db/schemas/PollChannel');
+const GuildConfig = require('../../../db/schemas/GuildConfig');
+const Logger = require('../../../helpers/logger');
 const {
    createProposalStatusEmbed,
    createInitialVoteEmbed,
    createNewProposalEmbed,
-} = require('../helpers/proposalHelpers');
+} = require('../../../helpers/proposalHelpers');
 
 const { Types } = require('mongoose');
 
@@ -19,8 +19,8 @@ module.exports = {
          `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.NODE_ENV} mode.`,
       );
 
-      await require('../db/index.js')(client);
-      await require('../utils/remindSheet.js')(client);
+      await require('../../../db/index.js')(client);
+      await require('../../../utils/remindSheet.js')(client);
 
       // const _StateOfNouns = import('stateofnouns');
       const _nerman = import('stateofnouns');
@@ -51,11 +51,6 @@ module.exports = {
                supportDetailed: vote.supportDetailed,
                reason: vote.reason,
             });
-
-            if (Number(vote.votes) === 0) {
-               Logger.info('On VoteCast. Received 0 votes. Exiting.');
-               return;
-            }
 
             const nounsGovId = process.env.NOUNS_GOV_ID;
 
@@ -163,8 +158,6 @@ module.exports = {
                   calldatas: `${data.calldatas}`,
                },
             );
-
-            const nounsGovId = process.env.NOUNS_GOV_ID;
 
             // todo fix these silly ternaries, I hate them, they're no longer needed
             const propChannelId =
@@ -328,14 +321,9 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
-                     const statusEmbed = await createProposalStatusEmbed(
-                        data,
-                        status,
-                     );
-
                      let message = await channel.send({
                         content: null,
-                        embeds: [statusEmbed],
+                        embeds: [createProposalStatusEmbed(data, status)],
                      });
 
                      return message;
@@ -353,14 +341,9 @@ module.exports = {
                   );
                }
             } else {
-               const statusEmbed = await createProposalStatusEmbed(
-                  data,
-                  status,
-               );
-
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [statusEmbed],
+                  embeds: [createProposalStatusEmbed(data, status)],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -408,14 +391,9 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
-                     const statusEmbed = await createProposalStatusEmbed(
-                        data,
-                        status,
-                     );
-
                      let message = await channel.send({
                         content: null,
-                        embeds: [statusEmbed],
+                        embeds: [createProposalStatusEmbed(data, status)],
                      });
 
                      return message;
@@ -433,14 +411,9 @@ module.exports = {
                   );
                }
             } else {
-               const statusEmbed = await createProposalStatusEmbed(
-                  data,
-                  status,
-               );
-
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [statusEmbed],
+                  embeds: [createProposalStatusEmbed(data, status)],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -487,14 +460,9 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
-                     const statusEmbed = await createProposalStatusEmbed(
-                        data,
-                        status,
-                     );
-
                      let message = await channel.send({
                         content: null,
-                        embeds: [statusEmbed],
+                        embeds: [createProposalStatusEmbed(data, status)],
                      });
 
                      return message;
@@ -512,14 +480,9 @@ module.exports = {
                   );
                }
             } else {
-               const statusEmbed = await createProposalStatusEmbed(
-                  data,
-                  status,
-               );
-
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [statusEmbed],
+                  embeds: [createProposalStatusEmbed(data, status)],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -568,14 +531,9 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
-                     const statusEmbed = await createProposalStatusEmbed(
-                        data,
-                        status,
-                     );
-
                      let message = await channel.send({
                         content: null,
-                        embeds: [statusEmbed],
+                        embeds: [createProposalStatusEmbed(data, status)],
                      });
 
                      return message;
@@ -593,14 +551,9 @@ module.exports = {
                   );
                }
             } else {
-               const statusEmbed = await createProposalStatusEmbed(
-                  data,
-                  status,
-               );
-
                let message = await nounsGovChannel.send({
                   content: null,
-                  embeds: [statusEmbed],
+                  embeds: [createProposalStatusEmbed(data, status)],
                });
 
                client.emit('propStatusChange', message, status, data);
@@ -634,6 +587,10 @@ module.exports = {
             const genChannel = await guildCache
                .get(guildId)
                .channels.cache.get(genId);
+
+            Logger.info(
+               `events/ready.js: Transfer from ${data.from.id} to ${data.to.id} with token id ${data.tokenId}`,
+            );
 
             client.emit('auctionCreated', genChannel, auction);
          });
