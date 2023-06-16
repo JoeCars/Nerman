@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const { drawBar, longestString } = require('../helpers/poll');
 
 const Logger = require('../helpers/logger');
-const ResultBar = require('../classes/ResultBar');
+const ResultBar = require('../structures/ResultBar');
 
 const Poll = require('../db/schemas/Poll');
 const { lc } = require('../utils/functions');
@@ -33,7 +33,7 @@ module.exports = async client => {
       process.env.NODE_ENV === 'production' ||
       process.env.NODE_ENV === 'staging'
          ? process.env.MONGODB_URI
-         : 'mongodb://localhost:27017/polls-test';
+         : 'mongodb://127.0.0.1:27017/polls-test';
 
    // create empty options object
    const options = {
