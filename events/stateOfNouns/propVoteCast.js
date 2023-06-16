@@ -11,7 +11,7 @@ const nounsGovId = process.env.NOUNS_GOV_ID;
 module.exports = {
    name: 'propVoteCast',
    /**
-    * @param {Message} interaction
+    * @param {Message} message
     */
    async execute(message, vote) {
       try {
@@ -241,8 +241,11 @@ module.exports = {
          //    choices: ['yes', 'no', 'abstain'],
          // };
 
-         // l(pollMessage?.thread.hasThread);
-         if (pollMessage !== null) {
+         // Checking if this is intended for Nouncil or not.
+         if (
+            pollMessage !== null &&
+            message.guildId === process.env.DISCORD_GUILD_ID
+         ) {
             pollMessage.thread.send({
                content: null,
                embeds: [threadEmbed],
