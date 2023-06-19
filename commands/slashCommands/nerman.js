@@ -128,7 +128,81 @@ module.exports = {
                   )
                   .setRequired(true),
             ),
-      ),
+      )
+
+      .addSubcommand(subcommand => {
+         return subcommand
+            .setName('notification-add')
+            .setDescription('Add an event configuration for the given channel.')
+            .addChannelOption(option => {
+               return option
+                  .setName('channel')
+                  .setDescription(
+                     'The channel that will receive the notifications.',
+                  )
+                  .setRequired(true);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('event')
+                  .setDescription('The event to register.')
+                  .setRequired(true)
+                  .addChoices([
+                     ['auctionBid', 'auctionBid'],
+                     ['auctionCreated', 'auctionCreated'],
+                     ['nounCreated', 'nounCreated'],
+                     ['propCreated', 'propCreated'],
+                     ['propStatusChange', 'propStatusChange'],
+                     ['propVoteCast', 'propVoteCast'],
+                     ['transferNoun', 'transferNoun'],
+                  ]);
+            });
+      })
+      .addSubcommand(subcommand => {
+         return subcommand
+            .setName('notification-remove')
+            .setDescription(
+               'Remove an event configuration for the given channel.',
+            )
+            .addChannelOption(option => {
+               return option
+                  .setName('channel')
+                  .setDescription(
+                     'The channel that will lose the notifications.',
+                  )
+                  .setRequired(true);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('event')
+                  .setDescription('The event to remove.')
+                  .setRequired(true)
+                  .addChoices([
+                     ['auctionBid', 'auctionBid'],
+                     ['auctionCreated', 'auctionCreated'],
+                     ['nounCreated', 'nounCreated'],
+                     ['propCreated', 'propCreated'],
+                     ['propStatusChange', 'propStatusChange'],
+                     ['propVoteCast', 'propVoteCast'],
+                     ['transferNoun', 'transferNoun'],
+                  ]);
+            });
+      })
+      .addSubcommand(subcommand => {
+         return subcommand
+            .setName('notification-display')
+            .setDescription(
+               'Display the event configuration of the given channel.',
+            )
+            .addChannelOption(option => {
+               return option
+                  .setName('channel')
+                  .setDescription(
+                     'The channel whose notifications you want to check.',
+                  )
+                  .setRequired(true);
+            });
+      }),
    /**
     *
     * @param {CommandInteraction} interaction
