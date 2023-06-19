@@ -328,7 +328,6 @@ module.exports = {
                   ];
 
                   const promises = channelList.map(async channel => {
-                    
                      const statusEmbed = await createProposalStatusEmbed(
                         data,
                         status,
@@ -635,10 +634,6 @@ module.exports = {
             const genChannel = await guildCache
                .get(guildId)
                .channels.cache.get(genId);
-
-            Logger.info(
-               `events/ready.js: Transfer from ${data.from.id} to ${data.to.id} with token id ${data.tokenId}`,
-            );
 
             client.emit('auctionCreated', genChannel, auction);
          });
