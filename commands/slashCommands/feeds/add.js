@@ -6,7 +6,7 @@ const Logger = require('../../../helpers/logger');
 const { isUserAuthorized } = require('../../../helpers/authorization');
 
 module.exports = {
-   subCommand: 'nerman.notification-add',
+   subCommand: 'nerman.feeds.add',
    /**
     * @param {CommandInteraction} interaction
     */

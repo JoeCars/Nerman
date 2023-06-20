@@ -129,78 +129,86 @@ module.exports = {
                   .setRequired(true),
             ),
       )
-
-      .addSubcommand(subcommand => {
-         return subcommand
-            .setName('notification-add')
-            .setDescription('Add an event configuration for the given channel.')
-            .addChannelOption(option => {
-               return option
-                  .setName('channel')
-                  .setDescription(
-                     'The channel that will receive the notifications.',
-                  )
-                  .setRequired(true);
-            })
-            .addStringOption(option => {
-               return option
-                  .setName('event')
-                  .setDescription('The event to register.')
-                  .setRequired(true)
-                  .addChoices([
-                     ['auctionBid', 'auctionBid'],
-                     ['auctionCreated', 'auctionCreated'],
-                     ['nounCreated', 'nounCreated'],
-                     ['propCreated', 'propCreated'],
-                     ['propStatusChange', 'propStatusChange'],
-                     ['propVoteCast', 'propVoteCast'],
-                     ['transferNoun', 'transferNoun'],
-                  ]);
-            });
-      })
-      .addSubcommand(subcommand => {
-         return subcommand
-            .setName('notification-remove')
+      .addSubcommandGroup(subcommandGroup => {
+         return subcommandGroup
+            .setName('feeds')
             .setDescription(
-               'Remove an event configuration for the given channel.',
+               'Commands to register, remove, and remove feeds from a channel.',
             )
-            .addChannelOption(option => {
-               return option
-                  .setName('channel')
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('add')
                   .setDescription(
-                     'The channel that will lose the notifications.',
+                     'Add an event configuration for the given channel.',
                   )
-                  .setRequired(true);
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will receive the notifications.',
+                        )
+                        .setRequired(true);
+                  })
+                  .addStringOption(option => {
+                     return option
+                        .setName('event')
+                        .setDescription('The event to register.')
+                        .setRequired(true)
+                        .addChoices([
+                           ['auctionBid', 'auctionBid'],
+                           ['auctionCreated', 'auctionCreated'],
+                           ['nounCreated', 'nounCreated'],
+                           ['propCreated', 'propCreated'],
+                           ['propStatusChange', 'propStatusChange'],
+                           ['propVoteCast', 'propVoteCast'],
+                           ['transferNoun', 'transferNoun'],
+                        ]);
+                  });
             })
-            .addStringOption(option => {
-               return option
-                  .setName('event')
-                  .setDescription('The event to remove.')
-                  .setRequired(true)
-                  .addChoices([
-                     ['auctionBid', 'auctionBid'],
-                     ['auctionCreated', 'auctionCreated'],
-                     ['nounCreated', 'nounCreated'],
-                     ['propCreated', 'propCreated'],
-                     ['propStatusChange', 'propStatusChange'],
-                     ['propVoteCast', 'propVoteCast'],
-                     ['transferNoun', 'transferNoun'],
-                  ]);
-            });
-      })
-      .addSubcommand(subcommand => {
-         return subcommand
-            .setName('notification-display')
-            .setDescription(
-               'Display the event configuration of the given channel.',
-            )
-            .addChannelOption(option => {
-               return option
-                  .setName('channel')
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('remove')
                   .setDescription(
-                     'The channel whose notifications you want to check.',
+                     'Remove an event configuration for the given channel.',
                   )
-                  .setRequired(true);
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will lose the notifications.',
+                        )
+                        .setRequired(true);
+                  })
+                  .addStringOption(option => {
+                     return option
+                        .setName('event')
+                        .setDescription('The event to remove.')
+                        .setRequired(true)
+                        .addChoices([
+                           ['auctionBid', 'auctionBid'],
+                           ['auctionCreated', 'auctionCreated'],
+                           ['nounCreated', 'nounCreated'],
+                           ['propCreated', 'propCreated'],
+                           ['propStatusChange', 'propStatusChange'],
+                           ['propVoteCast', 'propVoteCast'],
+                           ['transferNoun', 'transferNoun'],
+                        ]);
+                  });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('display')
+                  .setDescription(
+                     'Display the event configuration of the given channel.',
+                  )
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel whose notifications you want to check.',
+                        )
+                        .setRequired(true);
+                  });
             });
       }),
    /**
