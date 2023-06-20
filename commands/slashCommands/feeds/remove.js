@@ -1,7 +1,7 @@
 const { CommandInteraction } = require('discord.js');
 const { Types } = require('mongoose');
 
-const EventConfig = require('../../../db/schemas/EventConfig');
+const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
 const { isUserAuthorized } = require('../../../helpers/authorization');
 
@@ -34,7 +34,7 @@ module.exports = {
       // Removing configuration.
       let config;
       try {
-         config = await EventConfig.findOneAndDelete({
+         config = await FeedConfig.findOneAndDelete({
             guildId: interaction.guildId,
             channelId: channel.id,
             eventName: event,

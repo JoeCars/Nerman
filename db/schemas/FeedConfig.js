@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-const EventConfigSchema = new Schema(
+const FeedConfigSchema = new Schema(
    {
       _id: Schema.Types.ObjectId,
       guildId: {
@@ -30,14 +30,14 @@ const EventConfigSchema = new Schema(
          async findChannels(eventName) {
             return this.find({ eventName: eventName }).exec();
          },
-         async findEventsInGuild(guildId) {
+         async findFeedsInGuild(guildId) {
             return this.find({ guildId: guildId }).exec();
          },
-         async findEventsInChannel(guildId, channelId) {
+         async findFeedsInChannel(guildId, channelId) {
             return this.find({ guildId: guildId, channelId: channelId }).exec();
          },
       },
    },
 );
 
-module.exports = model('EventConfig', EventConfigSchema);
+module.exports = model('FeedConfig', FeedConfigSchema);

@@ -1,7 +1,7 @@
 const { CommandInteraction } = require('discord.js');
 const { Types } = require('mongoose');
 
-const EventConfig = require('../../../db/schemas/EventConfig');
+const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
 const { isUserAuthorized } = require('../../../helpers/authorization');
 
@@ -34,7 +34,7 @@ module.exports = {
       // Checking for previous configuration.
       let numOfConfigs;
       try {
-         numOfConfigs = await EventConfig.countDocuments({
+         numOfConfigs = await FeedConfig.countDocuments({
             guildId: interaction.guildId,
             channelId: channel.id,
             eventName: event,
@@ -61,7 +61,7 @@ module.exports = {
 
       // Inserting new configuration.
       try {
-         EventConfig.create({
+         FeedConfig.create({
             _id: new Types.ObjectId(),
             guildId: interaction.guildId,
             channelId: channel.id,

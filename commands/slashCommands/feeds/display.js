@@ -2,7 +2,7 @@ const { CommandInteraction } = require('discord.js');
 const { Types } = require('mongoose');
 const { codeBlock } = require('@discordjs/builders');
 
-const EventConfig = require('../../../db/schemas/EventConfig');
+const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
 const { isUserAuthorized } = require('../../../helpers/authorization');
 
@@ -32,9 +32,9 @@ module.exports = {
       }
 
       // Grabbing configuration.
-      let eventConfigs;
+      let feedConfigs;
       try {
-         eventConfigs = await EventConfig.findEventsInChannel(
+         feedConfigs = await FeedConfig.findFeedsInChannel(
             interaction.guildId,
             channel.id,
          );
@@ -52,7 +52,7 @@ module.exports = {
 
       await interaction.reply({
          ephemeral: true,
-         content: codeBlock(generateEventDisplay(eventConfigs)),
+         content: codeBlock(generateFeedDisplay(feedConfigs)),
       });
 
       Logger.info(
@@ -67,14 +67,14 @@ module.exports = {
 };
 
 /**
- * @param {Array} eventConfigs
+ * @param {Array} feedConfigs
  */
-function generateEventDisplay(eventConfigs) {
-   if (eventConfigs.length === 0) {
-      return 'This channel has no event configurations.';
+function generateFeedDisplay(feedConfigs) {
+   if (feedConfigs.length === 0) {
+      return 'This channel has no feed configurations.';
    }
 
-   return eventConfigs
+   return feedConfigs
       .map(config => {
          return config.eventName;
       })
