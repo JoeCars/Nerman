@@ -3,6 +3,7 @@ const User = require('../db/schemas/User');
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
 const Logger = require('../helpers/logger');
+const { checkUserEligibility } = require('../helpers/buttonEligibility');
 
 module.exports = {
    id: 'abstain',
@@ -41,40 +42,22 @@ module.exports = {
          'allowedRoles',
       ).exec();
 
-      if (!roleCache.hasAny(...allowedRoles)) {
-         Logger.warn(
-            'buttons/abstain.js: User does have an appropriate role.',
-            {
-               userId: userId,
-               guildId: guildId,
-               channelId: channelId,
-               messageId: messageId,
-            },
-         );
-         return interaction.editReply({
-            content: 'You do not have the role, dummy',
-            ephemeral: true,
-         });
-      }
-
       const pollStatus = await Poll.findOne(
          { messageId },
          'status allowedUsers',
       );
 
-      // if (!attachedPoll.allowedUsers.has(userId)) {
-      if (!pollStatus.allowedUsers.has(userId)) {
-         return interaction.editReply({
-            content: 'You are not eligible to participate in this poll, square',
-            ephemeral: true,
-         });
-      }
+      const eligibility = await checkUserEligibility(
+         roleCache,
+         allowedRoles,
+         pollStatus,
+         userId,
+         interaction.member.joinedTimestamp,
+      );
 
-      // enabled disabled for testing
-      // if (attachedPoll.allowedUsers.get(userId) === true) {
-      if (pollStatus.allowedUsers.get(userId) === true) {
+      if (!eligibility.isEligible) {
          return interaction.editReply({
-            content: 'You have already used up your vote allowance.',
+            content: eligibility.message,
             ephemeral: true,
          });
       }
@@ -84,56 +67,18 @@ module.exports = {
          .exec();
 
       if (!abstainingUser) {
-         const eligibleChannels = await User.findEligibleChannels(
+         abstainingUser = await createAbstainingUser(
             roleCache,
             anon,
-         );
-
-         abstainingUser = await User.createUser(
             guildId,
             userId,
-            eligibleChannels,
          );
       }
 
       const updatedPoll = await Poll.findAndSetAbstained(messageId, userId);
-
       abstainingUser.incParticipation(channelId);
 
-      let message = await client.channels.cache
-         .get(channelId)
-         .messages.fetch(messageId);
-
-      const updateEmbed = new MessageEmbed(message.embeds[0]);
-
-      updateEmbed.spliceFields(
-         updateEmbed.fields.findIndex(({ name }) => name === 'Abstains'),
-         1,
-         {
-            name: 'Abstains',
-            value: `${updatedPoll.countAbstains}`,
-            inline: true,
-         },
-      );
-
-      // NOTE: This is just to fix open polls without Voting Closes fields
-      // todo remove later when I find out the specific root of this issue
-      if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
-
-         updateEmbed.spliceFields(
-            updateEmbed.fields.findIndex(({ name }) => name === 'Abstains') + 1,
-            0,
-            {
-               name: 'Voting Closes',
-               value: `<t:${Math.floor(
-                  updatedPoll.timeEnd.getTime() / 1000,
-               )}:f>`,
-               inline: false,
-            },
-         );
-      }
-
-      message.edit({ embeds: [updateEmbed] });
+      await updateVoteEmbed(client, channelId, messageId, updatedPoll);
 
       await interaction.editReply({
          content: 'You have chosen to abstain from this poll',
@@ -151,3 +96,44 @@ module.exports = {
       );
    },
 };
+
+async function createAbstainingUser(roleCache, anon, guildId, userId) {
+   const eligibleChannels = await User.findEligibleChannels(roleCache, anon);
+   return await User.createUser(guildId, userId, eligibleChannels);
+}
+
+async function updateVoteEmbed(client, channelId, messageId, updatedPoll) {
+   // TODO: Update the results portion of the embed to include the new abstain.
+
+   let message = await client.channels.cache
+      .get(channelId)
+      .messages.fetch(messageId);
+
+   const updateEmbed = new MessageEmbed(message.embeds[0]);
+
+   updateEmbed.spliceFields(
+      updateEmbed.fields.findIndex(({ name }) => name === 'Abstains'),
+      1,
+      {
+         name: 'Abstains',
+         value: `${updatedPoll.countAbstains}`,
+         inline: true,
+      },
+   );
+
+   // NOTE: This is just to fix open polls without Voting Closes fields
+   // todo remove later when I find out the specific root of this issue
+   if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
+      updateEmbed.spliceFields(
+         updateEmbed.fields.findIndex(({ name }) => name === 'Abstains') + 1,
+         0,
+         {
+            name: 'Voting Closes',
+            value: `<t:${Math.floor(updatedPoll.timeEnd.getTime() / 1000)}:f>`,
+            inline: false,
+         },
+      );
+   }
+
+   message.edit({ embeds: [updateEmbed] });
+}

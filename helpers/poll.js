@@ -1,6 +1,3 @@
-// Globals
-const Logger = require('./logger');
-
 // Block arrays to denote blocks of progress beginning at 0 and increasing in steps of 0.125
 const step = 0.125;
 const complete = '█';
@@ -14,26 +11,12 @@ const barEnd = '▕';
 
 // Functions:
 const drawBlock = (fracIndex, completeBlocks) => {
-   Logger.info('helpers/poll.js/drawBlock(): Drawing a block for the poll.', {
-      fracIndex: fracIndex,
-      completeBlocks: completeBlocks,
-   });
-
    // const drawBlock = function (fracIndex, completeBlocks) {
    let blocks = '';
 
    for (let i = 0; i < completeBlocks; i++) {
       blocks += complete;
-      Logger.debug('helpers/poll.js/drawBlock(): Checking blocks.', {
-         index: i,
-         blocks: blocks,
-      });
    }
-
-   Logger.debug('helpers/poll.js/drawBlock(): Checking current fraction.', {
-      currentFracIndex: uniXBlockArray[fracIndex],
-      nextFracIndex: blocks + uniXBlockArray[fracIndex],
-   });
 
    blocks += uniXBlockArray[fracIndex];
 
@@ -70,12 +53,12 @@ const drawBar = function (maxLength, portion) {
 
    if (difference < 0) {
       let abs = Math.abs(difference);
-      fracIndex = abs >= 0.5 ? 4 : 0
+      fracIndex = abs >= 0.5 ? 4 : 0;
    }
 
    if (difference > 0) {
       let abs = Math.abs(difference);
-      fracIndex = abs <= 0.5 ? 4 : 0
+      fracIndex = abs <= 0.5 ? 4 : 0;
    }
 
    // disabled for testing
@@ -112,6 +95,9 @@ const longestString = array => {
 const randomNumber = async limit => Math.floor(Math.random() * limit);
 
 module.exports = {
+   drawBlock,
+   drawSpace,
    drawBar,
    longestString,
+   randomNumber,
 };

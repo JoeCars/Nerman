@@ -3,7 +3,7 @@ const { describe, it } = require('mocha');
 
 const {
    attachUsernames,
-} = require('../../../commands/context/exportPollReasons');
+} = require('../../../commands/contextCommands/exportPollReasons');
 
 describe('commands/context/exportPollReasons.js tests', () => {
    describe('attachUsernames() tests', () => {
@@ -22,9 +22,10 @@ describe('commands/context/exportPollReasons.js tests', () => {
          ];
          const targetPoll = {
             config: { anonymous: true },
+            getVotes: votes,
          };
 
-         await attachUsernames(interaction, votes, targetPoll);
+         await attachUsernames(interaction, targetPoll);
          expect(votes).to.eql([
             {
                user: '1',
@@ -64,9 +65,10 @@ describe('commands/context/exportPollReasons.js tests', () => {
          ];
          const targetPoll = {
             config: { anonymous: false },
+            getVotes: votes,
          };
 
-         await attachUsernames(interaction, votes, targetPoll);
+         await attachUsernames(interaction, targetPoll);
          expect(votes).to.eql([
             {
                user: '1',
@@ -96,9 +98,10 @@ describe('commands/context/exportPollReasons.js tests', () => {
          const votes = [];
          const targetPoll = {
             config: { anonymous: true },
+            getVotes: votes,
          };
 
-         await attachUsernames(interaction, votes, targetPoll);
+         await attachUsernames(interaction, targetPoll);
          expect(votes).to.eql([]);
       });
 
@@ -115,9 +118,10 @@ describe('commands/context/exportPollReasons.js tests', () => {
          const votes = [];
          const targetPoll = {
             config: { anonymous: false },
+            getVotes: votes,
          };
 
-         await attachUsernames(interaction, votes, targetPoll);
+         await attachUsernames(interaction, targetPoll);
          expect(votes).to.eql([]);
       });
    });
