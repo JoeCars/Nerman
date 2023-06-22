@@ -1,8 +1,14 @@
 const Logger = require('../../../../helpers/logger');
+const { CommandInteraction } = require('discord.js');
 
 // todo I should probably split this so that slash commands and context menu commands are housed in separate places.
 module.exports = {
    name: 'interactionCreate',
+   /**
+    *
+    * @param {CommandInteraction} interaction
+    * @returns
+    */
    async execute(interaction) {
       if (!interaction.isCommand() && !interaction.isContextMenu()) return;
 
@@ -10,7 +16,7 @@ module.exports = {
          'events/interactionCreate.js: Handling an interaction creation event.',
          {
             interaction: interaction,
-         }
+         },
       );
 
       const { client } = interaction;
@@ -28,9 +34,15 @@ module.exports = {
 
       try {
          if (subCommand) {
-            const subCommandFile = client.subCommands.get(
-               `${interaction.commandName}.${subCommand}`
-            );
+            const subCommandGroup =
+               interaction.options.getSubcommandGroup(false);
+            let commandName = '';
+            if (subCommandGroup) {
+               commandName = `${interaction.commandName}.${subCommandGroup}.${subCommand}`;
+            } else {
+               commandName = `${interaction.commandName}.${subCommand}`;
+            }
+            const subCommandFile = client.subCommands.get(commandName);
 
             if (!subCommandFile) {
                throw Error('Invalid subcommand');
@@ -43,7 +55,7 @@ module.exports = {
             'events/interactionCreate.js: Finished handling an interaction creation event.',
             {
                interaction: interaction,
-            }
+            },
          );
 
          await command.execute(interaction);
@@ -52,7 +64,7 @@ module.exports = {
             'events/interactionCreate.js: Encountered an error. Attempting to defer.',
             {
                error: error,
-            }
+            },
          );
 
          if (interaction.deferred) {
@@ -70,7 +82,7 @@ module.exports = {
                'events/interactionCreate.js: Did not defer interaction.',
                {
                   interaction: interaction,
-               }
+               },
             );
             await interaction.reply({
                content:
