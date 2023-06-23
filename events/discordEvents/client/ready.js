@@ -23,7 +23,7 @@ module.exports = {
       await require('../../../utils/remindSheet.js')(client);
 
       // const _StateOfNouns = import('stateofnouns');
-      const _nerman = import('stateofnouns');
+      const _nerman = import('nerman');
 
       async function runNouns() {
          const nerman = await _nerman;
