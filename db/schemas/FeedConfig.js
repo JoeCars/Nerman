@@ -16,6 +16,7 @@ const FeedConfigSchema = new Schema(
          enum: [
             'auctionBid',
             'auctionCreated',
+            'newPost',
             'nounCreated',
             'propCreated',
             'propStatusChange',

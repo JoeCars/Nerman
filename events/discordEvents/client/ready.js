@@ -1,7 +1,8 @@
-const { Collection } = require('discord.js');
+const { Collection, Client } = require('discord.js');
 
 const PollChannel = require('../../../db/schemas/PollChannel');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
+const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
 const {
    createProposalStatusEmbed,
@@ -14,6 +15,10 @@ const { Types } = require('mongoose');
 module.exports = {
    name: 'ready',
    once: true,
+   /**
+    *
+    * @param {Client} client
+    */
    async execute(client) {
       Logger.info(
          `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.NODE_ENV} mode.`,
@@ -23,11 +28,12 @@ module.exports = {
       await require('../../../utils/remindSheet.js')(client);
 
       // const _StateOfNouns = import('stateofnouns');
-      const _nerman = import('stateofnouns');
+      const _nerman = import('nerman');
 
       async function runNouns() {
          const nerman = await _nerman;
          const Nouns = new nerman.Nouns(process.env.JSON_RPC_API_URL);
+         const nounsNymz = new nerman.NounsNymz();
 
          const {
             guilds: { cache: guildCache },
@@ -42,6 +48,39 @@ module.exports = {
          // EXAMPLE EVENTS
          //
          // *************************************************************
+
+         nounsNymz.on('NewPost', async post => {
+            Logger.info('ready.js: On NewPost.', {
+               postId: post.id,
+               postTitle: post.title,
+            });
+
+            let feeds;
+            try {
+               feeds = await FeedConfig.findChannels('newPost');
+            } catch (error) {
+               return Logger.error('Unable to retrieve feed config.', {
+                  error: error,
+               });
+            }
+
+            // client.channels.fetch() is an async operation. Hence using Promise.all().
+            const channels = await Promise.all(
+               feeds
+                  .filter(feed => {
+                     return feed && feed.guildId && feed.channelId;
+                  })
+                  .map(feed => {
+                     return client.channels.fetch(feed.channelId);
+                  }),
+            );
+
+            channels.forEach(channel => {
+               if (channel) {
+                  client.emit('newPost', channel, post);
+               }
+            });
+         });
 
          Nouns.on('VoteCast', async vote => {
             Logger.info('events/ready.js: On VoteCast.', {
