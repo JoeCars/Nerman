@@ -4,7 +4,7 @@ const { describe, it } = require('mocha');
 const {
    getPostUrl,
    getUserUrl,
-   getTitleHyperlink,
+   getTitle,
    extractAnonymousUsernameFromId,
    findUsername,
    getUsernameHyperlink,
@@ -26,24 +26,45 @@ describe('views/embeds/nounsNymzPost.js tests', function () {
       });
    });
 
-   describe('getTitleHyperlink() tests', function () {
-      it('should return hyperlink', function () {
+   describe('getTitle() tests', function () {
+      it('should return root title', function () {
+         const post = {
+            id: 42,
+            title: 'The Answer To The Universe',
+            root: {
+               title: 'The Question Of The Universe',
+            },
+         };
+         const result = getTitle(post);
+
+         expect(result).to.equal('Reply In: The Question Of The Universe');
+      });
+
+      it('should return original title', function () {
          const post = {
             id: 42,
             title: 'The Answer To The Universe',
          };
-         const result = getTitleHyperlink(post);
+         const result = getTitle(post);
 
-         expect(result).to.equal(
-            '[The Answer To The Universe](https://nouns.nymz.xyz/posts/42)',
-         );
+         expect(result).to.equal('The Answer To The Universe');
+      });
+
+      it('should return default title', function () {
+         const post = {
+            id: 42,
+            title: '',
+         };
+         const result = getTitle(post);
+
+         expect(result).to.equal('New Post!');
       });
 
       it('should throw error', function () {
          const post = undefined;
 
          expect(function () {
-            getTitleHyperlink(post);
+            getTitle(post);
          }).to.throw();
       });
    });

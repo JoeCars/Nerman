@@ -11,10 +11,10 @@ exports.getUserUrl = function (userId) {
    return `https://nouns.nymz.xyz/users/${userId}`;
 };
 
-exports.getTitleHyperlink = function (post) {
-   const titleUrl = exports.getPostUrl(post.id);
-   const titleText = post.title;
-   return hyperlink(titleText, titleUrl);
+exports.getTitle = function (post) {
+   return (
+      (post.root ? `Reply In: ${post.root.title}` : post.title) || 'New Post!'
+   );
 };
 
 exports.extractAnonymousUsernameFromId = function (userId) {
@@ -46,11 +46,13 @@ exports.generatePostBody = function (post, username) {
 };
 
 exports.generateNewPostEmbed = async function (post, Nouns) {
-   const title = exports.getTitleHyperlink(post);
+   const title = exports.getTitle(post);
+   const url = exports.getPostUrl(post.id);
    const username = await exports.getUsernameHyperlink(post, Nouns);
    const body = exports.generatePostBody(post, username);
    return new MessageEmbed()
       .setColor('#00FFFF')
       .setTitle(title)
-      .setDescription(body);
+      .setDescription(body)
+      .setURL(url);
 };
