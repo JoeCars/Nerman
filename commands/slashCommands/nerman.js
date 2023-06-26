@@ -157,6 +157,7 @@ module.exports = {
                         .addChoices([
                            ['auctionBid', 'auctionBid'],
                            ['auctionCreated', 'auctionCreated'],
+                           ['newPost', 'newPost'],
                            ['nounCreated', 'nounCreated'],
                            ['propCreated', 'propCreated'],
                            ['propStatusChange', 'propStatusChange'],
@@ -187,6 +188,7 @@ module.exports = {
                         .addChoices([
                            ['auctionBid', 'auctionBid'],
                            ['auctionCreated', 'auctionCreated'],
+                           ['newPost', 'newPost'],
                            ['nounCreated', 'nounCreated'],
                            ['propCreated', 'propCreated'],
                            ['propStatusChange', 'propStatusChange'],
