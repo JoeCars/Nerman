@@ -77,13 +77,7 @@ function generateFeedDisplay(feedConfigs) {
 
    return feedConfigs
       .map(config => {
-         let eventName = config.eventName;
-         events.forEach((value, key) => {
-            if (config.eventName === value) {
-               eventName = key;
-            }
-         });
-         return eventName;
+         return events.get(config.eventName);
       })
       .join('\n');
 }

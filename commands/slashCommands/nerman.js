@@ -153,7 +153,7 @@ module.exports = {
                   .addStringOption(option => {
                      const eventOptions = [];
                      events.forEach((value, key) => {
-                        eventOptions.push([key, value]);
+                        eventOptions.push([value, key]);
                      });
                      return option
                         .setName('event')
@@ -179,7 +179,7 @@ module.exports = {
                   .addStringOption(option => {
                      const eventOptions = [];
                      events.forEach((value, key) => {
-                        eventOptions.push([key, value]);
+                        eventOptions.push([value, key]);
                      });
                      return option
                         .setName('event')

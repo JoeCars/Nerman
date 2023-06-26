@@ -53,12 +53,8 @@ module.exports = {
          );
       }
 
-      let eventName = event;
-      events.forEach((value, key) => {
-         if (event === value) {
-            eventName = key;
-         }
-      });
+      const eventName = events.get(event);
+
       if (config) {
          await interaction.reply({
             ephemeral: true,
