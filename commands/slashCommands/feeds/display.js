@@ -5,6 +5,7 @@ const { codeBlock } = require('@discordjs/builders');
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
 const { isUserAuthorized } = require('../../../helpers/authorization');
+const events = require('../../../utils/feedEvents');
 
 module.exports = {
    subCommand: 'nerman.feeds.display',
@@ -76,7 +77,13 @@ function generateFeedDisplay(feedConfigs) {
 
    return feedConfigs
       .map(config => {
-         return config.eventName;
+         let eventName = config.eventName;
+         events.forEach((value, key) => {
+            if (config.eventName === value) {
+               eventName = key;
+            }
+         });
+         return eventName;
       })
       .join('\n');
 }

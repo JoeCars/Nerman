@@ -1,0 +1,10 @@
+const events = new Map();
+events.set('NounsDAO.AuctionBid', 'auctionBid');
+events.set('NounsDAO.AuctionCreated', 'auctionCreated');
+events.set('NounsNymz.NewPost', 'newPost');
+events.set('NounsDAO.NounCreated', 'nounCreated');
+events.set('NounsDAO.PropCreated', 'propCreated');
+events.set('NounsDAO.PropStatusChange', 'propStatusChange');
+events.set('NounsDAO.PropVoteCast', 'propVoteCast');
+events.set('NounsDAO.TransferNoun', 'transferNoun');
+module.exports = events;

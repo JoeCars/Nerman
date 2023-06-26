@@ -1,9 +1,11 @@
 const { CommandInteraction } = require('discord.js');
 const { Types } = require('mongoose');
+const { inlineCode } = require('@discordjs/builders');
 
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
 const { isUserAuthorized } = require('../../../helpers/authorization');
+const events = require('../../../utils/feedEvents');
 
 module.exports = {
    subCommand: 'nerman.feeds.remove',
@@ -51,15 +53,27 @@ module.exports = {
          );
       }
 
+      let eventName = event;
+      events.forEach((value, key) => {
+         if (event === value) {
+            eventName = key;
+         }
+      });
       if (config) {
          await interaction.reply({
             ephemeral: true,
-            content: `You have successfully remove the ${event} event from ${channel.id}.`,
+            content: `You have successfully remove the ${inlineCode(
+               eventName,
+            )} event from channel ${inlineCode(channel.id)}.`,
          });
       } else {
          await interaction.reply({
             ephemeral: true,
-            content: `${event} was not registered to ${channel.id}. Nothing was removed.`,
+            content: `${inlineCode(
+               eventName,
+            )} was not registered to channel ${inlineCode(
+               channel.id,
+            )}. Nothing was removed.`,
          });
       }
 
