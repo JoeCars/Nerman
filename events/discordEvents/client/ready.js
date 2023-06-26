@@ -668,13 +668,31 @@ module.exports = {
                auctionEndTime: `${auction.endTime}`,
             });
 
-            const guildId = process.env.DISCORD_GUILD_ID;
-            const genId = process.env.NOUNCIL_GENERAL;
-            const genChannel = await guildCache
-               .get(guildId)
-               .channels.cache.get(genId);
+            let feeds;
+            try {
+               feeds = await FeedConfig.findChannels('auctionCreated');
+            } catch (error) {
+               return Logger.error('Unable to retrieve feed config.', {
+                  error: error,
+               });
+            }
 
-            client.emit('auctionCreated', genChannel, auction);
+            // client.channels.fetch() is an async operation. Hence using Promise.all().
+            const channels = await Promise.all(
+               feeds
+                  .filter(feed => {
+                     return feed && feed.guildId && feed.channelId;
+                  })
+                  .map(feed => {
+                     return client.channels.fetch(feed.channelId);
+                  }),
+            );
+
+            channels.forEach(channel => {
+               if (channel) {
+                  client.emit('auctionCreated', channel, auction);
+               }
+            });
          });
 
          Nouns.on('NounCreated', async data => {
