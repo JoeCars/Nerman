@@ -49,6 +49,40 @@ module.exports = {
          //
          // *************************************************************
 
+         Nouns.on('DelegateChanged', async data => {
+            Logger.info('ready.js: On DelegateChanged.', {
+               delegator: data.delegator.id,
+               oldDelegate: data.fromDelegate.id,
+               newDelegate: data.toDelegate.id,
+               event: data.event,
+            });
+
+            let feeds;
+            try {
+               feeds = await FeedConfig.findChannels('newPost'); // TODO: Change this to the correct event type after merge.
+            } catch (error) {
+               return Logger.error('Unable to retrieve feed config.', {
+                  error: error,
+               });
+            }
+
+            const channels = await Promise.all(
+               feeds
+                  .filter(feed => {
+                     return feed && feed.guildId && feed.channelId;
+                  })
+                  .map(feed => {
+                     return client.channels.fetch(feed.channelId);
+                  }),
+            );
+
+            channels.forEach(channel => {
+               if (channel) {
+                  client.emit('delegateChanged', channel, data);
+               }
+            });
+         });
+
          nounsNymz.on('NewPost', async post => {
             Logger.info('ready.js: On NewPost.', {
                postId: post.id,
