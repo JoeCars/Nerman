@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { CommandInteraction } = require('discord-modals');
 
 const Logger = require('../../helpers/logger');
+const events = require('../../utils/feedEvents');
 
 // !test this is going to be testing passing StateOfNouns in as an argument, so I'm attempting to make this a async thang?
 module.exports = {
@@ -150,20 +151,15 @@ module.exports = {
                         .setRequired(true);
                   })
                   .addStringOption(option => {
+                     const eventOptions = [];
+                     events.forEach((value, key) => {
+                        eventOptions.push([value, key]);
+                     });
                      return option
                         .setName('event')
                         .setDescription('The event to register.')
                         .setRequired(true)
-                        .addChoices([
-                           ['auctionBid', 'auctionBid'],
-                           ['auctionCreated', 'auctionCreated'],
-                           ['newPost', 'newPost'],
-                           ['nounCreated', 'nounCreated'],
-                           ['propCreated', 'propCreated'],
-                           ['propStatusChange', 'propStatusChange'],
-                           ['propVoteCast', 'propVoteCast'],
-                           ['transferNoun', 'transferNoun'],
-                        ]);
+                        .addChoices(eventOptions);
                   });
             })
             .addSubcommand(subcommand => {
@@ -181,20 +177,15 @@ module.exports = {
                         .setRequired(true);
                   })
                   .addStringOption(option => {
+                     const eventOptions = [];
+                     events.forEach((value, key) => {
+                        eventOptions.push([value, key]);
+                     });
                      return option
                         .setName('event')
                         .setDescription('The event to remove.')
                         .setRequired(true)
-                        .addChoices([
-                           ['auctionBid', 'auctionBid'],
-                           ['auctionCreated', 'auctionCreated'],
-                           ['newPost', 'newPost'],
-                           ['nounCreated', 'nounCreated'],
-                           ['propCreated', 'propCreated'],
-                           ['propStatusChange', 'propStatusChange'],
-                           ['propVoteCast', 'propVoteCast'],
-                           ['transferNoun', 'transferNoun'],
-                        ]);
+                        .addChoices(eventOptions);
                   });
             })
             .addSubcommand(subcommand => {
