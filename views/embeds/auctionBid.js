@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { findBidderLink, getNounsLink, getEthAmount } = require('../helpers');
+const { findAccountLink, getNounsLink, getEthAmount } = require('../helpers');
 
 /**
  *
@@ -11,7 +11,7 @@ exports.generateAuctionBidEmbed = async function generateAuctionBidEmbed(
    Nouns,
    bidData,
 ) {
-   const bidderLink = await findBidderLink(Nouns, bidData.bidder.id);
+   const bidderLink = await findAccountLink(Nouns, bidData.bidder.id);
    const nounsLink = getNounsLink(bidData.id);
    const amount = getEthAmount(bidData.amount);
 
