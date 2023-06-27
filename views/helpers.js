@@ -2,12 +2,10 @@ const { hyperlink } = require('@discordjs/builders');
 
 const shortenAddress = require('../helpers/nouns/shortenAddress');
 
-exports.findBidderLink = async function (Nouns, bidderId) {
-   const bidderENS =
-      (await Nouns.ensReverseLookup(bidderId)) ??
-      (await shortenAddress(bidderId));
+exports.findAccountLink = async function (Nouns, id) {
+   const bidderENS = await exports.findAccountENS(id);
    const ethBaseUrl = 'https://etherscan.io/address/';
-   return hyperlink(bidderENS, `${ethBaseUrl}${bidderId}`);
+   return hyperlink(bidderENS, `${ethBaseUrl}${id}`);
 };
 
 exports.getNounsLink = function (nounId) {
@@ -27,4 +25,9 @@ exports.getEthAmount = function (amount) {
    }
 
    return Number(bigNumString.slice(0, -18) + '.' + bigNumString.slice(-18));
+};
+
+exports.findAccountENS = async function (Nouns, id) {
+   const ens = (await Nouns.ensReverseLookup(id)) ?? (await shortenAddress(id));
+   return ense;
 };

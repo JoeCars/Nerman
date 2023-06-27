@@ -1,13 +1,13 @@
 const { expect } = require('chai');
 const { describe, it } = require('mocha');
 const {
-   findBidderLink,
+   findAccountLink,
    getNounsLink,
    getEthAmount,
 } = require('../../views/helpers');
 
 describe('views/helpers.js tests', function () {
-   describe('findBidderLink() tests', function () {
+   describe('findAccountLink() tests', function () {
       it('should generate a hyperlink when Nouns is working.', async function () {
          const nouns = {
             async ensReverseLookup(id) {
@@ -16,7 +16,7 @@ describe('views/helpers.js tests', function () {
          };
          const bidderId = 123;
 
-         const results = await findBidderLink(nouns, bidderId);
+         const results = await findAccountLink(nouns, bidderId);
 
          expect(results).to.eql('[123](https://etherscan.io/address/123)');
       });
@@ -29,7 +29,7 @@ describe('views/helpers.js tests', function () {
          };
          const bidderId = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
 
-         const results = await findBidderLink(nouns, bidderId);
+         const results = await findAccountLink(nouns, bidderId);
 
          expect(results).to.eql(
             '[0x71C7...976F](https://etherscan.io/address/0x71C7656EC7ab88b098defB751B7401B5f6d8976F)',
