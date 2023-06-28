@@ -29,5 +29,5 @@ exports.getEthAmount = function (amount) {
 
 exports.findAccountENS = async function (Nouns, id) {
    const ens = (await Nouns.ensReverseLookup(id)) ?? (await shortenAddress(id));
-   return ense;
+   return ens;
 };
