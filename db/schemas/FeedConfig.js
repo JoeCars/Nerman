@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const events = require('../../utils/feedEvents');
 
 const FeedConfigSchema = new Schema(
    {
@@ -13,16 +14,7 @@ const FeedConfigSchema = new Schema(
       },
       eventName: {
          type: String,
-         enum: [
-            'auctionBid',
-            'auctionCreated',
-            'newPost',
-            'nounCreated',
-            'propCreated',
-            'propStatusChange',
-            'propVoteCast',
-            'transferNoun',
-         ],
+         enum: [...events.keys()],
          required: true,
       },
    },
