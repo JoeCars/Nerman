@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { inlineCode } = require('@discordjs/builders');
+const Logger = require('../../helpers/logger');
 
 const { findAccountENS, findAccountLink } = require('../helpers');
 
@@ -19,8 +20,12 @@ exports.generateDelegateChangedEmbed = async function (
    }
 
    const votes = hasMarkdown ? inlineCode(data.events.data) : data.events.data;
+   Logger.debug('views/embeds/delegateChanged.js: Checking votes and data.', {
+      votes: votes,
+      data: data,
+   });
 
-   const message = `${delegator} delegated ${votes} votes to ${newDelegate}.`;
+   const message = `${delegator} delegated votes to ${newDelegate}.`;
 
    const embed = new MessageEmbed().setTitle(title).setDescription(message);
 
