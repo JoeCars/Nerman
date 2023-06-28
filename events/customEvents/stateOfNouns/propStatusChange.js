@@ -1,26 +1,39 @@
-const { MessageEmbed, Message } = require('discord.js');
+const { MessageEmbed, TextChannel } = require('discord.js');
 const { inlineCode } = require('@discordjs/builders');
 
 const Poll = require('../../../db/schemas/Poll');
 
-const shortenAddress = require('../../../helpers/nouns/createNounEmbed');
 const Logger = require('../../../helpers/logger');
-
-const nounsGovId = process.env.NOUNS_GOV_ID;
+const {
+   createProposalStatusEmbed,
+} = require('../../../helpers/proposalHelpers');
 
 module.exports = {
    name: 'propStatusChange',
    /**
-    * @param {Message} interaction
+    * @param {TextChannel} interaction
     */
-   async execute(message, statusChange, data) {
+   async execute(channel, data) {
       try {
          Logger.info(
             'events/stateOfNouns/propStatusChange.js: Handling a proposal change event.',
             {
                proposalId: `${data.id}`,
+               status: data.status,
             },
          );
+
+         const statusChange = data.status;
+
+         const statusEmbed = await createProposalStatusEmbed(
+            data,
+            statusChange,
+         );
+
+         const message = await channel.send({
+            content: null,
+            embeds: [statusEmbed],
+         });
 
          const {
             channelId,

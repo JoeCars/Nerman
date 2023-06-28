@@ -4,11 +4,7 @@ const PollChannel = require('../../../db/schemas/PollChannel');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
-const {
-   createProposalStatusEmbed,
-   createInitialVoteEmbed,
-   createNewProposalEmbed,
-} = require('../../../helpers/proposalHelpers');
+const { createNewProposalEmbed } = require('../../../helpers/proposalHelpers');
 
 const { Types } = require('mongoose');
 
@@ -236,77 +232,9 @@ module.exports = {
                id: `${data.id}`,
             });
 
-            const nounsGovId = process.env.NOUNS_GOV_ID;
+            data.status = 'Canceled';
 
-            const nounsGovChannel = guildCache
-               .get(process.env.DISCORD_GUILD_ID)
-               .channels.cache.get(nounsGovId);
-
-            const status = 'Canceled';
-
-            // todo change to production after testing
-            // if (process.env.DEPLOY_STAGE === 'development') {
-            if (process.env.DEPLOY_STAGE === 'production') {
-               try {
-                  // NCD
-                  const ncdGuildId = process.env.NCD_GUILD_ID;
-                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
-                  const ncdChannel = guildCache
-                     .get(ncdGuildId)
-                     .channels.cache.get(ncdChannelId);
-
-                  // Agora
-                  const agoraGuildId = process.env.AGORA_GUILD_ID;
-                  const agoraChannelId = process.env.AGORA_CHANNEL_ID;
-                  const agoraChannel = guildCache
-                     .get(agoraGuildId)
-                     .channels.cache.get(agoraChannelId);
-
-                  // List of channels to output events to, can't wait for config
-                  const channelList = [
-                     nounsGovChannel,
-                     ncdChannel,
-                     agoraChannel,
-                  ];
-
-                  const promises = channelList.map(async channel => {
-                     const statusEmbed = await createProposalStatusEmbed(
-                        data,
-                        status,
-                     );
-
-                     let message = await channel.send({
-                        content: null,
-                        embeds: [statusEmbed],
-                     });
-
-                     return message;
-                  });
-
-                  const resolved = await Promise.all(promises);
-
-                  resolved.forEach(message => {
-                     client.emit('propStatusChange', message, status, data);
-                  });
-               } catch (error) {
-                  Logger.error(
-                     'events/ready.js: ProposalCanceled - an error has occurred',
-                     { error },
-                  );
-               }
-            } else {
-               const statusEmbed = await createProposalStatusEmbed(
-                  data,
-                  status,
-               );
-
-               let message = await nounsGovChannel.send({
-                  content: null,
-                  embeds: [statusEmbed],
-               });
-
-               client.emit('propStatusChange', message, status, data);
-            }
+            processEvent('propStatusChange', data, client);
          });
 
          // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
@@ -316,77 +244,9 @@ module.exports = {
                eta: `${data.eta}`,
             });
 
-            const nounsGovId = process.env.NOUNS_GOV_ID;
+            data.status = 'Queued';
 
-            const nounsGovChannel = guildCache
-               .get(process.env.DISCORD_GUILD_ID)
-               .channels.cache.get(nounsGovId);
-
-            const status = 'Queued';
-
-            // todo change to production after testing
-            // if (process.env.DEPLOY_STAGE === 'development') {
-            if (process.env.DEPLOY_STAGE === 'production') {
-               try {
-                  // NCD
-                  const ncdGuildId = process.env.NCD_GUILD_ID;
-                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
-                  const ncdChannel = guildCache
-                     .get(ncdGuildId)
-                     .channels.cache.get(ncdChannelId);
-
-                  // Agora
-                  const agoraGuildId = process.env.AGORA_GUILD_ID;
-                  const agoraChannelId = process.env.AGORA_CHANNEL_ID;
-                  const agoraChannel = guildCache
-                     .get(agoraGuildId)
-                     .channels.cache.get(agoraChannelId);
-
-                  // List of channels to output events to, can't wait for config
-                  const channelList = [
-                     nounsGovChannel,
-                     ncdChannel,
-                     agoraChannel,
-                  ];
-
-                  const promises = channelList.map(async channel => {
-                     const statusEmbed = await createProposalStatusEmbed(
-                        data,
-                        status,
-                     );
-
-                     let message = await channel.send({
-                        content: null,
-                        embeds: [statusEmbed],
-                     });
-
-                     return message;
-                  });
-
-                  const resolved = await Promise.all(promises);
-
-                  resolved.forEach(message => {
-                     client.emit('propStatusChange', message, status, data);
-                  });
-               } catch (error) {
-                  Logger.error(
-                     'events/ready.js: ProposalQueued - an error has occurred',
-                     { error },
-                  );
-               }
-            } else {
-               const statusEmbed = await createProposalStatusEmbed(
-                  data,
-                  status,
-               );
-
-               let message = await nounsGovChannel.send({
-                  content: null,
-                  embeds: [statusEmbed],
-               });
-
-               client.emit('propStatusChange', message, status, data);
-            }
+            processEvent('propStatusChange', data, client);
          });
 
          // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
@@ -395,77 +255,9 @@ module.exports = {
                id: `${data.id}`,
             });
 
-            const nounsGovId = process.env.NOUNS_GOV_ID;
+            data.status = 'Vetoed';
 
-            const nounsGovChannel = guildCache
-               .get(process.env.DISCORD_GUILD_ID)
-               .channels.cache.get(nounsGovId);
-
-            const status = 'Vetoed';
-
-            // todo change to production after testing
-            // if (process.env.DEPLOY_STAGE === 'development') {
-            if (process.env.DEPLOY_STAGE === 'production') {
-               try {
-                  // NCD
-                  const ncdGuildId = process.env.NCD_GUILD_ID;
-                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
-                  const ncdChannel = guildCache
-                     .get(ncdGuildId)
-                     .channels.cache.get(ncdChannelId);
-
-                  // Agora
-                  const agoraGuildId = process.env.AGORA_GUILD_ID;
-                  const agoraChannelId = process.env.AGORA_CHANNEL_ID;
-                  const agoraChannel = guildCache
-                     .get(agoraGuildId)
-                     .channels.cache.get(agoraChannelId);
-
-                  // List of channels to output events to, can't wait for config
-                  const channelList = [
-                     nounsGovChannel,
-                     ncdChannel,
-                     agoraChannel,
-                  ];
-
-                  const promises = channelList.map(async channel => {
-                     const statusEmbed = await createProposalStatusEmbed(
-                        data,
-                        status,
-                     );
-
-                     let message = await channel.send({
-                        content: null,
-                        embeds: [statusEmbed],
-                     });
-
-                     return message;
-                  });
-
-                  const resolved = await Promise.all(promises);
-
-                  resolved.forEach(message => {
-                     client.emit('propStatusChange', message, status, data);
-                  });
-               } catch (error) {
-                  Logger.error(
-                     'events/ready.js: ProposalVetoed - an error has occurred',
-                     { error },
-                  );
-               }
-            } else {
-               const statusEmbed = await createProposalStatusEmbed(
-                  data,
-                  status,
-               );
-
-               let message = await nounsGovChannel.send({
-                  content: null,
-                  embeds: [statusEmbed],
-               });
-
-               client.emit('propStatusChange', message, status, data);
-            }
+            processEvent('propStatusChange', data, client);
          });
 
          // Nouns.on(
@@ -476,77 +268,9 @@ module.exports = {
                id: `${data.id}`,
             });
 
-            const nounsGovId = process.env.NOUNS_GOV_ID;
+            data.status = 'Executed';
 
-            const nounsGovChannel = guildCache
-               .get(process.env.DISCORD_GUILD_ID)
-               .channels.cache.get(nounsGovId);
-
-            const status = 'Executed';
-
-            // todo change to production after testing
-            // if (process.env.DEPLOY_STAGE === 'development') {
-            if (process.env.DEPLOY_STAGE === 'production') {
-               try {
-                  // NCD
-                  const ncdGuildId = process.env.NCD_GUILD_ID;
-                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
-                  const ncdChannel = guildCache
-                     .get(ncdGuildId)
-                     .channels.cache.get(ncdChannelId);
-
-                  // Agora
-                  const agoraGuildId = process.env.AGORA_GUILD_ID;
-                  const agoraChannelId = process.env.AGORA_CHANNEL_ID;
-                  const agoraChannel = guildCache
-                     .get(agoraGuildId)
-                     .channels.cache.get(agoraChannelId);
-
-                  // List of channels to output events to, can't wait for config
-                  const channelList = [
-                     nounsGovChannel,
-                     ncdChannel,
-                     agoraChannel,
-                  ];
-
-                  const promises = channelList.map(async channel => {
-                     const statusEmbed = await createProposalStatusEmbed(
-                        data,
-                        status,
-                     );
-
-                     let message = await channel.send({
-                        content: null,
-                        embeds: [statusEmbed],
-                     });
-
-                     return message;
-                  });
-
-                  const resolved = await Promise.all(promises);
-
-                  resolved.forEach(message => {
-                     client.emit('propStatusChange', message, status, data);
-                  });
-               } catch (error) {
-                  Logger.error(
-                     'events/ready.js: ProposalExecuted - an error has occurred',
-                     { error },
-                  );
-               }
-            } else {
-               const statusEmbed = await createProposalStatusEmbed(
-                  data,
-                  status,
-               );
-
-               let message = await nounsGovChannel.send({
-                  content: null,
-                  embeds: [statusEmbed],
-               });
-
-               client.emit('propStatusChange', message, status, data);
-            }
+            processEvent('propStatusChange', data, client);
          });
 
          Nouns.on('Transfer', async data => {
