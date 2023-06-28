@@ -654,47 +654,11 @@ module.exports = {
          });
 
          Nouns.on('NounCreated', async data => {
-            // console.log(
-            //    'NounsToken | NounCreated | id:' +
-            //       data.id +
-            //       ', seed: ' +
-            //       JSON.stringify(data.seed),
-            // );
-
             Logger.info('events/ready.js: On NounCreated.', {
                nounId: `${data.id}`,
             });
 
-            const nogGuildId = process.env.NOGGLES_DISCORD_ID;
-            const nogChanId = process.env.NOGGLES_CHANNEL_ID;
-            const nogglesChannel = await guildCache
-               .get(nogGuildId)
-               .channels.cache.get(nogChanId);
-
-            // todo switch to production
-            // if (process.env.DEPLOY_STAGE === 'development') {
-            if (process.env.DEPLOY_STAGE === 'production') {
-               try {
-                  const ncdGuildId = process.env.NCD_GUILD_ID;
-                  const ncdChannelId = process.env.NCD_CHANNEL_ID;
-                  const ncdChannel = guildCache
-                     .get(ncdGuildId)
-                     .channels.cache.get(ncdChannelId);
-
-                  const channelList = [nogglesChannel, ncdChannel];
-
-                  channelList.forEach(channel => {
-                     client.emit('nounCreated', channel, data);
-                  });
-               } catch (error) {
-                  Logger.error(
-                     'events/ready.js: nounCreated - Encountered an erro!',
-                     { error },
-                  );
-               }
-            } else {
-               client.emit('nounCreated', nogglesChannel, data);
-            }
+            processEvent('nounCreated', data, client);
          });
 
          Nouns.on('AuctionBid', async data => {
