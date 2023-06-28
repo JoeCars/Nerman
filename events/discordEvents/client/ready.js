@@ -45,7 +45,7 @@ module.exports = {
                event: data.event,
             });
 
-            processEvent('delegateChanged', data, client);
+            sendToChannelFeeds('delegateChanged', data, client);
          });
 
          nounsNymz.on('NewPost', async post => {
@@ -54,7 +54,7 @@ module.exports = {
                postTitle: post.title,
             });
 
-            processEvent('newPost', post, client);
+            sendToChannelFeeds('newPost', post, client);
          });
 
          Nouns.on('VoteCast', async vote => {
@@ -71,7 +71,7 @@ module.exports = {
                return;
             }
 
-            processEvent('propVoteCast', vote, client);
+            sendToChannelFeeds('propVoteCast', vote, client);
          });
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
@@ -94,8 +94,8 @@ module.exports = {
                },
             );
 
-            processEvent('newProposalPoll', data, client);
-            processEvent('propCreated', data, client);
+            sendToChannelFeeds('newProposalPoll', data, client);
+            sendToChannelFeeds('propCreated', data, client);
          });
 
          Nouns.on('ProposalCanceled', async data => {
@@ -105,7 +105,7 @@ module.exports = {
 
             data.status = 'Canceled';
 
-            processEvent('propStatusChange', data, client);
+            sendToChannelFeeds('propStatusChange', data, client);
          });
 
          // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
@@ -117,7 +117,7 @@ module.exports = {
 
             data.status = 'Queued';
 
-            processEvent('propStatusChange', data, client);
+            sendToChannelFeeds('propStatusChange', data, client);
          });
 
          // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
@@ -128,7 +128,7 @@ module.exports = {
 
             data.status = 'Vetoed';
 
-            processEvent('propStatusChange', data, client);
+            sendToChannelFeeds('propStatusChange', data, client);
          });
 
          // Nouns.on(
@@ -141,7 +141,7 @@ module.exports = {
 
             data.status = 'Executed';
 
-            processEvent('propStatusChange', data, client);
+            sendToChannelFeeds('propStatusChange', data, client);
          });
 
          Nouns.on('Transfer', async data => {
@@ -151,7 +151,7 @@ module.exports = {
                tokenId: `${data.tokenId}`,
             });
 
-            processEvent('transferNoun', data, client);
+            sendToChannelFeeds('transferNoun', data, client);
          });
 
          Nouns.on('AuctionCreated', async auction => {
@@ -161,7 +161,7 @@ module.exports = {
                auctionEndTime: `${auction.endTime}`,
             });
 
-            processEvent('auctionCreated', auction, client);
+            sendToChannelFeeds('auctionCreated', auction, client);
          });
 
          Nouns.on('NounCreated', async data => {
@@ -169,7 +169,7 @@ module.exports = {
                nounId: `${data.id}`,
             });
 
-            processEvent('nounCreated', data, client);
+            sendToChannelFeeds('nounCreated', data, client);
          });
 
          Nouns.on('AuctionBid', async data => {
@@ -180,7 +180,7 @@ module.exports = {
                dataExtended: `${data.extended}`,
             });
 
-            processEvent('auctionBid', data, client);
+            sendToChannelFeeds('auctionBid', data, client);
          });
 
          // *************************************************************
@@ -284,7 +284,7 @@ module.exports = {
  * @param {Client} client
  * @returns
  */
-async function processEvent(eventName, data, client) {
+async function sendToChannelFeeds(eventName, data, client) {
    let feeds;
    try {
       feeds = await FeedConfig.findChannels(eventName);
