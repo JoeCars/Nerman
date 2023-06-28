@@ -83,7 +83,7 @@ module.exports = {
       });
 
       // client.emit('newProposal', interaction, testProposal);
-      client.emit('newProposal', message, testProposal);
+      client.emit('newProposalPoll', propChannel, testProposal);
 
       // if (false) {
 

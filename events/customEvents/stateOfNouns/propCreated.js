@@ -1,7 +1,8 @@
-const { MessageEmbed, Message } = require('discord.js');
+const { MessageEmbed, TextChannel } = require('discord.js');
 const { hyperlink, hideLinkEmbed } = require('@discordjs/builders');
 
 const Logger = require('../../../helpers/logger');
+const { createNewProposalEmbed } = require('../../../helpers/proposalHelpers');
 
 const nounsGovId = process.env.NOUNS_GOV_ID;
 const titleRegex = new RegExp(/^(\#\s(?:\S+\s?)+(?:\S+\n?))/);
@@ -9,11 +10,15 @@ const titleRegex = new RegExp(/^(\#\s(?:\S+\s?)+(?:\S+\n?))/);
 module.exports = {
    name: 'propCreated',
    /**
-    * @param {Message} interaction
+    * @param {TextChannel} channel
     */
-   async execute(message, proposal) {
-      // async execute(message, proposal, proposalId) {
+   async execute(channel, proposal) {
       try {
+         const message = await channel.send({
+            content: null,
+            embeds: [createNewProposalEmbed(proposal)],
+         });
+
          const {
             guild: {
                channels: { cache },

@@ -1,6 +1,5 @@
 // todo I should rename newProposal to reduce confusion maybe? Will workshop it
-const { MessageEmbed, Message } = require('discord.js');
-const { roleMention } = require('@discordjs/builders');
+const { MessageEmbed, TextChannel } = require('discord.js');
 const { Types } = require('mongoose');
 
 const { initPollMessage } = require('../../../helpers/poll/initPollMessage');
@@ -9,6 +8,7 @@ const PollCount = require('../../../db/schemas/ChannelPollCount');
 const Poll = require('../../../db/schemas/Poll');
 const User = require('../../../db/schemas/User');
 const Logger = require('../../../helpers/logger');
+const { createNewProposalEmbed } = require('../../../helpers/proposalHelpers');
 
 // todo I will need to change this to the new Nouncil channel once Joel gives the go-ahead
 const propChannelId =
@@ -16,14 +16,31 @@ const propChannelId =
       ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
       : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 
-const nounsGovId = process.env.NOUNS_GOV_ID;
-
 module.exports = {
-   name: 'newProposal',
+   name: 'newProposalPoll',
    /**
-    * @param {Message} interaction
+    * @param {TextChannel} channel
     */
-   async execute(interaction, proposal) {
+   async execute(channel, proposal) {
+      const initialConfigExists = !!(await PollChannel.countDocuments({
+         channelId: channel.id,
+      }).exec());
+
+      if (!initialConfigExists) {
+         return Logger.warn(
+            'events/customEvents/poll/newPollProposal.js: No config. Aborting output of Proposal Poll.',
+            {
+               id: `${proposal.id}`,
+               proposer: `${proposal.proposer.id}`,
+            },
+         );
+      }
+
+      const interaction = await channel.send({
+         content: null,
+         embeds: [createNewProposalEmbed(proposal)],
+      });
+
       const {
          client,
          guildId,
@@ -41,23 +58,26 @@ module.exports = {
          // } = interaction;
       } = interaction;
 
-      Logger.info('events/poll/newProposal.js: Creating new proposal.', {
+      Logger.info('events/poll/newProposalPoll.js: Creating new proposal.', {
          guildId: guildId,
          member: username,
       });
 
       const propChannel = await cache.get(propChannelId);
       const configExists = await PollChannel.configExists(propChannel.id);
-      Logger.debug('events/poll/newProposal.js: Checking config exists.', {
+      Logger.debug('events/poll/newProposalPoll.js: Checking config exists.', {
          configExists: configExists,
          guildId: guildId,
          member: username,
       });
       if (!configExists) {
-         Logger.info('events/poll/newProposal.js: No config exists. Exiting.', {
-            guildId: guildId,
-            member: username,
-         });
+         Logger.info(
+            'events/poll/newProposalPoll.js: No config exists. Exiting.',
+            {
+               guildId: guildId,
+               member: username,
+            },
+         );
          return;
       }
 
@@ -68,7 +88,7 @@ module.exports = {
          .replaceAll(/^(#\s)|(\n+)$/g, '')}`;
       const description = `https://nouns.wtf/vote/${propId}`;
 
-      Logger.debug('events/poll/newProposal.js: Checking proposal.', {
+      Logger.debug('events/poll/newProposalPoll.js: Checking proposal.', {
          guildId: guildId,
          member: username,
          title: title,
@@ -82,7 +102,7 @@ module.exports = {
          '_id allowedRoles quorum duration forAgainst',
       ).exec();
 
-      Logger.debug('events/poll/newProposal.js: Checking roles and IDs.', {
+      Logger.debug('events/poll/newProposalPoll.js: Checking roles and IDs.', {
          guildId: guildId,
          member: username,
          everyoneId: everyoneId,
@@ -128,12 +148,14 @@ module.exports = {
             snapshotMap.set(key, false);
          }
       } catch (error) {
-         Logger.error('events/poll/newProposal.js: Error.', { error: error });
+         Logger.error('events/poll/newProposalPoll.js: Error.', {
+            error: error,
+         });
       }
 
       const countExists = await PollCount.checkExists(propChannelId);
 
-      Logger.debug('events/poll/newProposal.js: Checking existing count.', {
+      Logger.debug('events/poll/newProposalPoll.js: Checking existing count.', {
          guildId: guildId,
          member: username,
          countExists: countExists,
@@ -151,13 +173,16 @@ module.exports = {
 
       try {
          // todo refactor this to use {new: true} and return the document perhaps, rather than this two part operation?
-         Logger.debug('events/poll/newProposal.js: Checking poll attributes.', {
-            guildId: guildId,
-            userId: user.id,
-            channelConfigId: channelConfig._id,
-            interactionId: interaction.id,
-            pollData: pollData,
-         });
+         Logger.debug(
+            'events/poll/newProposalPoll.js: Checking poll attributes.',
+            {
+               guildId: guildId,
+               userId: user.id,
+               channelConfigId: channelConfig._id,
+               interactionId: interaction.id,
+               pollData: pollData,
+            },
+         );
 
          const data = {
             _id: new Types.ObjectId(),
@@ -193,7 +218,7 @@ module.exports = {
 
                if (!user) {
                   Logger.warn(
-                     'events/poll/newProposal.js: User does not exist yet. Creating new user.',
+                     'events/poll/newProposalPoll.js: User does not exist yet. Creating new user.',
                   );
 
                   const {
@@ -207,7 +232,7 @@ module.exports = {
                   user = await User.createUser(guildId, key, eligibleChannels);
 
                   Logger.debug(
-                     'events/poll/newProposal.js: Successfully created new user.',
+                     'events/poll/newProposalPoll.js: Successfully created new user.',
                      { user: user },
                   );
                } else if (
@@ -215,14 +240,14 @@ module.exports = {
                   user.eligibleChannels.has(newPoll.config.channelId)
                ) {
                   Logger.debug(
-                     'events/poll/newProposal.js: User exists and has channel key!',
+                     'events/poll/newProposalPoll.js: User exists and has channel key!',
                   );
 
                   user.eligibleChannels.get(newPoll.config.channelId)
                      .eligiblePolls++;
                } else {
                   Logger.warn(
-                     'events/poll/newProposal.js: User did not have the appropriate key. Attempting to set key.',
+                     'events/poll/newProposalPoll.js: User did not have the appropriate key. Attempting to set key.',
                      {
                         key: newPoll.config.channelId,
                      },
@@ -241,7 +266,7 @@ module.exports = {
 
          await Promise.all(updateVoterPromise);
 
-         let updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
+         const updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
 
          // const timeEndMilli = new Date(
          //    newPoll.timeCreated.getTime() + durationMs
@@ -296,9 +321,11 @@ module.exports = {
 
          // client.emit('propCreated', nounsGovMessage, newPoll, propId);
 
-         Logger.info('events/poll/newProposal.js: Finished creating proposal.');
+         Logger.info(
+            'events/poll/newProposalPoll.js: Finished creating proposal.',
+         );
       } catch (error) {
-         Logger.error('events/poll/newProposal.js: Encountered an error.', {
+         Logger.error('events/poll/newProposalPoll.js: Encountered an error.', {
             error: error,
          });
       }

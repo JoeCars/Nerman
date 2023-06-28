@@ -1,12 +1,8 @@
 const { Collection, Client } = require('discord.js');
 
-const PollChannel = require('../../../db/schemas/PollChannel');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
-const { createNewProposalEmbed } = require('../../../helpers/proposalHelpers');
-
-const { Types } = require('mongoose');
 
 module.exports = {
    name: 'ready',
@@ -35,10 +31,6 @@ module.exports = {
             guilds: { cache: guildCache },
          } = client;
 
-         // const testingGetAddress = await Nouns.getAddress('skilift.eth');
-         // l('HEY LOOK AT ME', testingGetAddress);
-
-         // const testingEnsReverseLookup = await Nouns
          // *************************************************************
          //
          // EXAMPLE EVENTS
@@ -102,129 +94,8 @@ module.exports = {
                },
             );
 
-            const nounsGovId = process.env.NOUNS_GOV_ID;
-
-            // todo fix these silly ternaries, I hate them, they're no longer needed
-            const propChannelId =
-               process.env.DEPLOY_STAGE === 'development'
-                  ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
-                  : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
-
-            const propChannel = await guildCache
-               .get(process.env.DISCORD_GUILD_ID)
-               .channels.cache.get(propChannelId);
-
-            const { id: propId, description: desc } = data;
-
-            const titleRegex = new RegExp(/^(\#\s(?:\S+\s?)+(?:\S+\n?))/);
-
-            const title = desc
-               .match(titleRegex)[0]
-               .replaceAll(/^(#\s)|(\n+)$/g, '');
-            // const description = `https://nouns.wtf/vote/${propId}`;
-            let description;
-
-            // todo switch this to production when finished testing
-            // if (process.env.DEPLOY_STAGE === 'development') {
-            if (process.env.DEPLOY_STAGE === 'production') {
-               // Nouncil
-               const nounsGovChannel = guildCache
-                  .get(process.env.DISCORD_GUILD_ID)
-                  .channels.cache.get(nounsGovId);
-
-               // NCD
-               const ncdGuildId = process.env.NCD_GUILD_ID;
-               const ncdChannelId = process.env.NCD_CHANNEL_ID;
-               const ncdChannel = guildCache
-                  .get(ncdGuildId)
-                  .channels.cache.get(ncdChannelId);
-
-               // Agora
-               const agoraGuildId = process.env.AGORA_GUILD_ID;
-               const agoraChannelId = process.env.AGORA_CHANNEL_ID;
-               const agoraChannel = guildCache
-                  .get(agoraGuildId)
-                  .channels.cache.get(agoraChannelId);
-
-               // List of channels to output events to, can't wait for config
-               const channelList = [nounsGovChannel, ncdChannel, agoraChannel];
-
-               const configExists = !!(await PollChannel.countDocuments({
-                  channelId: propChannelId,
-               }).exec());
-
-               if (!configExists) {
-                  Logger.warn(
-                     'events/ready.js: On ProposalCreatedWithRequirements. No config. Aborting output of Proposal Poll.',
-                     {
-                        id: `${data.id}`,
-                        proposer: `${data.proposer.id}`,
-                     },
-                  );
-                  // return;
-               } else {
-                  let message = await propChannel.send({
-                     content: null,
-                     embeds: [createNewProposalEmbed(data)],
-                  });
-
-                  client.emit('newProposal', message, data);
-               }
-
-               const promises = channelList.map(async channel => {
-                  let message = await channel.send({
-                     content: null,
-                     embeds: [createNewProposalEmbed(data)],
-                  });
-
-                  return message;
-               });
-
-               const resolved = await Promise.all(promises);
-
-               resolved.forEach(message => {
-                  client.emit('propCreated', message, data);
-               });
-            } else {
-               const configExists = !!(await PollChannel.countDocuments({
-                  channelId: propChannelId,
-               }).exec());
-
-               if (!configExists) {
-                  Logger.warn(
-                     'events/ready.js: On ProposalCreatedWithRequirements. Aborting output of Proposal Poll.',
-                     {
-                        id: `${data.id}`,
-                        proposer: `${data.proposer.id}`,
-                     },
-                  );
-                  return;
-               }
-
-               // const { id: propId, description: desc } = data;
-
-               // todo finetune thew regexp to extract title from any possible markdown
-               // const titleRegex = new RegExp(
-               //    /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*\/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/
-               // );
-
-               // const titleRegex = new RegExp(/^\N+/);
-               // const titleRegex = new RegExp(/^(\#\s(?:\S+\s?)+(?:\S+\n?))/);
-
-               // const title = desc
-               //    .match(titleRegex)[0]
-               //    .replaceAll(/^(#\s)|(\n+)$/g, '');
-               // const description = `https://nouns.wtf/vote/${propId}`;
-
-               let message = await propChannel.send({
-                  content: null,
-                  embeds: [createNewProposalEmbed(data)],
-               });
-
-               // todo I should rename these events to be less confusing
-               client.emit('newProposal', message, data);
-               // client.emit('propCreated', message, data);
-            }
+            processEvent('newProposalPoll', data, client);
+            processEvent('propCreated', data, client);
          });
 
          Nouns.on('ProposalCanceled', async data => {
