@@ -1,19 +1,18 @@
-const { MessageEmbed, Message } = require('discord.js');
+const { MessageEmbed, TextChannel } = require('discord.js');
 const { inlineCode, hyperlink } = require('@discordjs/builders');
 
 const Poll = require('../../../db/schemas/Poll');
 
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 const Logger = require('../../../helpers/logger');
-
-const nounsGovId = process.env.NOUNS_GOV_ID;
+const { createInitialVoteEmbed } = require('../../../helpers/proposalHelpers');
 
 module.exports = {
    name: 'propVoteCast',
    /**
-    * @param {Message} message
+    * @param {TextChannel} channel
     */
-   async execute(message, vote) {
+   async execute(channel, vote) {
       try {
          Logger.info(
             'events/stateOfNouns/propVoteCast.js: Handling a proposal vote event.',
@@ -24,6 +23,13 @@ module.exports = {
                reason: vote.reason,
             },
          );
+
+         const Nouns = await channel.client.libraries.get('Nouns');
+         const initialVoteEmbed = await createInitialVoteEmbed(vote, Nouns);
+         const message = await channel.send({
+            content: null,
+            embeds: [initialVoteEmbed],
+         });
 
          const {
             guild: {
@@ -42,16 +48,10 @@ module.exports = {
             // proposal: { description },
          } = vote;
 
-         const Nouns = await message.client.libraries.get('Nouns');
-         const nounsGovChannel = await cache.get(nounsGovId);
          const supportEnum = ['AGAINST', 'FOR', 'ABSTAIN'];
 
          const propRegExp = new RegExp(`^prop\\s${Number(proposalId)}`, 'i');
 
-         // const targetPolls = await Poll.find({
-         //    'pollData.title': { $regex: propRegExp },
-         // });
-         // Poll.find({ 'pollData.title': { $regex: propRegExp })
          Logger.info(
             'events/stateOfNouns/propVoteCast.js: Checking vote data, proposalId and proposal RegExp.',
             {
@@ -96,31 +96,6 @@ module.exports = {
             return message.delete();
          }
 
-         // const pollMessage = await (client.channels.cache
-
-         // const titleRegex = new RegExp(/^#+\s+.+\n/);
-
-         const titleRegex = new RegExp(
-            /^(\#\s((\w|[0-9_\-+=.,!:`~%;_&$()*/\[\]\{\}@\\\|])+\s+)+(\w+\s?\n?))/,
-         );
-         // const titleRegex = new RegExp(
-         //    /^(\#\s(\w+\s)+\s(\w+\s)+(\w+\s+\n?))/
-         // );
-         // # PropBox: A Nouns Proposal Incubator\n\n## TL;DR\n\nUsing lessons from a Nouncil trial program, we will set up a robust incubator that will help the best
-
-         // Prop 175: PropBox: A Nouns Proposal Incubator
-         // https://nouns.wtf/vote/175
-         // Yes, No, Abstain
-
-         // /^(\#\s((\w|[0-9_\-.,\|])+\s+)+(\w+\s?\n?))/
-         // const extractedTitleFromFind = targetPolls[0].pollData.title
-         //    .match(titleRegex)[0]
-         //    .replaceAll(/^(#\s)|(\n+)$/g, '');
-         // const extractedTitleFromFindOne = description
-         //    .match(titleRegex)[0]
-         //    .replaceAll(/^(#\s)|(\n+)$/g, '');
-
-         // const titleFromFind = targetPolls[0].pollData.title;
          const titleFromPoll = targetPoll?.pollData.title ?? 'No poll title';
 
          Logger.debug(
