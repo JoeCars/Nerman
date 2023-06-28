@@ -57,30 +57,7 @@ module.exports = {
                event: data.event,
             });
 
-            let feeds;
-            try {
-               feeds = await FeedConfig.findChannels('newPost'); // TODO: Change this to the correct event type after merge.
-            } catch (error) {
-               return Logger.error('Unable to retrieve feed config.', {
-                  error: error,
-               });
-            }
-
-            const channels = await Promise.all(
-               feeds
-                  .filter(feed => {
-                     return feed && feed.guildId && feed.channelId;
-                  })
-                  .map(feed => {
-                     return client.channels.fetch(feed.channelId);
-                  }),
-            );
-
-            channels.forEach(channel => {
-               if (channel) {
-                  client.emit('delegateChanged', channel, data);
-               }
-            });
+            processEvent('delegateChanged', data, client);
          });
 
          nounsNymz.on('NewPost', async post => {
@@ -89,31 +66,7 @@ module.exports = {
                postTitle: post.title,
             });
 
-            let feeds;
-            try {
-               feeds = await FeedConfig.findChannels('newPost');
-            } catch (error) {
-               return Logger.error('Unable to retrieve feed config.', {
-                  error: error,
-               });
-            }
-
-            // client.channels.fetch() is an async operation. Hence using Promise.all().
-            const channels = await Promise.all(
-               feeds
-                  .filter(feed => {
-                     return feed && feed.guildId && feed.channelId;
-                  })
-                  .map(feed => {
-                     return client.channels.fetch(feed.channelId);
-                  }),
-            );
-
-            channels.forEach(channel => {
-               if (channel) {
-                  client.emit('newPost', channel, post);
-               }
-            });
+            processEvent('newPost', post, client);
          });
 
          Nouns.on('VoteCast', async vote => {
@@ -687,31 +640,7 @@ module.exports = {
                tokenId: `${data.tokenId}`,
             });
 
-            let feeds;
-            try {
-               feeds = await FeedConfig.findChannels('transferNoun');
-            } catch (error) {
-               return Logger.error('Unable to retrieve feed config.', {
-                  error: error,
-               });
-            }
-
-            // client.channels.fetch() is an async operation. Hence using Promise.all().
-            const channels = await Promise.all(
-               feeds
-                  .filter(feed => {
-                     return feed && feed.guildId && feed.channelId;
-                  })
-                  .map(feed => {
-                     return client.channels.fetch(feed.channelId);
-                  }),
-            );
-
-            channels.forEach(channel => {
-               if (channel) {
-                  client.emit('transferNoun', channel, data);
-               }
-            });
+            processEvent('transferNoun', data, client);
          });
 
          Nouns.on('AuctionCreated', async auction => {
@@ -721,31 +650,7 @@ module.exports = {
                auctionEndTime: `${auction.endTime}`,
             });
 
-            let feeds;
-            try {
-               feeds = await FeedConfig.findChannels('auctionCreated');
-            } catch (error) {
-               return Logger.error('Unable to retrieve feed config.', {
-                  error: error,
-               });
-            }
-
-            // client.channels.fetch() is an async operation. Hence using Promise.all().
-            const channels = await Promise.all(
-               feeds
-                  .filter(feed => {
-                     return feed && feed.guildId && feed.channelId;
-                  })
-                  .map(feed => {
-                     return client.channels.fetch(feed.channelId);
-                  }),
-            );
-
-            channels.forEach(channel => {
-               if (channel) {
-                  client.emit('auctionCreated', channel, auction);
-               }
-            });
+            processEvent('auctionCreated', auction, client);
          });
 
          Nouns.on('NounCreated', async data => {
@@ -800,31 +705,7 @@ module.exports = {
                dataExtended: `${data.extended}`,
             });
 
-            let feeds;
-            try {
-               feeds = await FeedConfig.findChannels('auctionBid');
-            } catch (error) {
-               return Logger.error('Unable to retrieve feed config.', {
-                  error: error,
-               });
-            }
-
-            // client.channels.fetch() is an async operation. Hence using Promise.all().
-            const channels = await Promise.all(
-               feeds
-                  .filter(feed => {
-                     return feed && feed.guildId && feed.channelId;
-                  })
-                  .map(feed => {
-                     return client.channels.fetch(feed.channelId);
-                  }),
-            );
-
-            channels.forEach(channel => {
-               if (channel) {
-                  client.emit('auctionBid', channel, data);
-               }
-            });
+            processEvent('auctionBid', data, client);
          });
 
          // *************************************************************
@@ -920,3 +801,37 @@ module.exports = {
       }
    },
 };
+
+/**
+ *
+ * @param {string} eventName
+ * @param {object} data
+ * @param {Client} client
+ * @returns
+ */
+async function processEvent(eventName, data, client) {
+   let feeds;
+   try {
+      feeds = await FeedConfig.findChannels(eventName);
+   } catch (error) {
+      return Logger.error('Unable to retrieve feed config.', {
+         error: error,
+      });
+   }
+
+   const channels = await Promise.all(
+      feeds
+         .filter(feed => {
+            return feed && feed.guildId && feed.channelId;
+         })
+         .map(feed => {
+            return client.channels.fetch(feed.channelId);
+         }),
+   );
+
+   channels.forEach(channel => {
+      if (channel) {
+         client.emit(eventName, channel, data);
+      }
+   });
+}
