@@ -3,7 +3,7 @@ const { hyperlink } = require('@discordjs/builders');
 const shortenAddress = require('../helpers/nouns/shortenAddress');
 
 exports.findAccountLink = async function (Nouns, id) {
-   const bidderENS = await exports.findAccountENS(id);
+   const bidderENS = await exports.findAccountENS(Nouns, id);
    const ethBaseUrl = 'https://etherscan.io/address/';
    return hyperlink(bidderENS, `${ethBaseUrl}${id}`);
 };
