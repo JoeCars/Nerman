@@ -19,11 +19,26 @@ exports.generateDelegateChangedEmbed = async function (
       newDelegate = await findAccountLink(nouns, data.toDelegate.id);
    }
 
-   const votes = hasMarkdown ? inlineCode(data.events.data) : data.events.data;
-   Logger.debug('views/embeds/delegateChanged.js: Checking votes and data.', {
-      votes: votes,
-      data: data,
-   });
+   try {
+      const event = data.event;
+      const receipt = await event.getTransactionReceipt();
+      const firstData = receipt.logs[0].data;
+      const secondData = receipt.logs[1].data;
+      const thirdData = receipt.logs[2].data;
+      Logger.debug(
+         'views/embeds/delegateChanged.js: Checking transaction receipt data.',
+         {
+            firstData: firstData,
+            secondData: secondData,
+            thirdData: thirdData,
+            logs: receipt.logs,
+         },
+      );
+   } catch (error) {
+      Logger.error("views/embeds/delegateChanged.js: There's been an error.", {
+         error: error,
+      });
+   }
 
    const message = `${delegator} delegated votes to ${newDelegate}.`;
 
