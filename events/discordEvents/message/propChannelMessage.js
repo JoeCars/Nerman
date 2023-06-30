@@ -41,7 +41,7 @@ module.exports = {
 
       // if (channelId !== propChannelId || botId === authorId) return;
       if (!configExists || nermanIds.includes(botId)) {
-      // if (!configExists || botId === authorId) {
+         // if (!configExists || botId === authorId) {
          // Logger.info(
          //    'events/poll/propChannelMessage.js: Message was not invalid, so it was not deleted.',
          //    {

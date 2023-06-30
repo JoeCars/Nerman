@@ -16,7 +16,7 @@ module.exports = {
    async execute(channel, data) {
       try {
          Logger.info(
-            'events/stateOfNouns/propStatusChange.js: Handling a proposal change event.',
+            'events/nouns/propStatusChange.js: Handling a proposal change event.',
             {
                proposalId: `${data.id}`,
                status: data.status,
@@ -61,7 +61,7 @@ module.exports = {
          const titleFromFindOne = targetPoll.pollData.title;
 
          Logger.debug(
-            "events/stateOfNouns/propStatusChange.js: Checking the target poll's title.",
+            "events/nouns/propStatusChange.js: Checking the target poll's title.",
             {
                title: titleFromFindOne,
                poll: targetPoll,
@@ -114,18 +114,15 @@ module.exports = {
          });
 
          Logger.info(
-            'events/stateOfNouns/propStatusChange.js: Finished handling a proposal change event.',
+            'events/nouns/propStatusChange.js: Finished handling a proposal change event.',
             {
                proposalId: `${data.id}`,
             },
          );
       } catch (error) {
-         Logger.error(
-            'events/stateOfNouns/propStatusChange.js: Received an error.',
-            {
-               error: error,
-            },
-         );
+         Logger.error('events/nouns/propStatusChange.js: Received an error.', {
+            error: error,
+         });
       }
    },
 };

@@ -15,7 +15,7 @@ module.exports = {
    async execute(channel, vote) {
       try {
          Logger.info(
-            'events/stateOfNouns/propVoteCast.js: Handling a proposal vote event.',
+            'events/nouns/propVoteCast.js: Handling a proposal vote event.',
             {
                proposalId: Number(vote.proposalId),
                voterId: vote.voter.id,
@@ -53,7 +53,7 @@ module.exports = {
          const propRegExp = new RegExp(`^prop\\s${Number(proposalId)}`, 'i');
 
          Logger.info(
-            'events/stateOfNouns/propVoteCast.js: Checking vote data, proposalId and proposal RegExp.',
+            'events/nouns/propVoteCast.js: Checking vote data, proposalId and proposal RegExp.',
             {
                vote: vote,
                proposalId: {
@@ -85,7 +85,7 @@ module.exports = {
                   .messages.fetch(targetPoll.messageId));
          } else {
             Logger.warn(
-               'events/stateOfNouns/propVoteCast.js: Unable to find the associated poll.',
+               'events/nouns/propVoteCast.js: Unable to find the associated poll.',
                {
                   proposalId: `${vote.proposalId}`,
                   voterId: vote.voter.id,
@@ -98,16 +98,13 @@ module.exports = {
 
          const titleFromPoll = targetPoll?.pollData.title ?? 'No poll title';
 
-         Logger.debug(
-            'events/stateOfNouns/propVoteCast.js: Checking poll title.',
-            {
-               proposalId: `${vote.proposalId}`,
-               voterId: vote.voter.id,
-               votes: `${vote.votes}`,
-               reason: vote.reason,
-               title: titleFromPoll,
-            },
-         );
+         Logger.debug('events/nouns/propVoteCast.js: Checking poll title.', {
+            proposalId: `${vote.proposalId}`,
+            voterId: vote.voter.id,
+            votes: `${vote.votes}`,
+            reason: vote.reason,
+            title: titleFromPoll,
+         });
 
          // todo change this back when we have the config stuff sorted out
          // const titleUrl = `https://nouns.wtf/vote/${proposalId}`;
@@ -228,7 +225,7 @@ module.exports = {
          }
 
          Logger.info(
-            'events/stateOfNouns/propVoteCast.js: Finished handling a proposal vote event.',
+            'events/nouns/propVoteCast.js: Finished handling a proposal vote event.',
             {
                proposalId: `${vote.proposalId}`,
                voterId: vote.voter.id,
@@ -242,12 +239,9 @@ module.exports = {
             embeds: [voteEmbed],
          });
       } catch (error) {
-         Logger.error(
-            'events/stateOfNouns/propVoteCast.js: Received an error.',
-            {
-               error: error,
-            },
-         );
+         Logger.error('events/nouns/propVoteCast.js: Received an error.', {
+            error: error,
+         });
       }
    },
 };

@@ -19,7 +19,6 @@ module.exports = {
       await require('../../../db/index.js')(client);
       await require('../../../utils/remindSheet.js')(client);
 
-      // const _StateOfNouns = import('stateofnouns');
       const _nerman = import('nerman');
 
       async function runNouns() {

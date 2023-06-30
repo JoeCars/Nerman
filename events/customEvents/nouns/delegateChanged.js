@@ -12,7 +12,7 @@ module.exports = {
     */
    async execute(channel, data) {
       Logger.info(
-         'events/customEvents/stateOfNouns/delegateChanged.js: Sending delegate change notification.',
+         'events/customEvents/nouns/delegateChanged.js: Sending delegate change notification.',
          {
             delegator: data.delegator.id,
             newDelegate: data.toDelegate.id,
@@ -33,7 +33,7 @@ module.exports = {
       await message.edit({ embeds: [embed] });
 
       Logger.info(
-         'events/customEvents/stateOfNouns/delegateChanged.js: Finished sending delegate change notification.',
+         'events/customEvents/nouns/delegateChanged.js: Finished sending delegate change notification.',
          {
             delegator: data.delegator.id,
             newDelegate: data.toDelegate.id,

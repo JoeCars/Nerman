@@ -4,7 +4,7 @@ const { CommandInteraction } = require('discord-modals');
 const Logger = require('../../helpers/logger');
 const events = require('../../utils/feedEvents');
 
-// !test this is going to be testing passing StateOfNouns in as an argument, so I'm attempting to make this a async thang?
+// !test this is going to be testing passing Nerman.js in as an argument, so I'm attempting to make this a async thang?
 module.exports = {
    // module.exports = {
    data: new SlashCommandBuilder()
