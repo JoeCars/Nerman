@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { inlineCode } = require('@discordjs/builders');
+const Logger = require('../../helpers/logger');
 
 const { findAccountENS, findAccountLink } = require('../helpers');
 
@@ -18,9 +19,28 @@ exports.generateDelegateChangedEmbed = async function (
       newDelegate = await findAccountLink(nouns, data.toDelegate.id);
    }
 
-   const votes = hasMarkdown ? inlineCode(data.events.data) : data.events.data;
+   try {
+      const event = data.event;
+      const receipt = await event.getTransactionReceipt();
+      const firstData = receipt.logs[0].data;
+      const secondData = receipt.logs[1].data;
+      const thirdData = receipt.logs[2].data;
+      Logger.debug(
+         'views/embeds/delegateChanged.js: Checking transaction receipt data.',
+         {
+            firstData: firstData,
+            secondData: secondData,
+            thirdData: thirdData,
+            logs: receipt.logs,
+         },
+      );
+   } catch (error) {
+      Logger.error("views/embeds/delegateChanged.js: There's been an error.", {
+         error: error,
+      });
+   }
 
-   const message = `${delegator} delegated ${votes} votes to ${newDelegate}.`;
+   const message = `${delegator} delegated votes to ${newDelegate}.`;
 
    const embed = new MessageEmbed().setTitle(title).setDescription(message);
 

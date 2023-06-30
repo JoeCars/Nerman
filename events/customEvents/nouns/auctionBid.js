@@ -19,7 +19,7 @@ module.exports = {
       }
 
       Logger.info(
-         'events/customEvents/stateOfNouns/auctionBid.js: Printing an auction bid.',
+         'events/customEvents/nouns/auctionBid.js: Printing an auction bid.',
          {
             id: `${data.id}`,
             amount: `${data.amount}`,
@@ -38,7 +38,7 @@ module.exports = {
       }
 
       Logger.info(
-         'events/customEvents/stateOfNouns/auctionBid.js: Finished printing an auction bid.',
+         'events/customEvents/nouns/auctionBid.js: Finished printing an auction bid.',
          {
             id: `${data.id}`,
             amount: `${data.amount}`,

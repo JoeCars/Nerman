@@ -16,7 +16,7 @@ module.exports = {
    async execute(tokenChannel, data) {
       try {
          Logger.info(
-            'events/stateOfNouns/transferNoun.js: Handling a noun transfer event.',
+            'events/nouns/transferNoun.js: Handling a noun transfer event.',
             {
                senderId: `${data.from.id}`,
                receiverId: `${data.to.id}`,
@@ -75,7 +75,7 @@ module.exports = {
          }
 
          Logger.info(
-            'events/stateOfNouns/transferNoun.js: Finished handling a noun transfer event.',
+            'events/nouns/transferNoun.js: Finished handling a noun transfer event.',
             {
                senderId: `${data.from.id}`,
                receiverId: `${data.to.id}`,
@@ -85,12 +85,9 @@ module.exports = {
 
          return await tokenChannel.send({ embeds: [transferEmbed] });
       } catch (error) {
-         Logger.error(
-            'events/stateOfNouns/transferNoun.js: Received an error.',
-            {
-               error: error,
-            },
-         );
+         Logger.error('events/nouns/transferNoun.js: Received an error.', {
+            error: error,
+         });
       }
    },
 };

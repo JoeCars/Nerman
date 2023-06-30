@@ -20,14 +20,14 @@ const PollChannelSchema = new Schema(
                   'db/schemas/PollChannel.js: Attempting to validate poll channel ID.',
                   {
                      channelId: channelId,
-                  }
+                  },
                );
 
                await this.populate('guildConfig');
                await this.guildConfig.populate('pollChannels');
 
                const noChannel = !this.guildConfig.pollChannels.find(
-                  ({ channelId }) => channelId === this.channelId
+                  ({ channelId }) => channelId === this.channelId,
                );
 
                Logger.info(
@@ -35,7 +35,7 @@ const PollChannelSchema = new Schema(
                   {
                      channelId: channelId,
                      noChannel: noChannel,
-                  }
+                  },
                );
 
                return noChannel;
@@ -59,13 +59,6 @@ const PollChannelSchema = new Schema(
                channelId: new RegExp(channelId, 'i'),
             }).exec();
 
-            Logger.debug(
-               'db/schemas/PollChannel.js: Checking static poll config exists.',
-               {
-                  configExists: configExists,
-               }
-            );
-
             return !!configExists;
          },
       },
@@ -81,7 +74,7 @@ const PollChannelSchema = new Schema(
             return options;
          },
       },
-   }
+   },
 );
 
 // todo threshold dominationg vite needs to have 30% of the total eligible votes to win

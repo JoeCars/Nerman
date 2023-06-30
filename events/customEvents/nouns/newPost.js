@@ -10,7 +10,7 @@ module.exports = {
     */
    async execute(channel, post) {
       Logger.info(
-         'events/customevents/stateOfNouns/newPost.js: Sending NounsNymz post.',
+         'events/customevents/nouns/newPost.js: Sending NounsNymz post.',
          {
             postId: post.id,
             postTitle: post.title,
@@ -23,7 +23,7 @@ module.exports = {
       await channel.send({ embeds: [embed] });
 
       Logger.info(
-         'events/customevents/stateOfNouns/newPost.js: Finished sending NounsNymz post.',
+         'events/customevents/nouns/newPost.js: Finished sending NounsNymz post.',
          {
             postId: post.id,
             postTitle: post.title,
