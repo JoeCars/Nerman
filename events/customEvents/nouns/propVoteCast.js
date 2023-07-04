@@ -1,5 +1,5 @@
 const { MessageEmbed, TextChannel } = require('discord.js');
-const { inlineCode, hyperlink } = require('@discordjs/builders');
+const { inlineCode } = require('@discordjs/builders');
 
 const Poll = require('../../../db/schemas/Poll');
 
@@ -32,11 +32,7 @@ module.exports = {
          });
 
          const {
-            guild: {
-               channels: { cache },
-            },
             channelId, // for evaluating embedTitle
-            client,
          } = message;
 
          const {
@@ -72,30 +68,6 @@ module.exports = {
             .populate('config')
             .exec();
 
-         let pollChannelId;
-         let pollMessage = null;
-
-         if (targetPoll) {
-            pollChannelId = targetPoll.config.channelId;
-            pollMessage = await (client.channels.cache
-               .get(pollChannelId)
-               .messages.cache.get(targetPoll.messageId) ??
-               client.channels.cache
-                  .get(pollChannelId)
-                  .messages.fetch(targetPoll.messageId));
-         } else {
-            Logger.warn(
-               'events/nouns/propVoteCast.js: Unable to find the associated poll.',
-               {
-                  proposalId: `${vote.proposalId}`,
-                  voterId: vote.voter.id,
-                  votes: `${vote.votes}`,
-                  reason: vote.reason,
-               },
-            );
-            return message.delete();
-         }
-
          const titleFromPoll = targetPoll?.pollData.title ?? 'No poll title';
 
          Logger.debug('events/nouns/propVoteCast.js: Checking poll title.', {
@@ -123,10 +95,6 @@ module.exports = {
             (await shortenAddress(voterId));
          const voterUrl = `https://etherscan.io/address/${voterId}`;
          const voterHyperlink = `[${voter}](${voterUrl})`;
-         const propHyperlink = hyperlink(
-            `Prop ${proposalId}`,
-            `https://nouns.wtf/vote/${proposalId}`,
-         );
 
          // const title =
          //    'Test Title String Until I Discover Where This Should Come from ';
@@ -190,39 +158,9 @@ module.exports = {
                `${voterHyperlink} voted ${inlineCode(
                   supportEnum[supportDetailed],
                )} with ${inlineCode(Number(votes))} votes. ${
-                  !!reason.trim() ? `\n\n${reason}` : ''
+                  reason.trim() ? `\n\n${reason}` : ''
                }`,
             );
-
-         const threadEmbed = new MessageEmbed()
-            .setColor('#00FFFF')
-            .setDescription(
-               `${voterHyperlink} voted ${inlineCode(
-                  supportEnum[supportDetailed],
-               )} with ${inlineCode(
-                  Number(votes),
-               )} votes on ${propHyperlink}. ${
-                  !!reason.trim() ? `\n\n${reason}` : ''
-               }`,
-            );
-
-         // const pollData = {
-         //    title,
-         //    description,
-         //    voteAllowance: 1,
-         //    choices: ['yes', 'no', 'abstain'],
-         // };
-
-         // Checking if this is intended for Nouncil or not.
-         if (
-            pollMessage !== null &&
-            message.guildId === process.env.DISCORD_GUILD_ID
-         ) {
-            pollMessage.thread.send({
-               content: null,
-               embeds: [threadEmbed],
-            });
-         }
 
          Logger.info(
             'events/nouns/propVoteCast.js: Finished handling a proposal vote event.',
