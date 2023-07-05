@@ -1,6 +1,7 @@
 const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
 const PollChannel = require('../../../../db/schemas/PollChannel');
+const FeedConfig = require('../../../../db/schemas/FeedConfig');
 // const GuildConfig = require('../../db/schemas/GuildConfig');
 const Logger = require('../../../../helpers/logger');
 
@@ -15,7 +16,7 @@ module.exports = {
          {
             guildId: modal.guild.id,
             channelId: modal.channelId,
-         }
+         },
       );
 
       if (modal.customId !== 'modal-create-poll-channel') return;
@@ -36,12 +37,13 @@ module.exports = {
             channelId,
          }).exec();
 
-         if (!!configCheck)
+         if (!!configCheck) {
             return modal.editReply({
                content:
                   'A configuration has already been created for this channel.',
                ephemeral: true,
             });
+         }
 
          const guildConfig = await (guildConfigs.has(guildId) &&
             guildConfigs.get(guildId));
@@ -52,7 +54,7 @@ module.exports = {
                guildId: modal.guild.id,
                channelId: modal.channelId,
                guildConfig: guildConfig,
-            }
+            },
          );
 
          const durRegex = new RegExp(/^\d{1,3}(\.\d{1,2})?$/, 'g');
@@ -60,10 +62,10 @@ module.exports = {
 
          // /^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/;
          const quorRegex = new RegExp(
-            /^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/
+            /^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/,
          );
          const optionRegex = new RegExp(
-            /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?(^for-or-against$)?$/
+            /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?(^for-or-against$)?$/,
          );
 
          // extract data from submitted modal
@@ -81,7 +83,7 @@ module.exports = {
          const maxProposals = parseInt(modal.getTextInputValue('maxProposals'));
          // let pollQuorum = modal.getTextInputValue('pollQuorumThreshold');
          let pollQuorumThreshold = modal.getTextInputValue(
-            'pollQuorumThreshold'
+            'pollQuorumThreshold',
          );
 
          // check the characters at the beginning and end of the input string
@@ -106,14 +108,14 @@ module.exports = {
          if (pollQuorumThreshold.length > 2) {
             return modal.editReply({
                content: `Please double-check that you are not adding additional entries, and only using a single ***:*** to separate your values.\nYou entered ***${pollQuorumThreshold.join(
-                  ', '
+                  ', ',
                )}***`,
                ephermeral: true,
             });
          }
 
          const pollChannelOptions = modal.getTextInputValue(
-            'pollChannelOptions'
+            'pollChannelOptions',
          )
             ? modal
                  .getTextInputValue('pollChannelOptions')
@@ -135,7 +137,7 @@ module.exports = {
                pollChannelOptions: pollChannelOptions,
                pollQuorumThreshold: pollQuorumThreshold,
                votingRoles: votingRoles,
-            }
+            },
          );
 
          // map the ids of the guild channels that match the names of the user submitted roles
@@ -148,15 +150,15 @@ module.exports = {
                fetchedRoles
                   .filter(
                      ({ name, managed }) =>
-                        !managed && votingRoles.includes(name)
+                        !managed && votingRoles.includes(name),
                   )
-                  .map(({ id }) => id)
+                  .map(({ id }) => id),
             );
 
          // Check to see if any values from user submission don't match roles in guild/channel
          if (allowedRoles.length !== votingRoles.length) {
             const badRoles = votingRoles.filter(
-               role => !allowedRoles.some(value => value === role)
+               role => !allowedRoles.some(value => value === role),
             );
 
             return modal.editReply({
@@ -209,14 +211,14 @@ module.exports = {
             {
                guildId: modal.guild.id,
                channelId: modal.channelId,
-            }
+            },
          );
 
          const newPollChannel = await PollChannel.create({
             _id: new Types.ObjectId(),
             guildConfig: guildConfig._id,
             channelId,
-            //disabled until modal support
+            // disabled until modal support
             // allowedRoles: votingRoles,
             allowedRoles: allowedRoles,
             duration: pollDuration,
@@ -229,13 +231,15 @@ module.exports = {
             voteThreshold: voteThreshold,
          });
 
+         await registerForPollEvents(guildId, channelId);
+
          Logger.info(
             `events/poll/pollChannelSubmit.js: Repopulating channel configuration list, because channels belong to this guild config.`,
             {
                guildId: modal.guild.id,
                channelId: modal.channelId,
                numOfPollChannels: guildConfig.pollChannels.length,
-            }
+            },
          );
 
          await guildConfig.depopulate('pollChannels');
@@ -247,7 +251,7 @@ module.exports = {
                guildId: modal.guild.id,
                channelId: modal.channelId,
                numOfPollChannels: guildConfig.pollChannels.length,
-            }
+            },
          );
 
          Logger.info(
@@ -255,7 +259,7 @@ module.exports = {
             {
                guildId: modal.guild.id,
                channelId: modal.channelId,
-            }
+            },
          );
 
          return modal.editReply({
@@ -265,7 +269,7 @@ module.exports = {
       } catch (error) {
          Logger.error(
             'events/poll/pollChannelSubmit.js: Encountered an error.',
-            { error: error }
+            { error: error },
          );
          return modal.editReply({
             content: 'Polling channel has been successfully registered.',
@@ -274,3 +278,33 @@ module.exports = {
       }
    },
 };
+
+async function registerForPollEvents(guildId, channelId) {
+   try {
+      await FeedConfig.create({
+         _id: new Types.ObjectId(),
+         guildId: guildId,
+         channelId: channelId,
+         eventName: 'newProposalPoll',
+      });
+      await FeedConfig.create({
+         _id: new Types.ObjectId(),
+         guildId: guildId,
+         channelId: channelId,
+         eventName: 'threadVote',
+      });
+      await FeedConfig.create({
+         _id: new Types.ObjectId(),
+         guildId: guildId,
+         channelId: channelId,
+         eventName: 'threadStatusChange',
+      });
+   } catch (error) {
+      Logger.error(
+         'events/discordEvents/interaction/modal/pollChannelSubmit.js: Unable to register poll events.',
+         {
+            error: error,
+         },
+      );
+   }
+}
