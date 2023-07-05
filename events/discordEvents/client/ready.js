@@ -71,6 +71,7 @@ module.exports = {
             }
 
             sendToChannelFeeds('propVoteCast', vote, client);
+            sendToChannelFeeds('threadVote', vote, client);
          });
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
