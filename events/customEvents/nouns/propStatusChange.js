@@ -88,26 +88,6 @@ module.exports = {
                );
          }
 
-         if (guildId === process.env.DISCORD_GUILD_ID) {
-            const propChannel =
-               (await cache.get(targetPoll.config.channelId)) ??
-               (await channels.fetch(targetPoll.config.channelId));
-
-            const propMessage = await propChannel.messages.fetch(
-               targetPoll.messageId,
-            );
-
-            const messageThread = await propMessage.thread.fetch();
-
-            const pollThreadEmbed = new MessageEmbed()
-               .setColor('#00FFFF')
-               .setDescription(
-                  `Proposal status changed to ${inlineCode(statusChange)}`,
-               );
-
-            await messageThread.send({ embeds: [pollThreadEmbed] });
-         }
-
          await message.edit({
             content: null,
             embeds: [voteEmbedFindOne],

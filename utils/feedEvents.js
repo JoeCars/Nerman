@@ -9,5 +9,6 @@ events.set('propCreated', 'NounsDAO.PropCreated');
 events.set('propStatusChange', 'NounsDAO.PropStatusChange');
 events.set('propVoteCast', 'NounsDAO.PropVoteCast');
 events.set('threadVote', 'Nerman.ThreadVote');
+events.set('threadStatusChange', 'Nerman.ThreadStatusChange');
 events.set('transferNoun', 'NounsDAO.TransferNoun');
 module.exports = events;

@@ -106,6 +106,7 @@ module.exports = {
             data.status = 'Canceled';
 
             sendToChannelFeeds('propStatusChange', data, client);
+            sendToChannelFeeds('threadStatusChange', data, client);
          });
 
          // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
@@ -118,6 +119,7 @@ module.exports = {
             data.status = 'Queued';
 
             sendToChannelFeeds('propStatusChange', data, client);
+            sendToChannelFeeds('threadStatusChange', data, client);
          });
 
          // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
@@ -129,6 +131,7 @@ module.exports = {
             data.status = 'Vetoed';
 
             sendToChannelFeeds('propStatusChange', data, client);
+            sendToChannelFeeds('threadStatusChange', data, client);
          });
 
          // Nouns.on(
@@ -142,6 +145,7 @@ module.exports = {
             data.status = 'Executed';
 
             sendToChannelFeeds('propStatusChange', data, client);
+            sendToChannelFeeds('threadStatusChange', data, client);
          });
 
          Nouns.on('Transfer', async data => {
