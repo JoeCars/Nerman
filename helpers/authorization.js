@@ -2,12 +2,6 @@ const { GuildMember, Permissions } = require('discord.js');
 const Admin = require('../db/schemas/Admin');
 const Logger = require('./logger');
 
-exports.isUserAuthorized = function isUserAuthorized(userId) {
-   // FIXME: will need to remove these after we figure out a better permission control for admin command
-   const authorizedIds = process.env.BAD_BITCHES.split(',');
-   return authorizedIds.includes(userId);
-};
-
 /**
  * @param {GuildMember} user
  */
@@ -36,10 +30,10 @@ exports.isUserANermanAdmin = async function (user) {
 };
 
 /**
- * @param {GuildMember} user
+ * @param {string} userId
  */
-exports.isUserANermanDeveloper = function (user) {
+exports.isUserANermanDeveloper = function (userId) {
    // FIXME: will need to remove these after we figure out a better permission control for admin command
    const authorizedIds = process.env.BAD_BITCHES.split(',');
-   return authorizedIds.includes(user.id);
+   return authorizedIds.includes(userId);
 };

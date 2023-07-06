@@ -3,7 +3,7 @@ const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { isUserANermanDeveloper } = require('../../../helpers/authorization');
 
 module.exports = {
    subCommand: 'nerman.create-poll',
@@ -56,7 +56,7 @@ module.exports = {
       });
 
       if (
-         !isUserAuthorized(userId) &&
+         !isUserANermanDeveloper(userId) &&
          countedPolls >= channelConfig.maxUserProposal
       ) {
          throw new Error('You do not have permission to use this command.');

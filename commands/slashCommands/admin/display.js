@@ -3,7 +3,7 @@ const { memberNicknameMention } = require('@discordjs/builders');
 
 const Admin = require('../../../db/schemas/Admin');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { isUserANermanDeveloper } = require('../../../helpers/authorization');
 
 module.exports = {
    subCommand: 'nerman.admin.display',
@@ -19,7 +19,7 @@ module.exports = {
          },
       );
 
-      if (!isUserAuthorized(interaction.user.id)) {
+      if (!isUserANermanDeveloper(interaction.user.id)) {
          throw new Error('This is an admin-only command');
       }
 

@@ -5,7 +5,7 @@ const { ApplicationCommandType } = require('discord-api-types/v9');
 
 const Poll = require('../../db/schemas/Poll');
 const Logger = require('../../helpers/logger');
-const { isUserAuthorized } = require('../../helpers/authorization');
+const { isUserANermanDeveloper } = require('../../helpers/authorization');
 
 module.exports = {
    data: new ContextMenuCommandBuilder()
@@ -37,7 +37,7 @@ module.exports = {
             user: { id: userId },
          } = interaction;
 
-         if (!isUserAuthorized(userId)) {
+         if (!isUserANermanDeveloper(userId)) {
             throw new Error('You do not have permission to use this command.');
          }
 

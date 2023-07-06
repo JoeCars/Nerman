@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const testProposal = require('../../../dummyData/testGraphSample.json');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { isUserANermanDeveloper } = require('../../../helpers/authorization');
 
 const propChannelId =
    process.env.DEPLOY_STAGE === 'development'
@@ -41,7 +41,7 @@ module.exports = {
          },
       } = interaction;
 
-      if (!isUserAuthorized(userId)) {
+      if (!isUserANermanDeveloper(userId)) {
          throw new Error('You lack the permissions to use this command.');
       }
 

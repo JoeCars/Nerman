@@ -4,7 +4,7 @@ const { inlineCode } = require('@discordjs/builders');
 
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { isUserANermanDeveloper } = require('../../../helpers/authorization');
 const events = require('../../../utils/feedEvents');
 
 module.exports = {
@@ -22,7 +22,7 @@ module.exports = {
          },
       );
 
-      if (!isUserAuthorized(interaction.user.id)) {
+      if (!isUserANermanDeveloper(interaction.user.id)) {
          throw new Error('This is an admin-only command');
       }
 
