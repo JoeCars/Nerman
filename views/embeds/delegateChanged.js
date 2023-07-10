@@ -14,12 +14,8 @@ exports.generateDelegateChangedEmbed = async function (
 
    let delegator = await findAccountENS(nouns, data.delegator.id);
    let newDelegate = await findAccountENS(nouns, data.toDelegate.id);
-   if (hasMarkdown) {
-      delegator = await findAccountLink(nouns, data.delegator.id);
-      newDelegate = await findAccountLink(nouns, data.toDelegate.id);
-   }
+   let voteCount = '0';
 
-   let voteCount = '';
    try {
       const event = data.event;
       const receipt = await event.getTransactionReceipt();
@@ -31,21 +27,22 @@ exports.generateDelegateChangedEmbed = async function (
       // To see this in detail, follow the link of the delegate changed event and check the receipt logs.
       const numOfVotesChanged = exports.extractVoteChange(hexData);
 
-      Logger.debug(
-         'views/embeds/delegateChanged.js: Checking transaction receipt data.',
-         {
-            numOfVotes: numOfVotesChanged,
-            logs: receipt.logs,
-         },
-      );
-      voteCount = `${inlineCode(numOfVotesChanged)} `;
+      if (numOfVotesChanged) {
+         voteCount = numOfVotesChanged;
+      }
    } catch (error) {
       Logger.error("views/embeds/delegateChanged.js: There's been an error.", {
          error: error,
       });
    }
 
-   const message = `${delegator} delegated ${voteCount}votes to ${newDelegate}.`;
+   if (hasMarkdown) {
+      delegator = await findAccountLink(nouns, data.delegator.id);
+      newDelegate = await findAccountLink(nouns, data.toDelegate.id);
+      voteCount = inlineCode(voteCount);
+   }
+
+   const message = `${delegator} delegated ${voteCount} votes to ${newDelegate}.`;
 
    const embed = new MessageEmbed().setTitle(title).setDescription(message);
 
