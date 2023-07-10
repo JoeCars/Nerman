@@ -2,6 +2,7 @@ const events = new Map();
 events.set('auctionBid', 'NounsDAO.AuctionBid');
 events.set('auctionCreated', 'NounsDAO.AuctionCreated');
 events.set('delegateChanged', 'NounsDAO.DelegateChanged');
+events.set('delegateChanged', 'NounsDAO.DelegateChangedNoZero');
 events.set('newPost', 'NounsNymz.NewPost');
 events.set('newProposalPoll', 'Nerman.NewProposalPoll');
 events.set('nounCreated', 'NounsDAO.NounCreated');
