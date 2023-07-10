@@ -1,9 +1,11 @@
 const { CommandInteraction } = require('discord.js');
 const { Types } = require('mongoose');
+const { inlineCode } = require('@discordjs/builders');
 
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
 const { isUserAuthorized } = require('../../../helpers/authorization');
+const events = require('../../../utils/feedEvents');
 
 module.exports = {
    subCommand: 'nerman.feeds.add',
@@ -79,9 +81,13 @@ module.exports = {
          );
       }
 
+      const eventName = events.get(event);
+
       await interaction.reply({
          ephemeral: true,
-         content: `You have successfully registered the ${event} event to ${channel.id}.`,
+         content: `You have successfully registered the ${inlineCode(
+            eventName,
+         )} event to channel ${inlineCode(channel.id)}.`,
       });
 
       Logger.info(

@@ -1,26 +1,39 @@
-const { MessageEmbed, Message } = require('discord.js');
+const { MessageEmbed, TextChannel } = require('discord.js');
 const { inlineCode } = require('@discordjs/builders');
 
 const Poll = require('../../../db/schemas/Poll');
 
-const shortenAddress = require('../../../helpers/nouns/createNounEmbed');
 const Logger = require('../../../helpers/logger');
-
-const nounsGovId = process.env.NOUNS_GOV_ID;
+const {
+   createProposalStatusEmbed,
+} = require('../../../helpers/proposalHelpers');
 
 module.exports = {
    name: 'propStatusChange',
    /**
-    * @param {Message} interaction
+    * @param {TextChannel} interaction
     */
-   async execute(message, statusChange, data) {
+   async execute(channel, data) {
       try {
          Logger.info(
-            'events/stateOfNouns/propStatusChange.js: Handling a proposal change event.',
+            'events/nouns/propStatusChange.js: Handling a proposal change event.',
             {
                proposalId: `${data.id}`,
+               status: data.status,
             },
          );
+
+         const statusChange = data.status;
+
+         const statusEmbed = await createProposalStatusEmbed(
+            data,
+            statusChange,
+         );
+
+         const message = await channel.send({
+            content: null,
+            embeds: [statusEmbed],
+         });
 
          const {
             channelId,
@@ -48,7 +61,7 @@ module.exports = {
          const titleFromFindOne = targetPoll.pollData.title;
 
          Logger.debug(
-            "events/stateOfNouns/propStatusChange.js: Checking the target poll's title.",
+            "events/nouns/propStatusChange.js: Checking the target poll's title.",
             {
                title: titleFromFindOne,
                poll: targetPoll,
@@ -75,44 +88,21 @@ module.exports = {
                );
          }
 
-         if (guildId === process.env.DISCORD_GUILD_ID) {
-            const propChannel =
-               (await cache.get(targetPoll.config.channelId)) ??
-               (await channels.fetch(targetPoll.config.channelId));
-
-            const propMessage = await propChannel.messages.fetch(
-               targetPoll.messageId,
-            );
-
-            const messageThread = await propMessage.thread.fetch();
-
-            const pollThreadEmbed = new MessageEmbed()
-               .setColor('#00FFFF')
-               .setDescription(
-                  `Proposal status changed to ${inlineCode(statusChange)}`,
-               );
-
-            await messageThread.send({ embeds: [pollThreadEmbed] });
-         }
-
          await message.edit({
             content: null,
             embeds: [voteEmbedFindOne],
          });
 
          Logger.info(
-            'events/stateOfNouns/propStatusChange.js: Finished handling a proposal change event.',
+            'events/nouns/propStatusChange.js: Finished handling a proposal change event.',
             {
                proposalId: `${data.id}`,
             },
          );
       } catch (error) {
-         Logger.error(
-            'events/stateOfNouns/propStatusChange.js: Received an error.',
-            {
-               error: error,
-            },
-         );
+         Logger.error('events/nouns/propStatusChange.js: Received an error.', {
+            error: error,
+         });
       }
    },
 };

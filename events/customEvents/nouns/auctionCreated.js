@@ -12,7 +12,7 @@ module.exports = {
    async execute(genChannel, data) {
       try {
          Logger.info(
-            'events/stateOfNouns/auctionCreated.js: Attempting to handle an auction creation event.',
+            'events/nouns/auctionCreated.js: Attempting to handle an auction creation event.',
             {
                id: `${data.id}`,
                startTime: data.startTime,
@@ -43,7 +43,7 @@ module.exports = {
             .setImage(`https://noun.pics/${id}.png`);
 
          Logger.info(
-            'events/stateOfNouns/auctionCreated.js: Successfully handled an auction creation event.',
+            'events/nouns/auctionCreated.js: Successfully handled an auction creation event.',
             {
                id: data.id,
                startTime: data.startTime,
@@ -53,12 +53,9 @@ module.exports = {
 
          return await genChannel.send({ embeds: [acEmbed] });
       } catch (error) {
-         Logger.info(
-            'events/stateOfNouns/auctionCreated.js: Received an error.',
-            {
-               error: error,
-            },
-         );
+         Logger.info('events/nouns/auctionCreated.js: Received an error.', {
+            error: error,
+         });
       }
    },
 };

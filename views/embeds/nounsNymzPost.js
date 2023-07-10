@@ -48,7 +48,10 @@ exports.generatePostBody = function (post, username) {
 exports.generateNewPostEmbed = async function (post, Nouns) {
    const title = exports.getTitle(post);
    const url = exports.getPostUrl(post.id);
-   const username = await exports.getUsernameHyperlink(post, Nouns);
+   let username = await exports.getUsernameHyperlink(post, Nouns);
+   if (!post.doxed) {
+      username = `${bold('Anon -')} ${username}`;
+   }
    const body = exports.generatePostBody(post, username);
    return new MessageEmbed()
       .setColor('#00FFFF')

@@ -2,7 +2,7 @@ const { Collection } = require('discord.js');
 const { getFiles } = require('../utils/functions');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const importSON = require('../utils/StateOfNouns/importSON');
+const importNermanJS = require('../utils/nouns/importNerman');
 const Logger = require('../helpers/logger');
 // todo use for permissions validation later on
 // const { Perms } = require('../validation/permissions');
@@ -13,7 +13,7 @@ const token = process.env.DISCORD_TOKEN;
 module.exports = async client => {
    Logger.info('handlers/commands.js: Handling commands.');
 
-   const Nouns = await importSON();
+   const Nouns = await importNermanJS();
    // console.log(Nouns);
    const commandsArr = [];
 
@@ -59,7 +59,7 @@ module.exports = async client => {
             [
                `The slash command: ${commandFile} failed to load`,
                "because it doesn't have a name property`",
-            ].join(' ')
+            ].join(' '),
          );
       }
    });
@@ -78,12 +78,12 @@ module.exports = async client => {
    (async () => {
       try {
          Logger.info(
-            'handlers/commands.js: Attempting to register application commands.'
+            'handlers/commands.js: Attempting to register application commands.',
          );
 
          if (process.env.NODE_ENV === 'development') {
             Logger.info(
-               'handlers/commands.js: In development mode. Clearing application commands and adding application guild commands.'
+               'handlers/commands.js: In development mode. Clearing application commands and adding application guild commands.',
             );
 
             await rest.put(Routes.applicationCommands(clientId), {
@@ -99,7 +99,7 @@ module.exports = async client => {
          }
 
          Logger.info(
-            'handlers/commands.js: Successfully registered application commands! :D'
+            'handlers/commands.js: Successfully registered application commands! :D',
          );
       } catch (error) {
          Logger.error('handlers/commands.js: Received an error.', {
