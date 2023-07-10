@@ -3,6 +3,7 @@ const { Collection, Client } = require('discord.js');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
+const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
 
 module.exports = {
    name: 'ready',
@@ -44,6 +45,26 @@ module.exports = {
                event: data.event,
             });
 
+            let numOfVotesChanged = 0;
+            try {
+               const event = data.event;
+               const receipt = await event.getTransactionReceipt();
+               if (receipt.log[1]) {
+                  const hexData = receipt.logs[1].data;
+                  numOfVotesChanged = extractVoteChange(hexData);
+               }
+            } catch (error) {
+               Logger.error(
+                  "events/discordEvents/client/ready.js: On DelegateChanged. There's been an error.",
+                  {
+                     error: error,
+                  },
+               );
+            }
+
+            if (numOfVotesChanged) {
+               sendToChannelFeeds('delegateChangedNoZero', data, client);
+            }
             sendToChannelFeeds('delegateChanged', data, client);
          });
 
