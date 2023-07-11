@@ -10,12 +10,6 @@ const User = require('../../../db/schemas/User');
 const Logger = require('../../../helpers/logger');
 const { createNewProposalEmbed } = require('../../../helpers/proposalHelpers');
 
-// todo I will need to change this to the new Nouncil channel once Joel gives the go-ahead
-const propChannelId =
-   process.env.DEPLOY_STAGE === 'development'
-      ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
-      : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
-
 module.exports = {
    name: 'newProposalPoll',
    /**
@@ -63,8 +57,7 @@ module.exports = {
          member: username,
       });
 
-      const propChannel = await cache.get(propChannelId);
-      const configExists = await PollChannel.configExists(propChannel.id);
+      const configExists = await PollChannel.configExists(channel.id);
       Logger.debug('events/poll/newProposalPoll.js: Checking config exists.', {
          configExists: configExists,
          guildId: guildId,
@@ -97,7 +90,7 @@ module.exports = {
 
       const channelConfig = await PollChannel.findOne(
          {
-            channelId: propChannelId,
+            channelId: channel.id,
          },
          '_id allowedRoles quorum duration forAgainst',
       ).exec();
@@ -153,7 +146,7 @@ module.exports = {
          });
       }
 
-      const countExists = await PollCount.checkExists(propChannelId);
+      const countExists = await PollCount.checkExists(channel.id);
 
       Logger.debug('events/poll/newProposalPoll.js: Checking existing count.', {
          guildId: guildId,
@@ -164,10 +157,10 @@ module.exports = {
       let pollNumber;
 
       if (!countExists) {
-         pollNumber = await PollCount.createCount(propChannelId);
+         pollNumber = await PollCount.createCount(channel.id);
       } else {
          pollNumber = await PollCount.findOne({
-            channelId: propChannelId,
+            channelId: channel.id,
          }).exec();
       }
 
