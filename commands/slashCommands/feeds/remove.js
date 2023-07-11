@@ -14,7 +14,7 @@ module.exports = {
     */
    async execute(interaction) {
       Logger.info(
-         'commands/slashCommands/events/remove.js: Removing new event configuration.',
+         'commands/slashCommands/feeds/remove.js: Removing new event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -26,7 +26,8 @@ module.exports = {
          throw new Error('This is an admin-only command');
       }
 
-      const channel = interaction.options.getChannel('channel');
+      const channel =
+         interaction.options.getChannel('channel') ?? interaction.channel;
       const event = interaction.options.getString('event');
 
       if (!channel || !event) {
@@ -43,7 +44,7 @@ module.exports = {
          }).exec();
       } catch (error) {
          Logger.error(
-            'commands/slashCommands/events/remove.js: Unable to remove the configuration.',
+            'commands/slashCommands/feeds/remove.js: Unable to remove the configuration.',
             {
                error: error,
             },
@@ -74,7 +75,7 @@ module.exports = {
       }
 
       Logger.info(
-         'commands/slashCommands/events/remove.js: Finished removing new event configuration.',
+         'commands/slashCommands/feeds/remove.js: Finished removing new event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,

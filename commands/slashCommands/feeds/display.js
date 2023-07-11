@@ -14,7 +14,7 @@ module.exports = {
     */
    async execute(interaction) {
       Logger.info(
-         'commands/slashCommands/events/display.js: Displaying event configuration.',
+         'commands/slashCommands/feeds/display.js: Displaying event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -26,7 +26,8 @@ module.exports = {
          throw new Error('This is an admin-only command');
       }
 
-      const channel = interaction.options.getChannel('channel');
+      const channel =
+         interaction.options.getChannel('channel') ?? interaction.channel;
 
       if (!channel) {
          throw new Error('The channel was not supplied.');
@@ -41,7 +42,7 @@ module.exports = {
          );
       } catch (error) {
          Logger.error(
-            'commands/slashCommands/events/remove.js: Unable to find the configurations.',
+            'commands/slashCommands/feeds/remove.js: Unable to find the configurations.',
             {
                error: error,
             },
@@ -57,7 +58,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/slashCommands/events/display.js: Finished displaying new event configuration.',
+         'commands/slashCommands/feeds/display.js: Finished displaying new event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,

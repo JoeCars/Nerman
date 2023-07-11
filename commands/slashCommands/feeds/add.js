@@ -14,7 +14,7 @@ module.exports = {
     */
    async execute(interaction) {
       Logger.info(
-         'commands/slashCommands/events/add.js: Adding new event configuration.',
+         'commands/slashCommands/feeds/add.js: Adding new event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -26,7 +26,8 @@ module.exports = {
          throw new Error('This is an admin-only command');
       }
 
-      const channel = interaction.options.getChannel('channel');
+      const channel =
+         interaction.options.getChannel('channel') ?? interaction.channel;
       const event = interaction.options.getString('event');
 
       if (!channel || !event) {
@@ -71,7 +72,7 @@ module.exports = {
          });
       } catch (error) {
          Logger.error(
-            'commands/slashCommands/events/add.js: Unable to save the configuration.',
+            'commands/slashCommands/feeds/add.js: Unable to save the configuration.',
             {
                error: error,
             },
@@ -91,7 +92,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/slashCommands/events/add.js: Finished adding new event configuration.',
+         'commands/slashCommands/feeds/add.js: Finished adding new event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
