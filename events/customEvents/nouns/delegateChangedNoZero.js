@@ -17,8 +17,15 @@ module.exports = {
             delegator: data.delegator.id,
             newDelegate: data.toDelegate.id,
             channelId: channel.id,
+            numOfVotesChanged: data.numOfVotesChanged,
          },
       );
+
+      if (data.numOfVotesChanged === 0) {
+         return Logger.warn(
+            'events/customEvents/nouns/delegateChangedNoZero.js: Received a 0 vote. Quitting.',
+         );
+      }
 
       const nouns = channel.client.libraries.get('Nouns');
 

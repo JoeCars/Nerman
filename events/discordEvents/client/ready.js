@@ -47,6 +47,10 @@ module.exports = {
 
             let numOfVotesChanged = 0;
             try {
+               // The number of votes being changes is stored in receipt logs index 1 and 2.
+               // It is formatted as a single hex, where the first 64 digits after 0x is the previous vote count.
+               // And the second 64 digits after 0x is the new vote count of the delegate.
+               // To see this in detail, follow the link of the delegate changed event and check the receipt logs.
                const event = data.event;
                const receipt = await event.getTransactionReceipt();
                if (receipt.log[1]) {
@@ -61,6 +65,7 @@ module.exports = {
                   },
                );
             }
+            data.numOfVotesChanged = numOfVotesChanged;
 
             if (numOfVotesChanged) {
                sendToChannelFeeds('delegateChangedNoZero', data, client);

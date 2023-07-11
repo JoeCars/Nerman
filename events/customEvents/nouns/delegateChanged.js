@@ -17,6 +17,7 @@ module.exports = {
             delegator: data.delegator.id,
             newDelegate: data.toDelegate.id,
             channelId: channel.id,
+            numOfVotesChanged: data.numOfVotesChanged,
          },
       );
 
@@ -38,6 +39,7 @@ module.exports = {
             delegator: data.delegator.id,
             newDelegate: data.toDelegate.id,
             channelId: channel.id,
+            numOfVotesChanged: data.numOfVotesChanged,
          },
       );
    },
