@@ -324,19 +324,24 @@ async function sendToChannelFeeds(eventName, data, client) {
       });
    }
 
-   const channels = await Promise.all(
-      feeds
-         .filter(feed => {
-            return feed && feed.guildId && feed.channelId;
-         })
-         .map(feed => {
-            return client.channels.fetch(feed.channelId);
-         }),
-   );
-
-   channels.forEach(channel => {
-      if (channel) {
-         client.emit(eventName, channel, data);
-      }
-   });
+   feeds
+      .filter(feed => {
+         return feed && feed.guildId && feed.channelId;
+      })
+      .forEach(async feed => {
+         try {
+            const channel = await client.channels.fetch(feed.channelId);
+            if (channel) {
+               client.emit(eventName, channel, data);
+            }
+         } catch (error) {
+            Logger.error(
+               'events/discordEvents/client/ready.js: Received an error.',
+               {
+                  error: error,
+                  channelId: feed.channelId,
+               },
+            );
+         }
+      });
 }
