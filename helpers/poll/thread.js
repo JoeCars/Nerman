@@ -10,13 +10,17 @@ const Poll = require('../../db/schemas/Poll');
  */
 exports.findPollMessage = async function (channel, proposalId) {
    // Finding poll.
-   const propRegExp = new RegExp(`^prop\\s${Number(proposalId)}`, 'i');
+   const propRegExp = new RegExp(`^Prop\\s${Number(proposalId)}`, 'i');
    const polls = await Poll.find({
       'pollData.title': { $regex: propRegExp },
       guildId: channel.guildId,
    })
       .populate('config')
       .exec();
+
+   Logger.debug('helpers/poll/thread.js: Looking at polls.', {
+      polls: polls,
+   });
 
    const poll = polls.find(item => {
       return item.config.channelId === channel.id;
