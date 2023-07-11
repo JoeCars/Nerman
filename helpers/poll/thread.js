@@ -20,11 +20,21 @@ exports.findPollMessage = async function (channel, proposalId) {
 
    Logger.debug('helpers/poll/thread.js: Looking at polls.', {
       polls: polls,
+      firstPollConfig: polls.length > 0 ? polls[0].config : 'No polls.',
    });
 
-   const poll = polls.find(item => {
-      return item.config.channelId === channel.id;
-   });
+   let poll = undefined;
+   for (let i = 0; i < polls.length; ++i) {
+      try {
+         const message = channel.messages.fetch(polls[i].messageId);
+         if (message) {
+            poll = polls[i];
+            break;
+         }
+      } catch (error) {
+         console.error('No message found.');
+      }
+   }
 
    if (!poll) {
       return Logger.error(
