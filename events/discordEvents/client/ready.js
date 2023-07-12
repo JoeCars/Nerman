@@ -53,7 +53,7 @@ module.exports = {
                // To see this in detail, follow the link of the delegate changed event and check the receipt logs.
                const event = data.event;
                const receipt = await event.getTransactionReceipt();
-               if (receipt.log[1]) {
+               if (receipt.logs[1]) {
                   const hexData = receipt.logs[1].data;
                   numOfVotesChanged = extractVoteChange(hexData);
                }
