@@ -7,7 +7,7 @@ const {
 } = require('../../../views/embeds/threadStatusChange');
 
 module.exports = {
-   name: 'propStatusChange',
+   name: 'threadStatusChange',
    /**
     * @param {TextChannel} interaction
     */
