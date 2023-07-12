@@ -28,6 +28,15 @@ exports.findPollMessage = async function (channel, proposalId) {
       try {
          const message = channel.messages.fetch(polls[i].messageId);
          if (message) {
+            Logger.debug(
+               'Checking if the config channel id matches the channel id.',
+               {
+                  configChannelId: polls[i].config.channelId,
+                  channelId: channel.id,
+                  isEqual: polls[i].config.channelId === channel.id,
+               },
+            );
+
             poll = polls[i];
             break;
          }
