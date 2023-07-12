@@ -41,6 +41,9 @@ module.exports = {
             guildId: interaction.guildId,
             channelId: channel.id,
             eventName: event,
+            isDeleted: {
+               $ne: true,
+            },
          }).exec();
       } catch (error) {
          Logger.error(
