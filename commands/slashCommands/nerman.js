@@ -142,14 +142,6 @@ module.exports = {
                   .setDescription(
                      'Add an event configuration for the given channel.',
                   )
-                  .addChannelOption(option => {
-                     return option
-                        .setName('channel')
-                        .setDescription(
-                           'The channel that will receive the notifications.',
-                        )
-                        .setRequired(true);
-                  })
                   .addStringOption(option => {
                      const eventOptions = [];
                      events.forEach((value, key) => {
@@ -160,6 +152,14 @@ module.exports = {
                         .setDescription('The event to register.')
                         .setRequired(true)
                         .addChoices(eventOptions);
+                  })
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will receive the notifications.',
+                        )
+                        .setRequired(false);
                   });
             })
             .addSubcommand(subcommand => {
@@ -168,14 +168,6 @@ module.exports = {
                   .setDescription(
                      'Remove an event configuration for the given channel.',
                   )
-                  .addChannelOption(option => {
-                     return option
-                        .setName('channel')
-                        .setDescription(
-                           'The channel that will lose the notifications.',
-                        )
-                        .setRequired(true);
-                  })
                   .addStringOption(option => {
                      const eventOptions = [];
                      events.forEach((value, key) => {
@@ -186,6 +178,14 @@ module.exports = {
                         .setDescription('The event to remove.')
                         .setRequired(true)
                         .addChoices(eventOptions);
+                  })
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will lose the notifications.',
+                        )
+                        .setRequired(false);
                   });
             })
             .addSubcommand(subcommand => {
@@ -200,7 +200,7 @@ module.exports = {
                         .setDescription(
                            'The channel whose notifications you want to check.',
                         )
-                        .setRequired(true);
+                        .setRequired(false);
                   });
             });
       }),
