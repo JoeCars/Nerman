@@ -10,7 +10,7 @@ const Poll = require('../../db/schemas/Poll');
  */
 exports.findPollMessage = async function (channel, proposalId) {
    // Finding poll.
-   const propRegExp = new RegExp(`^prop\\s${Number(proposalId)}`, 'i');
+   const propRegExp = new RegExp(`^Prop\\s${Number(proposalId)}`, 'i');
    const polls = await Poll.find({
       'pollData.title': { $regex: propRegExp },
       guildId: channel.guildId,
@@ -18,9 +18,32 @@ exports.findPollMessage = async function (channel, proposalId) {
       .populate('config')
       .exec();
 
-   const poll = polls.find(item => {
-      return item.config.channelId === channel.id;
+   Logger.debug('helpers/poll/thread.js: Looking at polls.', {
+      polls: polls,
+      firstPollConfig: polls.length > 0 ? polls[0].config : 'No polls.',
    });
+
+   let poll = undefined;
+   for (let i = 0; i < polls.length; ++i) {
+      try {
+         const message = channel.messages.fetch(polls[i].messageId);
+         if (message) {
+            Logger.debug(
+               'Checking if the config channel id matches the channel id.',
+               {
+                  configChannelId: polls[i].config.channelId,
+                  channelId: channel.id,
+                  isEqual: polls[i].config.channelId === channel.id,
+               },
+            );
+
+            poll = polls[i];
+            break;
+         }
+      } catch (error) {
+         console.error('No message found.');
+      }
+   }
 
    if (!poll) {
       return Logger.error(

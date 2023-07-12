@@ -47,9 +47,13 @@ module.exports = {
 
             let numOfVotesChanged = 0;
             try {
+               // The number of votes being changes is stored in receipt logs index 1 and 2.
+               // It is formatted as a single hex, where the first 64 digits after 0x is the previous vote count.
+               // And the second 64 digits after 0x is the new vote count of the delegate.
+               // To see this in detail, follow the link of the delegate changed event and check the receipt logs.
                const event = data.event;
                const receipt = await event.getTransactionReceipt();
-               if (receipt.log[1]) {
+               if (receipt.logs[1]) {
                   const hexData = receipt.logs[1].data;
                   numOfVotesChanged = extractVoteChange(hexData);
                }
@@ -61,6 +65,7 @@ module.exports = {
                   },
                );
             }
+            data.numOfVotesChanged = numOfVotesChanged;
 
             if (numOfVotesChanged) {
                sendToChannelFeeds('delegateChangedNoZero', data, client);
@@ -319,19 +324,24 @@ async function sendToChannelFeeds(eventName, data, client) {
       });
    }
 
-   const channels = await Promise.all(
-      feeds
-         .filter(feed => {
-            return feed && feed.guildId && feed.channelId;
-         })
-         .map(feed => {
-            return client.channels.fetch(feed.channelId);
-         }),
-   );
-
-   channels.forEach(channel => {
-      if (channel) {
-         client.emit(eventName, channel, data);
-      }
-   });
+   feeds
+      .filter(feed => {
+         return feed && feed.guildId && feed.channelId;
+      })
+      .forEach(async feed => {
+         try {
+            const channel = await client.channels.fetch(feed.channelId);
+            if (channel) {
+               client.emit(eventName, channel, data);
+            }
+         } catch (error) {
+            Logger.error(
+               'events/discordEvents/client/ready.js: Received an error.',
+               {
+                  error: error,
+                  channelId: feed.channelId,
+               },
+            );
+         }
+      });
 }
