@@ -4,7 +4,7 @@ const { codeBlock } = require('@discordjs/builders');
 
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
-const { isUserANermanDeveloper } = require('../../../helpers/authorization');
+const { isUserAuthorized } = require('../../../helpers/authorization');
 const events = require('../../../utils/feedEvents');
 
 module.exports = {
@@ -22,7 +22,10 @@ module.exports = {
          },
       );
 
-      if (!isUserANermanDeveloper(interaction.user.id)) {
+      const guildUser = await interaction.guild.members.fetch(
+         interaction.user.id,
+      );
+      if (!isUserAuthorized(1, guildUser)) {
          throw new Error('This is an admin-only command');
       }
 

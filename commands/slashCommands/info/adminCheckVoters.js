@@ -1,7 +1,7 @@
 const { CommandInteraction } = require('discord.js');
 
 const Logger = require('../../../helpers/logger');
-const { isUserANermanDeveloper } = require('../../../helpers/authorization');
+const { isUserAuthorized } = require('../../../helpers/authorization');
 
 // const guildAdminId = process.env.NERMAN_G_ADMIN_ID;
 // const { lc } = require('../../../utils/functions');
@@ -35,7 +35,10 @@ module.exports = {
 
       await interaction.deferReply({ ephemeral: true });
 
-      if (!isUserANermanDeveloper(userId)) {
+      const guildUser = await interaction.guild.members.fetch(
+         interaction.user.id,
+      );
+      if (!isUserAuthorized(4, guildUser)) {
          throw new Error('This is an admin-only command');
       }
 
