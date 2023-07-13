@@ -342,6 +342,32 @@ async function sendToChannelFeeds(eventName, data, client) {
                   channelId: feed.channelId,
                },
             );
+
+            // https://discord.com/developers/docs/topics/opcodes-and-status-codes
+            const UNKNOWN_CHANNEL_ERROR_CODE = 10003;
+            if (error.code === UNKNOWN_CHANNEL_ERROR_CODE) {
+               feed.isDeleted = true;
+               feed
+                  .save()
+                  .then(() => {
+                     Logger.debug(
+                        "events/discordEvents/client/ready.js: Soft-deleted the non-existant channel's feed config.",
+                        {
+                           channelId: feed.channelId,
+                           guildId: feed.guildId,
+                           feedEvent: feed.eventName,
+                        },
+                     );
+                  })
+                  .catch(err => {
+                     Logger.error(
+                        'events/discordEvents/client/ready.js: Unable to soft-delete the feed config.',
+                        {
+                           error: err,
+                        },
+                     );
+                  });
+            }
          }
       });
 }

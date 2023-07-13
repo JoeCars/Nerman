@@ -17,17 +17,38 @@ const FeedConfigSchema = new Schema(
          enum: [...events.keys()],
          required: true,
       },
+      isDeleted: {
+         type: Boolean,
+         required: false,
+         default: false,
+      },
    },
    {
       statics: {
          async findChannels(eventName) {
-            return this.find({ eventName: eventName }).exec();
+            return this.find({
+               eventName: eventName,
+               isDeleted: {
+                  $ne: true,
+               },
+            }).exec();
          },
          async findFeedsInGuild(guildId) {
-            return this.find({ guildId: guildId }).exec();
+            return this.find({
+               guildId: guildId,
+               isDeleted: {
+                  $ne: true,
+               },
+            }).exec();
          },
          async findFeedsInChannel(guildId, channelId) {
-            return this.find({ guildId: guildId, channelId: channelId }).exec();
+            return this.find({
+               guildId: guildId,
+               channelId: channelId,
+               isDeleted: {
+                  $ne: true,
+               },
+            }).exec();
          },
       },
    },
