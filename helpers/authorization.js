@@ -3,6 +3,36 @@ const Admin = require('../db/schemas/Admin');
 const Logger = require('./logger');
 
 /**
+ *
+ * @param {number} authorizationLevel
+ * @param {GuildMember} user
+ * @returns {boolean}
+ */
+exports.isUserAuthorized = async function (authorizationLevel, user) {
+   switch (authorizationLevel) {
+      case 1:
+         return true;
+      case 2:
+         return (
+            exports.isUserANermanDeveloper(user.id) ||
+            exports.isUserADiscordAdmin(user) ||
+            exports.isUserANermanAdmin(user)
+         );
+      case 3:
+         return (
+            exports.isUserANermanDeveloper(user.id) ||
+            exports.isUserADiscordAdmin(user)
+         );
+      case 4:
+         return exports.isUserANermanDeveloper(user.id);
+      default:
+         throw new Error(
+            "Please enter a number between 1 to 4 when checking the user's authorization.",
+         );
+   }
+};
+
+/**
  * @param {GuildMember} user
  */
 exports.isUserADiscordAdmin = function (user) {
@@ -26,7 +56,7 @@ exports.isUserANermanAdmin = async function (user) {
       });
    }
 
-   return count;
+   return count !== 0;
 };
 
 /**
