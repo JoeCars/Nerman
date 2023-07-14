@@ -59,7 +59,7 @@ module.exports = {
          interaction.user.id,
       );
       if (
-         !(await isUserAuthorized(2, guildUser)) &&
+         !(await isUserAuthorized(2, guildUser)) ||
          countedPolls >= channelConfig.maxUserProposal
       ) {
          throw new Error('You do not have permission to use this command.');
