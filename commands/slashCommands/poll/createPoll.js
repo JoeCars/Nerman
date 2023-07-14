@@ -55,8 +55,11 @@ module.exports = {
          status: 'open',
       });
 
+      const guildUser = await interaction.guild.members.fetch(
+         interaction.user.id,
+      );
       if (
-         !isUserAuthorized(userId) &&
+         !isUserAuthorized(2, guildUser) &&
          countedPolls >= channelConfig.maxUserProposal
       ) {
          throw new Error('You do not have permission to use this command.');

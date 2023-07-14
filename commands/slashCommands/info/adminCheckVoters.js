@@ -35,7 +35,10 @@ module.exports = {
 
       await interaction.deferReply({ ephemeral: true });
 
-      if (!isUserAuthorized(userId)) {
+      const guildUser = await interaction.guild.members.fetch(
+         interaction.user.id,
+      );
+      if (!isUserAuthorized(4, guildUser)) {
          throw new Error('This is an admin-only command');
       }
 

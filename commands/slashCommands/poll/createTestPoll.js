@@ -39,7 +39,10 @@ module.exports = {
          });
       }
 
-      if (!isUserAuthorized(interaction.user.id)) {
+      const guildUser = await interaction.guild.members.fetch(
+         interaction.user.id,
+      );
+      if (!isUserAuthorized(4, guildUser)) {
          throw new Error('You do not have permission to use this command.');
       }
 

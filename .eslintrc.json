@@ -45,7 +45,10 @@
       ],
       "indent": [
          "error",
-         3
+         3,
+         {
+            "SwitchCase": 1
+         }
       ],
       "keyword-spacing": "error",
       "max-nested-callbacks": [
