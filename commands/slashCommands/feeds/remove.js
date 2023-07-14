@@ -25,7 +25,7 @@ module.exports = {
       const guildUser = await interaction.guild.members.fetch(
          interaction.user.id,
       );
-      if (!isUserAuthorized(2, guildUser)) {
+      if (!(await isUserAuthorized(2, guildUser))) {
          throw new Error('This is an admin-only command');
       }
 

@@ -61,7 +61,7 @@ module.exports = {
       const guildUser = await interaction.guild.members.fetch(
          interaction.user.id,
       );
-      if (!isUserAuthorized(3, guildUser)) {
+      if (!(await isUserAuthorized(3, guildUser))) {
          Logger.error(
             'commands/nerman/poll/regeneratePollMessage.js: User ID is not authorized.',
             {

@@ -47,7 +47,7 @@ module.exports = {
       const guildUser = await interaction.guild.members.fetch(
          interaction.user.id,
       );
-      if (!isUserAuthorized(2, guildUser)) {
+      if (!(await isUserAuthorized(2, guildUser))) {
          throw new Error('You do not have permission to use this command.');
       }
 
