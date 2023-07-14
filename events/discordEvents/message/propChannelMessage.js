@@ -1,9 +1,5 @@
 const { Message } = require('discord.js');
 const PollChannel = require('../../../db/schemas/PollChannel');
-const propChannelId =
-   process.env.DEPLOY_STAGE === 'development'
-      ? process.env.DEVNERMAN_NOUNCIL_CHAN_ID
-      : process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 
 const Logger = require('../../../helpers/logger');
 
@@ -39,18 +35,7 @@ module.exports = {
 
       const configExists = await PollChannel.configExists(channelId);
 
-      // if (channelId !== propChannelId || botId === authorId) return;
-      if (!configExists || nermanIds.includes(botId)) {
-         // if (!configExists || botId === authorId) {
-         // Logger.info(
-         //    'events/poll/propChannelMessage.js: Message was not invalid, so it was not deleted.',
-         //    {
-         //       authorId: message.author.id,
-         //       channelId: message.channelId,
-         //       guildId: message.guildId,
-         //       messageId: message.id,
-         //    }
-         // );
+      if (!configExists || nermanIds.includes(authorId)) {
          return;
       }
 
