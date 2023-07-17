@@ -202,12 +202,23 @@ module.exports = async client => {
                            },
                         );
 
-                        const message = await (client.channels.cache
-                           .get(closingPoll.config.channelId)
-                           .messages.cache.get(closingPoll.messageId) ??
-                           client.channels.cache
+                        let message = null;
+                        try {
+                           message = await (client.channels.cache
                               .get(closingPoll.config.channelId)
-                              .messages.fetch(closingPoll.messageId));
+                              .messages.cache.get(closingPoll.messageId) ??
+                              client.channels.cache
+                                 .get(closingPoll.config.channelId)
+                                 .messages.fetch(closingPoll.messageId));
+                        } catch (error) {
+                           Logger.error(
+                              'db/index.js: Error. Unable to find the message.',
+                              {
+                                 error: error,
+                              },
+                           );
+                           message = null;
+                        }
 
                         Logger.debug('db/index.js: Message.', {
                            message: message,
