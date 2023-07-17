@@ -53,6 +53,18 @@ If a given command requires permission level 2, then any user with a permission 
 		<td> 2 </td>
 	</tr>
 	<tr>
+		<td> <code> /nerman url add </code> </td>
+		<td> 2 </td>
+	</tr>
+	<tr>
+		<td> <code> /nerman url display </code> </td>
+		<td> 1 </td>
+	</tr>
+	<tr>
+		<td> <code> /nerman url remove </code> </td>
+		<td> 2 </td>
+	</tr>
+	<tr>
 		<td> <code> /nerman admin-check-voters </code> </td>
 		<td> 4 </td>
 	</tr>
