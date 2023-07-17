@@ -239,6 +239,44 @@ module.exports = {
                   .setName('display')
                   .setDescription('Displaying the admin users in this guild.');
             });
+      })
+      .addSubcommandGroup(subcommandGroup => {
+         return subcommandGroup
+            .setName('url')
+            .setDescription(
+               'Commands to add, remove, and display the guild URLs.',
+            )
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('add')
+                  .setDescription('Register a new set of URLs for this guild.')
+                  .addStringOption(option => {
+                     return option
+                        .setName('proposal-url')
+                        .setDescription('The URL for all future proposals.')
+                        .setRequired(false);
+                  })
+                  .addStringOption(option => {
+                     return option
+                        .setName('noun-url')
+                        .setDescription('The URL for all future Nouns.')
+                        .setRequired(false);
+                  });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('remove')
+                  .setDescription(
+                     'Removing the URLs registered to this guild.',
+                  );
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('display')
+                  .setDescription(
+                     'Displaying the URLs registered to this guild.',
+                  );
+            });
       }),
    /**
     *
