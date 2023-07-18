@@ -36,7 +36,7 @@ exports.isUserAuthorized = async function (authorizationLevel, user) {
  * @param {GuildMember} user
  */
 exports.isUserADiscordAdmin = function (user) {
-   return user.permissions.has(Permissions.FLAGS.ADMINISTRATOR);
+   return user.permissions.has(Permissions.FLAGS.MANAGE_GUILD);
 };
 
 /**
