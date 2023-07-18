@@ -8,7 +8,7 @@ The following are the permission levels in Nerman. These are guild-specific unle
 
 1. **General:** Any member of the guild.
 2. **Nerman Admin:** Any member registered as an admin in the guild using the `/nerman admin add` command.
-3. **Guild Admin:** Any member who has the administrator permission in the guild. This includes guild owners by default.
+3. **Guild Admin:** Any member who has the manage guilds permission in the guild. This includes guild owners by default.
 4. **Nerman Developer:** Any authorized member of the Nerman development team.
 
 ## Command Authorization
