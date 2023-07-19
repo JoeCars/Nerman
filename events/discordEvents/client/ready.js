@@ -2,6 +2,7 @@ const { Collection, Client } = require('discord.js');
 
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const FeedConfig = require('../../../db/schemas/FeedConfig');
+const Poll = require('../../../db/schemas/Poll');
 const Logger = require('../../../helpers/logger');
 const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
 
@@ -130,6 +131,7 @@ module.exports = {
             });
 
             data.status = 'Canceled';
+            data.title = await fetchProposalTitle(data.id);
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
@@ -143,6 +145,7 @@ module.exports = {
             });
 
             data.status = 'Queued';
+            data.title = await fetchProposalTitle(data.id);
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
@@ -155,6 +158,7 @@ module.exports = {
             });
 
             data.status = 'Vetoed';
+            data.title = await fetchProposalTitle(data.id);
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
@@ -169,6 +173,7 @@ module.exports = {
             });
 
             data.status = 'Executed';
+            data.title = await fetchProposalTitle(data.id);
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
@@ -370,4 +375,22 @@ async function sendToChannelFeeds(eventName, data, client) {
             }
          }
       });
+}
+
+/**
+ * @param {string} proposalId
+ */
+async function fetchProposalTitle(proposalId) {
+   let title = `Proposal ${proposalId}`;
+   try {
+      const targetPoll = await Poll.findOne({
+         'pollData.title': {
+            $regex: new RegExp(`^prop\\s${Number(proposalId)}`, 'i'),
+         },
+      }).exec();
+      title = targetPoll ? targetPoll.pollData.title : title;
+   } catch (error) {
+      Logger.error('Unable to find poll for status change.');
+   }
+   return title;
 }
