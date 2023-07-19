@@ -1,5 +1,4 @@
 const { MessageEmbed, TextChannel } = require('discord.js');
-const { inlineCode } = require('@discordjs/builders');
 
 const Poll = require('../../../db/schemas/Poll');
 
@@ -7,11 +6,12 @@ const Logger = require('../../../helpers/logger');
 const {
    createProposalStatusEmbed,
 } = require('../../../helpers/proposalHelpers');
+const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {
    name: 'propStatusChange',
    /**
-    * @param {TextChannel} interaction
+    * @param {TextChannel} channel
     */
    async execute(channel, data) {
       try {
@@ -34,15 +34,6 @@ module.exports = {
             content: null,
             embeds: [statusEmbed],
          });
-
-         const {
-            channelId,
-            guildId,
-            guild: {
-               channels,
-               channels: { cache },
-            },
-         } = message;
 
          const { id: proposalId } = data;
 
@@ -68,25 +59,12 @@ module.exports = {
             },
          );
 
-         // !testing conditional , will use empty var instead
-         // const voteEmbedFindOne = new MessageEmbed()
-         let voteEmbedFindOne;
+         const urls = await UrlConfig.fetchUrls(channel.guildId);
 
-         if (channelId !== process.env.AGORA_CHANNEL_ID) {
-            voteEmbedFindOne = new MessageEmbed()
-               .setColor('#000000')
-               .setTitle(titleFromFindOne)
-               .setDescription(
-                  `https://www.nounsagora.com/proposals/${proposalId}\n${statusChange}`,
-               );
-         } else {
-            voteEmbedFindOne = new MessageEmbed()
-               .setColor('#000000')
-               .setTitle(titleFromFindOne)
-               .setDescription(
-                  `https://nouns.wtf/vote/${proposalId}\n${statusChange}`,
-               );
-         }
+         const voteEmbedFindOne = new MessageEmbed()
+            .setColor('#000000')
+            .setTitle(titleFromFindOne)
+            .setDescription(`${urls.propUrl}${proposalId}\n${statusChange}`);
 
          await message.edit({
             content: null,
