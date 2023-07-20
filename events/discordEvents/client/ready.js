@@ -5,6 +5,7 @@ const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Poll = require('../../../db/schemas/Poll');
 const Logger = require('../../../helpers/logger');
 const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
+const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 
 module.exports = {
    name: 'ready',
@@ -96,6 +97,12 @@ module.exports = {
                Logger.info('On VoteCast. Received 0 votes. Exiting.');
                return;
             }
+
+            vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
+            vote.voter.name =
+               (await Nouns.ensReverseLookup(vote.voter.id)) ??
+               (await shortenAddress(vote.voter.id));
+            vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
 
             sendToChannelFeeds('propVoteCast', vote, client);
             sendToChannelFeeds('threadVote', vote, client);
