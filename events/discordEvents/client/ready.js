@@ -193,6 +193,13 @@ module.exports = {
                tokenId: `${data.tokenId}`,
             });
 
+            data.from.name =
+               (await Nouns.ensReverseLookup(data.from.id)) ??
+               (await shortenAddress(data.from.id));
+            data.to.name =
+               (await Nouns.ensReverseLookup(data.to.id)) ??
+               (await shortenAddress(data.to.id));
+
             sendToChannelFeeds('transferNoun', data, client);
          });
 
