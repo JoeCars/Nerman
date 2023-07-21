@@ -1,5 +1,4 @@
-const { MessageEmbed, Channel } = require('discord.js');
-const { hyperlink } = require('@discordjs/builders');
+const { TextChannel } = require('discord.js');
 
 const Logger = require('../../../helpers/logger');
 const {
@@ -10,26 +9,24 @@ module.exports = {
    name: 'auctionCreated',
    /**
     *
-    * @param {Channel} genChannel
+    * @param {TextChannel} channel
+    * @param {{
+    *    id: string,
+    *    startTime: string,
+    *    endTime: string
+    * }} data
     */
-   async execute(genChannel, data) {
-      Logger.info(
-         'events/nouns/auctionCreated.js: Attempting to handle an auction creation event.',
-         {
-            id: `${data.id}`,
-            startTime: data.startTime,
-            endTime: data.endTime,
-         },
-      );
-
+   async execute(channel, data) {
       try {
          const embed = generateAuctionCreatedEmbed(data);
-         await genChannel.send({ embeds: [embed] });
+         await channel.send({ embeds: [embed] });
       } catch (error) {
          return Logger.error(
             'events/customEvents/nouns/auctionCreated.js: Received an error.',
             {
                error: error,
+               channelId: channel.id,
+               guildId: channel.guildId,
             },
          );
       }
@@ -40,6 +37,8 @@ module.exports = {
             id: data.id,
             startTime: data.startTime,
             endTime: data.endTime,
+            channelId: channel.id,
+            guildId: channel.guildId,
          },
       );
    },
