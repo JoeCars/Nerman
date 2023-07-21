@@ -7,33 +7,23 @@ module.exports = {
    name: 'auctionBid',
    /**
     *
-    * @param {TextChannel} auctionChannel
+    * @param {TextChannel} channel
+    * @param {{
+    *    id: string,
+    *    bidder: {id: string, name: string},
+    *    amount: BigNumber,
+    *    extended: any
+    * }} data
     */
-   async execute(auctionChannel, data) {
-      if (!auctionChannel || !data) {
-         return Logger.error('Invalid arguments passed to auction bid.', {
-            auctionChannel: auctionChannel,
-            data: data,
-            error: new Error('Arguments not defined.'),
-         });
-      }
-
-      Logger.info(
-         'events/customEvents/nouns/auctionBid.js: Printing an auction bid.',
-         {
-            id: `${data.id}`,
-            amount: `${data.amount}`,
-            bidderId: `${data.bidder.id}`,
-         },
-      );
-
+   async execute(channel, data) {
       try {
-         const Nouns = auctionChannel.client.libraries.get('Nouns');
-         const bidEmbed = await generateAuctionBidEmbed(Nouns, data);
-         await auctionChannel.send({ embeds: [bidEmbed] });
+         const bidEmbed = generateAuctionBidEmbed(data);
+         await channel.send({ embeds: [bidEmbed] });
       } catch (error) {
-         Logger.error('Unable to generate bid embed.', {
+         return Logger.error('events/nouns/auctionBid.js: Received error.', {
             error: error,
+            channelId: channel.id,
+            guildId: channel.guildId,
          });
       }
 
@@ -43,6 +33,8 @@ module.exports = {
             id: `${data.id}`,
             amount: `${data.amount}`,
             bidderId: `${data.bidder.id}`,
+            channelId: channel.id,
+            guildId: channel.guildId,
          },
       );
    },

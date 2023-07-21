@@ -229,6 +229,10 @@ module.exports = {
                dataExtended: `${data.extended}`,
             });
 
+            data.bidder.name =
+               (await Nouns.ensReverseLookup(data.bidder.id)) ??
+               (await shortenAddress(data.bidder.id));
+
             sendToChannelFeeds('auctionBid', data, client);
          });
 
