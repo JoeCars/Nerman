@@ -12,16 +12,6 @@ module.exports = {
     * @param {TextChannel} channel
     */
    async execute(channel, data) {
-      Logger.info(
-         'events/nouns/propStatusChange.js: Generating status change embed.',
-         {
-            propId: data.id,
-            propStatus: data.status,
-            channelId: channel.id,
-            guildId: channel.guildId,
-         },
-      );
-
       try {
          const urls = await UrlConfig.fetchUrls(channel.guildId);
          const statusEmbed = await generatePropStatusChangeEmbed(
@@ -37,6 +27,8 @@ module.exports = {
             'events/nouns/propStatusChange.js: Received an error.',
             {
                error: error,
+               channelId: channel.id,
+               guildId: channel.guildId,
             },
          );
       }

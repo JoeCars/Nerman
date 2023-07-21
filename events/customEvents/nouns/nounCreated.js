@@ -1,4 +1,4 @@
-const { Channel } = require('discord.js');
+const { TextChannel } = require('discord.js');
 
 const Logger = require('../../../helpers/logger.js');
 const {
@@ -9,24 +9,24 @@ module.exports = {
    name: 'nounCreated',
    /**
     *
-    * @param {Channel} nogglesChannel
+    * @param {TextChannel} channel
     */
-   async execute(nogglesChannel, data) {
-      Logger.info('events/nouns/nounCreated.js: Sending Noun Created embed.', {
-         nounId: data.id,
-      });
-
+   async execute(channel, data) {
       try {
          const ncEmbed = generateNounCreatedEmbed(data);
-         await nogglesChannel.send({ embeds: [ncEmbed] });
+         await channel.send({ embeds: [ncEmbed] });
       } catch (error) {
          return Logger.error('events/nouns/nounCreated.js: Received error.', {
             error: error,
+            guildId: channel.guildId,
+            channelId: channel.id,
          });
       }
 
       Logger.info('events/nouns/nounCreated.js: Finished Noun Created embed.', {
          nounId: data.id,
+         guildId: channel.guildId,
+         channelId: channel.id,
       });
    },
 };

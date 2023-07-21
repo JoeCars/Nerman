@@ -12,15 +12,6 @@ module.exports = {
     * @param {TextChannel} channel
     */
    async execute(channel, proposal) {
-      Logger.info(
-         'events/nouns/propCreated.js: Generating propCreated embed.',
-         {
-            propId: proposal.id,
-            channelId: channel.id,
-            guildId: channel.guildId,
-         },
-      );
-
       try {
          const propUrl = (await UrlConfig.fetchUrls(channel.guildId)).propUrl;
          const embed = generatePropCreatedEmbed(proposal, propUrl);
@@ -33,6 +24,8 @@ module.exports = {
             'events/nouns/propCreated.js: Received an error.',
             {
                error: error,
+               channelId: channel.id,
+               guildId: channel.guildId,
             },
          );
       }

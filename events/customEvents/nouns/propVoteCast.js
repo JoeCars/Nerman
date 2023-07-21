@@ -19,11 +19,6 @@ module.exports = {
     *    reason: string}} vote
     */
    async execute(channel, vote) {
-      Logger.info('events/nouns/propVoteCast.js: Sending propVoteCast embed.', {
-         channelId: channel.id,
-         guildId: channel.guildId,
-      });
-
       const urls = await UrlConfig.fetchUrls(channel.guildId);
       const noticeEmbed = generatePropVoteCastEmbed(vote, urls.propUrl, false);
       const messageEmbed = generatePropVoteCastEmbed(vote, urls.propUrl, true);
@@ -42,6 +37,8 @@ module.exports = {
       } catch (error) {
          return Logger.error('events/nouns/propVoteCast.js: Received error.', {
             error: error,
+            channelId: channel.id,
+            guildId: channel.guildId,
          });
       }
 

@@ -10,34 +10,31 @@ module.exports = {
     * @param {TextChannel} channel
     */
    async execute(channel, vote) {
-      Logger.info(
-         'events/customEvents/poll/threadVote.js: Sending a thread vote.',
-         {
-            channelId: channel.id,
-            proposalId: Number(vote.proposalId),
-            voterId: vote.voter.id,
-            votes: Number(vote.votes),
-         },
-      );
-
       const Nouns = await channel.client.libraries.get('Nouns');
-      const threadEmbed = await generateThreadVoteEmbed(vote, Nouns);
 
-      const pollMessage = await findPollMessage(channel, vote.proposalId);
-
-      if (!pollMessage) {
-         return;
+      try {
+         const threadEmbed = await generateThreadVoteEmbed(vote, Nouns);
+         const pollMessage = await findPollMessage(channel, vote.proposalId);
+         if (!pollMessage) {
+            return;
+         }
+         await pollMessage.thread.send({
+            content: null,
+            embeds: [threadEmbed],
+         });
+      } catch (error) {
+         return Logger.error('events/poll/threadVote.js: Received error.', {
+            error: error,
+            channelId: channel.id,
+            guildId: channel.guildId,
+         });
       }
-
-      await pollMessage.thread.send({
-         content: null,
-         embeds: [threadEmbed],
-      });
 
       Logger.info(
          'events/customEvents/poll/threadVote.js: Finished sending a thread vote.',
          {
             channelId: channel.id,
+            guildId: channel.guildId,
             proposalId: Number(vote.proposalId),
             voterId: vote.voter.id,
             votes: Number(vote.votes),
