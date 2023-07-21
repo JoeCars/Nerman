@@ -47,6 +47,16 @@ module.exports = {
                event: data.event,
             });
 
+            data.delegator.name =
+               (await Nouns.ensReverseLookup(data.delegator.id)) ??
+               (await shortenAddress(data.delegator.id));
+            data.fromDelegate.name =
+               (await Nouns.ensReverseLookup(data.fromDelegate.id)) ??
+               (await shortenAddress(data.fromDelegate.id));
+            data.toDelegate.name =
+               (await Nouns.ensReverseLookup(data.toDelegate.id)) ??
+               (await shortenAddress(data.toDelegate.id));
+
             let numOfVotesChanged = 0;
             try {
                // The number of votes being changes is stored in receipt logs index 1 and 2.

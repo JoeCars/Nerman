@@ -1,23 +1,23 @@
 const { MessageEmbed } = require('discord.js');
-const { inlineCode } = require('@discordjs/builders');
+const { inlineCode, hyperlink } = require('@discordjs/builders');
 
-const { findAccountENS, findAccountLink } = require('../helpers');
-
-exports.generateDelegateChangedEmbed = async function (
-   nouns,
-   data,
-   hasMarkdown = true,
-) {
+exports.generateDelegateChangedEmbed = function (data, hasMarkdown = true) {
    const title = 'Delegate Changed';
    const titleUrl = `https://etherscan.io/tx/${data.event.transactionHash}`;
 
-   let delegator = await findAccountENS(nouns, data.delegator.id);
-   let newDelegate = await findAccountENS(nouns, data.toDelegate.id);
+   let delegator = data.delegator.name;
+   let newDelegate = data.toDelegate.name;
    let voteCount = data.numOfVotesChanged;
 
    if (hasMarkdown) {
-      delegator = await findAccountLink(nouns, data.delegator.id);
-      newDelegate = await findAccountLink(nouns, data.toDelegate.id);
+      delegator = hyperlink(
+         delegator,
+         `https://etherscan.io/address/${data.delegator.id}`,
+      );
+      newDelegate = hyperlink(
+         delegator,
+         `https://etherscan.io/address/${data.toDelegate.id}`,
+      );
       voteCount = inlineCode(voteCount);
    }
 

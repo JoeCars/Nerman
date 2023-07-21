@@ -11,35 +11,27 @@ module.exports = {
     * @param {TextChannel} channel
     */
    async execute(channel, data) {
+      const notificationEmbed = generateDelegateChangedEmbed(data, false);
+      const embed = generateDelegateChangedEmbed(data);
+
+      try {
+         const message = await channel.send({ embeds: [notificationEmbed] });
+         await message.edit({ embeds: [embed] });
+      } catch (error) {
+         return Logger.error(
+            'events/nouns/delegateChanged.js: Received error.',
+            { error: error, channelId: channel.id, guildId: channel.guildId },
+         );
+      }
+
       Logger.info(
-         'events/customEvents/nouns/delegateChanged.js: Sending delegate change notification.',
+         'events/nouns/delegateChanged.js: Finished sending delegate change notification.',
          {
             delegator: data.delegator.id,
             newDelegate: data.toDelegate.id,
-            channelId: channel.id,
             numOfVotesChanged: data.numOfVotesChanged,
-         },
-      );
-
-      const nouns = channel.client.libraries.get('Nouns');
-
-      const notificationEmbed = await generateDelegateChangedEmbed(
-         nouns,
-         data,
-         false,
-      );
-      const message = await channel.send({ embeds: [notificationEmbed] });
-
-      const embed = await generateDelegateChangedEmbed(nouns, data);
-      await message.edit({ embeds: [embed] });
-
-      Logger.info(
-         'events/customEvents/nouns/delegateChanged.js: Finished sending delegate change notification.',
-         {
-            delegator: data.delegator.id,
-            newDelegate: data.toDelegate.id,
             channelId: channel.id,
-            numOfVotesChanged: data.numOfVotesChanged,
+            guildId: channel.guildId,
          },
       );
    },
