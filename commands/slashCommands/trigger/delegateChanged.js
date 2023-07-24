@@ -20,11 +20,6 @@ module.exports = {
          throw new Error('This is an admin-only command');
       }
 
-      // delegate.id
-      // toDelegator.id
-      // event.getTransactionReceipts().logs[1].data
-      // Should be 0x00000000000...old + 000000...new
-
       const delegatorId =
          interaction.options.getString('delegator-id') ?? DEFAULT_DELEGATOR_ID;
       const newDelegateId =
@@ -65,11 +60,11 @@ module.exports = {
 
       interaction.reply({
          ephemeral: true,
-         content: 'Triggered an AuctionCreated event.',
+         content: 'Triggered a DelegateChanged event.',
       });
 
       Logger.info(
-         'commands/trigger/auctionCreated.js: An auction created has been triggered.',
+         'commands/trigger/auctionCreated.js: A delegate changed event has been triggered.',
          {
             guildId: interaction.guildId,
             channelId: interaction.channelId,
