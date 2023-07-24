@@ -19,7 +19,6 @@ module.exports = {
          throw new Error('This is an admin-only command');
       }
 
-      // Grab options.
       const proposalNumber =
          interaction.options.getNumber('proposal-number') ??
          DEFAULT_PROPOSAL_NUMBER;
