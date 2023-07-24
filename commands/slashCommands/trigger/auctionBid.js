@@ -2,6 +2,11 @@ const { CommandInteraction } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const { isUserAuthorized } = require('../../../helpers/authorization');
 
+const ETH_TO_WEI_RATE = 100_0000_0000_0000_0000;
+const DEFAULT_NOUN_ID = 117;
+const DEFAULT_ETH_AMOUNT = 42;
+const DEFAULT_WALLET = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
+
 module.exports = {
    subCommand: 'nerman.trigger.auction-bid',
 
@@ -16,12 +21,19 @@ module.exports = {
          throw new Error('This is an admin-only command');
       }
 
+      const nounId =
+         interaction.options.getNumber('noun-number') ?? DEFAULT_NOUN_ID;
+      const ethereumAmount =
+         interaction.options.getNumber('ethereum-amount') ?? DEFAULT_ETH_AMOUNT;
+      const bidderAddress =
+         interaction.options.getString('bidder-address') ?? DEFAULT_WALLET;
+
       const Nouns = interaction.client.libraries.get('Nouns');
       Nouns.trigger('AuctionBid', {
-         id: 69,
-         amount: '69690000000000000000',
+         id: nounId,
+         amount: ethereumAmount * ETH_TO_WEI_RATE,
          bidder: {
-            id: '0x281eC184E704CE57570614C33B3477Ec7Ff07243',
+            id: bidderAddress,
          },
       });
 

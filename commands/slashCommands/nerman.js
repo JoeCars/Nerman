@@ -285,7 +285,25 @@ module.exports = {
             .addSubcommand(subcommand => {
                return subcommand
                   .setName('auction-bid')
-                  .setDescription('Trigger an auction bid event.');
+                  .setDescription('Trigger an auction bid event.')
+                  .addStringOption(option => {
+                     return option
+                        .setName('bidder-address')
+                        .setDescription("The bidder's wallet address.")
+                        .setRequired(false);
+                  })
+                  .addNumberOption(option => {
+                     return option
+                        .setName('ethereum-amount')
+                        .setDescription('The amount of Eth being bid.')
+                        .setRequired(false);
+                  })
+                  .addNumberOption(option => {
+                     return option
+                        .setName('noun-number')
+                        .setDescription('The noun being bid on.')
+                        .setRequired(false);
+                  });
             });
       }),
    /**
