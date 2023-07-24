@@ -340,6 +340,17 @@ module.exports = {
                         )
                         .setRequired(false);
                   });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('noun-created')
+                  .setDescription('Trigger a noun created event.')
+                  .addNumberOption(option => {
+                     return option
+                        .setName('noun-id')
+                        .setDescription('The noun created.')
+                        .setRequired(false);
+                  });
             });
       }),
    /**
