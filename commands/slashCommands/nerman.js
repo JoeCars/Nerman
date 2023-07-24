@@ -315,6 +315,31 @@ module.exports = {
                         .setDescription('The noun being auctioned.')
                         .setRequired(false);
                   });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('delegate-changed')
+                  .setDescription('Trigger a delegate changed event.')
+                  .addStringOption(option => {
+                     return option
+                        .setName('delegator-id')
+                        .setDescription("The delegator's wallet address.")
+                        .setRequired(false);
+                  })
+                  .addStringOption(option => {
+                     return option
+                        .setName('new-delegate-id')
+                        .setDescription("The new delegate's wallet address.")
+                        .setRequired(false);
+                  })
+                  .addNumberOption(option => {
+                     return option
+                        .setName('nouns-transferred')
+                        .setDescription(
+                           'The number of nouns being transferred.',
+                        )
+                        .setRequired(false);
+                  });
             });
       }),
    /**
