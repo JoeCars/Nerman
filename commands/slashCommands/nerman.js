@@ -304,6 +304,17 @@ module.exports = {
                         .setDescription('The noun being bid on.')
                         .setRequired(false);
                   });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('auction-created')
+                  .setDescription('Trigger an auction created event.')
+                  .addNumberOption(option => {
+                     return option
+                        .setName('noun-number')
+                        .setDescription('The noun being auctioned.')
+                        .setRequired(false);
+                  });
             });
       }),
    /**
