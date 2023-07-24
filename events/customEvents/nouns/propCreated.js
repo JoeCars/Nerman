@@ -3,9 +3,9 @@ const { hyperlink, hideLinkEmbed } = require('@discordjs/builders');
 
 const Logger = require('../../../helpers/logger');
 const { createNewProposalEmbed } = require('../../../helpers/proposalHelpers');
+const UrlConfig = require('../../../db/schemas/UrlConfig');
 
-const nounsGovId = process.env.NOUNS_GOV_ID;
-const titleRegex = new RegExp(/^(\#\s(?:\S+\s?)+(?:\S+\n?))/);
+const titleRegex = new RegExp(/^(#\s(?:\S+\s?)+(?:\S+\n?))/);
 
 module.exports = {
    name: 'propCreated',
@@ -18,13 +18,6 @@ module.exports = {
             content: null,
             embeds: [createNewProposalEmbed(proposal)],
          });
-
-         const {
-            guild: {
-               channels: { cache },
-            },
-            channelId,
-         } = message;
 
          const { id: propId, description } = proposal;
 
@@ -50,19 +43,11 @@ module.exports = {
          //    pollData: { title, description },
          // } = proposal;
 
-         const nounsGovChannel = await cache.get(nounsGovId);
-
-         // !testing disabling this to try using emoty variable and assign based on conditional
+         // !testing disabling this to try using empty variable and assign based on conditional
          // const propUrl = `https://nouns.wtf/vote/${proposalId}`;
-         let propUrl;
+         let propUrl = (await UrlConfig.fetchUrls(channel.guildId)).propUrl;
+         propUrl += `${propId}`;
 
-         if (channelId !== process.env.AGORA_CHANNEL_ID) {
-            propUrl = `https://nouns.wtf/vote/${propId}`;
-         } else {
-            propUrl = `https://www.nounsagora.com/proposals/${propId}`;
-         }
-
-         const titleHyperlink = hyperlink(title, propUrl);
          const shortDescription = `${description.substring(0, 200)}...`;
          // disabled to test Joel's new formatting
          // const readMoreHyperlink = hyperlink('Read Full Proposal', propUrl);

@@ -6,6 +6,7 @@ const Poll = require('../../../db/schemas/Poll');
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 const Logger = require('../../../helpers/logger');
 const { createInitialVoteEmbed } = require('../../../helpers/proposalHelpers');
+const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {
    name: 'propVoteCast',
@@ -30,10 +31,6 @@ module.exports = {
             content: null,
             embeds: [initialVoteEmbed],
          });
-
-         const {
-            channelId, // for evaluating embedTitle
-         } = message;
 
          const {
             proposalId,
@@ -78,17 +75,9 @@ module.exports = {
             title: titleFromPoll,
          });
 
-         // todo change this back when we have the config stuff sorted out
-         // const titleUrl = `https://nouns.wtf/vote/${proposalId}`;
-         let titleUrl;
-         // todo change this DEPLOY_STAGE to 'production' when testing passes
-         // if (process.env.DEPLOY_STAGE === 'development') {
-         if (process.env.DEPLOY_STAGE === 'production') {
-            titleUrl =
-               channelId !== process.env.AGORA_CHANNEL_ID
-                  ? `https://nouns.wtf/vote/${proposalId}`
-                  : `https://www.nounsagora.com/proposals/${proposalId}`;
-         }
+         const titleUrl =
+            (await UrlConfig.fetchUrls(channel.guildId)).propUrl +
+            `${proposalId}`;
 
          const voter =
             (await Nouns.ensReverseLookup(voterId)) ??
