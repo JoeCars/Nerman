@@ -277,6 +277,16 @@ module.exports = {
                      'Displaying the URLs registered to this guild.',
                   );
             });
+      })
+      .addSubcommandGroup(subcommandGroup => {
+         return subcommandGroup
+            .setName('trigger')
+            .setDescription('Trigger a specific event.')
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('auction-bid')
+                  .setDescription('Trigger an auction bid event.');
+            });
       }),
    /**
     *
