@@ -26,7 +26,7 @@ module.exports = {
 
       async function runNouns() {
          const nerman = await _nerman;
-         const Nouns = new nerman.Nouns(process.env.JSON_RPC_API_URL);
+         const Nouns = client.libraries.get('Nouns');
          const nounsNymz = new nerman.NounsNymz();
 
          const {
