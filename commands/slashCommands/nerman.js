@@ -351,6 +351,23 @@ module.exports = {
                         .setDescription('The noun created.')
                         .setRequired(false);
                   });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('prop-created')
+                  .setDescription('Trigger a prop created event.')
+                  .addNumberOption(option => {
+                     return option
+                        .setName('proposal-number')
+                        .setDescription('The proposal number.')
+                        .setRequired(false);
+                  })
+                  .addStringOption(option => {
+                     return option
+                        .setName('proposal-title')
+                        .setDescription('The proposal title.')
+                        .setRequired(false);
+                  });
             });
       }),
    /**
