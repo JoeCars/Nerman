@@ -13,7 +13,7 @@ const { hyperlink, inlineCode } = require('@discordjs/builders');
  * @param {string} proposalUrl
  * @param {boolean} hasMarkdown
  */
-exports.generatePropVoteCastEmbed = async function (
+exports.generatePropVoteCastEmbed = function (
    vote,
    proposalUrl,
    hasMarkdown = true,
