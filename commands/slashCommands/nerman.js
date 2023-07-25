@@ -368,6 +368,29 @@ module.exports = {
                         .setDescription('The proposal title.')
                         .setRequired(false);
                   });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('prop-status-change')
+                  .setDescription('Trigger a prop created event.')
+                  .addNumberOption(option => {
+                     return option
+                        .setName('proposal-number')
+                        .setDescription('The proposal number.')
+                        .setRequired(false);
+                  })
+                  .addStringOption(option => {
+                     return option
+                        .setName('proposal-status')
+                        .setDescription('The proposal status.')
+                        .setRequired(false)
+                        .addChoices([
+                           ['Canceled', 'Canceled'],
+                           ['Queued', 'Queued'],
+                           ['Vetoed', 'Vetoed'],
+                           ['Executed', 'Executed'],
+                        ]);
+                  });
             });
       }),
    /**
