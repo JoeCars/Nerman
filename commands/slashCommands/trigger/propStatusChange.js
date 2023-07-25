@@ -6,7 +6,7 @@ const DEFAULT_PROPOSAL_NUMBER = 117;
 const DEFAULT_STATUS = 'Executed';
 
 module.exports = {
-   subCommand: 'nerman.trigger.prop-status-change',
+   subCommand: 'nerman-trigger.prop-status-change',
 
    /**
     * @param {CommandInteraction} interaction

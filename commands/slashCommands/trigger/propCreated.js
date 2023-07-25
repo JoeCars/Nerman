@@ -6,7 +6,7 @@ const DEFAULT_PROPOSAL_NUMBER = 117;
 const DEFAULT_PROPOSAL_TITLE = 'Six Seasons And A Movie!';
 
 module.exports = {
-   subCommand: 'nerman.trigger.prop-created',
+   subCommand: 'nerman-trigger.prop-created',
 
    /**
     * @param {CommandInteraction} interaction

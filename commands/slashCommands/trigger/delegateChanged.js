@@ -7,7 +7,7 @@ const DEFAULT_NEW_DELEGATE_ID = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_NOUNS_TRANSFERRED = 42;
 
 module.exports = {
-   subCommand: 'nerman.trigger.delegate-changed',
+   subCommand: 'nerman-trigger.delegate-changed',
 
    /**
     * @param {CommandInteraction} interaction

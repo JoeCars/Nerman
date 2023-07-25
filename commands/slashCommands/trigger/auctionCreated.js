@@ -5,7 +5,7 @@ const { isUserAuthorized } = require('../../../helpers/authorization');
 const DEFAULT_NOUN_ID = 117;
 
 module.exports = {
-   subCommand: 'nerman.trigger.auction-created',
+   subCommand: 'nerman-trigger.auction-created',
 
    /**
     * @param {CommandInteraction} interaction

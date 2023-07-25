@@ -8,7 +8,7 @@ const DEFAULT_ETH_AMOUNT = 42;
 const DEFAULT_WALLET = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 
 module.exports = {
-   subCommand: 'nerman.trigger.auction-bid',
+   subCommand: 'nerman-trigger.auction-bid',
 
    /**
     * @param {CommandInteraction} interaction
