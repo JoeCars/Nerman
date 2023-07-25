@@ -161,6 +161,29 @@ module.exports = {
                   .setDescription('The vote reason.')
                   .setRequired(false);
             });
+      })
+      .addSubcommand(subcommand => {
+         return subcommand
+            .setName('transfer-noun')
+            .setDescription('Trigger a transfer noun event.')
+            .addNumberOption(option => {
+               return option
+                  .setName('noun-number')
+                  .setDescription('The noun number.')
+                  .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('from-wallet')
+                  .setDescription('The wallet of the old owner.')
+                  .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('to-wallet')
+                  .setDescription('The wallet of the new owner.')
+                  .setRequired(false);
+            });
       }),
    /**
     *
