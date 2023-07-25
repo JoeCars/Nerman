@@ -97,6 +97,12 @@ module.exports = {
                   .setName('proposal-title')
                   .setDescription('The proposal title.')
                   .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('proposer-wallet')
+                  .setDescription("The proposer's wallet address.")
+                  .setRequired(false);
             });
       })
       .addSubcommand(subcommand => {
