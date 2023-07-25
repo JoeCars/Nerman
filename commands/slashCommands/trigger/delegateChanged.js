@@ -64,7 +64,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/trigger/auctionCreated.js: A delegate changed event has been triggered.',
+         'commands/trigger/delegateChanged.js: A delegate changed event has been triggered.',
          {
             guildId: interaction.guildId,
             channelId: interaction.channelId,
