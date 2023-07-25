@@ -28,6 +28,7 @@ module.exports = {
          const nerman = await _nerman;
          const Nouns = client.libraries.get('Nouns');
          const nounsNymz = new nerman.NounsNymz();
+         client.libraries.set('NounsNymz', nounsNymz);
 
          const {
             guilds: { cache: guildCache },

@@ -184,6 +184,49 @@ module.exports = {
                   .setDescription('The wallet of the new owner.')
                   .setRequired(false);
             });
+      })
+      .addSubcommand(subcommand => {
+         return subcommand
+            .setName('new-noun-nymz-post')
+            .setDescription('Trigger a new Nouns Nymz post event.')
+            .addBooleanOption(option => {
+               return option
+                  .setName('is-doxed')
+                  .setDescription('Set whether the user is doxed or not.')
+                  .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('post-title')
+                  .setDescription('The post title.')
+                  .setRequired(false);
+            })
+            .addBooleanOption(option => {
+               return option
+                  .setName('is-reply')
+                  .setDescription(
+                     'Set whether the post is a reply or an original post.',
+                  )
+                  .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('post-id')
+                  .setDescription('The post id.')
+                  .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('user-id')
+                  .setDescription('The user id.')
+                  .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('body')
+                  .setDescription('The body of the post.')
+                  .setRequired(false);
+            });
       }),
    /**
     *
