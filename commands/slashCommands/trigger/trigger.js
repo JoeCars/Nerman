@@ -166,9 +166,7 @@ module.exports = {
     *
     * @param {CommandInteraction} interaction
     */
-   async execute(interaction) {
-      Logger.info(
-         'commands/nerman/nerman.js: Executed Nerman trigger command.',
-      );
+   async execute() {
+      Logger.info('commands/trigger.js: Executed Nerman trigger command.');
    },
 };
