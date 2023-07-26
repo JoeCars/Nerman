@@ -16,19 +16,6 @@ const { lc } = require('../utils/functions');
 // } = require('../scratchcode/db/schema/testExecutions/createPoll');
 
 module.exports = async client => {
-   // const usernameSegment = encodeURI(process.env.MONGODB_DEV_USER);
-   // const passwordSegment = encodeURI(process.env.MONGODB_DEV_PASSWORD);
-   // const mongoCloudURI = process.env.MONGODB_URI_BASE.replace(
-   // /<username>/,
-   //    usernameSegment
-   // ).replace(/<password>/, passwordSegment);
-
-   // disabled Nerman-Dev-Jr stuff
-   // const mongoURI =
-   //    process.env.DB_ENV === 'Cloud'
-   //       ? mongoCloudURI
-   //       : 'mongodb://localhost:27017/polls-test';
-
    const mongoURI =
       process.env.NODE_ENV === 'production' ||
       process.env.NODE_ENV === 'staging'
