@@ -9,18 +9,18 @@ module.exports = {
     * @param {TextChannel} channel
     */
    async execute(channel, post) {
-      Logger.info(
-         'events/customevents/nouns/newPost.js: Sending NounsNymz post.',
-         {
-            postId: post.id,
-            postTitle: post.title,
-            channelId: channel.id,
-         },
-      );
-
       const nouns = channel.client.libraries.get('Nouns');
-      const embed = await generateNewPostEmbed(post, nouns);
-      await channel.send({ embeds: [embed] });
+
+      try {
+         const embed = await generateNewPostEmbed(post, nouns);
+         await channel.send({ embeds: [embed] });
+      } catch (error) {
+         return Logger.error('events/nouns/newPost.js: Received error.', {
+            error: error,
+            channelId: channel.id,
+            guildId: channel.guildId,
+         });
+      }
 
       Logger.info(
          'events/customevents/nouns/newPost.js: Finished sending NounsNymz post.',
@@ -28,6 +28,7 @@ module.exports = {
             postId: post.id,
             postTitle: post.title,
             channelId: channel.id,
+            guildId: channel.guildId,
          },
       );
    },
