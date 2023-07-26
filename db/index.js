@@ -464,6 +464,7 @@ module.exports = async client => {
             }
          });
 
+         mongoose.set('strictQuery', true);
          await mongoose.connect(mongoURI, options);
       } catch (error) {
          Logger.error('db/index.js', { error: error });

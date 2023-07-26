@@ -26,12 +26,10 @@ module.exports = {
       try {
          // Sending notification.
          const message = await channel.send({
-            content: null,
             embeds: [noticeEmbed],
          });
          // Sending main message.
          await message.edit({
-            content: null,
             embeds: [messageEmbed],
          });
       } catch (error) {

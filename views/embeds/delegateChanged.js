@@ -15,7 +15,7 @@ exports.generateDelegateChangedEmbed = function (data, hasMarkdown = true) {
          `https://etherscan.io/address/${data.delegator.id}`,
       );
       newDelegate = hyperlink(
-         delegator,
+         newDelegate,
          `https://etherscan.io/address/${data.toDelegate.id}`,
       );
       voteCount = inlineCode(voteCount);

@@ -4,7 +4,7 @@
    "description": "A Great Listener",
    "main": "index.js",
    "engines": {
-      "node": "16.x"
+      "node": ">=16.x"
    },
    "scripts": {
       "start": "node index.js",
@@ -31,7 +31,7 @@
       "mime": "^3.0.0",
       "mongodb": "^4.2.2",
       "mongoose": "^6.2.7",
-      "nerman": "^0.0.8",
+      "nerman": "*",
       "node-fetch": "^2.6.6",
       "twit": "^2.2.11"
    },

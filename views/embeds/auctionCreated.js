@@ -14,9 +14,9 @@ exports.generateAuctionCreatedEmbed = function (data) {
 
    const embed = new MessageEmbed()
       .setColor('#00FFFF')
-      .setTitle(`New Auction | Noun ${id}`)
+      .setTitle(`New Auction | Noun ${data.id}`)
       .setDescription(`${nounsWTF}\n${pronouns}\n${nounOClock}`)
-      .setImage(`https://noun.pics/${id}.png`);
+      .setImage(`https://noun.pics/${data.id}.png`);
 
    return embed;
 };
