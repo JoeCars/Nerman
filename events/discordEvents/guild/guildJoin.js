@@ -20,32 +20,6 @@ module.exports = {
          guildId: guildId,
       });
 
-      // TESTING GUILD ID: 783406052372643940
-
-      // todo this is temporary until I can just add a proper whitelist env to heroku, which first requires a (now) mandatory 2FA to log in, which I need Joel to handle.
-      // const guildWhitelist =
-      //    process.env.NODE_ENV === 'development'
-      //       ? process.env.GUILD_ID_WHITELIST.split(',')
-      //       : ['919783277726957599', '992462546860785778'];
-
-      // const guildWhitelist = process.env.GUILD_ID_WHITELIST.split(',');
-
-      // l({ guildWhitelist });
-      // l('CLIENT', guild.client);
-      // l('NEW GUILD JOINED', guild);
-      // l('NEW GUILD ID:', guildId);
-
-      // l('CHANNELS', channels.cache);
-
-      //       if (!guildWhitelist.includes(guildId)) {
-      //          Logger.debug(
-      //             'events/guild/guildJoin.js: The guild is not white-listed. Leaving the guild.',
-      //             {
-      //                guildId,
-      //             }
-      //          );
-      //       }
-
       let gConfigDoc;
 
       if (!guildConfigs.has(guildId) || guildConfigs.get(guildId) === null) {

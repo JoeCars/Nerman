@@ -3,8 +3,6 @@ const { CommandInteraction } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const { isUserAuthorized } = require('../../../helpers/authorization');
 
-// const guildAdminId = process.env.NERMAN_G_ADMIN_ID;
-// const { lc } = require('../../../utils/functions');
 module.exports = {
    subCommand: 'nerman.admin-check-voters',
    /**
