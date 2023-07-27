@@ -17,8 +17,8 @@ const { lc } = require('../utils/functions');
 
 module.exports = async client => {
    const mongoURI =
-      process.env.NODE_ENV === 'production' ||
-      process.env.NODE_ENV === 'staging'
+      process.env.DEPLOY_STAGE === 'production' ||
+      process.env.DEPLOY_STAGE === 'staging'
          ? process.env.MONGODB_URI
          : 'mongodb://127.0.0.1:27017/polls-test';
 
@@ -30,7 +30,7 @@ module.exports = async client => {
    };
 
    // Turn off auto indexing in production, because it's expensive on performance
-   if (process.env.NODE_ENV === 'production') {
+   if (process.env.DEPLOY_STAGE === 'production') {
       options.autoIndex = false;
       options.keepAlive = true; // this is true by default since v5.2.0 but keeping it as a reminder
       options.keepAliveInitialDelay = 300000;

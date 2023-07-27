@@ -81,7 +81,7 @@ module.exports = async client => {
             'handlers/commands.js: Attempting to register application commands.',
          );
 
-         if (process.env.NODE_ENV === 'development') {
+         if (process.env.DEPLOY_STAGE === 'development') {
             Logger.info(
                'handlers/commands.js: In development mode. Clearing application commands and adding application guild commands.',
             );
