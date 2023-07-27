@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const testProposal = require('../../../dummyData/testGraphSample.json');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const propChannelId =
    process.env.DEPLOY_STAGE === 'development'
@@ -41,12 +41,7 @@ module.exports = {
          },
       } = interaction;
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(4, guildUser))) {
-         throw new Error('You lack the permissions to use this command.');
-      }
+      await authorizeInteraction(interaction, 4);
 
       await interaction.deferReply({ ephemeral: true });
 

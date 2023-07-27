@@ -1,6 +1,6 @@
 const { CommandInteraction } = require('discord.js');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_DELEGATOR_ID = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_NEW_DELEGATE_ID = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
@@ -13,12 +13,7 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(4, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+      await authorizeInteraction(interaction, 4);
 
       const delegatorId =
          interaction.options.getString('delegator-id') ?? DEFAULT_DELEGATOR_ID;

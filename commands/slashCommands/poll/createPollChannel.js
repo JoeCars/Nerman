@@ -4,7 +4,7 @@ const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {
    subCommand: 'nerman.create-poll-channel',
@@ -44,12 +44,7 @@ module.exports = {
          memberPermissions,
       } = interaction;
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(2, guildUser))) {
-         throw new Error('You do not have permission to use this command.');
-      }
+      await authorizeInteraction(interaction, 2);
 
       // disabled until we nail down the cross-guild permissions on this command
       // if (!memberPermissions.has('MANAGE_GUILD')) {

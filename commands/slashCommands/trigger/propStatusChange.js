@@ -1,6 +1,6 @@
 const { CommandInteraction } = require('discord.js');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_PROPOSAL_NUMBER = 117;
 const DEFAULT_STATUS = 'Executed';
@@ -12,12 +12,7 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(4, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+      await authorizeInteraction(interaction, 4);
 
       const propNumber =
          interaction.options.getNumber('proposal-number') ??
