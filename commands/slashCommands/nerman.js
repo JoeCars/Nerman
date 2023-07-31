@@ -169,7 +169,7 @@ module.exports = {
                      'Remove an event configuration for the given channel.',
                   )
                   .addStringOption(option => {
-                     const eventOptions = [];
+                     const eventOptions = [['All', 'All']];
                      events.forEach((value, key) => {
                         eventOptions.push([value, key]);
                      });
