@@ -1,5 +1,7 @@
 // Sorted lexicographically. First by group name. Then by event name.
 const events = new Map();
+events.set('federationBidPlaced', 'Federation.BidPlaced');
+events.set('federationVoteCast', 'Federation.VoteCast');
 events.set('newProposalPoll', 'Nerman.NewProposalPoll');
 events.set('threadStatusChange', 'Nerman.ThreadStatusChange');
 events.set('threadVote', 'Nerman.ThreadVote');
