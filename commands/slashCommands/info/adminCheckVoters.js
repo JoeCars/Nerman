@@ -1,7 +1,7 @@
 const { CommandInteraction } = require('discord.js');
 
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {
    subCommand: 'nerman.admin-check-voters',
@@ -33,12 +33,7 @@ module.exports = {
 
       await interaction.deferReply({ ephemeral: true });
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(4, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+      await authorizeInteraction(interaction, 4);
 
       const userArray = await constructUserData(guildMembers, interaction);
 
