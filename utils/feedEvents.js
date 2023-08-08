@@ -13,6 +13,7 @@ events.set('nounCreated', 'NounsDAO.NounCreated');
 events.set('propCreated', 'NounsDAO.PropCreated');
 events.set('propStatusChange', 'NounsDAO.PropStatusChange');
 events.set('propVoteCast', 'NounsDAO.PropVoteCastNoZero');
+events.set('propVoteCastOnlyZero', 'NounsDAO.PropVoteCastOnlyZero');
 events.set('transferNoun', 'NounsDAO.TransferNoun');
 events.set('newPost', 'NounsNymz.NewPost');
 module.exports = events;

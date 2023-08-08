@@ -158,19 +158,18 @@ module.exports = {
                reason: vote.reason,
             });
 
-            if (Number(vote.votes) === 0) {
-               Logger.info('On VoteCast. Received 0 votes. Exiting.');
-               return;
-            }
-
             vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
             vote.voter.name =
                (await Nouns.ensReverseLookup(vote.voter.id)) ??
                (await shortenAddress(vote.voter.id));
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
 
-            sendToChannelFeeds('propVoteCast', vote, client);
-            sendToChannelFeeds('threadVote', vote, client);
+            if (Number(vote.votes) === 0) {
+               sendToChannelFeeds('propVoteCastOnlyZero', vote, client);
+            } else {
+               sendToChannelFeeds('propVoteCast', vote, client);
+               sendToChannelFeeds('threadVote', vote, client);
+            }
          });
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
