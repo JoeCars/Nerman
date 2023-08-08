@@ -1,61 +1,45 @@
-const { MessageEmbed, Channel } = require('discord.js');
-const { hyperlink } = require('@discordjs/builders');
+const { TextChannel } = require('discord.js');
 
 const Logger = require('../../../helpers/logger');
+const {
+   generateAuctionCreatedEmbed,
+} = require('../../../views/embeds/auctionCreated');
 
 module.exports = {
    name: 'auctionCreated',
    /**
     *
-    * @param {Channel} genChannel
+    * @param {TextChannel} channel
+    * @param {{
+    *    id: string,
+    *    startTime: string,
+    *    endTime: string
+    * }} data
     */
-   async execute(genChannel, data) {
+   async execute(channel, data) {
       try {
-         Logger.info(
-            'events/nouns/auctionCreated.js: Attempting to handle an auction creation event.',
-            {
-               id: `${data.id}`,
-               startTime: data.startTime,
-               endTime: data.endTime,
-            },
-         );
-
-         const { id, startTime, endTime } = data;
-
-         const nounsWTF = hyperlink(
-            'Nouns.wtf',
-            `https://nouns.wtf/noun/${id}`,
-         );
-         const pronouns = hyperlink(
-            'Pronouns.gg',
-            `https://pronouns.gg/noun/${id}`,
-         );
-         const nounOClock = hyperlink(
-            'Nounoclock.app',
-            `https://www.nounoclock.app/`,
-         );
-
-         const acEmbed = new MessageEmbed()
-            .setColor('#00FFFF')
-            .setTitle(`New Auction | Noun ${id}`)
-            .setDescription(`${nounsWTF}\n${pronouns}\n${nounOClock}`)
-
-            .setImage(`https://noun.pics/${id}.png`);
-
-         Logger.info(
-            'events/nouns/auctionCreated.js: Successfully handled an auction creation event.',
-            {
-               id: data.id,
-               startTime: data.startTime,
-               endTime: data.endTime,
-            },
-         );
-
-         return await genChannel.send({ embeds: [acEmbed] });
+         const embed = generateAuctionCreatedEmbed(data);
+         await channel.send({ embeds: [embed] });
       } catch (error) {
-         Logger.info('events/nouns/auctionCreated.js: Received an error.', {
-            error: error,
-         });
+         return Logger.error(
+            'events/customEvents/nouns/auctionCreated.js: Received an error.',
+            {
+               error: error,
+               channelId: channel.id,
+               guildId: channel.guildId,
+            },
+         );
       }
+
+      Logger.info(
+         'events/nouns/auctionCreated.js: Successfully handled an auction creation event.',
+         {
+            id: data.id,
+            startTime: data.startTime,
+            endTime: data.endTime,
+            channelId: channel.id,
+            guildId: channel.guildId,
+         },
+      );
    },
 };

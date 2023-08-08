@@ -1,19 +1,22 @@
 const { MessageEmbed } = require('discord.js');
-const { findAccountLink, getNounsLink, getEthAmount } = require('../helpers');
+const { hyperlink } = require('@discordjs/builders');
+const { getNounsLink, getEthAmount } = require('../helpers');
 
 /**
- *
- * @param {*} Nouns
- * @param {{amount: BigNumber, bidder: {id: any}, id: any}} bidData
- * @returns {MessageEmbed}
+ * @param {{
+ *    id: string,
+ *    bidder: {id: string, name: string},
+ *    amount: BigNumber,
+ *    extended: any
+ * }} data
  */
-exports.generateAuctionBidEmbed = async function generateAuctionBidEmbed(
-   Nouns,
-   bidData,
-) {
-   const bidderLink = await findAccountLink(Nouns, bidData.bidder.id);
-   const nounsLink = getNounsLink(bidData.id);
-   const amount = getEthAmount(bidData.amount);
+exports.generateAuctionBidEmbed = function (data) {
+   const bidderLink = hyperlink(
+      data.bidder.name,
+      `https://etherscan.io/address/${data.bidder.id}`,
+   );
+   const nounsLink = getNounsLink(data.id);
+   const amount = getEthAmount(data.amount);
 
    return new MessageEmbed()
       .setColor('#00FFFF')

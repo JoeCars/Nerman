@@ -2,8 +2,10 @@ const { Collection, Client } = require('discord.js');
 
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const FeedConfig = require('../../../db/schemas/FeedConfig');
+const Poll = require('../../../db/schemas/Poll');
 const Logger = require('../../../helpers/logger');
 const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
+const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 
 module.exports = {
    name: 'ready',
@@ -24,8 +26,9 @@ module.exports = {
 
       async function runNouns() {
          const nerman = await _nerman;
-         const Nouns = new nerman.Nouns(process.env.JSON_RPC_API_URL);
+         const Nouns = client.libraries.get('Nouns');
          const nounsNymz = new nerman.NounsNymz();
+         client.libraries.set('NounsNymz', nounsNymz);
 
          const {
             guilds: { cache: guildCache },
@@ -44,6 +47,16 @@ module.exports = {
                newDelegate: data.toDelegate.id,
                event: data.event,
             });
+
+            data.delegator.name =
+               (await Nouns.ensReverseLookup(data.delegator.id)) ??
+               (await shortenAddress(data.delegator.id));
+            data.fromDelegate.name =
+               (await Nouns.ensReverseLookup(data.fromDelegate.id)) ??
+               (await shortenAddress(data.fromDelegate.id));
+            data.toDelegate.name =
+               (await Nouns.ensReverseLookup(data.toDelegate.id)) ??
+               (await shortenAddress(data.toDelegate.id));
 
             let numOfVotesChanged = 0;
             try {
@@ -96,6 +109,12 @@ module.exports = {
                return;
             }
 
+            vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
+            vote.voter.name =
+               (await Nouns.ensReverseLookup(vote.voter.id)) ??
+               (await shortenAddress(vote.voter.id));
+            vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
+
             sendToChannelFeeds('propVoteCast', vote, client);
             sendToChannelFeeds('threadVote', vote, client);
          });
@@ -130,6 +149,7 @@ module.exports = {
             });
 
             data.status = 'Canceled';
+            data.title = await fetchProposalTitle(data.id);
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
@@ -143,6 +163,7 @@ module.exports = {
             });
 
             data.status = 'Queued';
+            data.title = await fetchProposalTitle(data.id);
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
@@ -155,6 +176,7 @@ module.exports = {
             });
 
             data.status = 'Vetoed';
+            data.title = await fetchProposalTitle(data.id);
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
@@ -169,6 +191,7 @@ module.exports = {
             });
 
             data.status = 'Executed';
+            data.title = await fetchProposalTitle(data.id);
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
@@ -180,6 +203,13 @@ module.exports = {
                toId: `${data.to.id}`,
                tokenId: `${data.tokenId}`,
             });
+
+            data.from.name =
+               (await Nouns.ensReverseLookup(data.from.id)) ??
+               (await shortenAddress(data.from.id));
+            data.to.name =
+               (await Nouns.ensReverseLookup(data.to.id)) ??
+               (await shortenAddress(data.to.id));
 
             sendToChannelFeeds('transferNoun', data, client);
          });
@@ -209,6 +239,10 @@ module.exports = {
                ethereumWeiAmount: `${data.amount}`,
                dataExtended: `${data.extended}`,
             });
+
+            data.bidder.name =
+               (await Nouns.ensReverseLookup(data.bidder.id)) ??
+               (await shortenAddress(data.bidder.id));
 
             sendToChannelFeeds('auctionBid', data, client);
          });
@@ -370,4 +404,22 @@ async function sendToChannelFeeds(eventName, data, client) {
             }
          }
       });
+}
+
+/**
+ * @param {string} proposalId
+ */
+async function fetchProposalTitle(proposalId) {
+   let title = `Proposal ${proposalId}`;
+   try {
+      const targetPoll = await Poll.findOne({
+         'pollData.title': {
+            $regex: new RegExp(`^prop\\s${Number(proposalId)}`, 'i'),
+         },
+      }).exec();
+      title = targetPoll ? targetPoll.pollData.title : title;
+   } catch (error) {
+      Logger.error('Unable to find poll for status change.');
+   }
+   return title;
 }

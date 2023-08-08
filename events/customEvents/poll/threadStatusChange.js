@@ -9,28 +9,36 @@ const {
 module.exports = {
    name: 'threadStatusChange',
    /**
-    * @param {TextChannel} interaction
+    * @param {TextChannel} channel
     */
    async execute(channel, data) {
-      Logger.info(
-         'events/customEvents/poll/threadStatusChange.js: Updating status in poll thread.',
-         {
-            proposalId: `${data.id}`,
-            status: data.status,
-         },
-      );
-
-      const pollMessage = await findPollMessage(channel, data.id);
-
-      if (!pollMessage) {
-         return;
+      try {
+         const pollMessage = await findPollMessage(channel, data.id);
+         if (!pollMessage) {
+            return;
+         }
+         const threadEmbed = generateThreadStatusEmbed(data.status);
+         await pollMessage.thread.send({
+            content: null,
+            embeds: [threadEmbed],
+         });
+      } catch (error) {
+         return Logger.error(
+            'events/poll/threadStatusChange.js: Received error.',
+            {
+               error: error,
+               guildId: channel.guildId,
+               channelId: channel.id,
+            },
+         );
       }
 
-      const threadEmbed = generateThreadStatusEmbed(data.status);
-
-      await pollMessage.thread.send({
-         content: null,
-         embeds: [threadEmbed],
-      });
+      Logger.info(
+         'events/poll/threadStatusChange.js: Finished sending thread status update.',
+         {
+            guildId: channel.guildId,
+            channelId: channel.id,
+         },
+      );
    },
 };
