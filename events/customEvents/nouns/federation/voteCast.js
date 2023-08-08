@@ -20,6 +20,7 @@ module.exports = {
     *	   bidder: string,
     *	   bidderName: string,
     *    proposalTitle: string
+    *    voteNumber: number
     * }} data
     */
    async execute(channel, data) {
