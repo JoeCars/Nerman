@@ -2,8 +2,8 @@ const { TextChannel } = require('discord.js');
 const UrlConfig = require('../../../../db/schemas/UrlConfig');
 
 const {
-   generateFederationBidEmbed,
-} = require('../../../../views/embeds/federation/bidPlaced');
+   generateFederationVoteEmbed,
+} = require('../../../../views/embeds/federation/voteCast');
 const Logger = require('../../../../helpers/logger');
 
 module.exports = {
@@ -24,7 +24,7 @@ module.exports = {
    async execute(channel, data) {
       try {
          const urls = await UrlConfig.fetchUrls(channel.guildId);
-         const embed = generateFederationBidEmbed(data, urls.propUrl, true);
+         const embed = generateFederationVoteEmbed(data, urls.propUrl, true);
          await channel.send({ embeds: [embed] });
       } catch (error) {
          return Logger.error(

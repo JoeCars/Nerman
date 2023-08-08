@@ -14,7 +14,7 @@ const { getEthAmount } = require('../../helpers');
  *	reason?: string,
  * }} data
  */
-exports.generateFederationBidEmbed = function (
+exports.generateFederationVoteEmbed = function (
    data,
    proposalUrl,
    hasMarkdown = true,
@@ -36,12 +36,10 @@ exports.generateFederationBidEmbed = function (
       );
    }
 
-   const text = `${bidderLink} bid ${amount}Ξ ${vote} ${proposal}${
-      data.reason ? `\n\n${data.reason}` : ''
-   }`;
+   const text = `Federation has voted ${vote} on ${proposal} on behalf of ${bidderLink}'s winning bid of ${amount}Ξ.`;
 
    return new MessageEmbed()
       .setColor('#00FFFF')
-      .setTitle(`Federation Bid`)
+      .setTitle(`Federation Vote Cast`)
       .setDescription(text);
 };
