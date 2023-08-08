@@ -32,7 +32,7 @@ module.exports = {
          client.libraries.set('NounsNymz', nounsNymz);
 
          const federationNounsPool = new nerman.FederationNounsPool(
-            process.env.ALCHEMY_WEBSOCKEtS,
+            process.env.ALCHEMY_WEBSOCKETS,
          );
          client.libraries.set('FederationNounsPool', federationNounsPool);
 
