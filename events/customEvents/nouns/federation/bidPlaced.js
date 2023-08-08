@@ -4,7 +4,7 @@ const UrlConfig = require('../../../../db/schemas/UrlConfig');
 const {
    generateFederationBidEmbed,
 } = require('../../../../views/embeds/federation/bidPlaced');
-const Logger = require('../../../helpers/logger');
+const Logger = require('../../../../helpers/logger');
 
 module.exports = {
    name: 'federationBidPlaced',
