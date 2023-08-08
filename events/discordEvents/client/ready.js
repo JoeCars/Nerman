@@ -27,8 +27,14 @@ module.exports = {
       async function runNouns() {
          const nerman = await _nerman;
          const Nouns = client.libraries.get('Nouns');
+
          const nounsNymz = new nerman.NounsNymz();
          client.libraries.set('NounsNymz', nounsNymz);
+
+         const federationNounsPool = new nerman.FederationNounsPool(
+            process.env.ALCHEMY_WEBSOCKEtS,
+         );
+         client.libraries.set('FederationNounsPool', federationNounsPool);
 
          const {
             guilds: { cache: guildCache },
@@ -39,6 +45,38 @@ module.exports = {
          // EXAMPLE EVENTS
          //
          // *************************************************************
+
+         federationNounsPool.on('BidPlaced', async data => {
+            Logger.info('ready.js: On Federation BidPlaced.', {
+               propId: `${data.propId}`,
+               bidder: data.bidder,
+               support: data.support,
+               amount: data.amount,
+            });
+
+            data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.bidderName =
+               (await Nouns.ensReverseLookup(data.bidder)) ??
+               (await shortenAddress(data.bidder));
+
+            sendToChannelFeeds('federationBidPlaced', data, client);
+         });
+
+         federationNounsPool.on('VoteCast', async data => {
+            Logger.info('ready.js: On Federation VoteCast.', {
+               propId: `${data.propId}`,
+               bidder: data.bidder,
+               support: data.support,
+               amount: data.amount,
+            });
+
+            data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.bidderName =
+               (await Nouns.ensReverseLookup(data.bidder)) ??
+               (await shortenAddress(data.bidder));
+
+            sendToChannelFeeds('federationVoteCast', data, client);
+         });
 
          Nouns.on('DelegateChanged', async data => {
             Logger.info('ready.js: On DelegateChanged.', {
