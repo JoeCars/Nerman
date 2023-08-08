@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const { longestString } = require('../../../helpers/poll');
 const ResultBar = require('../../../structures/ResultBar');
 const { codeBlock } = require('@discordjs/builders');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {
    subCommand: 'nerman.create-test-poll',
@@ -39,12 +39,7 @@ module.exports = {
          });
       }
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(4, guildUser))) {
-         throw new Error('You do not have permission to use this command.');
-      }
+      await authorizeInteraction(interaction, 4);
 
       interaction.deferReply();
 

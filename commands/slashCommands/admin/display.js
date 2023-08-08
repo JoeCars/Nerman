@@ -3,7 +3,7 @@ const { memberNicknameMention } = require('@discordjs/builders');
 
 const Admin = require('../../../db/schemas/Admin');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {
    subCommand: 'nerman.admin.display',
@@ -18,12 +18,8 @@ module.exports = {
             guildId: interaction.guildId,
          },
       );
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(2, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+
+      await authorizeInteraction(interaction, 2);
 
       // Grabbing admins.
       let admins;
