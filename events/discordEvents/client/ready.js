@@ -58,6 +58,16 @@ module.exports = {
             data.bidderName =
                (await Nouns.ensReverseLookup(data.bidder)) ??
                (await shortenAddress(data.bidder));
+            data.proposalTitle = await fetchProposalTitle(data.propId);
+
+            const GOVERNANCE_POOL_VOTING_ADDRESS = `0x6b2645b468A828a12fEA8C7D644445eB808Ec2B1`;
+            const voting = await Nouns.NounsDAO.Contract.getReceipt(
+               data.propId,
+               GOVERNANCE_POOL_VOTING_ADDRESS,
+            );
+            data.voteNumber = voting[2];
+
+            console.log(data.voteNumber);
 
             sendToChannelFeeds('federationBidPlaced', data, client);
          });
@@ -74,6 +84,7 @@ module.exports = {
             data.bidderName =
                (await Nouns.ensReverseLookup(data.bidder)) ??
                (await shortenAddress(data.bidder));
+            data.proposalTitle = await fetchProposalTitle(data.propId);
 
             sendToChannelFeeds('federationVoteCast', data, client);
          });
