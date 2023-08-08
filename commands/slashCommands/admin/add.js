@@ -4,7 +4,7 @@ const { Types } = require('mongoose');
 
 const Admin = require('../../../db/schemas/Admin');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {
    subCommand: 'nerman.admin.add',
@@ -17,12 +17,7 @@ module.exports = {
          guildId: interaction.guildId,
       });
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(3, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+      await authorizeInteraction(interaction, 3);
 
       const newAdmin = interaction.options.getUser('user');
 

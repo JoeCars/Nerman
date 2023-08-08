@@ -1,6 +1,6 @@
 const { CommandInteraction } = require('discord.js');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_IS_DOXED = false;
 const DEFAULT_TITLE = 'The Rabbit Hole';
@@ -19,12 +19,7 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(4, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+      await authorizeInteraction(interaction, 4);
 
       // post.doxed
       const isDoxed =

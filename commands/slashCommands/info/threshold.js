@@ -1,6 +1,6 @@
 const nThreshold = require(`../../../helpers/twitter/nThreshold.js`);
 const Logger = require('../../../helpers/logger.js');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {
    subCommand: 'nerman.threshold',
@@ -9,12 +9,7 @@ module.exports = {
          'commands/nerman/info/threshold.js: Starting to retrieve threshold.',
       );
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(2, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+      await authorizeInteraction(interaction, 2);
 
       let votingRole = 'Voters';
 

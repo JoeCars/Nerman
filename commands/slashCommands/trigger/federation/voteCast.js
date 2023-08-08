@@ -1,6 +1,6 @@
 const { CommandInteraction } = require('discord.js');
 const Logger = require('../../../../helpers/logger');
-const { isUserAuthorized } = require('../../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../../helpers/authorization');
 
 const ETH_TO_WEI_RATE = 100_0000_0000_0000_0000;
 const DEFAULT_DAO = '0x6f3E6272A167e8AcCb32072d08E0957F9c79223d';
@@ -16,12 +16,7 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(4, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+      await authorizeInteraction(interaction, 4);
 
       const dao = DEFAULT_DAO;
       const proposalNumber =

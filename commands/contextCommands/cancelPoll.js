@@ -5,7 +5,7 @@ const { ApplicationCommandType } = require('discord-api-types/v9');
 
 const Poll = require('../../db/schemas/Poll');
 const Logger = require('../../helpers/logger');
-const { isUserAuthorized } = require('../../helpers/authorization');
+const { authorizeInteraction } = require('../../helpers/authorization');
 
 module.exports = {
    data: new ContextMenuCommandBuilder()
@@ -37,17 +37,7 @@ module.exports = {
             user: { id: userId },
          } = interaction;
 
-         const guildUser = await interaction.guild.members.fetch(userId);
-         if (!(await isUserAuthorized(2, guildUser))) {
-            throw new Error('You do not have permission to use this command.');
-         }
-
-         // disabled until we nail down the cross-guild permissions on this command
-         // if (!memberPermissions.has('MANAGE_GUILD')) {
-         //    throw new Error(
-         //       'You require manage guild permissions to use this command'
-         //    );
-         // }
+         await authorizeInteraction(interaction, 2);
 
          const targetPoll = await Poll.findOne(
             {

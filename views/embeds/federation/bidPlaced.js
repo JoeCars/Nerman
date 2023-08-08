@@ -12,6 +12,7 @@ const { getEthAmount } = require('../../helpers');
  *	bidder: string,
  *	bidderName: string,
  *	reason?: string,
+ * voteNumber: number
  * }} data
  */
 exports.generateFederationBidEmbed = function (
@@ -19,10 +20,14 @@ exports.generateFederationBidEmbed = function (
    proposalUrl,
    hasMarkdown = true,
 ) {
+   const title = `Nouns Gov Pool | ${data.proposalTitle}`;
+   const url = `https://www.federation.wtf/governance-pools/0x0f722d69B3D8C292E85F2b1E5D9F4439edd58F1e/${data.propId}`;
+
    const amount = getEthAmount(data.amount);
    let bidderLink = data.bidderName;
    let vote = data.supportVote;
-   let proposal = `Proposal ${data.propId}`;
+   let bidAmount = `${amount}Ξ`;
+   let voteNumber = data.voteNumber;
 
    if (hasMarkdown) {
       bidderLink = hyperlink(
@@ -30,18 +35,15 @@ exports.generateFederationBidEmbed = function (
          `https://etherscan.io/address/${data.bidder}`,
       );
       vote = inlineCode(data.supportVote);
-      proposal = hyperlink(
-         `Proposal ${data.propId}`,
-         `${proposalUrl}${data.propId}`,
-      );
+      bidAmount = inlineCode(bidAmount);
+      voteNumber = inlineCode(voteNumber);
    }
 
-   const text = `${bidderLink} bid ${amount}Ξ ${vote} ${proposal}${
-      data.reason ? `\n\n${data.reason}` : ''
-   }`;
+   const text = `${bidderLink} bid ${bidAmount} to vote ${vote} with ${voteNumber} votes.`;
 
    return new MessageEmbed()
       .setColor('#00FFFF')
-      .setTitle(`Federation Bid`)
-      .setDescription(text);
+      .setTitle(title)
+      .setDescription(text)
+      .setURL(url);
 };

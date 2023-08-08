@@ -1,6 +1,6 @@
 const { CommandInteraction } = require('discord.js');
 const { Types } = require('mongoose');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 const Logger = require('../../../helpers/logger');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 
@@ -19,12 +19,7 @@ module.exports = {
          },
       );
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(2, guildUser))) {
-         throw new Error('This command requires permission level 2.');
-      }
+      await authorizeInteraction(interaction, 2);
 
       let oldConfig;
       try {
