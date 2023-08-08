@@ -7,6 +7,8 @@ const Logger = require('../../../helpers/logger');
 const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 
+const REASON_LENGTH_LIMIT = 3000;
+
 module.exports = {
    name: 'ready',
    once: true,
@@ -54,6 +56,11 @@ module.exports = {
                amount: data.amount,
             });
 
+            if (data.reason && data.reason.length > REASON_LENGTH_LIMIT) {
+               data.reason =
+                  data.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
             data.bidderName =
                (await Nouns.ensReverseLookup(data.bidder)) ??
@@ -77,6 +84,11 @@ module.exports = {
                support: data.support,
                amount: data.amount,
             });
+
+            if (data.reason && data.reason.length > REASON_LENGTH_LIMIT) {
+               data.reason =
+                  data.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
 
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
             data.bidderName =
@@ -157,6 +169,11 @@ module.exports = {
                supportDetailed: vote.supportDetailed,
                reason: vote.reason,
             });
+
+            if (vote.reason && vote.reason.length > REASON_LENGTH_LIMIT) {
+               vote.reason =
+                  vote.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
 
             if (Number(vote.votes) === 0) {
                Logger.info('On VoteCast. Received 0 votes. Exiting.');
