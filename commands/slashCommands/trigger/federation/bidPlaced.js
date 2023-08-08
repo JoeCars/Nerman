@@ -29,7 +29,7 @@ module.exports = {
          interaction.options.getNumber('proposal-number') ||
          DEFAULT_PROPOSAL_NUMBER;
       const voteChoice =
-         interaction.options.getNumber('vote-choice') || DEFAULT_VOTE_CHOICE;
+         interaction.options.getNumber('vote-choice') ?? DEFAULT_VOTE_CHOICE;
       const ethereumAmount =
          interaction.options.getNumber('ethereum-amount') || DEFAULT_ETH_AMOUNT;
       const bidderAddress =
