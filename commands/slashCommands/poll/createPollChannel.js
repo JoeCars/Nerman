@@ -243,10 +243,10 @@ function createPollChannelModal(roleOptions) {
       .setCustomId('pollChannelOptions')
       .setLabel('Choose Channel Options (if any)')
       .setPlaceholder(
-         'anonymous-voting, live-results, vote-allowance, for-or-against',
+         'anonymous-voting, live-results, vote-allowance, for-or-against, nouns-dao',
       )
       .setDefaultValue(
-         'anonymous-voting, live-results, vote-allowance, for-or-against',
+         'anonymous-voting, live-results, for-or-against, nouns-dao',
       )
       .setStyle('SHORT')
       .setMaxLength(100);
