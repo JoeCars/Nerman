@@ -63,7 +63,6 @@ exports.isUserANermanAdmin = async function (user) {
  * @param {string} userId
  */
 exports.isUserANermanDeveloper = function (userId) {
-   // FIXME: will need to remove these after we figure out a better permission control for admin command
-   const authorizedIds = process.env.BAD_BITCHES.split(',');
+   const authorizedIds = process.env.DEVELOPER_IDS.split(',');
    return authorizedIds.includes(userId);
 };

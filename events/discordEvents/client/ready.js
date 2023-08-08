@@ -16,7 +16,7 @@ module.exports = {
     */
    async execute(client) {
       Logger.info(
-         `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.NODE_ENV} mode.`,
+         `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.DEPLOY_STAGE} mode.`,
       );
 
       await require('../../../db/index.js')(client);

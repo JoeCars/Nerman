@@ -38,8 +38,6 @@ npm install
 2. **Setup A Database:** This can either be a cloud server or a locally-run MongoDB server.
 3. **Add Environmental Variables:** Ensure you add the appropriate environmental variables.
 
-<!-- TODO: Add examples of the environmental variables needed. -->
-
 Once everything is ready, you can start the bot using `npm start`.
 
 ### Bot Scopes

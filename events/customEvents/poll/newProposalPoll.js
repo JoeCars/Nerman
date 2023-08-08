@@ -304,16 +304,6 @@ module.exports = {
 
          client.emit('enqueuePoll', newPoll);
 
-         // const nounsGovChannel = guildCache
-         //    .get(process.env.DISCORD_GUILD_ID)
-         //    .channels.cache.get(nounsGovId);
-         // const nounsGovChannel = await cache.get(nounsGovId);
-         // let nounsGovMessage = await nounsGovChannel.send({
-         //    content: 'New proposal data...',
-         // });
-
-         // client.emit('propCreated', nounsGovMessage, newPoll, propId);
-
          Logger.info(
             'events/poll/newProposalPoll.js: Finished creating proposal.',
          );
