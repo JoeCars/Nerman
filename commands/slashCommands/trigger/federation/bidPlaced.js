@@ -38,9 +38,10 @@ module.exports = {
       const voteReason =
          interaction.options.getString('vote-reason') || DEFAULT_VOTE_REASON;
 
-      // TODO: Update this to use the Federation library once that's been added.
-      const Nouns = interaction.client.libraries.get('Nouns');
-      Nouns.trigger('AuctionBid', {
+      const federationNounsPool = interaction.client.libraries.get(
+         'FederationNounsPool',
+      );
+      federationNounsPool.trigger('BidPlaced', {
          dao: dao,
          propId: proposalNumber,
          support: voteChoice,

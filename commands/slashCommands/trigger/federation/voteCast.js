@@ -35,9 +35,10 @@ module.exports = {
          interaction.options.getString('bidder-address') ||
          DEFAULT_BIDDER_ADDRESS;
 
-      // TODO: Update this to use the Federation library once that's been added.
-      const Nouns = interaction.client.libraries.get('Nouns');
-      Nouns.trigger('AuctionBid', {
+      const federationNounsPool = interaction.client.libraries.get(
+         'FederationNounsPool',
+      );
+      federationNounsPool.trigger('BidPlaced', {
          dao: dao,
          propId: proposalNumber,
          support: voteChoice,
