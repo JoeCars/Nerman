@@ -15,6 +15,11 @@ const NounsProposalForumSchema = new Schema({
       required: true,
       default: new Map(),
    },
+   isDeleted: {
+      type: Boolean,
+      required: false,
+      default: false,
+   },
 });
 
 module.exports = model('NounsProposalForum', NounsProposalForumSchema);

@@ -6,6 +6,7 @@ const Poll = require('../../../db/schemas/Poll');
 const Logger = require('../../../helpers/logger');
 const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
+const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
 
 const REASON_LENGTH_LIMIT = 3000;
 
@@ -102,8 +103,10 @@ module.exports = {
                GOVERNANCE_POOL_VOTING_ADDRESS,
             );
             data.voteNumber = voting[2];
+            data.nounsForumType = 'VoteCast';
 
             sendToChannelFeeds('federationVoteCast', data, client);
+            sendToNounsForum(data.propId, data, client);
          });
 
          Nouns.on('DelegateChanged', async data => {
@@ -185,9 +188,12 @@ module.exports = {
                (await Nouns.ensReverseLookup(vote.voter.id)) ??
                (await shortenAddress(vote.voter.id));
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
+            vote.nounsForumType = 'PropVoteCast';
 
             sendToChannelFeeds('propVoteCast', vote, client);
             sendToChannelFeeds('threadVote', vote, client);
+
+            sendToNounsForum(vote.proposalId, vote, client);
          });
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
@@ -210,8 +216,11 @@ module.exports = {
                },
             );
 
+            data.nounsForumType = 'PropCreated';
+
             sendToChannelFeeds('newProposalPoll', data, client);
             sendToChannelFeeds('propCreated', data, client);
+            sendToNounsForum(data.id, data, client);
          });
 
          Nouns.on('ProposalCanceled', async data => {
@@ -221,9 +230,11 @@ module.exports = {
 
             data.status = 'Canceled';
             data.title = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
+            sendToNounsForum(data.id, data, client);
          });
 
          // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
@@ -235,9 +246,11 @@ module.exports = {
 
             data.status = 'Queued';
             data.title = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
+            sendToNounsForum(data.id, data, client);
          });
 
          // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
@@ -248,14 +261,13 @@ module.exports = {
 
             data.status = 'Vetoed';
             data.title = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
+            sendToNounsForum(data.id, data, client);
          });
 
-         // Nouns.on(
-         //    'ProposalExecuted',
-         //    (data: nerman.EventData.ProposalExecuted) => {
          Nouns.on('ProposalExecuted', async data => {
             Logger.info('events/ready.js: On ProposalExecuted.', {
                id: `${data.id}`,
@@ -263,9 +275,11 @@ module.exports = {
 
             data.status = 'Executed';
             data.title = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
+            sendToNounsForum(data.id, data, client);
          });
 
          Nouns.on('Transfer', async data => {
@@ -411,6 +425,37 @@ module.exports = {
       }
    },
 };
+
+/**
+ * @param {number} proposalId
+ * @param {object} data
+ * @param {Client} client
+ */
+async function sendToNounsForum(proposalId, data, client) {
+   const threadKey = `${proposalId}`; // Mongoose only supports string keys.
+   const forums = await NounsProposalForum.find({
+      isDeleted: { $ne: true },
+   }).exec();
+
+   forums.forEach(async forum => {
+      const guild = await client.guilds.fetch(forum.guildId);
+      const channel = await guild.channels.fetch(forum.channelId);
+
+      let thread = undefined;
+      if (forum.threads.get(threadKey)) {
+         thread = await channel.threads.fetch(forum.threads.get(threadKey));
+      } else {
+         thread = await channel.threads.create({
+            name: `Proposal ${proposalId}`,
+            message: `Proposal ${proposalId}! Starting Message!`,
+         });
+         forum.threads.set(threadKey, thread.id);
+         await forum.save();
+      }
+
+      client.emit('nounsForumUpdate', thread, data);
+   });
+}
 
 /**
  *
