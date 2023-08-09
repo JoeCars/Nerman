@@ -10,6 +10,9 @@ const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
 
 const REASON_LENGTH_LIMIT = 3000;
 
+// https://discord.com/developers/docs/topics/opcodes-and-status-codes
+const UNKNOWN_CHANNEL_ERROR_CODE = 10003;
+
 module.exports = {
    name: 'ready',
    once: true,
@@ -439,7 +442,25 @@ async function sendToNounsForum(proposalId, data, client) {
 
    forums.forEach(async forum => {
       const guild = await client.guilds.fetch(forum.guildId);
-      const channel = await guild.channels.fetch(forum.channelId);
+      let channel = undefined;
+      try {
+         channel = await guild.channels.fetch(forum.channelId);
+         if (!channel) {
+            throw new Error('Cannot find nouns forum channel.');
+         }
+      } catch (error) {
+         Logger.error('events/ready.js: Cannot find nouns forum channel.', {
+            error: error,
+            guildId: forum.guildId,
+            channelId: forum.channelId,
+         });
+         if (error.code === UNKNOWN_CHANNEL_ERROR_CODE) {
+            forum.isDeleted = true;
+            forum.save();
+            // Log message about this.
+         }
+         return;
+      }
 
       let thread = undefined;
       if (forum.threads.get(threadKey)) {
@@ -493,8 +514,6 @@ async function sendToChannelFeeds(eventName, data, client) {
                },
             );
 
-            // https://discord.com/developers/docs/topics/opcodes-and-status-codes
-            const UNKNOWN_CHANNEL_ERROR_CODE = 10003;
             if (error.code === UNKNOWN_CHANNEL_ERROR_CODE) {
                feed.isDeleted = true;
                feed
