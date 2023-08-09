@@ -446,8 +446,8 @@ async function sendToNounsForum(proposalId, data, client) {
          thread = await channel.threads.fetch(forum.threads.get(threadKey));
       } else {
          thread = await channel.threads.create({
-            name: `Proposal ${proposalId}`,
-            message: `Proposal ${proposalId}! Starting Message!`,
+            name: data.proposalTitle ?? `Proposal ${proposalId}`,
+            message: data.proposalTitle ?? `Proposal ${proposalId}`,
          });
          forum.threads.set(threadKey, thread.id);
          await forum.save();
