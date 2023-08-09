@@ -4,7 +4,7 @@ const { inlineCode } = require('@discordjs/builders');
 
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 const events = require('../../../utils/feedEvents');
 
 module.exports = {
@@ -22,12 +22,7 @@ module.exports = {
          },
       );
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(2, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+      await authorizeInteraction(interaction, 2);
 
       const channel =
          interaction.options.getChannel('channel') ?? interaction.channel;

@@ -7,7 +7,6 @@ const Logger = require('../helpers/logger');
 // todo use for permissions validation later on
 // const { Perms } = require('../validation/permissions');
 const clientId = process.env.DISCORD_CLIENT_ID;
-const guildId = process.env.DISCORD_GUILD_ID;
 const token = process.env.DISCORD_TOKEN;
 
 module.exports = async client => {
@@ -64,15 +63,6 @@ module.exports = async client => {
       }
    });
 
-   // console.log(commandsArr);
-   // commandsArr.forEach(cmd => {
-   //    console.log(cmd);
-   //    cmd.options.forEach(option => {
-   //       console.log(option);
-   //       console.log(option.testAttribute);
-   //    });
-   // });
-
    const rest = new REST({ version: '9' }).setToken(token);
 
    (async () => {
@@ -80,23 +70,9 @@ module.exports = async client => {
          Logger.info(
             'handlers/commands.js: Attempting to register application commands.',
          );
-
-         if (process.env.NODE_ENV === 'development') {
-            Logger.info(
-               'handlers/commands.js: In development mode. Clearing application commands and adding application guild commands.',
-            );
-
-            await rest.put(Routes.applicationCommands(clientId), {
-               body: [],
-            });
-            await rest.put(Routes.applicationGuildCommands(clientId, guildId), {
-               body: commandsArr,
-            });
-         } else {
-            await rest.put(Routes.applicationCommands(clientId), {
-               body: commandsArr,
-            });
-         }
+         await rest.put(Routes.applicationCommands(clientId), {
+            body: commandsArr,
+         });
 
          Logger.info(
             'handlers/commands.js: Successfully registered application commands! :D',

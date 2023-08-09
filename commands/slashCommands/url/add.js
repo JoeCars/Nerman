@@ -1,7 +1,7 @@
 const { CommandInteraction } = require('discord.js');
 const { Types } = require('mongoose');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {
@@ -19,12 +19,7 @@ module.exports = {
          },
       );
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(2, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+      await authorizeInteraction(interaction, 2);
 
       let urlConfig;
       try {

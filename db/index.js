@@ -16,22 +16,9 @@ const { lc } = require('../utils/functions');
 // } = require('../scratchcode/db/schema/testExecutions/createPoll');
 
 module.exports = async client => {
-   // const usernameSegment = encodeURI(process.env.MONGODB_DEV_USER);
-   // const passwordSegment = encodeURI(process.env.MONGODB_DEV_PASSWORD);
-   // const mongoCloudURI = process.env.MONGODB_URI_BASE.replace(
-   // /<username>/,
-   //    usernameSegment
-   // ).replace(/<password>/, passwordSegment);
-
-   // disabled Nerman-Dev-Jr stuff
-   // const mongoURI =
-   //    process.env.DB_ENV === 'Cloud'
-   //       ? mongoCloudURI
-   //       : 'mongodb://localhost:27017/polls-test';
-
    const mongoURI =
-      process.env.NODE_ENV === 'production' ||
-      process.env.NODE_ENV === 'staging'
+      process.env.DEPLOY_STAGE === 'production' ||
+      process.env.DEPLOY_STAGE === 'staging'
          ? process.env.MONGODB_URI
          : 'mongodb://127.0.0.1:27017/polls-test';
 
@@ -43,7 +30,7 @@ module.exports = async client => {
    };
 
    // Turn off auto indexing in production, because it's expensive on performance
-   if (process.env.NODE_ENV === 'production') {
+   if (process.env.DEPLOY_STAGE === 'production') {
       options.autoIndex = false;
       options.keepAlive = true; // this is true by default since v5.2.0 but keeping it as a reminder
       options.keepAliveInitialDelay = 300000;

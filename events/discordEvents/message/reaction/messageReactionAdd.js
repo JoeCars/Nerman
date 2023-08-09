@@ -1,5 +1,5 @@
 // disabled
-const stahp = process.env.NODE_ENV === 'development' ? true : false;
+const stahp = process.env.DEPLOY_STAGE === 'development' ? true : false;
 let nTwitter;
 console.log('messageReactionAdd stahp => ', stahp);
 if (stahp === false) {

@@ -3,7 +3,7 @@ const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {
    subCommand: 'nerman.create-poll',
@@ -55,14 +55,11 @@ module.exports = {
          status: 'open',
       });
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (
-         !(await isUserAuthorized(2, guildUser)) ||
-         countedPolls >= channelConfig.maxUserProposal
-      ) {
-         throw new Error('You do not have permission to use this command.');
+      await authorizeInteraction(interaction, 2);
+      if (countedPolls >= channelConfig.maxUserProposal) {
+         throw new Error(
+            `You have exceeded the maximum number (${channelConfig.maxUserProposal}) of active proposals permitted in this channel.`,
+         );
       }
 
       // disabled until we nail down the cross-guild permissions on this command

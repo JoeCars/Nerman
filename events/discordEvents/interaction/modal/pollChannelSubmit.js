@@ -65,7 +65,7 @@ module.exports = {
             /^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/,
          );
          const optionRegex = new RegExp(
-            /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?(^for-or-against$)?$/,
+            /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?(^for-or-against$)?(^nouns-dao$)?$/,
          );
 
          // extract data from submitted modal
@@ -231,7 +231,9 @@ module.exports = {
             voteThreshold: voteThreshold,
          });
 
-         await registerForPollEvents(guildId, channelId);
+         if (pollChannelOptions.includes('nouns-dao')) {
+            await registerForPollEvents(guildId, channelId);
+         }
 
          Logger.info(
             `events/poll/pollChannelSubmit.js: Repopulating channel configuration list, because channels belong to this guild config.`,

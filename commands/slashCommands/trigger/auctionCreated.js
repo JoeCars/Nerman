@@ -1,6 +1,6 @@
 const { CommandInteraction } = require('discord.js');
 const Logger = require('../../../helpers/logger');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_NOUN_ID = 117;
 
@@ -11,12 +11,7 @@ module.exports = {
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(4, guildUser))) {
-         throw new Error('This is an admin-only command');
-      }
+      await authorizeInteraction(interaction, 4);
 
       const nounId =
          interaction.options.getNumber('noun-number') ?? DEFAULT_NOUN_ID;

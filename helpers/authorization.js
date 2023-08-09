@@ -1,9 +1,19 @@
-const { GuildMember, Permissions } = require('discord.js');
+const { GuildMember, Permissions, Interaction } = require('discord.js');
 const Admin = require('../db/schemas/Admin');
 const Logger = require('./logger');
 
 /**
- *
+ * @param {Interaction} interaction
+ * @param {number} permissionLevel
+ */
+exports.authorizeInteraction = async function (interaction, permissionLevel) {
+   const guildUser = await interaction.guild.members.fetch(interaction.user.id);
+   if (!(await exports.isUserAuthorized(permissionLevel, guildUser))) {
+      throw new Error('You do not have permission to use this command.');
+   }
+};
+
+/**
  * @param {number} authorizationLevel
  * @param {GuildMember} user
  * @returns {boolean}
@@ -63,7 +73,6 @@ exports.isUserANermanAdmin = async function (user) {
  * @param {string} userId
  */
 exports.isUserANermanDeveloper = function (userId) {
-   // FIXME: will need to remove these after we figure out a better permission control for admin command
-   const authorizedIds = process.env.BAD_BITCHES.split(',');
+   const authorizedIds = process.env.DEVELOPER_IDS.split(',');
    return authorizedIds.includes(userId);
 };

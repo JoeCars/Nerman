@@ -11,7 +11,7 @@ const PollChannel = require('../../../db/schemas/PollChannel');
 const ResultBar = require('../../../structures/ResultBar');
 const { initPollMessage } = require('../../../helpers/poll/initPollMessage');
 const { drawBar, longestString } = require('../../../helpers/poll');
-const { isUserAuthorized } = require('../../../helpers/authorization');
+const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const Logger = require('../../../helpers/logger');
 const { log: l } = console;
@@ -58,20 +58,7 @@ module.exports = {
 
       // todo later on change permissions associated with this, once we decide one how to tdeal with the cross guild shenanigans
 
-      const guildUser = await interaction.guild.members.fetch(
-         interaction.user.id,
-      );
-      if (!(await isUserAuthorized(3, guildUser))) {
-         Logger.error(
-            'commands/nerman/poll/regeneratePollMessage.js: User ID is not authorized.',
-            {
-               userId: interaction.user.id,
-               guildId: interaction.guildId,
-               channelId: interaction.channelId,
-            },
-         );
-         throw new Error('You do not have permission to access this command.');
-      }
+      await authorizeInteraction(interaction, 3);
 
       // return await interaction.editReply({ content: 'TEST END' });
 

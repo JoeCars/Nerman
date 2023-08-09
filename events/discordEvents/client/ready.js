@@ -7,6 +7,8 @@ const Logger = require('../../../helpers/logger');
 const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 
+const REASON_LENGTH_LIMIT = 3000;
+
 module.exports = {
    name: 'ready',
    once: true,
@@ -16,7 +18,7 @@ module.exports = {
     */
    async execute(client) {
       Logger.info(
-         `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.NODE_ENV} mode.`,
+         `events/ready.js: Ready! Logged in as ${client.user.tag} in ${process.env.DEPLOY_STAGE} mode.`,
       );
 
       await require('../../../db/index.js')(client);
@@ -27,8 +29,14 @@ module.exports = {
       async function runNouns() {
          const nerman = await _nerman;
          const Nouns = client.libraries.get('Nouns');
+
          const nounsNymz = new nerman.NounsNymz();
          client.libraries.set('NounsNymz', nounsNymz);
+
+         const federationNounsPool = new nerman.FederationNounsPool(
+            process.env.ALCHEMY_WEBSOCKETS,
+         );
+         client.libraries.set('FederationNounsPool', federationNounsPool);
 
          const {
             guilds: { cache: guildCache },
@@ -39,6 +47,64 @@ module.exports = {
          // EXAMPLE EVENTS
          //
          // *************************************************************
+
+         federationNounsPool.on('BidPlaced', async data => {
+            Logger.info('ready.js: On Federation BidPlaced.', {
+               propId: `${data.propId}`,
+               bidder: data.bidder,
+               support: data.support,
+               amount: data.amount,
+            });
+
+            if (data.reason && data.reason.length > REASON_LENGTH_LIMIT) {
+               data.reason =
+                  data.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.bidderName =
+               (await Nouns.ensReverseLookup(data.bidder)) ??
+               (await shortenAddress(data.bidder));
+            data.proposalTitle = await fetchProposalTitle(data.propId);
+
+            const GOVERNANCE_POOL_VOTING_ADDRESS = `0x6b2645b468A828a12fEA8C7D644445eB808Ec2B1`;
+            const voting = await Nouns.NounsDAO.Contract.getReceipt(
+               data.propId,
+               GOVERNANCE_POOL_VOTING_ADDRESS,
+            );
+            data.voteNumber = voting[2];
+
+            sendToChannelFeeds('federationBidPlaced', data, client);
+         });
+
+         federationNounsPool.on('VoteCast', async data => {
+            Logger.info('ready.js: On Federation VoteCast.', {
+               propId: `${data.propId}`,
+               bidder: data.bidder,
+               support: data.support,
+               amount: data.amount,
+            });
+
+            if (data.reason && data.reason.length > REASON_LENGTH_LIMIT) {
+               data.reason =
+                  data.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.bidderName =
+               (await Nouns.ensReverseLookup(data.bidder)) ??
+               (await shortenAddress(data.bidder));
+            data.proposalTitle = await fetchProposalTitle(data.propId);
+
+            const GOVERNANCE_POOL_VOTING_ADDRESS = `0x6b2645b468A828a12fEA8C7D644445eB808Ec2B1`;
+            const voting = await Nouns.NounsDAO.Contract.getReceipt(
+               data.propId,
+               GOVERNANCE_POOL_VOTING_ADDRESS,
+            );
+            data.voteNumber = voting[2];
+
+            sendToChannelFeeds('federationVoteCast', data, client);
+         });
 
          Nouns.on('DelegateChanged', async data => {
             Logger.info('ready.js: On DelegateChanged.', {
@@ -103,6 +169,11 @@ module.exports = {
                supportDetailed: vote.supportDetailed,
                reason: vote.reason,
             });
+
+            if (vote.reason && vote.reason.length > REASON_LENGTH_LIMIT) {
+               vote.reason =
+                  vote.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
 
             if (Number(vote.votes) === 0) {
                Logger.info('On VoteCast. Received 0 votes. Exiting.');
