@@ -1,4 +1,4 @@
-const { Collection, Client } = require('discord.js');
+const { Collection, Client, Channel, TextChannel } = require('discord.js');
 
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const FeedConfig = require('../../../db/schemas/FeedConfig');
@@ -7,6 +7,10 @@ const Logger = require('../../../helpers/logger');
 const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
+const {
+   fetchForumChannel,
+   fetchForumThread,
+} = require('../../../helpers/forum');
 
 const REASON_LENGTH_LIMIT = 3000;
 
@@ -435,43 +439,24 @@ module.exports = {
  * @param {Client} client
  */
 async function sendToNounsForum(proposalId, data, client) {
-   const threadKey = `${proposalId}`; // Mongoose only supports string keys.
    const forums = await NounsProposalForum.find({
       isDeleted: { $ne: true },
    }).exec();
 
    forums.forEach(async forum => {
-      const guild = await client.guilds.fetch(forum.guildId);
-      let channel = undefined;
-      try {
-         channel = await guild.channels.fetch(forum.channelId);
-         if (!channel) {
-            throw new Error('Cannot find nouns forum channel.');
-         }
-      } catch (error) {
-         Logger.error('events/ready.js: Cannot find nouns forum channel.', {
-            error: error,
-            guildId: forum.guildId,
-            channelId: forum.channelId,
-         });
-         if (error.code === UNKNOWN_CHANNEL_ERROR_CODE) {
-            forum.isDeleted = true;
-            forum.save();
-            // Log message about this.
-         }
+      const channel = await fetchForumChannel(forum, client);
+      if (!channel) {
          return;
       }
 
-      let thread = undefined;
-      if (forum.threads.get(threadKey)) {
-         thread = await channel.threads.fetch(forum.threads.get(threadKey));
-      } else {
-         thread = await channel.threads.create({
-            name: data.proposalTitle ?? `Proposal ${proposalId}`,
-            message: data.proposalTitle ?? `Proposal ${proposalId}`,
-         });
-         forum.threads.set(threadKey, thread.id);
-         await forum.save();
+      const thread = await fetchForumThread(
+         `${proposalId}`, // Mongoose only supports string keys.
+         forum,
+         channel,
+         data,
+      );
+      if (!thread) {
+         return;
       }
 
       client.emit('nounsForumUpdate', thread, data);
@@ -479,11 +464,9 @@ async function sendToNounsForum(proposalId, data, client) {
 }
 
 /**
- *
  * @param {string} eventName
  * @param {object} data
  * @param {Client} client
- * @returns
  */
 async function sendToChannelFeeds(eventName, data, client) {
    let feeds;
