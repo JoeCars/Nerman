@@ -1,5 +1,6 @@
 const Logger = require('./logger');
 const NounsProposalForum = require('../db/schemas/NounsProposalForum');
+const UrlConfig = require('../db/schemas/UrlConfig');
 const { TextChannel } = require('discord.js');
 
 // https://discord.com/developers/docs/topics/opcodes-and-status-codes
@@ -54,9 +55,10 @@ exports.fetchForumThread = async function fetchForumThread(
    }
 
    if (!thread) {
+      const url = (await UrlConfig.fetchUrls(channel.guildId)).propUrl;
       thread = await channel.threads.create({
          name: data.proposalTitle ?? `Proposal ${proposalId}`,
-         message: data.proposalTitle ?? `Proposal ${proposalId}`,
+         message: `${url}${proposalId}`,
       });
       forum.threads.set(proposalId, thread.id);
       await forum.save();
