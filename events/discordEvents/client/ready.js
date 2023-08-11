@@ -11,6 +11,7 @@ const {
    fetchForumChannel,
    fetchForumThread,
 } = require('../../../helpers/forum');
+const Proposal = require('../../../db/schemas/Proposal');
 
 const REASON_LENGTH_LIMIT = 3000;
 
@@ -204,7 +205,9 @@ module.exports = {
          });
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
-            data.description = data.description.substring(0, 150);
+            data.description = data.description.substring(0, 200);
+
+            await Proposal.tryCreateProposal(data);
 
             Logger.info(
                'events/ready.js: On ProposalCreatedWithRequirements.',
