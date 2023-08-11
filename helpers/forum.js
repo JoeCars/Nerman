@@ -1,7 +1,9 @@
 const Logger = require('./logger');
 const NounsProposalForum = require('../db/schemas/NounsProposalForum');
 const UrlConfig = require('../db/schemas/UrlConfig');
+const Proposal = require('../db/schemas/Proposal');
 const { TextChannel } = require('discord.js');
+const { bold } = require('@discordjs/builders');
 
 // https://discord.com/developers/docs/topics/opcodes-and-status-codes
 const UNKNOWN_CHANNEL_ERROR_CODE = 10003;
@@ -55,10 +57,16 @@ exports.fetchForumThread = async function fetchForumThread(
    }
 
    if (!thread) {
+      const proposal = await Proposal.findOne({
+         proposalId: parseInt(proposalId),
+      });
+      const description = proposal
+         ? `\n${bold('Summary:')}\n\n${proposal.description}\n`
+         : '';
       const url = (await UrlConfig.fetchUrls(channel.guildId)).propUrl;
       thread = await channel.threads.create({
          name: data.proposalTitle ?? `Proposal ${proposalId}`,
-         message: `${url}${proposalId}`,
+         message: `${url}${proposalId}\n${description}`,
       });
       forum.threads.set(proposalId, thread.id);
       await forum.save();
