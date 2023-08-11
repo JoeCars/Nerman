@@ -18,11 +18,6 @@ exports.findPollMessage = async function (channel, proposalId) {
       .populate('config')
       .exec();
 
-   Logger.debug('helpers/poll/thread.js: Looking at polls.', {
-      polls: polls,
-      firstPollConfig: polls.length > 0 ? polls[0].config : 'No polls.',
-   });
-
    let poll = undefined;
    for (let i = 0; i < polls.length; ++i) {
       try {
