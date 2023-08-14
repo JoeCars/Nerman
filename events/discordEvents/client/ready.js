@@ -205,7 +205,7 @@ module.exports = {
          });
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
-            data.description = data.description.substring(0, 300);
+            data.description = data.description.substring(0, 500);
 
             try {
                const proposal = await Proposal.tryCreateProposal(data);
