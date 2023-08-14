@@ -20,7 +20,7 @@ module.exports = {
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
-         }
+         },
       );
 
       await interaction.deferReply({ ephemeral: true });
@@ -31,7 +31,7 @@ module.exports = {
 
       if (nounNum < 0) {
          throw new Error(
-            'You must choose a Noun ID that is a positive integer.'
+            'You must choose a Noun ID that is a positive integer.',
          );
       }
 
@@ -47,7 +47,7 @@ module.exports = {
 
       promises.push(
          await getNounInfo(Nouns, nounNum),
-         await fetch(`https://noun.pics/${nounNum}.png`)
+         await fetch(`http://noun.pics/${nounNum}.png`),
       );
       // promises.push({nounInfo}, resp);
       // const resp = await fetch(`https://noun.pics/${nounNum}.png`);
@@ -62,7 +62,7 @@ module.exports = {
 
       if (!resp.ok) {
          throw new Error(
-            `Unable to return Noun #${nounNum}, are you sure this Noun exists yet?`
+            `Unable to return Noun #${nounNum}, are you sure this Noun exists yet?`,
          );
       }
 
@@ -71,7 +71,7 @@ module.exports = {
       //    `https://noun.pics/${nounNum}.png`
       // );
 
-      const imgUrl = `https://noun.pics/${nounNum}.png`;
+      const imgUrl = `http://noun.pics/${nounNum}.png`;
 
       // Getting Data for Noun 32
       //  Owner: 0x6f9e3976fa3b5b22761fe5D635E1f0d9d9aeB85d
@@ -108,7 +108,7 @@ module.exports = {
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
-         }
+         },
       );
    },
 };

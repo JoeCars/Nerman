@@ -37,6 +37,6 @@ exports.generateTransferNounEmbed = function (data, hasMarkdown = true) {
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)
-      .setImage(`https://noun.pics/${data.tokenId}.png`);
+      .setImage(`http://noun.pics/${data.tokenId}.png`);
    return embed;
 };

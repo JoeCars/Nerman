@@ -16,7 +16,7 @@ exports.generateAuctionCreatedEmbed = function (data) {
       .setColor('#00FFFF')
       .setTitle(`New Auction | Noun ${data.id}`)
       .setDescription(`${nounsWTF}\n${pronouns}\n${nounOClock}`)
-      .setImage(`https://noun.pics/${data.id}.png`);
+      .setImage(`http://noun.pics/${data.id}.png`);
 
    return embed;
 };

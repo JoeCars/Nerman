@@ -12,7 +12,7 @@ exports.generateNounCreatedEmbed = function (data) {
       .setDescription(
          `${data.id % 10 !== 0 ? 'Auction Created' : "Nounder's Noun"}`,
       )
-      .setImage(`https://noun.pics/${data.id}.png`);
+      .setImage(`http://noun.pics/${data.id}.png`);
 
    return embed;
 };
