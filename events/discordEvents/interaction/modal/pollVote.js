@@ -17,7 +17,6 @@ const User = require('../../../../db/schemas/User');
 const Vote = require('../../../../db/schemas/Vote');
 const Logger = require('../../../../helpers/logger');
 
-
 const { longestString } = require('../../../../helpers/poll');
 const ResultBar = require('../../../../structures/ResultBar');
 
@@ -60,7 +59,7 @@ module.exports = {
 
       const pollStatus = await Poll.findOne(
          { messageId },
-         'status pollData.voteAllowance pollData.choices config',
+         'status pollData.voteAllowance pollData.choices config creatorId',
       ).exec();
 
       const pollOptions = await pollStatus.pollOptions();
@@ -321,7 +320,10 @@ module.exports = {
 
       message.edit({ embeds: [updateEmbed] });
 
-      if (propRegExp.test(updatedPoll.pollData.title)) {
+      const nermanIds = process.env.NERMAN_BOT_IDS.split(',');
+      const isProposalPoll = nermanIds.includes(pollStatus.creatorId);
+
+      if (isProposalPoll && propRegExp.test(updatedPoll.pollData.title)) {
          try {
             const matches = updatedPoll.pollData.title.match(propRegExp);
 
