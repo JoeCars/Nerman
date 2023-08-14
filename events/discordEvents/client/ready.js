@@ -538,12 +538,17 @@ async function sendToChannelFeeds(eventName, data, client) {
 async function fetchProposalTitle(proposalId) {
    let title = `Proposal ${proposalId}`;
    try {
-      const targetPoll = await Poll.findOne({
-         'pollData.title': {
-            $regex: new RegExp(`^prop\\s${Number(proposalId)}`, 'i'),
-         },
-      }).exec();
-      title = targetPoll ? targetPoll.pollData.title : title;
+      const newProposalTitle = await Proposal.fetchProposalTitle(proposalId);
+      if (newProposalTitle === title) {
+         const targetPoll = await Poll.findOne({
+            'pollData.title': {
+               $regex: new RegExp(`^prop\\s${Number(proposalId)}`, 'i'),
+            },
+         }).exec();
+         title = targetPoll ? targetPoll.pollData.title : title;
+      } else {
+         title = newProposalTitle;
+      }
    } catch (error) {
       Logger.error('Unable to find poll for status change.');
    }

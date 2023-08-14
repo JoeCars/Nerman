@@ -64,7 +64,7 @@ exports.fetchForumThread = async function fetchForumThread(
          proposalId: parseInt(proposalId),
       });
       if (proposal) {
-         data.description = data.description || '';
+         data.description = proposal.description || data.description || '';
       }
       const url = (await UrlConfig.fetchUrls(channel.guildId)).propUrl;
       const embed = generateInitialForumMessage(proposalId, data, url);
