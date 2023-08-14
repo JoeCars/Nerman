@@ -47,6 +47,30 @@ const UrlConfigSchema = new Schema(
                nounUrl: config ? config.nounUrl : DEFAULT_NOUNS_URL,
             };
          },
+
+         /**
+          * Fetches the full URL for the given proposal.
+          * @param {string} guildId
+          * @param {number} proposalId
+          */
+         async fetchProposalUrl(guildId, proposalId) {
+            let config = null;
+            try {
+               config = await this.findOne({ guildId: guildId }).exec();
+            } catch (error) {
+               Logger.error(
+                  'db/schemas/UrlConfig.js: Unable to fetch the config due to a database error.',
+                  {
+                     error: error,
+                     guildId: guildId,
+                  },
+               );
+               config = null;
+            }
+
+            const url = config ? config.propUrl : DEFAULT_PROPOSAL_URL;
+            return `${url}${proposalId}`;
+         },
       },
    },
 );
