@@ -1,7 +1,7 @@
 const { MessageAttachment } = require('discord.js');
 
 async function fetchNouner(endpoint, includeDelegates) {
-   let address = `https://noun.pics/${endpoint}`;
+   let address = `http://noun.pics/${endpoint}`;
 
    if (includeDelegates) {
       address += `?includeDelegates=${includeDelegates}`;
