@@ -186,11 +186,6 @@ module.exports = {
                   vote.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
             }
 
-            if (Number(vote.votes) === 0) {
-               Logger.info('On VoteCast. Received 0 votes. Exiting.');
-               return;
-            }
-
             vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
             vote.voter.name =
                (await Nouns.ensReverseLookup(vote.voter.id)) ??
@@ -198,9 +193,13 @@ module.exports = {
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
             vote.nounsForumType = 'PropVoteCast';
 
-            sendToChannelFeeds('propVoteCast', vote, client);
-            sendToChannelFeeds('threadVote', vote, client);
-
+            if (Number(vote.votes) === 0) {
+               sendToChannelFeeds('propVoteCastOnlyZero', vote, client);
+            } else {
+               sendToChannelFeeds('propVoteCast', vote, client);
+               sendToChannelFeeds('threadVote', vote, client);
+            }
+           
             sendToNounsForum(vote.proposalId, vote, client);
          });
 
