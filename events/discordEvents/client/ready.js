@@ -207,7 +207,12 @@ module.exports = {
          Nouns.on('ProposalCreatedWithRequirements', async data => {
             data.description = data.description.substring(0, 300);
 
-            await Proposal.tryCreateProposal(data);
+            try {
+               const proposal = await Proposal.tryCreateProposal(data);
+               data.proposalTitle = proposal.fullTitle;
+            } catch (error) {
+               Logger.error('events/ready.js: Error creating a proposal.');
+            }
 
             Logger.info(
                'events/ready.js: On ProposalCreatedWithRequirements.',
