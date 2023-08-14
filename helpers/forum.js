@@ -3,7 +3,10 @@ const NounsProposalForum = require('../db/schemas/NounsProposalForum');
 const UrlConfig = require('../db/schemas/UrlConfig');
 const Proposal = require('../db/schemas/Proposal');
 const { TextChannel } = require('discord.js');
-const { bold } = require('@discordjs/builders');
+const { hideLinkEmbed } = require('@discordjs/builders');
+const {
+   generateInitialForumMessage,
+} = require('../views/embeds/forum/forumInitialMessage');
 
 // https://discord.com/developers/docs/topics/opcodes-and-status-codes
 const UNKNOWN_CHANNEL_ERROR_CODE = 10003;
@@ -60,18 +63,18 @@ exports.fetchForumThread = async function fetchForumThread(
       const proposal = await Proposal.findOne({
          proposalId: parseInt(proposalId),
       });
-      let description = '';
       if (proposal) {
-         description = `\n# ${bold('Summary:')}\n\n${proposal.description
-            .replace(/\\n/g, '\n')
-            .replace(/!\[\]\(.+\)/g, link => {
-               return link.substring(4, link.length - 1);
-            })}`;
+         data.description = data.description || '';
       }
       const url = (await UrlConfig.fetchUrls(channel.guildId)).propUrl;
+      const embed = generateInitialForumMessage(proposalId, data, url);
+
       thread = await channel.threads.create({
          name: data.proposalTitle ?? `Proposal ${proposalId}`,
-         message: `${url}${proposalId}\n${description}`,
+         message: {
+            content: hideLinkEmbed(`${url}${proposalId}`),
+            embeds: [embed],
+         },
       });
       forum.threads.set(proposalId, thread.id);
       await forum.save();
