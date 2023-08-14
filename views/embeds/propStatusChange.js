@@ -6,7 +6,7 @@ const Logger = require('../../helpers/logger');
  * @param {{id: string, status: string, title: string}} data
  * @param {string} url
  */
-exports.generatePropStatusChangeEmbed = async function (data, url) {
+exports.generatePropStatusChangeEmbed = function (data, url) {
    const title = data.title || `Proposal ${data.id}`;
    const description = `${url}${data.id}\n${data.status}`;
 
