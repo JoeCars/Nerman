@@ -204,9 +204,14 @@ module.exports = {
          });
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
-            data.description = data.description.substring(0, 300);
+            data.description = data.description.substring(0, 500);
 
-            await Proposal.tryCreateProposal(data);
+            try {
+               const proposal = await Proposal.tryCreateProposal(data);
+               data.proposalTitle = proposal.fullTitle;
+            } catch (error) {
+               Logger.error('events/ready.js: Error creating a proposal.');
+            }
 
             Logger.info(
                'events/ready.js: On ProposalCreatedWithRequirements.',
@@ -532,12 +537,17 @@ async function sendToChannelFeeds(eventName, data, client) {
 async function fetchProposalTitle(proposalId) {
    let title = `Proposal ${proposalId}`;
    try {
-      const targetPoll = await Poll.findOne({
-         'pollData.title': {
-            $regex: new RegExp(`^prop\\s${Number(proposalId)}`, 'i'),
-         },
-      }).exec();
-      title = targetPoll ? targetPoll.pollData.title : title;
+      const newProposalTitle = await Proposal.fetchProposalTitle(proposalId);
+      if (newProposalTitle === title) {
+         const targetPoll = await Poll.findOne({
+            'pollData.title': {
+               $regex: new RegExp(`^prop\\s${Number(proposalId)}`, 'i'),
+            },
+         }).exec();
+         title = targetPoll ? targetPoll.pollData.title : title;
+      } else {
+         title = newProposalTitle;
+      }
    } catch (error) {
       Logger.error('Unable to find poll for status change.');
    }
