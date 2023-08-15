@@ -117,6 +117,26 @@ module.exports = {
             sendToNounsForum(data.propId, data, client);
          });
 
+         Nouns.on('AuctionEnd', async nounId => {
+            const bidData = await Nouns.NounsAuctionHouse.getLatestBidData(
+               nounId,
+            );
+
+            if (!bidData) {
+               return Logger.error('ready.js: No bid data found.');
+            }
+
+            Logger.info('ready.js: On AuctionEnd.', {
+               nounId: bidData.id,
+               bidAmount: bidData.amount,
+               address: bidData.address,
+            });
+
+            bidData.bidderName = bidData.ens || shortenAddress(bidData.address);
+
+            sendToChannelFeeds('auctionEnd', bidData, client);
+         });
+
          Nouns.on('DelegateChanged', async data => {
             Logger.info('ready.js: On DelegateChanged.', {
                delegator: data.delegator.id,
@@ -199,7 +219,7 @@ module.exports = {
                sendToChannelFeeds('propVoteCast', vote, client);
                sendToChannelFeeds('threadVote', vote, client);
             }
-           
+
             sendToNounsForum(vote.proposalId, vote, client);
          });
 

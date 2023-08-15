@@ -7,6 +7,7 @@ events.set('threadStatusChange', 'Nerman.ThreadStatusChange');
 events.set('threadVote', 'Nerman.ThreadVote');
 events.set('auctionBid', 'NounsDAO.AuctionBid');
 events.set('auctionCreated', 'NounsDAO.AuctionCreated');
+events.set('auctionEnd', 'NounsDAO.AuctionEnd');
 events.set('delegateChanged', 'NounsDAO.DelegateChanged');
 events.set('delegateChangedNoZero', 'NounsDAO.DelegateChangedNoZero');
 events.set('nounCreated', 'NounsDAO.NounCreated');
