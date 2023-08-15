@@ -117,10 +117,13 @@ module.exports = {
             sendToNounsForum(data.propId, data, client);
          });
 
-         Nouns.on('AuctionEnd', async nounId => {
-            const bidData = await Nouns.NounsAuctionHouse.getLatestBidData(
-               nounId,
-            );
+         Nouns.on('AuctionEnd', async data => {
+            let bidData = undefined;
+            if (typeof data === 'object') {
+               bidData = data;
+            } else if (typeof data === 'number') {
+               bidData = await Nouns.NounsAuctionHouse.getLatestBidData(data);
+            }
 
             if (!bidData) {
                return Logger.error('ready.js: No bid data found.');
