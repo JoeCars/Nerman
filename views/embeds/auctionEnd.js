@@ -2,20 +2,13 @@ const { MessageEmbed } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
 const { getEthAmount } = require('../helpers');
 
-/**
- * @param {{
- *    id: number,
- *    winner: {id: string, name: string}
- *    amount: BigNumber
- * }} data
- */
 exports.generateAuctionEndEmbed = (data, hasMarkdown = true) => {
    const title = `SOLD! Noun ${data.id} for ${getEthAmount(data.amount)}Ξ`;
-   let bidder = data.winner.name;
+   let bidder = data.bidderName;
    if (hasMarkdown) {
       bidder = hyperlink(
          bidder,
-         `https://etherscan.io/address/${data.winner.id}`,
+         `https://etherscan.io/address/${data.address}`,
       );
    }
    const description = `Winner: ${bidder}`;

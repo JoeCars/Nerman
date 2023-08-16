@@ -1,6 +1,7 @@
 const { CommandInteraction } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const { authorizeInteraction } = require('../../../helpers/authorization');
+const { shortenAddress } = require('../../../helpers/nouns/shortenAddress');
 
 const ETH_TO_WEI_RATE = 100_0000_0000_0000_0000;
 const DEFAULT_NOUN_ID = 117;
@@ -23,11 +24,15 @@ module.exports = {
          interaction.options.getNumber('ethereum-amount') ?? DEFAULT_ETH_AMOUNT;
       const bidderAddress =
          interaction.options.getString('bidder-address') ?? DEFAULT_WALLET;
+      const ens =
+         (await Nouns.ensReverseLookup(bidderAddress)) ??
+         (await shortenAddress(bidderAddress));
 
-      Nouns.trigger('AuctionSettled', {
+      Nouns.trigger('AuctionEnd', {
          id: nounId,
-         amount: ethereumAmount * ETH_TO_WEI_RATE,
-         winner: { id: bidderAddress },
+         amount: `${ethereumAmount * ETH_TO_WEI_RATE}`,
+         address: bidderAddress,
+         ens: ens,
       });
 
       interaction.reply({

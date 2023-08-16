@@ -117,18 +117,27 @@ module.exports = {
             sendToNounsForum(data.propId, data, client);
          });
 
-         Nouns.on('AuctionSettled', async data => {
+         Nouns.on('AuctionEnd', async data => {
+            let bidData = undefined;
+            if (typeof data === 'object') {
+               bidData = data;
+            } else if (typeof data === 'number') {
+               bidData = await Nouns.NounsAuctionHouse.getLatestBidData(data);
+            }
+
+            if (!bidData) {
+               return Logger.error('ready.js: No bid data found.');
+            }
+
             Logger.info('ready.js: On AuctionEnd.', {
-               nounId: data.id,
-               bidAmount: data.amount,
-               bidWinner: data.winner.id,
+               nounId: bidData.id,
+               bidAmount: bidData.amount,
+               address: bidData.address,
             });
 
-            data.winner.name =
-               (await Nouns.ensReverseLookup(data.winner.id)) ??
-               (await shortenAddress(data.winner.id));
+            bidData.bidderName = bidData.ens || shortenAddress(bidData.address);
 
-            sendToChannelFeeds('auctionEnd', data, client);
+            sendToChannelFeeds('auctionEnd', bidData, client);
          });
 
          Nouns.on('DelegateChanged', async data => {
