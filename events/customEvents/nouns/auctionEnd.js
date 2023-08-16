@@ -10,12 +10,8 @@ module.exports = {
     * @param {TextChannel} channel
     * @param {{
     *    id: number,
-    *    block: number,
-    *    date: Date,
-    *    amount: string,
-    *    address: any,
-    *    ens: string | null,
-    *    bidderName: string
+    *    winner: {id: string, name: string}
+    *    amount: BigNumber
     * }} data
     */
    async execute(channel, data) {
