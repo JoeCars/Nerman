@@ -76,12 +76,12 @@ module.exports = {
                (await shortenAddress(data.bidder));
             data.proposalTitle = await fetchProposalTitle(data.propId);
 
+            // TODO: Grab the votes at the proposal's snapshot using getPriorVotes.
             const GOVERNANCE_POOL_VOTING_ADDRESS = `0x6b2645b468A828a12fEA8C7D644445eB808Ec2B1`;
-            const voting = await Nouns.NounsDAO.Contract.getReceipt(
-               data.propId,
+            const votes = await Nouns.NounsToken.Contract.getCurrentVotes(
                GOVERNANCE_POOL_VOTING_ADDRESS,
             );
-            data.voteNumber = voting[2];
+            data.voteNumber = votes;
 
             sendToChannelFeeds('federationBidPlaced', data, client);
          });
@@ -110,7 +110,7 @@ module.exports = {
                data.propId,
                GOVERNANCE_POOL_VOTING_ADDRESS,
             );
-            data.voteNumber = voting[2];
+            data.voteNumber = voting.votes;
 
             sendToChannelFeeds('federationVoteCast', data, client);
          });
@@ -197,7 +197,7 @@ module.exports = {
                sendToChannelFeeds('propVoteCast', vote, client);
                sendToChannelFeeds('threadVote', vote, client);
             }
-           
+
             sendToNounsForum(vote.proposalId, vote, client);
          });
 
