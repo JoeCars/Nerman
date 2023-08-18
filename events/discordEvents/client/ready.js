@@ -114,7 +114,6 @@ module.exports = {
             data.nounsForumType = 'VoteCast';
 
             sendToChannelFeeds('federationVoteCast', data, client);
-            sendToNounsForum(data.propId, data, client);
          });
 
          Nouns.on('DelegateChanged', async data => {
