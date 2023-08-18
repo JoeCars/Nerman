@@ -111,7 +111,6 @@ module.exports = {
                GOVERNANCE_POOL_VOTING_ADDRESS,
             );
             data.voteNumber = voting[2];
-            data.nounsForumType = 'VoteCast';
 
             sendToChannelFeeds('federationVoteCast', data, client);
          });
