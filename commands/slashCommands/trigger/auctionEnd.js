@@ -30,7 +30,7 @@ module.exports = {
 
       Nouns.trigger('AuctionEnd', {
          id: nounId,
-         amount: `${ethereumAmount * ETH_TO_WEI_RATE}`,
+         amount: `${ethereumAmount}`,
          address: bidderAddress,
          ens: ens,
       });

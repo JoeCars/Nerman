@@ -3,7 +3,7 @@ const { hyperlink } = require('@discordjs/builders');
 const { getEthAmount } = require('../helpers');
 
 exports.generateAuctionEndEmbed = (data, hasMarkdown = true) => {
-   const title = `SOLD! Noun ${data.id} for ${getEthAmount(data.amount)}Ξ`;
+   const title = `SOLD! Noun ${data.id} for ${data.amount}Ξ`;
    let bidder = data.bidderName;
    if (hasMarkdown) {
       bidder = hyperlink(
