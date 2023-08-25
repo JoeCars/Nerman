@@ -1,4 +1,4 @@
-const { Collection, Client } = require('discord.js');
+const { Collection, Client, Channel, TextChannel } = require('discord.js');
 
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const FeedConfig = require('../../../db/schemas/FeedConfig');
@@ -6,8 +6,17 @@ const Poll = require('../../../db/schemas/Poll');
 const Logger = require('../../../helpers/logger');
 const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
+const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
+const {
+   fetchForumChannel,
+   fetchForumThread,
+} = require('../../../helpers/forum');
+const Proposal = require('../../../db/schemas/Proposal');
 
 const REASON_LENGTH_LIMIT = 3000;
+
+// https://discord.com/developers/docs/topics/opcodes-and-status-codes
+const UNKNOWN_CHANNEL_ERROR_CODE = 10003;
 
 module.exports = {
    name: 'ready',
@@ -102,8 +111,33 @@ module.exports = {
                GOVERNANCE_POOL_VOTING_ADDRESS,
             );
             data.voteNumber = voting[2];
+            data.nounsForumType = 'VoteCast';
 
             sendToChannelFeeds('federationVoteCast', data, client);
+            sendToNounsForum(data.propId, data, client);
+         });
+
+         Nouns.on('AuctionEnd', async data => {
+            let bidData = undefined;
+            if (typeof data === 'object') {
+               bidData = data;
+            } else if (typeof data === 'number') {
+               bidData = await Nouns.NounsAuctionHouse.getLatestBidData(data);
+            }
+
+            if (!bidData) {
+               return Logger.error('ready.js: No bid data found.');
+            }
+
+            Logger.info('ready.js: On AuctionEnd.', {
+               nounId: bidData.id,
+               bidAmount: bidData.amount,
+               address: bidData.address,
+            });
+
+            bidData.bidderName = bidData.ens || shortenAddress(bidData.address);
+
+            sendToChannelFeeds('auctionEnd', bidData, client);
          });
 
          Nouns.on('DelegateChanged', async data => {
@@ -175,23 +209,32 @@ module.exports = {
                   vote.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
             }
 
-            if (Number(vote.votes) === 0) {
-               Logger.info('On VoteCast. Received 0 votes. Exiting.');
-               return;
-            }
-
             vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
             vote.voter.name =
                (await Nouns.ensReverseLookup(vote.voter.id)) ??
                (await shortenAddress(vote.voter.id));
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
+            vote.nounsForumType = 'PropVoteCast';
 
-            sendToChannelFeeds('propVoteCast', vote, client);
-            sendToChannelFeeds('threadVote', vote, client);
+            if (Number(vote.votes) === 0) {
+               sendToChannelFeeds('propVoteCastOnlyZero', vote, client);
+            } else {
+               sendToChannelFeeds('propVoteCast', vote, client);
+               sendToChannelFeeds('threadVote', vote, client);
+            }
+
+            sendToNounsForum(vote.proposalId, vote, client);
          });
 
          Nouns.on('ProposalCreatedWithRequirements', async data => {
-            data.description = data.description.substring(0, 150);
+            data.description = data.description.substring(0, 500);
+
+            try {
+               const proposal = await Proposal.tryCreateProposal(data);
+               data.proposalTitle = proposal.fullTitle;
+            } catch (error) {
+               Logger.error('events/ready.js: Error creating a proposal.');
+            }
 
             Logger.info(
                'events/ready.js: On ProposalCreatedWithRequirements.',
@@ -210,8 +253,11 @@ module.exports = {
                },
             );
 
+            data.nounsForumType = 'PropCreated';
+
             sendToChannelFeeds('newProposalPoll', data, client);
             sendToChannelFeeds('propCreated', data, client);
+            sendToNounsForum(data.id, data, client);
          });
 
          Nouns.on('ProposalCanceled', async data => {
@@ -221,9 +267,11 @@ module.exports = {
 
             data.status = 'Canceled';
             data.title = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
+            sendToNounsForum(data.id, data, client);
          });
 
          // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
@@ -235,9 +283,11 @@ module.exports = {
 
             data.status = 'Queued';
             data.title = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
+            sendToNounsForum(data.id, data, client);
          });
 
          // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
@@ -248,14 +298,13 @@ module.exports = {
 
             data.status = 'Vetoed';
             data.title = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
+            sendToNounsForum(data.id, data, client);
          });
 
-         // Nouns.on(
-         //    'ProposalExecuted',
-         //    (data: nerman.EventData.ProposalExecuted) => {
          Nouns.on('ProposalExecuted', async data => {
             Logger.info('events/ready.js: On ProposalExecuted.', {
                id: `${data.id}`,
@@ -263,9 +312,11 @@ module.exports = {
 
             data.status = 'Executed';
             data.title = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
             sendToChannelFeeds('threadStatusChange', data, client);
+            sendToNounsForum(data.id, data, client);
          });
 
          Nouns.on('Transfer', async data => {
@@ -413,11 +464,39 @@ module.exports = {
 };
 
 /**
- *
+ * @param {number} proposalId
+ * @param {object} data
+ * @param {Client} client
+ */
+async function sendToNounsForum(proposalId, data, client) {
+   const forums = await NounsProposalForum.find({
+      isDeleted: { $ne: true },
+   }).exec();
+
+   forums.forEach(async forum => {
+      const channel = await fetchForumChannel(forum, client);
+      if (!channel) {
+         return;
+      }
+
+      const thread = await fetchForumThread(
+         `${proposalId}`, // Mongoose only supports string keys.
+         forum,
+         channel,
+         data,
+      );
+      if (!thread) {
+         return;
+      }
+
+      client.emit('nounsForumUpdate', thread, data);
+   });
+}
+
+/**
  * @param {string} eventName
  * @param {object} data
  * @param {Client} client
- * @returns
  */
 async function sendToChannelFeeds(eventName, data, client) {
    let feeds;
@@ -448,8 +527,6 @@ async function sendToChannelFeeds(eventName, data, client) {
                },
             );
 
-            // https://discord.com/developers/docs/topics/opcodes-and-status-codes
-            const UNKNOWN_CHANNEL_ERROR_CODE = 10003;
             if (error.code === UNKNOWN_CHANNEL_ERROR_CODE) {
                feed.isDeleted = true;
                feed
@@ -483,12 +560,17 @@ async function sendToChannelFeeds(eventName, data, client) {
 async function fetchProposalTitle(proposalId) {
    let title = `Proposal ${proposalId}`;
    try {
-      const targetPoll = await Poll.findOne({
-         'pollData.title': {
-            $regex: new RegExp(`^prop\\s${Number(proposalId)}`, 'i'),
-         },
-      }).exec();
-      title = targetPoll ? targetPoll.pollData.title : title;
+      const newProposalTitle = await Proposal.fetchProposalTitle(proposalId);
+      if (newProposalTitle === title) {
+         const targetPoll = await Poll.findOne({
+            'pollData.title': {
+               $regex: new RegExp(`^prop\\s${Number(proposalId)}`, 'i'),
+            },
+         }).exec();
+         title = targetPoll ? targetPoll.pollData.title : title;
+      } else {
+         title = newProposalTitle;
+      }
    } catch (error) {
       Logger.error('Unable to find poll for status change.');
    }

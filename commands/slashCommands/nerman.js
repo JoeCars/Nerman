@@ -277,6 +277,19 @@ module.exports = {
                      'Displaying the URLs registered to this guild.',
                   );
             });
+      })
+      .addSubcommand(subcommand => {
+         return subcommand
+            .setName('register-nouns-forum')
+            .setDescription('Register a nouns forum.')
+            .addChannelOption(option => {
+               return option
+                  .setName('forum-channel')
+                  .setDescription(
+                     'The forum channel being set to a nouns forum.',
+                  )
+                  .setRequired(true);
+            });
       }),
    /**
     *

@@ -103,6 +103,12 @@ module.exports = {
                   .setName('proposer-wallet')
                   .setDescription("The proposer's wallet address.")
                   .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('proposal-description')
+                  .setDescription("The proposal's description.")
+                  .setRequired(false);
             });
       })
       .addSubcommand(subcommand => {
@@ -305,6 +311,29 @@ module.exports = {
                return option
                   .setName('bidder-address')
                   .setDescription("The bidder's wallet address.")
+                  .setRequired(false);
+            });
+      })
+      .addSubcommand(subcommand => {
+         return subcommand
+            .setName('auction-end')
+            .setDescription('Trigger an auction end event.')
+            .addStringOption(option => {
+               return option
+                  .setName('bidder-address')
+                  .setDescription("The bidder's wallet address.")
+                  .setRequired(false);
+            })
+            .addNumberOption(option => {
+               return option
+                  .setName('ethereum-amount')
+                  .setDescription('The amount of Eth being bid.')
+                  .setRequired(false);
+            })
+            .addNumberOption(option => {
+               return option
+                  .setName('noun-number')
+                  .setDescription('The noun being bid on.')
                   .setRequired(false);
             });
       }),
