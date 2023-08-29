@@ -369,6 +369,25 @@ module.exports = {
             sendToChannelFeeds('auctionBid', data, client);
          });
 
+         // =============================================================
+         // Nouns DAO Data
+         // =============================================================
+
+         Nouns.on('ProposalCandidateCreated', async data => {
+            data.description = data.description.substring(0, 500);
+            Logger.info('ready.js: On ProposalCandidateCreated.', {
+               slug: data.slug,
+               proposer: data.msgSender.id,
+               description: data.description,
+            });
+
+            data.msgSender.name =
+               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
+               (await shortenAddress(data.msgSender.id));
+
+            sendToChannelFeeds('proposalCandidateCreated', data, client);
+         });
+
          // *************************************************************
          //
          // EXAMPLE METADATA
