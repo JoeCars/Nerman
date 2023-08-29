@@ -391,7 +391,7 @@ module.exports = {
          Nouns.on('SignatureAdded', async data => {
             if (data.reason > REASON_LENGTH_LIMIT) {
                data.reason =
-                  data.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+                  data.reason.substring(0, REASON_LENGTH_LIMIT).trim() + '...';
             }
             Logger.info('ready.js: On SignatureAdded.', {
                slug: data.slug,
