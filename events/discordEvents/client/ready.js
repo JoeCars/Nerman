@@ -389,7 +389,10 @@ module.exports = {
          });
 
          Nouns.on('SignatureAdded', async data => {
-            data.reason = data.reason.substring(0, REASON_LENGTH_LIMIT);
+            if (data.reason > REASON_LENGTH_LIMIT) {
+               data.reason =
+                  data.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
             Logger.info('ready.js: On SignatureAdded.', {
                slug: data.slug,
                proposer: data.proposer.id,
