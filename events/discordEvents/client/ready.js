@@ -388,6 +388,25 @@ module.exports = {
             sendToChannelFeeds('proposalCandidateCreated', data, client);
          });
 
+         Nouns.on('SignatureAdded', async data => {
+            data.reason = data.reason.substring(0, REASON_LENGTH_LIMIT);
+            Logger.info('ready.js: On SignatureAdded.', {
+               slug: data.slug,
+               proposer: data.proposer.id,
+               signer: data.signer.id,
+               reason: data.reason,
+            });
+
+            data.proposer.name =
+               (await Nouns.ensReverseLookup(data.proposer.id)) ??
+               (await shortenAddress(data.proposer.id));
+            data.signer.name =
+               (await Nouns.ensReverseLookup(data.signer.id)) ??
+               (await shortenAddress(data.signer.id));
+
+            sendToChannelFeeds('signatureAdded', data, client);
+         });
+
          // *************************************************************
          //
          // EXAMPLE METADATA
