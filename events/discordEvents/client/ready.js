@@ -406,6 +406,9 @@ module.exports = {
             data.signer.name =
                (await Nouns.ensReverseLookup(data.signer.id)) ??
                (await shortenAddress(data.signer.id));
+            data.votes = await Nouns.NounsToken.Contract.getCurrentVotes(
+               data.signer.id,
+            );
 
             sendToChannelFeeds('signatureAdded', data, client);
          });

@@ -9,7 +9,7 @@ module.exports = {
    name: 'signatureAdded',
    /**
     * @param {TextChannel} channel
-    * @param {{slug: string, proposer: {id: string, name: string}, signer: {id: string, name: string}, reason: string}} data
+    * @param {{slug: string, proposer: {id: string, name: string}, signer: {id: string, name: string}, reason: string, votes: number}} data
     *
     */
    async execute(channel, data) {

@@ -1,8 +1,8 @@
 const { MessageEmbed } = require('discord.js');
-const { hyperlink } = require('@discordjs/builders');
+const { hyperlink, inlineCode } = require('@discordjs/builders');
 
 /**
- * @param {{slug: string, proposer: {id: string, name: string}, signer: {id: string, name: string}, reason: string}} data
+ * @param {{slug: string, proposer: {id: string, name: string}, signer: {id: string, name: string}, reason: string, votes: number}} data
  */
 exports.generateProposalCandidateCreatedEmbed = function (data) {
    let proposalTitle = data.slug
@@ -27,8 +27,9 @@ exports.generateProposalCandidateCreatedEmbed = function (data) {
       data.signer.name,
       `https://etherscan.io/address/${data.signer.id}`,
    );
+   const votes = inlineCode(data.votes);
    const reason = data.reason ? `\n\n${data.reason}` : '';
-   const description = `${proposer} signed ${signer}'s candidate proposal.${reason}`;
+   const description = `${signer} signed ${proposer}'s proposal with ${votes}.${reason}`;
 
    const url = `https://nouns.wtf/candidates/${data.proposer.id}-${data.slug}`;
 
