@@ -1,6 +1,8 @@
 const { MessageEmbed } = require('discord.js');
 const { hyperlink, blockQuote } = require('@discordjs/builders');
 
+const PROPOSAL_DESCRIPTION_LENGTH = 150;
+
 /**
  * @param {{slug: string, msgSender: {id: string, name: string}, description: string}} proposal
  */
@@ -19,7 +21,7 @@ exports.generateProposalCandidateCreatedEmbed = function (proposal) {
    const titleEndIndex = proposal.description.indexOf('\n');
    const proposalDescription =
       proposal.description
-         .substring(titleEndIndex, titleEndIndex + 150)
+         .substring(titleEndIndex, titleEndIndex + PROPOSAL_DESCRIPTION_LENGTH)
          .trim() + '...';
    const proposer = hyperlink(
       proposal.msgSender.name,
