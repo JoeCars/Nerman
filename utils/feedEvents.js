@@ -16,5 +16,7 @@ events.set('propStatusChange', 'NounsDAO.PropStatusChange');
 events.set('propVoteCast', 'NounsDAO.PropVoteCastNoZero');
 events.set('propVoteCastOnlyZero', 'NounsDAO.PropVoteCastOnlyZero');
 events.set('transferNoun', 'NounsDAO.TransferNoun');
+events.set('proposalCandidateCreated', 'NounsDAOCandidates.ProposalCandidateCreated');
+events.set('signatureAdded', 'NounsDAOCandidates.SignatureAdded');
 events.set('newPost', 'NounsNymz.NewPost');
 module.exports = events;
