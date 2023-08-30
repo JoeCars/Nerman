@@ -4,6 +4,7 @@ const Logger = require('../../../helpers/logger');
 const {
    generateFeedbackSentEmbed,
 } = require('../../../views/embeds/feedbackSent');
+const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {
    name: 'feedbackSent',
@@ -11,13 +12,15 @@ module.exports = {
     * @param {TextChannel} channel
     * @param {{proposalId: number,
     * msgSender: {id: string, name: string},
+    * proposalTitle: string,
     * supportVote: string,
     * reason: string}} data
     *
     */
    async execute(channel, data) {
       try {
-         const embed = generateFeedbackSentEmbed(data);
+         const propUrl = (await UrlConfig.fetchUrls(channel.guildId)).propUrl;
+         const embed = generateFeedbackSentEmbed(data, propUrl);
          await channel.send({
             content: null,
             embeds: [embed],

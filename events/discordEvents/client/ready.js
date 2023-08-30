@@ -405,6 +405,7 @@ module.exports = {
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.proposalTitle = await fetchProposalTitle(data.proposalId);
 
             sendToChannelFeeds('feedbackSent', data, client);
          });
