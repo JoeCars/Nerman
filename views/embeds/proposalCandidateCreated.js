@@ -1,13 +1,12 @@
 const { MessageEmbed } = require('discord.js');
-const { hyperlink } = require('@discordjs/builders');
+const { hyperlink, blockQuote } = require('@discordjs/builders');
 
 /**
  * @param {{slug: string, msgSender: {id: string, name: string}, description: string}} proposal
  */
 exports.generateProposalCandidateCreatedEmbed = function (proposal) {
-   const titleEndIndex = proposal.description.indexOf('\n');
-   let proposalTitle = proposal.slug
-      .split('-')
+   const proposalTitle = proposal.slug
+      .split('-', 3)
       .filter(word => {
          return word.trim();
       })
@@ -15,18 +14,20 @@ exports.generateProposalCandidateCreatedEmbed = function (proposal) {
          return word[0].toUpperCase() + word.substring(1);
       })
       .join(' ');
-   if (proposalTitle.length > 150) {
-      proposalTitle = proposalTitle.substring(0, 150) + '...';
-   }
-   const title = `Candidate Proposal Created: ${proposalTitle}`;
+   const title = `New Proposal Candidate: ${proposalTitle}...`;
 
+   const titleEndIndex = proposal.description.indexOf('\n');
    const proposalDescription =
-      proposal.description.substring(titleEndIndex).trim() + '...';
+      proposal.description
+         .substring(titleEndIndex, titleEndIndex + 150)
+         .trim() + '...';
    const proposer = hyperlink(
       proposal.msgSender.name,
       `https://etherscan.io/address/${proposal.msgSender.id}`,
    );
-   const description = `${proposalDescription}\n\n—${proposer}`;
+   const description = `Proposed by ${proposer}\n\n${blockQuote(
+      proposalDescription,
+   )}`;
 
    const url = `https://nouns.wtf/candidates/${proposal.msgSender.id}-${proposal.slug}`;
 
