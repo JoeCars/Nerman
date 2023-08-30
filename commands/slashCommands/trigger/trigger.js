@@ -359,6 +359,35 @@ module.exports = {
                   .setDescription("The proposal's description.")
                   .setRequired(false);
             });
+      })
+      .addSubcommand(subcommand => {
+         return subcommand
+            .setName('signature-added')
+            .setDescription('Trigger a signature added event.')
+            .addStringOption(option => {
+               return option
+                  .setName('signer-address')
+                  .setDescription("The signer's wallet address.")
+                  .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('proposer-address')
+                  .setDescription("The proposer's wallet address.")
+                  .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('proposal-title')
+                  .setDescription("The proposal's title.")
+                  .setRequired(false);
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('reason')
+                  .setDescription('The reason for signing.')
+                  .setRequired(false);
+            });
       }),
    /**
     *
