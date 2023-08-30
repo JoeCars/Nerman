@@ -29,7 +29,7 @@ exports.generateSignatureAddedEmbed = function (data) {
    );
    const votes = inlineCode(data.votes);
    const reason = data.reason ? `\n\n${data.reason}` : '';
-   const description = `${signer} signed ${proposer}'s proposal with ${votes} votes.${reason}`;
+   const description = `${signer} signed ${proposer}'s proposal with ${votes} vote(s).${reason}`;
 
    const url = `https://nouns.wtf/candidates/${data.proposer.id}-${data.slug}`;
 
