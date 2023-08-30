@@ -4,7 +4,7 @@ const { hyperlink, inlineCode } = require('@discordjs/builders');
 /**
  * @param {{slug: string, proposer: {id: string, name: string}, signer: {id: string, name: string}, reason: string, votes: number}} data
  */
-exports.generateProposalCandidateCreatedEmbed = function (data) {
+exports.generateSignatureAddedEmbed = function (data) {
    let proposalTitle = data.slug
       .split('-')
       .filter(word => {
