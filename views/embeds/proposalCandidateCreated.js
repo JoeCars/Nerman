@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { hyperlink, blockQuote } = require('@discordjs/builders');
+const { hyperlink, codeBlock } = require('@discordjs/builders');
 
 const PROPOSAL_DESCRIPTION_LENGTH = 150;
 
@@ -27,7 +27,7 @@ exports.generateProposalCandidateCreatedEmbed = function (proposal) {
       proposal.msgSender.name,
       `https://etherscan.io/address/${proposal.msgSender.id}`,
    );
-   const description = `Proposed by ${proposer}\n\n${blockQuote(
+   const description = `Proposed by ${proposer}\n\n${codeBlock(
       proposalDescription,
    )}`;
 
