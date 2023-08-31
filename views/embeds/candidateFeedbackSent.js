@@ -24,30 +24,22 @@ exports.generateCandidateFeedbackSentEmbed = function (data) {
       .join(' ');
    const title = `New Candidate Feedback | ${proposalTitle}...`;
 
-   const proposer = hyperlink(
-      data.proposer.name,
-      `https://etherscan.io/address/${data.proposer.id}`,
-   );
    const feedbacker = hyperlink(
       data.msgSender.name,
       `https://etherscan.io/address/${data.msgSender.id}`,
    );
-   const proposalDescription = `${feedbacker} left feedback on ${proposer}'s candidate proposal.\n\n`;
+   const proposalDescription = `${feedbacker}'s current sentiment: ${inlineCode(
+      data.supportVote,
+   )}.`;
    let proposalReason = '';
    if (data.reason.trim()) {
-      proposalReason = data.reason.trim();
+      proposalReason = '\n\n' + data.reason.trim();
    }
    if (proposalReason.length > PROPOSAL_REASON_LENGTH) {
       proposalReason =
          proposalReason.substring(0, PROPOSAL_REASON_LENGTH).trim() + '...';
    }
-   if (proposalReason) {
-      proposalReason += '\n\n';
-   }
-   const proposalSentiment = `Current sentiment: ${inlineCode(
-      data.supportVote,
-   )}`;
-   const description = proposalDescription + proposalReason + proposalSentiment;
+   const description = proposalDescription + proposalReason;
 
    const url = `https://nouns.wtf/candidates/${data.msgSender.id}-${data.slug}`;
 
