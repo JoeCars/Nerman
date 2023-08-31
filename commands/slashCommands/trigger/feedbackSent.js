@@ -53,7 +53,7 @@ module.exports = {
          interaction.options.getString('feedbacker-address') ??
          DEFAULT_FEEDBACKER_ADDRESS;
       const proposalNumber =
-         interaction.options.getString('proposal-number') ??
+         interaction.options.getNumber('proposal-number') ??
          DEFAULT_PROPOSAL_NUMBER;
       const proposalReason =
          interaction.options.getString('reason') ?? DEFAULT_PROPOSAL_REASON;
