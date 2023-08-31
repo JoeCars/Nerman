@@ -3,6 +3,7 @@ const events = new Map();
 events.set('federationBidPlaced', 'Federation.BidPlaced');
 events.set('federationVoteCast', 'Federation.VoteCast');
 events.set('newProposalPoll', 'Nerman.NewProposalPoll');
+events.set('threadFeedbackSent', 'Nerman.ThreadFeedbackSent');
 events.set('threadStatusChange', 'Nerman.ThreadStatusChange');
 events.set('threadVote', 'Nerman.ThreadVote');
 events.set('auctionBid', 'NounsDAO.AuctionBid');

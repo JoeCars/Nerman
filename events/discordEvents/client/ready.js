@@ -409,7 +409,7 @@ module.exports = {
             data.nounsForumType = 'FeedbackSent';
 
             sendToChannelFeeds('feedbackSent', data, client);
-            // sendToChannelFeeds('threadStatusChange', data, client);
+            sendToChannelFeeds('threadFeedbackSent', data, client);
             sendToNounsForum(data.proposalId, data, client);
          });
 
