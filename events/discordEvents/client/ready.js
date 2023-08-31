@@ -406,8 +406,11 @@ module.exports = {
                (await shortenAddress(data.msgSender.id));
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
             data.proposalTitle = await fetchProposalTitle(data.proposalId);
+            data.nounsForumType = 'FeedbackSent';
 
             sendToChannelFeeds('feedbackSent', data, client);
+            // sendToChannelFeeds('threadStatusChange', data, client);
+            sendToNounsForum(data.proposalId, data, client);
          });
 
          Nouns.on('ProposalCandidateCanceled', async data => {
