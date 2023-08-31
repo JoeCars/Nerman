@@ -4,7 +4,7 @@ const Logger = require('../../../helpers/logger');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {
-   subCommand: 'nerman.url.display',
+   subCommand: 'nerman-url.display',
 
    /**
     * @param {CommandInteraction} interaction

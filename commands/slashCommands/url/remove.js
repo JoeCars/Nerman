@@ -5,7 +5,7 @@ const Logger = require('../../../helpers/logger');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {
-   subCommand: 'nerman.url.remove',
+   subCommand: 'nerman-url.remove',
    /**
     * @param {CommandInteraction} interaction
     */

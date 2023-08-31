@@ -5,7 +5,7 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {
-   subCommand: 'nerman.url.add',
+   subCommand: 'nerman-url.add',
    /**
     * @param {CommandInteraction} interaction
     */
