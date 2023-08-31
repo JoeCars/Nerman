@@ -90,7 +90,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/trigger/proposalCandidateCreated.js: A CandidateFeedbackSent event has been triggered.',
+         'commands/trigger/candidateFeedbackSent.js: A CandidateFeedbackSent event has been triggered.',
          {
             guildId: interaction.guildId,
             channelId: interaction.channelId,

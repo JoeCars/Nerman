@@ -74,7 +74,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/trigger/proposalCandidateCreated.js: A FeedbackSent event has been triggered.',
+         'commands/trigger/feedbackSent.js: A FeedbackSent event has been triggered.',
          {
             guildId: interaction.guildId,
             channelId: interaction.channelId,
