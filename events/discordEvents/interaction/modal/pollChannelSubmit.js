@@ -301,6 +301,12 @@ async function registerForPollEvents(guildId, channelId) {
          channelId: channelId,
          eventName: 'threadStatusChange',
       });
+      await FeedConfig.create({
+         _id: new Types.ObjectId(),
+         guildId: guildId,
+         channelId: channelId,
+         eventName: 'threadFeedbackSent',
+      });
    } catch (error) {
       Logger.error(
          'events/discordEvents/interaction/modal/pollChannelSubmit.js: Unable to register poll events.',
