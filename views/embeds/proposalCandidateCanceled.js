@@ -25,9 +25,10 @@ exports.generateProposalCandidateCanceledEmbed = function (proposal) {
          }) + +'...';
    const proposalUrl = `https://nouns.wtf/candidates/${proposal.msgSender.id}-${proposal.slug}`;
    const proposalName = hyperlink(proposalTitle, proposalUrl);
+   const reason = proposal.reason ? `\n\n${proposal.reason}` : '';
    const description = `${proposer} has ${inlineCode(
       'CANCELED',
-   )} their proposal candidate (${proposalName}).`;
+   )} their proposal candidate (${proposalName}).${reason}`;
 
    const embed = new MessageEmbed()
       .setColor('#00FFFF')
