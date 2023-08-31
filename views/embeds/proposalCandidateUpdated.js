@@ -22,7 +22,8 @@ exports.generateProposalCandidateUpdatedEmbed = function (proposal) {
          })
          .map(word => {
             return word[0].toUpperCase() + word.substring(1).toLowerCase();
-         }) + +'...';
+         })
+         .join(' ') + '...';
    const proposalUrl = `https://nouns.wtf/candidates/${proposal.msgSender.id}-${proposal.slug}`;
    const proposalName = hyperlink(proposalTitle, proposalUrl);
    const reason = proposal.reason ? `\n\n${proposal.reason}` : '';
