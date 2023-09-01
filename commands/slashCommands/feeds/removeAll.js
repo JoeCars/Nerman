@@ -7,7 +7,7 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 const events = require('../../../utils/feedEvents');
 
 module.exports = {
-   subCommand: 'nerman.feeds.remove-all',
+   subCommand: 'nerman-feeds.remove-all',
    /**
     * @param {CommandInteraction} interaction
     */
