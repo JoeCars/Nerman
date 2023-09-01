@@ -9,6 +9,9 @@ const {
 const {
    generatePropVoteCastEmbed,
 } = require('../../../../views/embeds/propVoteCast');
+const {
+   generateFeedbackSentEmbed,
+} = require('../../../../views/embeds/feedbackSent');
 const Logger = require('../../../../helpers/logger');
 
 module.exports = {
@@ -22,14 +25,22 @@ module.exports = {
    async execute(thread, data) {
       const propUrl = (await UrlConfig.fetchUrls(thread.guildId)).propUrl;
       let embed = undefined;
-      if (data.nounsForumType === 'PropVoteCast') {
-         embed = generatePropVoteCastEmbed(data, propUrl);
-      } else if (data.nounsForumType === 'PropCreated') {
-         embed = generatePropCreatedEmbed(data, propUrl);
-      } else if (data.nounsForumType === 'PropStatusChange') {
-         embed = generatePropStatusChangeEmbed(data, propUrl);
-      } else {
-         throw new Error('Data does not match any known type.');
+
+      switch (data.nounsForumType) {
+         case 'PropVoteCast':
+            embed = generatePropVoteCastEmbed(data, propUrl);
+            break;
+         case 'PropCreated':
+            embed = generatePropCreatedEmbed(data, propUrl);
+            break;
+         case 'PropStatusChange':
+            embed = generatePropStatusChangeEmbed(data, propUrl);
+            break;
+         case 'FeedbackSent':
+            embed = generateFeedbackSentEmbed(data, propUrl);
+            break;
+         default:
+            throw new Error('Data does not match any known type.');
       }
 
       thread.send({

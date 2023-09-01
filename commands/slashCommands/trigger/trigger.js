@@ -337,6 +337,7 @@ module.exports = {
                   .setRequired(false);
             });
       }),
+
    /**
     *
     * @param {CommandInteraction} interaction

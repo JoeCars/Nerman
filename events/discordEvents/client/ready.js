@@ -369,6 +369,118 @@ module.exports = {
             sendToChannelFeeds('auctionBid', data, client);
          });
 
+         // =============================================================
+         // Nouns DAO Data
+         // =============================================================
+
+         Nouns.on('CandidateFeedbackSent', async data => {
+            Logger.info('ready.js: On CandidateFeedbackSent', {
+               msgSender: data.msgSender.id,
+               proposer: data.proposer.id,
+               slug: data.slug,
+               support: data.support,
+               reason: data.reason,
+            });
+
+            data.msgSender.name =
+               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
+               (await shortenAddress(data.msgSender.id));
+            data.proposer.name =
+               (await Nouns.ensReverseLookup(data.proposer.id)) ??
+               (await shortenAddress(data.proposer.id));
+            data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+
+            sendToChannelFeeds('candidateFeedbackSent', data, client);
+         });
+
+         Nouns.on('FeedbackSent', async data => {
+            Logger.info('ready.js: On FeedbackSent', {
+               msgSender: data.msgSender.id,
+               proposalId: data.proposalId,
+               support: data.support,
+               reason: data.reason,
+            });
+
+            data.msgSender.name =
+               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
+               (await shortenAddress(data.msgSender.id));
+            data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.proposalTitle = await fetchProposalTitle(data.proposalId);
+            data.nounsForumType = 'FeedbackSent';
+
+            sendToChannelFeeds('feedbackSent', data, client);
+            sendToChannelFeeds('threadFeedbackSent', data, client);
+            sendToNounsForum(data.proposalId, data, client);
+         });
+
+         Nouns.on('ProposalCandidateCanceled', async data => {
+            Logger.info('ready.js: On ProposalCandidateCanceled', {
+               msgSender: data.msgSender.id,
+               slug: data.slug,
+               reason: data.reason,
+            });
+
+            data.msgSender.name =
+               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
+               (await shortenAddress(data.msgSender.id));
+
+            sendToChannelFeeds('proposalCandidateCanceled', data, client);
+         });
+
+         Nouns.on('ProposalCandidateCreated', async data => {
+            data.description = data.description.substring(0, 500);
+            Logger.info('ready.js: On ProposalCandidateCreated.', {
+               slug: data.slug,
+               proposer: data.msgSender.id,
+               description: data.description,
+            });
+
+            data.msgSender.name =
+               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
+               (await shortenAddress(data.msgSender.id));
+
+            sendToChannelFeeds('proposalCandidateCreated', data, client);
+         });
+
+         Nouns.on('ProposalCandidateUpdated', async data => {
+            Logger.info('ready.js: On ProposalCandidateUpdated', {
+               msgSender: data.msgSender.id,
+               slug: data.slug,
+               reason: data.reason,
+            });
+
+            data.msgSender.name =
+               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
+               (await shortenAddress(data.msgSender.id));
+
+            sendToChannelFeeds('proposalCandidateUpdated', data, client);
+         });
+
+         Nouns.on('SignatureAdded', async data => {
+            if (data.reason > REASON_LENGTH_LIMIT) {
+               data.reason =
+                  data.reason.substring(0, REASON_LENGTH_LIMIT).trim() + '...';
+            }
+            Logger.info('ready.js: On SignatureAdded.', {
+               slug: data.slug,
+               proposer: data.proposer.id,
+               signer: data.signer.id,
+               reason: data.reason,
+            });
+
+            data.proposer.name =
+               (await Nouns.ensReverseLookup(data.proposer.id)) ??
+               (await shortenAddress(data.proposer.id));
+            data.signer.name =
+               (await Nouns.ensReverseLookup(data.signer.id)) ??
+               (await shortenAddress(data.signer.id));
+            data.votes = await Nouns.NounsToken.Contract.getCurrentVotes(
+               data.signer.id,
+            );
+
+            sendToChannelFeeds('signatureAdded', data, client);
+         });
+
          // *************************************************************
          //
          // EXAMPLE METADATA
