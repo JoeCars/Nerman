@@ -481,6 +481,30 @@ module.exports = {
             sendToChannelFeeds('signatureAdded', data, client);
          });
 
+         // =============================================================
+         // Nouns DAO Fork
+         // =============================================================
+
+         Nouns.on('EscrowedToFork', async data => {
+            if (data.reason.length > REASON_LENGTH_LIMIT) {
+               data.reason =
+                  data.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            Logger.info('ready.js: On EscrowedToFork', {
+               forkId: data.forkId,
+               owner: data.owner.id,
+               tokenIds: data.tokenIds,
+               reason: data.reason,
+            });
+
+            data.owner.name =
+               (await Nouns.ensReverseLookup(data.owner.id)) ??
+               (await shortenAddress(data.owner.id));
+
+            sendToChannelFeeds('escrowedToFork', data, client);
+         });
+
          // *************************************************************
          //
          // EXAMPLE METADATA

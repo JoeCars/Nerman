@@ -23,5 +23,6 @@ events.set('proposalCandidateCanceled', 'NounsDAOCandidates.ProposalCandidateCan
 events.set('proposalCandidateCreated', 'NounsDAOCandidates.ProposalCandidateCreated');
 events.set('proposalCandidateUpdated', 'NounsDAOCandidates.ProposalCandidateUpdated');
 events.set('signatureAdded', 'NounsDAOCandidates.SignatureAdded');
+events.set('EscrowedToFork', 'NounsDAOFork.EscrowedToFork');
 events.set('newPost', 'NounsNymz.NewPost');
 module.exports = events;
