@@ -26,7 +26,9 @@ exports.generateFeedbackSentEmbed = function (data, propUrl) {
    }
    if (proposalReason.length > PROPOSAL_REASON_LENGTH) {
       proposalReason =
-         proposalReason.substring(0, PROPOSAL_REASON_LENGTH).trim() + '...';
+         '\n\n' +
+         proposalReason.substring(0, PROPOSAL_REASON_LENGTH).trim() +
+         '...';
    }
    const description = proposalDescription + proposalReason;
 
