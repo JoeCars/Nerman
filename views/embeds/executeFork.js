@@ -1,4 +1,5 @@
 const { MessageEmbed } = require('discord.js');
+const { inlineCode, hyperlink } = require('@discordjs/builders');
 
 /**
  * @param {{forkId: number,
@@ -9,11 +10,15 @@ const { MessageEmbed } = require('discord.js');
  * reason: string}} data
  */
 exports.generateExecuteForkEmbed = function (data) {
-   const title = `Fork ${data.forkId} Executed!`;
-
-   const description = `Fork ${data.forkId} executed with ${data.tokensInEscrow} tokens!`;
+   const title = `Fork Executed!`;
 
    const url = `https://nouns.wtf/fork/${data.forkId}`;
+
+   const forkName = hyperlink(`Fork ${data.forkId}`, url);
+
+   const description = `${forkName} executed with ${inlineCode(
+      data.tokensInEscrow,
+   )} tokens!`;
 
    const embed = new MessageEmbed()
       .setColor('#00FFFF')
