@@ -505,6 +505,26 @@ module.exports = {
             sendToChannelFeeds('escrowedToFork', data, client);
          });
 
+         Nouns.on('ExecuteFork', async data => {
+            Logger.info('ready.js: On ExecuteFork', {
+               forkId: data.forkId,
+               forkTreasury: data.forkTreasury.id,
+               forkToken: data.forkToken.id,
+               tokenIds: data.tokenIds,
+               forkEndTimestamp: data.forkEndTimestamp,
+               tokensInEscrow: data.tokensInEscrow,
+            });
+
+            data.forkTreasury.name =
+               (await Nouns.ensReverseLookup(data.forkTreasury.id)) ??
+               (await shortenAddress(data.forkTreasury.id));
+            data.forkToken.name =
+               (await Nouns.ensReverseLookup(data.forkToken.id)) ??
+               (await shortenAddress(data.forkToken.id));
+
+            sendToChannelFeeds('executeFork', data, client);
+         });
+
          // *************************************************************
          //
          // EXAMPLE METADATA
