@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const { hyperlink, inlineCode } = require('@discordjs/builders');
 
-const PROPOSAL_REASON_LENGTH = 150;
+const PROPOSAL_REASON_LENGTH = 1500;
 
 /**
  * @param {{proposalId: number,
