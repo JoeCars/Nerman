@@ -31,7 +31,9 @@ exports.generateProposalCandidateCreatedEmbed = function (proposal) {
       proposalDescription,
    )}`;
 
-   const url = `https://nouns.wtf/candidates/${proposal.msgSender.id}-${proposal.slug}`;
+   const url = `https://nouns.wtf/candidates/${proposal.msgSender.id.toLowerCase()}-${
+      proposal.slug
+   }`;
 
    const embed = new MessageEmbed()
       .setColor('#00FFFF')

@@ -43,7 +43,9 @@ exports.generateCandidateFeedbackSentEmbed = function (data) {
    }
    const description = proposalDescription + proposalReason;
 
-   const url = `https://nouns.wtf/candidates/${data.msgSender.id}-${data.slug}`;
+   const url = `https://nouns.wtf/candidates/${data.proposer.id.toLowerCase()}-${
+      data.slug
+   }`;
 
    const embed = new MessageEmbed()
       .setColor('#00FFFF')

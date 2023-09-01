@@ -28,7 +28,9 @@ exports.generateSignatureAddedEmbed = function (data) {
    const reason = data.reason ? `\n\n${data.reason}` : '';
    const description = `${signer} signed ${proposer}'s proposal with ${votes} vote(s).${reason}`;
 
-   const url = `https://nouns.wtf/candidates/${data.proposer.id}-${data.slug}`;
+   const url = `https://nouns.wtf/candidates/${data.proposer.id.toLowerCase()}-${
+      data.slug
+   }`;
 
    const embed = new MessageEmbed()
       .setColor('#00FFFF')

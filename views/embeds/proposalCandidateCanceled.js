@@ -23,6 +23,9 @@ exports.generateProposalCandidateCanceledEmbed = function (proposal) {
          return word[0].toUpperCase() + word.substring(1).toLowerCase();
       })
       .join(' ');
+   const proposalUrl = `https://nouns.wtf/candidates/${proposal.msgSender.id.toLowerCase()}-${
+      proposal.slug
+   }`;
    const proposalName = hyperlink(proposalTitle, proposalUrl);
    const reason = proposal.reason ? `\n\n${proposal.reason}` : '';
    const description = `${proposer} has ${inlineCode(
