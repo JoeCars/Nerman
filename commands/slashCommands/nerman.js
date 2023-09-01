@@ -169,6 +169,7 @@ module.exports = {
                      'Remove an event configuration for the given channel.',
                   )
                   .addStringOption(option => {
+                     // Note. Discord supports up to a maximum of 25 drop-down options.
                      const eventOptions = [['All', 'All']];
                      events.forEach((value, key) => {
                         eventOptions.push([value, key]);
