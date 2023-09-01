@@ -2,6 +2,7 @@ const { MessageEmbed } = require('discord.js');
 const { hyperlink, inlineCode } = require('@discordjs/builders');
 
 const PROPOSAL_REASON_LENGTH = 1500;
+const DISCORD_TITLE_LIMIT = 250; // Actually 256 but leaving space for ellipses.
 
 /**
  * @param {TextChannel} channel
@@ -22,7 +23,10 @@ exports.generateCandidateFeedbackSentEmbed = function (data) {
          return word[0].toUpperCase() + word.substring(1);
       })
       .join(' ');
-   const title = `New Candidate Feedback | ${proposalTitle}`;
+   let title = `New Candidate Feedback | ${proposalTitle}`;
+   if (title.length > DISCORD_TITLE_LIMIT) {
+      title = title.substring(0, DISCORD_TITLE_LIMIT) + '...';
+   }
 
    const feedbacker = hyperlink(
       data.msgSender.name,

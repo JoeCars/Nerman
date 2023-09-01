@@ -1,6 +1,8 @@
 const { MessageEmbed } = require('discord.js');
 const { hyperlink, inlineCode } = require('@discordjs/builders');
 
+const DISCORD_TITLE_LIMIT = 250; // Actually 256 but leaving space for ellipses.
+
 /**
  * @param {{slug: string, proposer: {id: string, name: string}, signer: {id: string, name: string}, reason: string, votes: number}} data
  */
@@ -14,7 +16,10 @@ exports.generateSignatureAddedEmbed = function (data) {
          return word[0].toUpperCase() + word.substring(1);
       })
       .join(' ');
-   const title = `Candidate Proposal Signed: ${proposalTitle}`;
+   let title = `Candidate Proposal Signed: ${proposalTitle}`;
+   if (title.length > DISCORD_TITLE_LIMIT) {
+      title = title.substring(0, DISCORD_TITLE_LIMIT) + '...';
+   }
 
    const proposer = hyperlink(
       data.proposer.name,
