@@ -196,34 +196,6 @@ module.exports = {
             });
       })
       .addSubcommand(subcommand => {
-         return (
-            subcommand
-               .setName('remove')
-               .setDescription(
-                  'Remove an event configuration for the given channel.',
-               )
-               // .addStringOption(option => {
-               //    // const eventOptions = [];
-               //    // events.forEach((value, key) => {
-               //    //    eventOptions.push([value, key]);
-               //    // });
-               //    return option
-               //       .setName('event')
-               //       .setDescription('The event to remove.')
-               //       .setRequired(true)
-               //       .addChoices(eventOptions);
-               // })
-               .addChannelOption(option => {
-                  return option
-                     .setName('channel')
-                     .setDescription(
-                        'The channel that will lose the notifications.',
-                     )
-                     .setRequired(false);
-               })
-         );
-      })
-      .addSubcommand(subcommand => {
          return subcommand
             .setName('remove-all')
             .setDescription(
