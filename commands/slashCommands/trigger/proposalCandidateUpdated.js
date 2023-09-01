@@ -18,7 +18,7 @@ module.exports = {
             .setDescription("The proposer's wallet address.")
             .setRequired(false);
       })
-      .addNumberOption(option => {
+      .addStringOption(option => {
          return option
             .setName('proposal-title')
             .setDescription("The proposal's title.")

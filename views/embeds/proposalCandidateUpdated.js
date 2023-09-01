@@ -13,18 +13,19 @@ exports.generateProposalCandidateUpdatedEmbed = function (proposal) {
       proposal.msgSender.name,
       `https://etherscan.io/address/${proposal.msgSender.id}`,
    );
-   const proposalTitle =
+   const proposalTitle = proposal.slug
+      .trim()
+      .split('-')
+      .filter(word => {
+         return word.trim();
+      })
+      .map(word => {
+         return word[0].toUpperCase() + word.substring(1).toLowerCase();
+      })
+      .join(' ');
+   const proposalUrl = `https://nouns.wtf/candidates/${proposal.msgSender.id.toLowerCase()}-${
       proposal.slug
-         .trim()
-         .split('-', 3)
-         .filter(word => {
-            return word.trim();
-         })
-         .map(word => {
-            return word[0].toUpperCase() + word.substring(1).toLowerCase();
-         })
-         .join(' ') + '...';
-   const proposalUrl = `https://nouns.wtf/candidates/${proposal.msgSender.id}-${proposal.slug}`;
+   }`;
    const proposalName = hyperlink(proposalTitle, proposalUrl);
    const reason = proposal.reason ? `\n\n${proposal.reason}` : '';
    const description = `${proposer} has ${inlineCode(
