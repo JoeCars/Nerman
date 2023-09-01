@@ -7,13 +7,13 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 const events = require('../../../utils/feedEvents');
 
 module.exports = {
-   subCommand: 'nerman.feeds.remove',
+   subCommand: 'nerman.feeds.remove-all',
    /**
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
       Logger.info(
-         'commands/slashCommands/feeds/remove.js: Removing new event configuration.',
+         'commands/slashCommands/feeds/removeAll.js: Removing all event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -25,16 +25,15 @@ module.exports = {
 
       const channel =
          interaction.options.getChannel('channel') ?? interaction.channel;
-      const event = interaction.options.getString('event');
 
-      if (!channel || !event) {
-         throw new Error('The channel and event were not supplied.');
+      if (!channel) {
+         throw new Error('Could not retrieve channel for removal.');
       }
 
-      await removeFeed(interaction, channel.id, event);
+      await removeAllFeeds(interaction, channel.id);
 
       Logger.info(
-         'commands/slashCommands/feeds/remove.js: Finished removing event configuration.',
+         'commands/slashCommands/feeds/removeAll.js: Finished removing all event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -47,19 +46,17 @@ module.exports = {
 /**
  * @param {CommandInteraction} interaction
  * @param {string} channelId
- * @param {string} event
  */
-async function removeFeed(interaction, channelId, event) {
-   let config;
+async function removeAllFeeds(interaction, channelId) {
+   let result;
    try {
-      config = await FeedConfig.findOneAndDelete({
+      result = await FeedConfig.deleteMany({
          guildId: interaction.guildId,
          channelId: channelId,
-         eventName: event,
          isDeleted: {
             $ne: true,
          },
-      }).exec();
+      });
    } catch (error) {
       Logger.error(
          'commands/slashCommands/feeds/remove.js: Unable to remove the configuration.',
@@ -72,23 +69,17 @@ async function removeFeed(interaction, channelId, event) {
       );
    }
 
-   const eventName = events.get(event);
-
-   if (config) {
-      await interaction.reply({
+   if (!result) {
+      return interaction.reply({
          ephemeral: true,
-         content: `You have successfully removed the ${inlineCode(
-            eventName,
-         )} event from channel ${inlineCode(channelId)}.`,
-      });
-   } else {
-      await interaction.reply({
-         ephemeral: true,
-         content: `${inlineCode(
-            eventName,
-         )} was not registered to channel ${inlineCode(
-            channelId,
-         )}. Nothing was removed.`,
+         content: `Something's gone wrong! Sorry about that.`,
       });
    }
+
+   await interaction.reply({
+      ephemeral: true,
+      content: `You have successfully removed ${inlineCode(
+         result.deletedCount,
+      )} events from channel ${inlineCode(channelId)}.`,
+   });
 }

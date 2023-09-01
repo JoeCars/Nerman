@@ -170,7 +170,7 @@ module.exports = {
                   )
                   .addStringOption(option => {
                      // Note. Discord supports up to a maximum of 25 drop-down options.
-                     const eventOptions = [['All', 'All']];
+                     const eventOptions = [];
                      events.forEach((value, key) => {
                         eventOptions.push([value, key]);
                      });
@@ -185,6 +185,21 @@ module.exports = {
                         .setName('channel')
                         .setDescription(
                            'The channel that will lose the notifications.',
+                        )
+                        .setRequired(false);
+                  });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('remove-all')
+                  .setDescription(
+                     'Remove all event configurations for the given channel.',
+                  )
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will lose the notifications. The current channel by default.',
                         )
                         .setRequired(false);
                   });
