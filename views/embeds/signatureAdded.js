@@ -6,7 +6,7 @@ const { hyperlink, inlineCode } = require('@discordjs/builders');
  */
 exports.generateSignatureAddedEmbed = function (data) {
    const proposalTitle = data.slug
-      .split('-', 3)
+      .split('-')
       .filter(word => {
          return word.trim();
       })
@@ -14,7 +14,7 @@ exports.generateSignatureAddedEmbed = function (data) {
          return word[0].toUpperCase() + word.substring(1);
       })
       .join(' ');
-   const title = `Candidate Proposal Signed: ${proposalTitle}...`;
+   const title = `Candidate Proposal Signed: ${proposalTitle}`;
 
    const proposer = hyperlink(
       data.proposer.name,

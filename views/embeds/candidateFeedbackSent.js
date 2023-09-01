@@ -14,7 +14,7 @@ const PROPOSAL_REASON_LENGTH = 1500;
  */
 exports.generateCandidateFeedbackSentEmbed = function (data) {
    const proposalTitle = data.slug
-      .split('-', 3)
+      .split('-')
       .filter(word => {
          return word.trim();
       })
@@ -22,7 +22,7 @@ exports.generateCandidateFeedbackSentEmbed = function (data) {
          return word[0].toUpperCase() + word.substring(1);
       })
       .join(' ');
-   const title = `New Candidate Feedback | ${proposalTitle}...`;
+   const title = `New Candidate Feedback | ${proposalTitle}`;
 
    const feedbacker = hyperlink(
       data.msgSender.name,

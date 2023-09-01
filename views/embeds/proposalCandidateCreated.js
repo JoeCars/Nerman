@@ -8,7 +8,7 @@ const PROPOSAL_DESCRIPTION_LENGTH = 150;
  */
 exports.generateProposalCandidateCreatedEmbed = function (proposal) {
    const proposalTitle = proposal.slug
-      .split('-', 3)
+      .split('-')
       .filter(word => {
          return word.trim();
       })
@@ -16,7 +16,7 @@ exports.generateProposalCandidateCreatedEmbed = function (proposal) {
          return word[0].toUpperCase() + word.substring(1);
       })
       .join(' ');
-   const title = `New Proposal Candidate: ${proposalTitle}...`;
+   const title = `New Proposal Candidate: ${proposalTitle}`;
 
    const titleEndIndex = proposal.description.indexOf('\n');
    const proposalDescription =
