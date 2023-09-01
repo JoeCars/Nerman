@@ -510,7 +510,6 @@ module.exports = {
                forkId: data.forkId,
                forkTreasury: data.forkTreasury.id,
                forkToken: data.forkToken.id,
-               tokenIds: data.tokenIds,
                forkEndTimestamp: data.forkEndTimestamp,
                tokensInEscrow: data.tokensInEscrow,
             });
