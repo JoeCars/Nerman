@@ -15,6 +15,10 @@ module.exports = {
                return option
                   .setName('proposal-url')
                   .setDescription('The URL for all future proposals.')
+                  .addChoices([
+                     ['nouns.wtf', 'https://nouns.wtf/vote/'],
+                     ['nounsagora.com', 'https://nounsagora.com/proposals/'],
+                  ])
                   .setRequired(false);
             })
             .addStringOption(option => {
