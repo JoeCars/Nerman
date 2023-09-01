@@ -485,6 +485,19 @@ module.exports = {
          // Nouns DAO Fork
          // =============================================================
 
+         Nouns.on('DAOWithdrawNounsFromEscrow', async data => {
+            Logger.info('ready.js: On WithdrawNounsFromEscrow', {
+               tokenIds: data.tokenIds,
+               to: data.to.id,
+            });
+
+            data.to.name =
+               (await Nouns.ensReverseLookup(data.to.id)) ??
+               (await shortenAddress(data.to.id));
+
+            sendToChannelFeeds('withdrawNounsFromEscrow', data, client);
+         });
+
          Nouns.on('EscrowedToFork', async data => {
             if (data.reason.length > REASON_LENGTH_LIMIT) {
                data.reason =
