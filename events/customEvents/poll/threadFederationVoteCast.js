@@ -14,7 +14,7 @@ module.exports = {
     */
    async execute(channel, data) {
       try {
-         const pollMessage = await findPollMessage(channel, data.proposalId);
+         const pollMessage = await findPollMessage(channel, data.propId);
          if (!pollMessage) {
             return;
          }
