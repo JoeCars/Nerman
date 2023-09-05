@@ -96,7 +96,10 @@ module.exports = {
             }
             data.voteNumber = votes;
 
+            data.nounsForumType = 'FederationBidPlaced';
+
             sendToChannelFeeds('federationBidPlaced', data, client);
+            sendToNounsForum(data.propId, data, client);
          });
 
          federationNounsPool.on('VoteCast', async data => {
@@ -125,7 +128,10 @@ module.exports = {
             );
             data.voteNumber = voting.votes;
 
+            data.nounsForumType = 'FederationVoteCast';
+
             sendToChannelFeeds('federationVoteCast', data, client);
+            sendToNounsForum(data.propId, data, client);
          });
 
          Nouns.on('AuctionEnd', async data => {
