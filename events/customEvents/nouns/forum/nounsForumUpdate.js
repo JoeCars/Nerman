@@ -12,6 +12,12 @@ const {
 const {
    generateFeedbackSentEmbed,
 } = require('../../../../views/embeds/feedbackSent');
+const {
+   generateFederationBidEmbed,
+} = require('../../../../views/embeds/federation/bidPlaced');
+const {
+   generateFederationVoteEmbed,
+} = require('../../../../views/embeds/federation/voteCast');
 const Logger = require('../../../../helpers/logger');
 
 module.exports = {
@@ -39,6 +45,12 @@ module.exports = {
          case 'FeedbackSent':
             embed = generateFeedbackSentEmbed(data, propUrl);
             break;
+         case 'FederationBidPlaced':
+            embed = generateFederationBidEmbed(data, propUrl);
+            break;
+         case 'FederationVoteCast':
+            embed = generateFederationVoteEmbed(data, propUrl);
+            break;
          default:
             throw new Error('Data does not match any known type.');
       }
@@ -47,6 +59,6 @@ module.exports = {
          embeds: [embed],
       });
 
-      Logger.info('Successfully send thing.');
+      Logger.info('Successfully sent forum embed.');
    },
 };
