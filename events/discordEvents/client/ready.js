@@ -76,7 +76,6 @@ module.exports = {
                (await shortenAddress(data.bidder));
             data.proposalTitle = await fetchProposalTitle(data.propId);
 
-            // TODO: Grab the votes at the proposal's snapshot using getPriorVotes.
             const GOVERNANCE_POOL_VOTING_ADDRESS = `0x6b2645b468A828a12fEA8C7D644445eB808Ec2B1`;
             const currentBlock = await Nouns.provider.getBlockNumber();
             const proposal = await Nouns.NounsDAO.Contract.proposals(
@@ -85,6 +84,7 @@ module.exports = {
 
             let votes = 0;
             if (proposal.startBlock <= currentBlock) {
+               // Grabs vote at the snapshot.
                votes = await Nouns.NounsToken.Contract.getPriorVotes(
                   GOVERNANCE_POOL_VOTING_ADDRESS,
                   proposal.startBlock,
