@@ -78,9 +78,22 @@ module.exports = {
 
             // TODO: Grab the votes at the proposal's snapshot using getPriorVotes.
             const GOVERNANCE_POOL_VOTING_ADDRESS = `0x6b2645b468A828a12fEA8C7D644445eB808Ec2B1`;
-            const votes = await Nouns.NounsToken.Contract.getCurrentVotes(
-               GOVERNANCE_POOL_VOTING_ADDRESS,
+            const currentBlock = await Nouns.provider.getBlockNumber();
+            const proposal = await Nouns.NounsDAO.Contract.proposals(
+               Number(data.propId),
             );
+
+            let votes = 0;
+            if (proposal.startBlock <= currentBlock) {
+               votes = await Nouns.NounsToken.Contract.getPriorVotes(
+                  GOVERNANCE_POOL_VOTING_ADDRESS,
+                  proposal.startBlock,
+               );
+            } else {
+               votes = await Nouns.NounsToken.Contract.getCurrentVotes(
+                  GOVERNANCE_POOL_VOTING_ADDRESS,
+               );
+            }
             data.voteNumber = votes;
 
             sendToChannelFeeds('federationBidPlaced', data, client);
