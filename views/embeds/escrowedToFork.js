@@ -17,7 +17,7 @@ exports.generateEscrowedToForkEmbed = function (data) {
       `https://etherscan.io/address/${data.owner.id}`,
    );
    const tokenNumber = inlineCode(data.tokenIds.length);
-   const proposalDescription = `${owner} escrowed ${tokenNumber} tokens.`;
+   const proposalDescription = `${owner} escrowed ${tokenNumber} token(s).`;
    let proposalReason = '';
    if (data.reason.trim()) {
       proposalReason = '\n\n' + data.reason.trim();
