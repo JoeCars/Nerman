@@ -10,6 +10,8 @@ events.set('newProposalPoll', 'NermanPoll.NewProposalPoll');
 events.set('threadFeedbackSent', 'NermanPoll.ThreadFeedbackSent');
 events.set('threadStatusChange', 'NermanPoll.ThreadStatusChange');
 events.set('threadVote', 'NermanPoll.ThreadVote');
+events.set('threadFederationBidPlaced', 'NermanPoll.ThreadFederationBidPlaced');
+events.set('threadFederationVoteCast', 'NermanPoll.ThreadFederationVoteCast');
 
 // NounsDAOAuctions.
 events.set('auctionBid', 'NounsDAOAuctions.AuctionBid');

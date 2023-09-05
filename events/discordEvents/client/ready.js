@@ -99,6 +99,7 @@ module.exports = {
             data.nounsForumType = 'FederationBidPlaced';
 
             sendToChannelFeeds('federationBidPlaced', data, client);
+            sendToChannelFeeds('threadFederationBidPlaced', data, client);
             sendToNounsForum(data.propId, data, client);
          });
 
@@ -131,6 +132,7 @@ module.exports = {
             data.nounsForumType = 'FederationVoteCast';
 
             sendToChannelFeeds('federationVoteCast', data, client);
+            sendToChannelFeeds('threadFederationVoteCast', data, client);
             sendToNounsForum(data.propId, data, client);
          });
 
