@@ -481,6 +481,62 @@ module.exports = {
             sendToChannelFeeds('signatureAdded', data, client);
          });
 
+         // =============================================================
+         // Nouns DAO Fork
+         // =============================================================
+
+         Nouns.on('DAOWithdrawNounsFromEscrow', async data => {
+            Logger.info('ready.js: On WithdrawNounsFromEscrow', {
+               tokenIds: data.tokenIds,
+               to: data.to.id,
+            });
+
+            data.to.name =
+               (await Nouns.ensReverseLookup(data.to.id)) ??
+               (await shortenAddress(data.to.id));
+
+            sendToChannelFeeds('withdrawNounsFromEscrow', data, client);
+         });
+
+         Nouns.on('EscrowedToFork', async data => {
+            if (data.reason.length > REASON_LENGTH_LIMIT) {
+               data.reason =
+                  data.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            Logger.info('ready.js: On EscrowedToFork', {
+               forkId: data.forkId,
+               owner: data.owner.id,
+               tokenIds: data.tokenIds,
+               reason: data.reason,
+            });
+
+            data.owner.name =
+               (await Nouns.ensReverseLookup(data.owner.id)) ??
+               (await shortenAddress(data.owner.id));
+
+            sendToChannelFeeds('escrowedToFork', data, client);
+         });
+
+         Nouns.on('ExecuteFork', async data => {
+            Logger.info('ready.js: On ExecuteFork', {
+               forkId: data.forkId,
+               forkTreasury: data.forkTreasury.id,
+               forkToken: data.forkToken.id,
+               forkEndTimestamp: data.forkEndTimestamp,
+               tokensInEscrow: data.tokensInEscrow,
+            });
+
+            data.forkTreasury.name =
+               (await Nouns.ensReverseLookup(data.forkTreasury.id)) ??
+               (await shortenAddress(data.forkTreasury.id));
+            data.forkToken.name =
+               (await Nouns.ensReverseLookup(data.forkToken.id)) ??
+               (await shortenAddress(data.forkToken.id));
+
+            sendToChannelFeeds('executeFork', data, client);
+         });
+
          // *************************************************************
          //
          // EXAMPLE METADATA
