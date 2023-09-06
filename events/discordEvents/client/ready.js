@@ -77,13 +77,30 @@ module.exports = {
             data.proposalTitle = await fetchProposalTitle(data.propId);
 
             const GOVERNANCE_POOL_VOTING_ADDRESS = `0x6b2645b468A828a12fEA8C7D644445eB808Ec2B1`;
-            const voting = await Nouns.NounsDAO.Contract.getReceipt(
-               data.propId,
-               GOVERNANCE_POOL_VOTING_ADDRESS,
+            const currentBlock = await Nouns.provider.getBlockNumber();
+            const proposal = await Nouns.NounsDAO.Contract.proposals(
+               Number(data.propId),
             );
-            data.voteNumber = voting[2];
+
+            let votes = 0;
+            if (proposal.startBlock <= currentBlock) {
+               // Grabs vote at the snapshot.
+               votes = await Nouns.NounsToken.Contract.getPriorVotes(
+                  GOVERNANCE_POOL_VOTING_ADDRESS,
+                  proposal.startBlock,
+               );
+            } else {
+               votes = await Nouns.NounsToken.Contract.getCurrentVotes(
+                  GOVERNANCE_POOL_VOTING_ADDRESS,
+               );
+            }
+            data.voteNumber = votes;
+
+            data.nounsForumType = 'FederationBidPlaced';
 
             sendToChannelFeeds('federationBidPlaced', data, client);
+            sendToChannelFeeds('threadFederationBidPlaced', data, client);
+            sendToNounsForum(data.propId, data, client);
          });
 
          federationNounsPool.on('VoteCast', async data => {
@@ -110,10 +127,12 @@ module.exports = {
                data.propId,
                GOVERNANCE_POOL_VOTING_ADDRESS,
             );
-            data.voteNumber = voting[2];
-            data.nounsForumType = 'VoteCast';
+            data.voteNumber = voting.votes;
+
+            data.nounsForumType = 'FederationVoteCast';
 
             sendToChannelFeeds('federationVoteCast', data, client);
+            sendToChannelFeeds('threadFederationVoteCast', data, client);
             sendToNounsForum(data.propId, data, client);
          });
 
