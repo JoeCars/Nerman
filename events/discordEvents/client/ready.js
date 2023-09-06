@@ -31,7 +31,6 @@ module.exports = {
       );
 
       await require('../../../db/index.js')(client);
-      await require('../../../utils/remindSheet.js')(client);
 
       const _nerman = import('nerman');
 
