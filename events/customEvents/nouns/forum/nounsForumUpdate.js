@@ -52,6 +52,9 @@ module.exports = {
             embed = generateFederationVoteEmbed(data, propUrl);
             break;
          default:
+            Logger.error('events/nounsForumUpdate.js: Unknown data type.', {
+               data: data,
+            });
             throw new Error('Data does not match any known type.');
       }
 
