@@ -20,7 +20,7 @@ module.exports = {
 
       try {
          if (subCommand) {
-            commandName += `${interaction.commandName}.${subCommand}`;
+            commandName = `${interaction.commandName}.${subCommand}`;
             const subCommandGroup =
                interaction.options.getSubcommandGroup(false);
             if (subCommandGroup) {
