@@ -1,6 +1,6 @@
 const add = require('./add');
 module.exports = {
-   subCommand: 'nerman-feeds.add.nouns-dao-tokens',
+   subCommand: 'nerman-feeds.add.nouns-contracts',
    /**
     * @param {CommandInteraction} interaction
     */
