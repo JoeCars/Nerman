@@ -15,8 +15,29 @@ function filterEvent(group) {
       });
 }
 
+function filterNounsContractEvents() {
+   return [...events.entries()]
+      .filter(([key, value]) => {
+         const eventGroup = value.substring(0, 8);
+         return eventGroup === 'NounsDAO';
+      })
+      .map(([key, value]) => {
+         return [value, key];
+      });
+}
+
+function filterNounsOtherEvents() {
+   return [...events.entries()]
+      .filter(([key, value]) => {
+         const eventGroup = value.substring(0, 8);
+         return eventGroup !== 'NounsDAO';
+      })
+      .map(([key, value]) => {
+         return [value, key];
+      });
+}
+
 module.exports = {
-   // module.exports = {
    data: new SlashCommandBuilder()
       .setName('nerman-feeds')
       .setDescription(
@@ -28,10 +49,10 @@ module.exports = {
             .setDescription('Add an event configuration for the given channel.')
             .addSubcommand(subcommand => {
                return subcommand
-                  .setName('federation')
-                  .setDescription('Federation events.')
+                  .setName('nouns-contracts')
+                  .setDescription('Nouns contract events.')
                   .addStringOption(option => {
-                     const federationEvents = filterEvent('Federation');
+                     const federationEvents = filterNounsContractEvents();
                      return option
                         .setName('event')
                         .setDescription('The event to register.')
@@ -49,136 +70,10 @@ module.exports = {
             })
             .addSubcommand(subcommand => {
                return subcommand
-                  .setName('nerman-poll')
-                  .setDescription('NermanPoll events.')
+                  .setName('nouns-others')
+                  .setDescription('General nouns events.')
                   .addStringOption(option => {
-                     const federationEvents = filterEvent('NermanPoll');
-                     return option
-                        .setName('event')
-                        .setDescription('The event to register.')
-                        .setRequired(true)
-                        .addChoices(federationEvents);
-                  })
-                  .addChannelOption(option => {
-                     return option
-                        .setName('channel')
-                        .setDescription(
-                           'The channel that will receive the notifications.',
-                        )
-                        .setRequired(false);
-                  });
-            })
-            .addSubcommand(subcommand => {
-               return subcommand
-                  .setName('nouns-dao-auctions')
-                  .setDescription('NounsDAOAuctions events.')
-                  .addStringOption(option => {
-                     const federationEvents = filterEvent('NounsDAOAuctions');
-                     return option
-                        .setName('event')
-                        .setDescription('The event to register.')
-                        .setRequired(true)
-                        .addChoices(federationEvents);
-                  })
-                  .addChannelOption(option => {
-                     return option
-                        .setName('channel')
-                        .setDescription(
-                           'The channel that will receive the notifications.',
-                        )
-                        .setRequired(false);
-                  });
-            })
-            .addSubcommand(subcommand => {
-               return subcommand
-                  .setName('nouns-dao-tokens')
-                  .setDescription('NounsDAOTokens events.')
-                  .addStringOption(option => {
-                     const federationEvents = filterEvent('NounsDAOTokens');
-                     return option
-                        .setName('event')
-                        .setDescription('The event to register.')
-                        .setRequired(true)
-                        .addChoices(federationEvents);
-                  })
-                  .addChannelOption(option => {
-                     return option
-                        .setName('channel')
-                        .setDescription(
-                           'The channel that will receive the notifications.',
-                        )
-                        .setRequired(false);
-                  });
-            })
-            .addSubcommand(subcommand => {
-               return subcommand
-                  .setName('nouns-dao-proposals')
-                  .setDescription('NounsDAOProposals events.')
-                  .addStringOption(option => {
-                     const federationEvents = filterEvent('NounsDAOProposals');
-                     return option
-                        .setName('event')
-                        .setDescription('The event to register.')
-                        .setRequired(true)
-                        .addChoices(federationEvents);
-                  })
-                  .addChannelOption(option => {
-                     return option
-                        .setName('channel')
-                        .setDescription(
-                           'The channel that will receive the notifications.',
-                        )
-                        .setRequired(false);
-                  });
-            })
-            .addSubcommand(subcommand => {
-               return subcommand
-                  .setName('nouns-dao-candidates')
-                  .setDescription('NounsDAOCandidates events.')
-                  .addStringOption(option => {
-                     const federationEvents = filterEvent('NounsDAOCandidates');
-                     return option
-                        .setName('event')
-                        .setDescription('The event to register.')
-                        .setRequired(true)
-                        .addChoices(federationEvents);
-                  })
-                  .addChannelOption(option => {
-                     return option
-                        .setName('channel')
-                        .setDescription(
-                           'The channel that will receive the notifications.',
-                        )
-                        .setRequired(false);
-                  });
-            })
-            .addSubcommand(subcommand => {
-               return subcommand
-                  .setName('nouns-dao-fork')
-                  .setDescription('NounsDAOFork events.')
-                  .addStringOption(option => {
-                     const federationEvents = filterEvent('NounsDAOFork');
-                     return option
-                        .setName('event')
-                        .setDescription('The event to register.')
-                        .setRequired(true)
-                        .addChoices(federationEvents);
-                  })
-                  .addChannelOption(option => {
-                     return option
-                        .setName('channel')
-                        .setDescription(
-                           'The channel that will receive the notifications.',
-                        )
-                        .setRequired(false);
-                  });
-            })
-            .addSubcommand(subcommand => {
-               return subcommand
-                  .setName('nouns-nymz')
-                  .setDescription('NounsNymz events.')
-                  .addStringOption(option => {
-                     const federationEvents = filterEvent('NounsNymz');
+                     const federationEvents = filterNounsOtherEvents();
                      return option
                         .setName('event')
                         .setDescription('The event to register.')
