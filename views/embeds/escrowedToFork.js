@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { hyperlink, inlineCode } = require('@discordjs/builders');
+const { hyperlink, inlineCode, italic } = require('@discordjs/builders');
 
 const PROPOSAL_REASON_LENGTH = 1500;
 
@@ -24,11 +24,7 @@ exports.generateEscrowedToForkEmbed = function (data) {
    const tokenNumber = inlineCode(data.tokenIds.length);
    const escrowDescription = `${owner} escrowed ${tokenNumber} token(s).`;
 
-   const status = `\n\n${inlineCode(
-      data.currentEscrowAmount,
-   )} Nouns in escrow. ${inlineCode(
-      data.thresholdNumber,
-   )} total tokens needed to fork.`;
+   const status = italic(`\n\n${data.currentEscrowAmount} in escrow, ${data.currentPercentage}% of fork threshold.`);
 
    let escrowReason = '';
    if (data.reason.trim()) {
