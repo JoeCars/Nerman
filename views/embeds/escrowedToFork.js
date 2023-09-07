@@ -11,7 +11,7 @@ const PROPOSAL_REASON_LENGTH = 1500;
  * currentEscrowAmount: number,
  * totalSupply: number,
  * thresholdNumber, number,
- * currentPercentage: string
+ * currentPercentage: number
  * }} data
  */
 exports.generateEscrowedToForkEmbed = function (data) {
