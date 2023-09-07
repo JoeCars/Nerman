@@ -60,10 +60,6 @@ exports.fetchForumThread = async function fetchForumThread(
    }
 
    if (!thread) {
-      const proposal = await Proposal.findOne({
-         proposalId: parseInt(proposalId),
-      });
-
       const url = (await UrlConfig.fetchUrls(channel.guildId)).propUrl;
 
       let threadName = data.proposalTitle ?? `Proposal ${proposalId}`;
