@@ -533,6 +533,28 @@ module.exports = {
                (await Nouns.ensReverseLookup(data.owner.id)) ??
                (await shortenAddress(data.owner.id));
 
+            // Grabbing fork threshold numbers.
+            const ESCROW_PROXY = '0x44d97D22B3d37d837cE4b22773aAd9d1566055D9';
+            const currentEscrowAmount =
+               await Nouns.NounsToken.Contract.getCurrentVotes(ESCROW_PROXY);
+
+            const THRESHOLD_FRACTION = 0.2;
+            const totalSupply =
+               (await Nouns.NounsToken.Contract.totalSupply());
+            const thresholdNumber = Math.floor(
+               totalSupply * THRESHOLD_FRACTION,
+            );
+
+            const currentPercentage = (
+               (currentEscrowAmount / thresholdNumber) *
+               100
+            ).toFixed(2);
+
+            data.currentEscrowAmount = currentEscrowAmount;
+            data.totalSupply = totalSupply;
+            data.thresholdNumber = thresholdNumber;
+            data.currentPercentage = currentPercentage;
+
             sendToChannelFeeds('escrowedToFork', data, client);
          });
 
