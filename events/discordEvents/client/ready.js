@@ -539,11 +539,9 @@ module.exports = {
                await Nouns.NounsToken.Contract.getCurrentVotes(ESCROW_PROXY);
 
             const THRESHOLD_FRACTION = 0.2;
-            const totalSupply =
-               (await Nouns.NounsToken.Contract.totalSupply());
-            const thresholdNumber = Math.floor(
-               totalSupply * THRESHOLD_FRACTION,
-            );
+            const totalSupply = await Nouns.NounsToken.Contract.totalSupply();
+            const thresholdNumber =
+               Math.floor(totalSupply * THRESHOLD_FRACTION) + 1; // Must be strictly greater than thresholdFraction. Hence + 1.
 
             const currentPercentage = (
                (currentEscrowAmount / thresholdNumber) *
