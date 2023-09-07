@@ -12,7 +12,12 @@ module.exports = {
     * @param {{forkId: number,
     * owner: {id: string, name: string},
     * tokenIds: number[],
-    * reason: string}} data
+    * reason: string,
+    * currentEscrowAmount: number,
+    * totalSupply: number,
+    * thresholdNumber, number,
+    * currentPercentage: string
+    * }} data
     */
    async execute(channel, data) {
       try {
