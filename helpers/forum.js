@@ -66,8 +66,11 @@ exports.fetchForumThread = async function fetchForumThread(
 
       const url = (await UrlConfig.fetchUrls(channel.guildId)).propUrl;
 
+      let threadName = data.proposalTitle ?? `Proposal ${proposalId}`;
+      threadName = threadName.split(' ').slice(1).join(' '); // Removing 'Proposal'.
+
       thread = await channel.threads.create({
-         name: data.proposalTitle ?? `Proposal ${proposalId}`,
+         name: threadName,
          message: {
             content: hideLinkEmbed(`${url}${proposalId}`),
          },
