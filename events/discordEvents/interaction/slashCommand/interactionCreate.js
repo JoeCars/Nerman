@@ -1,7 +1,6 @@
 const Logger = require('../../../../helpers/logger');
 const { CommandInteraction } = require('discord.js');
 
-// todo I should probably split this so that slash commands and context menu commands are housed in separate places.
 module.exports = {
    name: 'interactionCreate',
    /**
@@ -12,38 +11,24 @@ module.exports = {
    async execute(interaction) {
       if (!interaction.isCommand() && !interaction.isContextMenu()) return;
 
-      Logger.info(
-         'events/interactionCreate.js: Handling an interaction creation event.',
-         {
-            interaction: interaction,
-         },
-      );
-
-      const { client } = interaction;
-
-      const command = client.commands.get(interaction.commandName);
-
+      const command = interaction.client.commands.get(interaction.commandName);
       if (!command) return;
-      // console.log(interaction.options.getSubcommand() ?? 'No subcommands');
-      const subCommand = interaction.options?.getSubcommand(false);
 
-      Logger.debug('events/interactionCreate.js: Checking subcommands.', {
-         interaction: interaction,
-         subCommand: subCommand,
-      });
+      let commandName = interaction.commandName;
+
+      const subCommand = interaction.options?.getSubcommand(false);
 
       try {
          if (subCommand) {
+            commandName = `${interaction.commandName}.${subCommand}`;
             const subCommandGroup =
                interaction.options.getSubcommandGroup(false);
-            let commandName = '';
             if (subCommandGroup) {
                commandName = `${interaction.commandName}.${subCommandGroup}.${subCommand}`;
-            } else {
-               commandName = `${interaction.commandName}.${subCommand}`;
             }
-            const subCommandFile = client.subCommands.get(commandName);
 
+            const subCommandFile =
+               interaction.client.subCommands.get(commandName);
             if (!subCommandFile) {
                throw Error('Invalid subcommand');
             }
@@ -51,14 +36,17 @@ module.exports = {
             await subCommandFile.execute(interaction);
          }
 
+         await command.execute(interaction);
+
          Logger.info(
-            'events/interactionCreate.js: Finished handling an interaction creation event.',
+            'events/interactionCreate.js: Finished executing interaction command.',
             {
-               interaction: interaction,
+               commandName: commandName,
+               channelId: interaction.channelId,
+               guildId: interaction.guildId,
+               userId: interaction.user.id,
             },
          );
-
-         await command.execute(interaction);
       } catch (error) {
          Logger.warn(
             'events/interactionCreate.js: Encountered an error. Attempting to defer.',
@@ -68,9 +56,6 @@ module.exports = {
          );
 
          if (interaction.deferred) {
-            Logger.info('events/interactionCreate.js: Deferred interaction.', {
-               interaction: interaction,
-            });
             await interaction.editReply({
                content:
                   error.message ||
@@ -78,12 +63,6 @@ module.exports = {
                ephemeral: true,
             });
          } else {
-            Logger.info(
-               'events/interactionCreate.js: Did not defer interaction.',
-               {
-                  interaction: interaction,
-               },
-            );
             await interaction.reply({
                content:
                   error.message ||

@@ -4,6 +4,7 @@ const PollChannel = require('../../../../db/schemas/PollChannel');
 const FeedConfig = require('../../../../db/schemas/FeedConfig');
 // const GuildConfig = require('../../db/schemas/GuildConfig');
 const Logger = require('../../../../helpers/logger');
+const events = require('../../../../utils/feedEvents');
 
 module.exports = {
    name: 'modalSubmit',
@@ -282,31 +283,23 @@ module.exports = {
 };
 
 async function registerForPollEvents(guildId, channelId) {
+   const pollEvents = [...events.entries()]
+      .filter(([key, value]) => {
+         return value.split('.')[0] === 'NermanPoll';
+      })
+      .map(([key, value]) => {
+         return key;
+      });
+
    try {
-      await FeedConfig.create({
-         _id: new Types.ObjectId(),
-         guildId: guildId,
-         channelId: channelId,
-         eventName: 'newProposalPoll',
-      });
-      await FeedConfig.create({
-         _id: new Types.ObjectId(),
-         guildId: guildId,
-         channelId: channelId,
-         eventName: 'threadVote',
-      });
-      await FeedConfig.create({
-         _id: new Types.ObjectId(),
-         guildId: guildId,
-         channelId: channelId,
-         eventName: 'threadStatusChange',
-      });
-      await FeedConfig.create({
-         _id: new Types.ObjectId(),
-         guildId: guildId,
-         channelId: channelId,
-         eventName: 'threadFeedbackSent',
-      });
+      for (let i = 0; i < pollEvents.length; ++i) {
+         await FeedConfig.create({
+            _id: new Types.ObjectId(),
+            guildId: guildId,
+            channelId: channelId,
+            eventName: pollEvents[i],
+         });
+      }
    } catch (error) {
       Logger.error(
          'events/discordEvents/interaction/modal/pollChannelSubmit.js: Unable to register poll events.',

@@ -5,15 +5,6 @@ const Logger = require('../../../helpers/logger');
 module.exports = {
    name: 'messageDelete',
    async execute(message) {
-      Logger.info(
-         'events/poll/pollMessageDelete.js: Attempting to delete poll.',
-         {
-            channelId: message.channelId,
-            guildId: message.guild.id,
-            messageId: message.id,
-         }
-      );
-
       const {
          client,
          channelId,
@@ -35,7 +26,7 @@ module.exports = {
                channelId: message.channelId,
                guildId: message.guild.id,
                messageId: message.id,
-            }
+            },
          );
          return;
       }
@@ -44,7 +35,7 @@ module.exports = {
       // const messagePoll = await Poll.findOneAndDelete({ messageId });
       const messagePoll = await Poll.findOneAndUpdate(
          { messageId, guildId },
-         { status: 'closed' }
+         { status: 'closed' },
       );
 
       client.emit('dequeuePoll', messagePoll);

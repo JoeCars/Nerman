@@ -31,7 +31,6 @@ module.exports = {
       );
 
       await require('../../../db/index.js')(client);
-      await require('../../../utils/remindSheet.js')(client);
 
       const _nerman = import('nerman');
 
@@ -77,13 +76,30 @@ module.exports = {
             data.proposalTitle = await fetchProposalTitle(data.propId);
 
             const GOVERNANCE_POOL_VOTING_ADDRESS = `0x6b2645b468A828a12fEA8C7D644445eB808Ec2B1`;
-            const voting = await Nouns.NounsDAO.Contract.getReceipt(
-               data.propId,
-               GOVERNANCE_POOL_VOTING_ADDRESS,
+            const currentBlock = await Nouns.provider.getBlockNumber();
+            const proposal = await Nouns.NounsDAO.Contract.proposals(
+               Number(data.propId),
             );
-            data.voteNumber = voting[2];
+
+            let votes = 0;
+            if (proposal.startBlock <= currentBlock) {
+               // Grabs vote at the snapshot.
+               votes = await Nouns.NounsToken.Contract.getPriorVotes(
+                  GOVERNANCE_POOL_VOTING_ADDRESS,
+                  proposal.startBlock,
+               );
+            } else {
+               votes = await Nouns.NounsToken.Contract.getCurrentVotes(
+                  GOVERNANCE_POOL_VOTING_ADDRESS,
+               );
+            }
+            data.voteNumber = votes;
+
+            data.nounsForumType = 'FederationBidPlaced';
 
             sendToChannelFeeds('federationBidPlaced', data, client);
+            sendToChannelFeeds('threadFederationBidPlaced', data, client);
+            sendToNounsForum(data.propId, data, client);
          });
 
          federationNounsPool.on('VoteCast', async data => {
@@ -110,10 +126,12 @@ module.exports = {
                data.propId,
                GOVERNANCE_POOL_VOTING_ADDRESS,
             );
-            data.voteNumber = voting[2];
-            data.nounsForumType = 'VoteCast';
+            data.voteNumber = voting.votes;
+
+            data.nounsForumType = 'FederationVoteCast';
 
             sendToChannelFeeds('federationVoteCast', data, client);
+            sendToChannelFeeds('threadFederationVoteCast', data, client);
             sendToNounsForum(data.propId, data, client);
          });
 
@@ -479,6 +497,62 @@ module.exports = {
             );
 
             sendToChannelFeeds('signatureAdded', data, client);
+         });
+
+         // =============================================================
+         // Nouns DAO Fork
+         // =============================================================
+
+         Nouns.on('DAOWithdrawNounsFromEscrow', async data => {
+            Logger.info('ready.js: On WithdrawNounsFromEscrow', {
+               tokenIds: data.tokenIds,
+               to: data.to.id,
+            });
+
+            data.to.name =
+               (await Nouns.ensReverseLookup(data.to.id)) ??
+               (await shortenAddress(data.to.id));
+
+            sendToChannelFeeds('withdrawNounsFromEscrow', data, client);
+         });
+
+         Nouns.on('EscrowedToFork', async data => {
+            if (data.reason.length > REASON_LENGTH_LIMIT) {
+               data.reason =
+                  data.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            Logger.info('ready.js: On EscrowedToFork', {
+               forkId: data.forkId,
+               owner: data.owner.id,
+               tokenIds: data.tokenIds,
+               reason: data.reason,
+            });
+
+            data.owner.name =
+               (await Nouns.ensReverseLookup(data.owner.id)) ??
+               (await shortenAddress(data.owner.id));
+
+            sendToChannelFeeds('escrowedToFork', data, client);
+         });
+
+         Nouns.on('ExecuteFork', async data => {
+            Logger.info('ready.js: On ExecuteFork', {
+               forkId: data.forkId,
+               forkTreasury: data.forkTreasury.id,
+               forkToken: data.forkToken.id,
+               forkEndTimestamp: data.forkEndTimestamp,
+               tokensInEscrow: data.tokensInEscrow,
+            });
+
+            data.forkTreasury.name =
+               (await Nouns.ensReverseLookup(data.forkTreasury.id)) ??
+               (await shortenAddress(data.forkTreasury.id));
+            data.forkToken.name =
+               (await Nouns.ensReverseLookup(data.forkToken.id)) ??
+               (await shortenAddress(data.forkToken.id));
+
+            sendToChannelFeeds('executeFork', data, client);
          });
 
          // *************************************************************
