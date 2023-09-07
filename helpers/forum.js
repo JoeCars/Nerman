@@ -60,24 +60,15 @@ exports.fetchForumThread = async function fetchForumThread(
    }
 
    if (!thread) {
-      const proposal = await Proposal.findOne({
-         proposalId: parseInt(proposalId),
-      });
-      let description = '';
-      if (proposal) {
-         description = proposal.description || data.description || '';
-      }
-      description =
-         description.replace(/\\n/g, '\n').replace(/!\[\]\(.+\)/g, link => {
-            return link.substring(4, link.length - 1);
-         }) + '...';
-
       const url = (await UrlConfig.fetchUrls(channel.guildId)).propUrl;
 
+      let threadName = data.proposalTitle ?? `Proposal ${proposalId}`;
+      threadName = threadName.split(' ').slice(1).join(' '); // Removing 'Proposal'.
+
       thread = await channel.threads.create({
-         name: data.proposalTitle ?? `Proposal ${proposalId}`,
+         name: threadName,
          message: {
-            content: `${description}\n${hideLinkEmbed(`${url}${proposalId}`)}`,
+            content: hideLinkEmbed(`${url}${proposalId}`),
          },
       });
       forum.threads.set(proposalId, thread.id);

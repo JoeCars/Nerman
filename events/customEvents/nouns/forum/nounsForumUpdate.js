@@ -35,6 +35,7 @@ module.exports = {
       switch (data.nounsForumType) {
          case 'PropVoteCast':
             embed = generatePropVoteCastEmbed(data, propUrl);
+            embed.title = null;
             break;
          case 'PropCreated':
             embed = generatePropCreatedEmbed(data, propUrl);
