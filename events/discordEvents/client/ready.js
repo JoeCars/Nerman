@@ -543,10 +543,9 @@ module.exports = {
             const thresholdNumber =
                Math.floor(totalSupply * THRESHOLD_FRACTION) + 1; // Must be strictly greater than thresholdFraction. Hence + 1.
 
-            const currentPercentage = (
-               (currentEscrowAmount / thresholdNumber) *
-               100
-            ).toFixed(2);
+            const currentPercentage = Math.floor(
+               (currentEscrowAmount / thresholdNumber) * 100,
+            );
 
             data.currentEscrowAmount = currentEscrowAmount;
             data.totalSupply = totalSupply;

@@ -16,7 +16,7 @@ module.exports = {
     * currentEscrowAmount: number,
     * totalSupply: number,
     * thresholdNumber, number,
-    * currentPercentage: string
+    * currentPercentage: number
     * }} data
     */
    async execute(channel, data) {

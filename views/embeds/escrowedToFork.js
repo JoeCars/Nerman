@@ -11,7 +11,7 @@ const PROPOSAL_REASON_LENGTH = 1500;
  * currentEscrowAmount: number,
  * totalSupply: number,
  * thresholdNumber, number,
- * currentPercentage: string
+ * currentPercentage: number
  * }} data
  */
 exports.generateEscrowedToForkEmbed = function (data) {
@@ -24,7 +24,9 @@ exports.generateEscrowedToForkEmbed = function (data) {
    const tokenNumber = inlineCode(data.tokenIds.length);
    const escrowDescription = `${owner} escrowed ${tokenNumber} token(s).`;
 
-   const status = italic(`\n\n${data.currentEscrowAmount} in escrow, ${data.currentPercentage}% of fork threshold.`);
+   const status = italic(
+      `\n\n${data.currentEscrowAmount} Nouns in escrow - ${data.currentPercentage}% of fork threshold.`,
+   );
 
    let escrowReason = '';
    if (data.reason.trim()) {
