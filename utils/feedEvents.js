@@ -37,6 +37,7 @@ events.set('signatureAdded', 'NounsDAOCandidates.SignatureAdded');
 // NounsDAOFork.
 events.set('escrowedToFork', 'NounsDAOFork.EscrowedToFork');
 events.set('executeFork', 'NounsDAOFork.ExecuteFork');
+events.set('joinFork', 'NounsDAOFork.JoinFork');
 events.set('withdrawNounsFromEscrow', 'NounsDAOFork.WithdrawNounsFromEscrow');
 
 // NounsDAOProposals.
