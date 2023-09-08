@@ -5,8 +5,7 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_PROPOSER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_PROPOSAL_TITLE = 'Blood For The Blood God';
-const DEFAULT_PROPOSAL_REASON =
-   'Turns out the Blood God was planning on destroying the planet, so we will not be feeding it after all.';
+const DEFAULT_PROPOSAL_REASON = '';
 
 module.exports = {
    data: new SlashCommandBuilder()

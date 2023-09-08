@@ -6,8 +6,7 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 const DEFAULT_FEEDBACKER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_PROPOSER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_PROPOSAL_TITLE = 'Death Star Construction';
-const DEFAULT_PROPOSAL_REASON =
-   'A giant super weapon with a built-in flaw sounds like a bad idea. We should really get that fixed before we built it.';
+const DEFAULT_PROPOSAL_REASON = '';
 const DEFAULT_VOTE_CHOICE = 0; // Against.
 
 module.exports = {

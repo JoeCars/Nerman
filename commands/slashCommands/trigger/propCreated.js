@@ -5,7 +5,7 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 const DEFAULT_PROPOSAL_NUMBER = 117;
 const DEFAULT_PROPOSAL_TITLE = 'Six Seasons And A Movie!';
 const DEFAULT_PROPOSER_WALLET = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
-const DEFAULT_PROPOSAL_DESCRIPTION = 'Cool. Cool cool cool.';
+const DEFAULT_PROPOSAL_DESCRIPTION = '';
 
 module.exports = {
    subCommand: 'nerman-trigger.prop-created',
