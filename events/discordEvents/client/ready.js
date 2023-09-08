@@ -574,6 +574,22 @@ module.exports = {
             sendToChannelFeeds('executeFork', data, client);
          });
 
+         Nouns.on('JoinFork', async data => {
+            Logger.info('ready.js: On JoinFork', {
+               forkId: data.forkId,
+               owner: data.owner.id,
+               numOfTokens: data.tokenIds.length,
+               numOfProposalIds: data.proposalIds.length,
+               reason: data.data.reason,
+            });
+
+            data.owner.name =
+               (await Nouns.ensReverseLookup(data.owner.id)) ??
+               (await shortenAddress(data.owner.id));
+
+            sendToChannelFeeds('joinFork', data, client);
+         });
+
          // *************************************************************
          //
          // EXAMPLE METADATA
