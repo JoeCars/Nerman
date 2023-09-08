@@ -14,13 +14,13 @@ module.exports = {
          return option
             .setName('withdrawer-address')
             .setDescription('The withdrawer address.')
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addNumberOption(option => {
          return option
             .setName('token-number')
             .setDescription('The number of tokens being escrowed.')
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       }),
 
    /**
