@@ -580,7 +580,7 @@ module.exports = {
                owner: data.owner.id,
                numOfTokens: data.tokenIds.length,
                numOfProposalIds: data.proposalIds.length,
-               reason: data.data.reason,
+               reason: data.reason,
             });
 
             data.owner.name =
