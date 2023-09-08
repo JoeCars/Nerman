@@ -3,9 +3,9 @@ const Logger = require('../../../helpers/logger');
 const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_PROPOSAL_TITLE = 'Experience';
-const DEFAULT_PROPOSAL_REASON = 'In my book, experience outranks everything.';
 const DEFAULT_PROPOSER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_SIGNER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
+const DEFAULT_PROPOSAL_REASON = '';
 
 module.exports = {
    subCommand: 'nerman-trigger.signature-added',
