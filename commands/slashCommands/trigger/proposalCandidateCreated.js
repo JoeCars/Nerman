@@ -4,8 +4,7 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_PROPOSAL_TITLE = 'Dear Humanity';
 const DEFAULT_PROPOSER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
-const DEFAULT_PROPOSAL_DESCRIPTION =
-   'We regret being alien bastards. We regret coming to Earth. And we most definitely regret that the Corps just blew up our raggedy-ass fleet!';
+const DEFAULT_PROPOSAL_DESCRIPTION = '';
 
 module.exports = {
    subCommand: 'nerman-trigger.proposal-candidate-created',

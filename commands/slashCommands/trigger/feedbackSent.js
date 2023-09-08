@@ -5,8 +5,7 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_FEEDBACKER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_PROPOSAL_NUMBER = 117;
-const DEFAULT_PROPOSAL_REASON =
-   'The Covenant pose a threat, and the spartans are the only ones who can stop them.';
+const DEFAULT_PROPOSAL_REASON = '';
 const DEFAULT_VOTE_CHOICE = 1; // For.
 
 module.exports = {

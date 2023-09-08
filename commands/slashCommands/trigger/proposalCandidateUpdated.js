@@ -5,8 +5,7 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_PROPOSER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_PROPOSAL_TITLE = 'Cheese For The Cheese God';
-const DEFAULT_PROPOSAL_REASON =
-   'Turns out the moon is not actually made of cheese, so we have worked hard to find another source of cheese.';
+const DEFAULT_PROPOSAL_REASON = '';
 
 module.exports = {
    data: new SlashCommandBuilder()
