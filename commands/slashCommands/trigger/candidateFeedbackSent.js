@@ -67,7 +67,7 @@ module.exports = {
       const proposalReason =
          interaction.options.getString('reason') ?? DEFAULT_PROPOSAL_REASON;
       const voteChoice =
-         interaction.options.getString('vote-choice') ?? DEFAULT_VOTE_CHOICE;
+         interaction.options.getNumber('vote-choice') ?? DEFAULT_VOTE_CHOICE;
 
       const Nouns = interaction.client.libraries.get('Nouns');
       Nouns.trigger('CandidateFeedbackSent', {
