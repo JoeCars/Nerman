@@ -15,13 +15,13 @@ module.exports = {
          return option
             .setName('proposer-address')
             .setDescription("The proposer's wallet address.")
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addStringOption(option => {
          return option
             .setName('proposal-title')
             .setDescription("The proposal's title.")
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addStringOption(option => {
          return option

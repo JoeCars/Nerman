@@ -16,19 +16,19 @@ module.exports = {
          return option
             .setName('fork-id')
             .setDescription('The fork id.')
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addStringOption(option => {
          return option
             .setName('owner-address')
             .setDescription("The owner's address.")
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addNumberOption(option => {
          return option
             .setName('token-number')
             .setDescription('The number of tokens being escrowed.')
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addStringOption(option => {
          return option

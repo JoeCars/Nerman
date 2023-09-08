@@ -16,30 +16,31 @@ module.exports = {
          return option
             .setName('feedbacker-address')
             .setDescription("The feedbacker's wallet address.")
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addNumberOption(option => {
          return option
             .setName('proposal-number')
             .setDescription("The proposal's number.")
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
+      })
+
+      .addNumberOption(option => {
+         return option
+            .setName('vote-choice')
+            .setDescription('The side being voted for.')
+            .setRequired(process.env.DEPLOY_STAGE !== 'development')
+            .addChoices([
+               ['Against', 0],
+               ['For', 1],
+               ['Abstain', 2],
+            ]);
       })
       .addStringOption(option => {
          return option
             .setName('reason')
             .setDescription('The reason for the feedback.')
             .setRequired(false);
-      })
-      .addNumberOption(option => {
-         return option
-            .setName('vote-choice')
-            .setDescription('The side being voted for.')
-            .setRequired(false)
-            .addChoices([
-               ['Against', 0],
-               ['For', 1],
-               ['Abstain', 2],
-            ]);
       }),
 
    /**
