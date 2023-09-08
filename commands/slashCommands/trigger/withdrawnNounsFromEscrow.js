@@ -30,7 +30,7 @@ module.exports = {
       await authorizeInteraction(interaction, 4);
 
       const withdrawerAddress =
-         interaction.options.getNumber('withdrawer-address') ?? DEFAULT_ADDRESS;
+         interaction.options.getString('withdrawer-address') ?? DEFAULT_ADDRESS;
       const tokenNumber =
          interaction.options.getNumber('token-number') ?? DEFAULT_TOKEN_NUMBER;
 
