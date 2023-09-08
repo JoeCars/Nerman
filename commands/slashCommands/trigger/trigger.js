@@ -22,19 +22,19 @@ module.exports = {
                return option
                   .setName('bidder-address')
                   .setDescription("The bidder's wallet address.")
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addNumberOption(option => {
                return option
                   .setName('ethereum-amount')
                   .setDescription('The amount of Eth being bid.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addNumberOption(option => {
                return option
                   .setName('noun-number')
                   .setDescription('The noun being bid on.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             });
       })
       .addSubcommand(subcommand => {
@@ -45,7 +45,7 @@ module.exports = {
                return option
                   .setName('noun-number')
                   .setDescription('The noun being auctioned.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             });
       })
       .addSubcommand(subcommand => {
@@ -56,19 +56,19 @@ module.exports = {
                return option
                   .setName('delegator-id')
                   .setDescription("The delegator's wallet address.")
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('new-delegate-id')
                   .setDescription("The new delegate's wallet address.")
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addNumberOption(option => {
                return option
                   .setName('nouns-transferred')
                   .setDescription('The number of nouns being transferred.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             });
       })
       .addSubcommand(subcommand => {
@@ -79,7 +79,7 @@ module.exports = {
                return option
                   .setName('noun-id')
                   .setDescription('The noun created.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             });
       })
       .addSubcommand(subcommand => {
@@ -90,19 +90,19 @@ module.exports = {
                return option
                   .setName('proposal-number')
                   .setDescription('The proposal number.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('proposal-title')
                   .setDescription('The proposal title.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('proposer-wallet')
                   .setDescription("The proposer's wallet address.")
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
@@ -119,13 +119,13 @@ module.exports = {
                return option
                   .setName('proposal-number')
                   .setDescription('The proposal number.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('proposal-status')
                   .setDescription('The proposal status.')
-                  .setRequired(false)
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development')
                   .addChoices([
                      ['Canceled', 'Canceled'],
                      ['Queued', 'Queued'],
@@ -142,25 +142,25 @@ module.exports = {
                return option
                   .setName('proposal-number')
                   .setDescription('The proposal number.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('voter-wallet')
                   .setDescription('The voter wallet id.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addNumberOption(option => {
                return option
                   .setName('vote-number')
                   .setDescription('The number of votes.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addNumberOption(option => {
                return option
                   .setName('vote-choice')
                   .setDescription('The vote choice.')
-                  .setRequired(false)
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development')
                   .addChoices([
                      ['Against', 0],
                      ['For', 1],
@@ -182,19 +182,19 @@ module.exports = {
                return option
                   .setName('noun-number')
                   .setDescription('The noun number.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('from-wallet')
                   .setDescription('The wallet of the old owner.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('to-wallet')
                   .setDescription('The wallet of the new owner.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             });
       })
       .addSubcommand(subcommand => {
@@ -205,13 +205,13 @@ module.exports = {
                return option
                   .setName('is-doxed')
                   .setDescription('Set whether the user is doxed or not.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('post-title')
                   .setDescription('The post title.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addBooleanOption(option => {
                return option
@@ -219,25 +219,25 @@ module.exports = {
                   .setDescription(
                      'Set whether the post is a reply or an original post.',
                   )
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('post-id')
                   .setDescription('The post id.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('user-id')
                   .setDescription('The user id.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('body')
                   .setDescription('The body of the post.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             });
       })
       .addSubcommand(subcommand => {
@@ -248,13 +248,13 @@ module.exports = {
                return option
                   .setName('proposal-number')
                   .setDescription('The proposal being bid on.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addNumberOption(option => {
                return option
                   .setName('vote-choice')
                   .setDescription('The side being bid for.')
-                  .setRequired(false)
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development')
                   .addChoices([
                      ['Against', 0],
                      ['For', 1],
@@ -265,13 +265,13 @@ module.exports = {
                return option
                   .setName('ethereum-amount')
                   .setDescription('The amount of Eth being bid.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('bidder-address')
                   .setDescription("The bidder's wallet address.")
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
@@ -288,13 +288,13 @@ module.exports = {
                return option
                   .setName('proposal-number')
                   .setDescription('The proposal being bid on.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addNumberOption(option => {
                return option
                   .setName('vote-choice')
                   .setDescription('The side being bid for.')
-                  .setRequired(false)
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development')
                   .addChoices([
                      ['Against', 0],
                      ['For', 1],
@@ -305,13 +305,13 @@ module.exports = {
                return option
                   .setName('ethereum-amount')
                   .setDescription('The amount of Eth being bid.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addStringOption(option => {
                return option
                   .setName('bidder-address')
                   .setDescription("The bidder's wallet address.")
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             });
       })
       .addSubcommand(subcommand => {
@@ -322,19 +322,19 @@ module.exports = {
                return option
                   .setName('bidder-address')
                   .setDescription("The bidder's wallet address.")
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addNumberOption(option => {
                return option
                   .setName('ethereum-amount')
                   .setDescription('The amount of Eth being bid.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             })
             .addNumberOption(option => {
                return option
                   .setName('noun-number')
                   .setDescription('The noun being bid on.')
-                  .setRequired(false);
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             });
       }),
 

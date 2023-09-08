@@ -14,13 +14,13 @@ module.exports = {
          return option
             .setName('withdrawer-address')
             .setDescription('The withdrawer address.')
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addNumberOption(option => {
          return option
             .setName('token-number')
             .setDescription('The number of tokens being escrowed.')
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       }),
 
    /**
@@ -30,7 +30,7 @@ module.exports = {
       await authorizeInteraction(interaction, 4);
 
       const withdrawerAddress =
-         interaction.options.getNumber('withdrawer-address') ?? DEFAULT_ADDRESS;
+         interaction.options.getString('withdrawer-address') ?? DEFAULT_ADDRESS;
       const tokenNumber =
          interaction.options.getNumber('token-number') ?? DEFAULT_TOKEN_NUMBER;
 

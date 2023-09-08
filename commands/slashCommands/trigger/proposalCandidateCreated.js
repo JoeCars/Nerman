@@ -1,14 +1,34 @@
 const { CommandInteraction } = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const Logger = require('../../../helpers/logger');
 const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_PROPOSAL_TITLE = 'Dear Humanity';
 const DEFAULT_PROPOSER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
-const DEFAULT_PROPOSAL_DESCRIPTION =
-   'We regret being alien bastards. We regret coming to Earth. And we most definitely regret that the Corps just blew up our raggedy-ass fleet!';
+const DEFAULT_PROPOSAL_DESCRIPTION = '';
 
 module.exports = {
-   subCommand: 'nerman-trigger.proposal-candidate-created',
+   data: new SlashCommandBuilder()
+      .setName('trigger-candidate-created')
+      .setDescription('Trigger a proposal candidate created event.')
+      .addStringOption(option => {
+         return option
+            .setName('proposer-address')
+            .setDescription("The proposer's wallet address.")
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
+      })
+      .addStringOption(option => {
+         return option
+            .setName('title')
+            .setDescription("The proposal's title.")
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
+      })
+      .addStringOption(option => {
+         return option
+            .setName('description')
+            .setDescription('The proposal description.')
+            .setRequired(false);
+      }),
 
    /**
     * @param {CommandInteraction} interaction

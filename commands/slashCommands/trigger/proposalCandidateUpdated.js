@@ -5,8 +5,7 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_PROPOSER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_PROPOSAL_TITLE = 'Cheese For The Cheese God';
-const DEFAULT_PROPOSAL_REASON =
-   'Turns out the moon is not actually made of cheese, so we have worked hard to find another source of cheese.';
+const DEFAULT_PROPOSAL_REASON = '';
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -16,13 +15,13 @@ module.exports = {
          return option
             .setName('proposer-address')
             .setDescription("The proposer's wallet address.")
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addStringOption(option => {
          return option
             .setName('proposal-title')
             .setDescription("The proposal's title.")
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addStringOption(option => {
          return option

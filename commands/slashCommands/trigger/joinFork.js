@@ -4,26 +4,38 @@ const Logger = require('../../../helpers/logger');
 const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_FORK_ID = 0;
-const DEFAULT_TOKEN_NUMBER = 69;
 const DEFAULT_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
+const DEFAULT_TOKEN_NUMBER = 117;
+const DEFAULT_REASON = '';
 
 module.exports = {
    data: new SlashCommandBuilder()
-      .setName('trigger-execute-fork')
-      .setDescription('Trigger an execute fork event.')
+      .setName('trigger-join-fork')
+      .setDescription('Trigger a joinFork event.')
       .addNumberOption(option => {
          return option
             .setName('fork-id')
             .setDescription('The fork id.')
             .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
+      .addStringOption(option => {
+         return option
+            .setName('owner-address')
+            .setDescription('The owner address.')
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
+      })
       .addNumberOption(option => {
          return option
             .setName('token-number')
-            .setDescription('The number of tokens being escrowed.')
+            .setDescription('The number of tokens joining.')
             .setRequired(process.env.DEPLOY_STAGE !== 'development');
+      })
+      .addStringOption(option => {
+         return option
+            .setName('reason')
+            .setDescription('The reason.')
+            .setRequired(false);
       }),
-
    /**
     * @param {CommandInteraction} interaction
     */
@@ -32,24 +44,28 @@ module.exports = {
 
       const forkId =
          interaction.options.getNumber('fork-id') ?? DEFAULT_FORK_ID;
+      const ownerAddress =
+         interaction.options.getString('owner-address') ?? DEFAULT_ADDRESS;
       const tokenNumber =
          interaction.options.getNumber('token-number') ?? DEFAULT_TOKEN_NUMBER;
+      const reason = interaction.options.getString('reason') ?? DEFAULT_REASON;
 
       const Nouns = interaction.client.libraries.get('Nouns');
-      Nouns.trigger('ExecuteFork', {
+      Nouns.trigger('JoinFork', {
          forkId: forkId,
-         forkTreasury: { id: DEFAULT_ADDRESS },
-         forkToken: { id: DEFAULT_ADDRESS },
-         tokensInEscrow: tokenNumber,
+         owner: { id: ownerAddress },
+         tokenIds: new Array(tokenNumber),
+         proposalIds: [],
+         reason: reason,
       });
 
       interaction.reply({
          ephemeral: true,
-         content: 'Triggered a ExecuteFork event.',
+         content: 'Triggered a JoinFork event.',
       });
 
       Logger.info(
-         'commands/trigger/executeFork.js: A ExecuteFork event has been triggered.',
+         'commands/trigger/joinFork.js: A JoinFork event has been triggered.',
          {
             guildId: interaction.guildId,
             channelId: interaction.channelId,

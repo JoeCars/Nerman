@@ -6,8 +6,7 @@ const { authorizeInteraction } = require('../../../helpers/authorization');
 const DEFAULT_FORK_ID = 0;
 const DEFAULT_OWNER_ADDRESS = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_TOKEN_NUMBER = 2;
-const DEFAULT_REASON =
-   "Fork you, fork you, and fork you! Fork all of you! Except Nerman. Nerman's chill.";
+const DEFAULT_REASON = '';
 
 module.exports = {
    data: new SlashCommandBuilder()
@@ -17,19 +16,19 @@ module.exports = {
          return option
             .setName('fork-id')
             .setDescription('The fork id.')
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addStringOption(option => {
          return option
             .setName('owner-address')
             .setDescription("The owner's address.")
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addNumberOption(option => {
          return option
             .setName('token-number')
             .setDescription('The number of tokens being escrowed.')
-            .setRequired(false);
+            .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addStringOption(option => {
          return option
