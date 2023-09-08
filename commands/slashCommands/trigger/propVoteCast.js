@@ -6,7 +6,7 @@ const DEFAULT_PROPOSAL_NUMBER = 117;
 const DEFAULT_VOTER_ID = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_VOTES = 42;
 const DEFAULT_AGAINST_CHOICE = 0; // Against.
-const DEFAULT_REASON = '.';
+const DEFAULT_REASON = '';
 
 module.exports = {
    subCommand: 'nerman-trigger.prop-vote-cast',
