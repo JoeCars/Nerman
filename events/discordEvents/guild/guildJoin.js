@@ -34,13 +34,10 @@ module.exports = {
             );
             gConfigDoc =
                (await GuildConfig.findGuildConfig(guildId)) ??
-               (await GuildConfig.create(
-                  {
-                     _id: new Types.ObjectId(),
-                     guildId,
-                  },
-                  { new: true },
-               ));
+               (await GuildConfig.create({
+                  _id: new Types.ObjectId(),
+                  guildId: guildId,
+               }));
             Logger.info(
                'events/guild/guildJoin.js: gConfigDoc created, new Doc => ',
                { gConfigDoc },
