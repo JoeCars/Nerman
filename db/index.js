@@ -30,7 +30,10 @@ module.exports = async client => {
    };
 
    // Turn off auto indexing in production, because it's expensive on performance
-   if (process.env.DEPLOY_STAGE === 'production') {
+   if (
+      process.env.DEPLOY_STAGE === 'production' ||
+      process.env.DEPLOY_STAGE === 'staging'
+   ) {
       options.autoIndex = false;
       options.keepAlive = true; // this is true by default since v5.2.0 but keeping it as a reminder
       options.keepAliveInitialDelay = 300000;
