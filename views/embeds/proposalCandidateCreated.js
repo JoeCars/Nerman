@@ -23,17 +23,23 @@ exports.generateProposalCandidateCreatedEmbed = function (proposal) {
    }
 
    const titleEndIndex = proposal.description.indexOf('\n');
-   const proposalDescription =
-      proposal.description
-         .substring(titleEndIndex, titleEndIndex + PROPOSAL_DESCRIPTION_LENGTH)
-         .trim() + '...';
+
+   let proposalDescription = proposal.description
+      .substring(titleEndIndex)
+      .trim();
+   if (proposalDescription.length > PROPOSAL_DESCRIPTION_LENGTH) {
+      proposalDescription =
+         proposalDescription.substring(0, PROPOSAL_DESCRIPTION_LENGTH).trim() + '...';
+   }
+   if (proposalDescription) {
+      proposalDescription = `\n\n${codeBlock(proposalDescription)}`;
+   }
+
    const proposer = hyperlink(
       proposal.msgSender.name,
       `https://etherscan.io/address/${proposal.msgSender.id}`,
    );
-   const description = `Proposed by ${proposer}\n\n${codeBlock(
-      proposalDescription,
-   )}`;
+   const description = `Proposed by ${proposer}` + proposalDescription;
 
    const url = `https://nouns.wtf/candidates/${proposal.msgSender.id.toLowerCase()}-${
       proposal.slug
