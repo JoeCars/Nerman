@@ -33,7 +33,7 @@ exports.generateJoinForkEmbed = function (data) {
    }
 
    const description =
-      `${owner} joined ${fork} with ${tokens} tokens.` + reason;
+      `${owner} joined ${fork} with ${tokens} token(s).` + reason;
 
    const embed = new MessageEmbed()
       .setColor('#00FFFF')
