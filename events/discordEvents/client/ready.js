@@ -46,6 +46,9 @@ module.exports = {
          );
          client.libraries.set('FederationNounsPool', federationNounsPool);
 
+         const nounsFork = new nerman.NounsForkToken(Nouns.provider);
+         client.libraries.set('NounsFork', nounsFork);
+
          const {
             guilds: { cache: guildCache },
          } = client;
@@ -588,6 +591,27 @@ module.exports = {
                (await shortenAddress(data.owner.id));
 
             sendToChannelFeeds('joinFork', data, client);
+         });
+
+         // =============================================================
+         // Nouns Fork Tokens
+         // =============================================================
+
+         nounsFork.on('Transfer', async data => {
+            Logger.info('ready.js: On ForkTransfer', {
+               from: data.from.id,
+               to: data.to.id,
+               tokenId: data.tokenId,
+            });
+
+            data.from.name =
+               (await Nouns.ensReverseLookup(data.from.id)) ??
+               (await shortenAddress(data.from.id));
+            data.to.name =
+               (await Nouns.ensReverseLookup(data.to.id)) ??
+               (await shortenAddress(data.to.id));
+
+            sendToChannelFeeds('transferForkNoun', data, client);
          });
 
          // *************************************************************
