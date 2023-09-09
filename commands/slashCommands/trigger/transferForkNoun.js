@@ -41,7 +41,7 @@ module.exports = {
       const newId =
          interaction.options.getString('to-wallet') ?? DEFAULT_NEW_OWNER_ID;
       const transferNoun =
-         interaction.options.getNumber('transfer-noun') ?? DEFAULT_NOUN_NUMBER;
+         interaction.options.getNumber('noun-number') ?? DEFAULT_NOUN_NUMBER;
 
       const Nouns = interaction.client.libraries.get('NounsFork');
       Nouns.emit('Transfer', {
