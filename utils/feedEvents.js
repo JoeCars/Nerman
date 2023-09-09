@@ -53,6 +53,9 @@ events.set('delegateChangedNoZero', 'NounsDAOTokens.DelegateChangedNoZero');
 events.set('nounCreated', 'NounsDAOTokens.NounCreated');
 events.set('transferNoun', 'NounsDAOTokens.TransferNoun');
 
+// NounsForkTokens.
+events.set('transferForkNoun', 'NounsForkTokens.TransferForkNoun');
+
 // NounsNymz.
 events.set('newPost', 'NounsNymz.NewPost');
 
