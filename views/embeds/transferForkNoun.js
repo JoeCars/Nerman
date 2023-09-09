@@ -11,7 +11,7 @@ const DEFAULT_MINT_ID = '0x0000000000000000000000000000000000000000';
  *    tokenId: string}} data
  * @param {boolean} hasMarkdown
  */
-exports.generateTransferNounEmbed = function (data, hasMarkdown = true) {
+exports.generateTransferForkNounEmbed = function (data, hasMarkdown = true) {
    let title = `Transfer | Noun ${data.tokenId}`;
    if (data.from.id === data.to.id) {
       title = `Stanky Shameless Washing | Noun ${data.tokenId}`;
