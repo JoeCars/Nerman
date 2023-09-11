@@ -614,6 +614,28 @@ module.exports = {
                (await Nouns.ensReverseLookup(data.toDelegate.id)) ??
                (await shortenAddress(data.toDelegate.id));
 
+            let numOfVotesChanged = 0;
+            try {
+               // The number of votes being changes is stored in receipt logs index 1 and 2.
+               // It is formatted as a single hex, where the first 64 digits after 0x is the previous vote count.
+               // And the second 64 digits after 0x is the new vote count of the delegate.
+               // To see this in detail, follow the link of the delegate changed event and check the receipt logs.
+               const event = data.event;
+               const receipt = await event.getTransactionReceipt();
+               if (receipt.logs[1]) {
+                  const hexData = receipt.logs[1].data;
+                  numOfVotesChanged = extractVoteChange(hexData);
+               }
+            } catch (error) {
+               Logger.error(
+                  "events/discordEvents/client/ready.js: On ForkDelegateChanged. There's been an error.",
+                  {
+                     error: error,
+                  },
+               );
+            }
+            data.numOfVotesChanged = numOfVotesChanged;
+
             sendToChannelFeeds('forkDelegateChanged', data, client);
          });
 
