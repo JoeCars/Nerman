@@ -597,6 +597,40 @@ module.exports = {
          // Nouns Fork Tokens
          // =============================================================
 
+         nounsFork.on('DelegateChanged', async data => {
+            Logger.info('ready.js: On ForkDelegateChanged', {
+               delegator: data.delegator.id,
+               fromDelegate: data.fromDelegate.id,
+               toDelegate: data.toDelegate.id,
+            });
+
+            data.delegator.name =
+               (await Nouns.ensReverseLookup(data.delegator.id)) ??
+               (await shortenAddress(data.delegator.id));
+            data.fromDelegate.name =
+               (await Nouns.ensReverseLookup(data.fromDelegate.id)) ??
+               (await shortenAddress(data.fromDelegate.id));
+            data.toDelegate.name =
+               (await Nouns.ensReverseLookup(data.toDelegate.id)) ??
+               (await shortenAddress(data.toDelegate.id));
+
+            sendToChannelFeeds('forkDelegateChanged', data, client);
+         });
+
+         nounsFork.on('DelegateVotesChanged', async data => {
+            Logger.info('ready.js: On ForkDelegateVotesChanged', {
+               delegate: data.delegate.id,
+               previousBalance: data.previousBalance,
+               newBalance: data.newBalance,
+            });
+
+            data.delegate.name =
+               (await Nouns.ensReverseLookup(data.delegate.id)) ??
+               (await shortenAddress(data.delegate.id));
+
+            sendToChannelFeeds('forkDelegateVotesChanged', data, client);
+         });
+
          nounsFork.on('Transfer', async data => {
             Logger.info('ready.js: On ForkTransfer', {
                from: data.from.id,
@@ -612,6 +646,14 @@ module.exports = {
                (await shortenAddress(data.to.id));
 
             sendToChannelFeeds('transferForkNoun', data, client);
+         });
+
+         nounsFork.on('NounCreated', async data => {
+            Logger.info('ready.js: On ForkNounCreated', {
+               id: data.id,
+            });
+
+            sendToChannelFeeds('forkNounCreated', data, client);
          });
 
          // *************************************************************
