@@ -639,20 +639,6 @@ module.exports = {
             sendToChannelFeeds('forkDelegateChanged', data, client);
          });
 
-         nounsFork.on('DelegateVotesChanged', async data => {
-            Logger.info('ready.js: On ForkDelegateVotesChanged', {
-               delegate: data.delegate.id,
-               previousBalance: data.previousBalance,
-               newBalance: data.newBalance,
-            });
-
-            data.delegate.name =
-               (await Nouns.ensReverseLookup(data.delegate.id)) ??
-               (await shortenAddress(data.delegate.id));
-
-            sendToChannelFeeds('forkDelegateVotesChanged', data, client);
-         });
-
          nounsFork.on('Transfer', async data => {
             Logger.info('ready.js: On ForkTransfer', {
                from: data.from.id,
