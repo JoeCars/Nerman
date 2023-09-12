@@ -23,7 +23,10 @@ exports.generateDelegateChangedEmbed = function (data, hasMarkdown = true) {
 
    const message = `${delegator} delegated ${voteCount} votes to ${newDelegate}.`;
 
-   const embed = new MessageEmbed().setTitle(title).setDescription(message);
+   const embed = new MessageEmbed()
+      .setTitle(title)
+      .setColor('#00FFFF')
+      .setDescription(message);
 
    if (hasMarkdown) {
       embed.setURL(titleUrl);
