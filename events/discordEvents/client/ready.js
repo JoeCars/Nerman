@@ -414,6 +414,7 @@ module.exports = {
             data.nounsForumType = 'CandidateFeedbackSent';
 
             sendToChannelFeeds('candidateFeedbackSent', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('FeedbackSent', async data => {
@@ -450,6 +451,7 @@ module.exports = {
             data.nounsForumType = 'ProposalCandidateCanceled';
 
             sendToChannelFeeds('proposalCandidateCanceled', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('ProposalCandidateCreated', async data => {
@@ -467,6 +469,7 @@ module.exports = {
             data.nounsForumType = 'ProposalCandidateCreated';
 
             sendToChannelFeeds('proposalCandidateCreated', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('ProposalCandidateUpdated', async data => {
@@ -483,6 +486,7 @@ module.exports = {
             data.nounsForumType = 'ProposalCandidateUpdated';
 
             sendToChannelFeeds('proposalCandidateUpdated', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('SignatureAdded', async data => {
@@ -509,6 +513,7 @@ module.exports = {
             data.nounsForumType = 'SignatureAdded';
 
             sendToChannelFeeds('signatureAdded', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          // =============================================================
