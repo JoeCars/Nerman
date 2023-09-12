@@ -10,6 +10,7 @@ const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
 const {
    fetchForumChannel,
    fetchForumThread,
+   fetchCandidateForumThread,
 } = require('../../../helpers/forum');
 const Proposal = require('../../../db/schemas/Proposal');
 
@@ -410,8 +411,10 @@ module.exports = {
                (await Nouns.ensReverseLookup(data.proposer.id)) ??
                (await shortenAddress(data.proposer.id));
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.nounsForumType = 'CandidateFeedbackSent';
 
             sendToChannelFeeds('candidateFeedbackSent', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('FeedbackSent', async data => {
@@ -444,8 +447,11 @@ module.exports = {
             data.msgSender.name =
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
+            data.proposer = data.msgSender;
+            data.nounsForumType = 'ProposalCandidateCanceled';
 
             sendToChannelFeeds('proposalCandidateCanceled', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('ProposalCandidateCreated', async data => {
@@ -459,8 +465,11 @@ module.exports = {
             data.msgSender.name =
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
+            data.proposer = data.msgSender;
+            data.nounsForumType = 'ProposalCandidateCreated';
 
             sendToChannelFeeds('proposalCandidateCreated', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('ProposalCandidateUpdated', async data => {
@@ -473,8 +482,11 @@ module.exports = {
             data.msgSender.name =
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
+            data.proposer = data.msgSender;
+            data.nounsForumType = 'ProposalCandidateUpdated';
 
             sendToChannelFeeds('proposalCandidateUpdated', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('SignatureAdded', async data => {
@@ -498,8 +510,10 @@ module.exports = {
             data.votes = await Nouns.NounsToken.Contract.getCurrentVotes(
                data.signer.id,
             );
+            data.nounsForumType = 'SignatureAdded';
 
             sendToChannelFeeds('signatureAdded', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          // =============================================================
@@ -785,6 +799,36 @@ async function sendToNounsForum(proposalId, data, client) {
       }
 
       client.emit('nounsForumUpdate', thread, data);
+   });
+}
+
+/**
+ * @param {string} slug
+ * @param {object} data
+ * @param {Client} client
+ */
+async function sendToCandidateForum(slug, data, client) {
+   const forums = await NounsProposalForum.find({
+      isDeleted: { $ne: true },
+   }).exec();
+
+   forums.forEach(async forum => {
+      const channel = await fetchForumChannel(forum, client);
+      if (!channel) {
+         return;
+      }
+
+      const thread = await fetchCandidateForumThread(
+         slug,
+         forum,
+         channel,
+         data,
+      );
+      if (!thread) {
+         return;
+      }
+
+      client.emit('nounsCandidateForumUpdate', thread, data);
    });
 }
 
