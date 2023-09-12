@@ -288,7 +288,7 @@ module.exports = {
             });
 
             data.status = 'Canceled';
-            data.title = await fetchProposalTitle(data.id);
+            data.proposalTitle = await fetchProposalTitle(data.id);
             data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
@@ -304,7 +304,7 @@ module.exports = {
             });
 
             data.status = 'Queued';
-            data.title = await fetchProposalTitle(data.id);
+            data.proposalTitle = await fetchProposalTitle(data.id);
             data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
@@ -319,7 +319,7 @@ module.exports = {
             });
 
             data.status = 'Vetoed';
-            data.title = await fetchProposalTitle(data.id);
+            data.proposalTitle = await fetchProposalTitle(data.id);
             data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
@@ -333,7 +333,7 @@ module.exports = {
             });
 
             data.status = 'Executed';
-            data.title = await fetchProposalTitle(data.id);
+            data.proposalTitle = await fetchProposalTitle(data.id);
             data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
