@@ -411,6 +411,7 @@ module.exports = {
                (await Nouns.ensReverseLookup(data.proposer.id)) ??
                (await shortenAddress(data.proposer.id));
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.nounsForumType = 'CandidateFeedbackSent';
 
             sendToChannelFeeds('candidateFeedbackSent', data, client);
          });
@@ -446,6 +447,7 @@ module.exports = {
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
             data.proposer = data.msgSender;
+            data.nounsForumType = 'ProposalCandidateCanceled';
 
             sendToChannelFeeds('proposalCandidateCanceled', data, client);
          });
@@ -462,6 +464,7 @@ module.exports = {
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
             data.proposer = data.msgSender;
+            data.nounsForumType = 'ProposalCandidateCreated';
 
             sendToChannelFeeds('proposalCandidateCreated', data, client);
          });
@@ -477,6 +480,7 @@ module.exports = {
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
             data.proposer = data.msgSender;
+            data.nounsForumType = 'ProposalCandidateUpdated';
 
             sendToChannelFeeds('proposalCandidateUpdated', data, client);
          });
@@ -502,6 +506,7 @@ module.exports = {
             data.votes = await Nouns.NounsToken.Contract.getCurrentVotes(
                data.signer.id,
             );
+            data.nounsForumType = 'SignatureAdded';
 
             sendToChannelFeeds('signatureAdded', data, client);
          });
