@@ -11,7 +11,7 @@ exports.generatePropStatusChangeEmbed = function (data, url) {
    const description = `${url}${data.id}\n${data.status}`;
 
    const proposalEmbed = new MessageEmbed()
-      .setColor('#000000')
+      .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);
 
