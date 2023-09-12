@@ -10,6 +10,7 @@ const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
 const {
    fetchForumChannel,
    fetchForumThread,
+   fetchCandidateForumThread,
 } = require('../../../helpers/forum');
 const Proposal = require('../../../db/schemas/Proposal');
 
@@ -444,6 +445,7 @@ module.exports = {
             data.msgSender.name =
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
+            data.proposer = data.msgSender;
 
             sendToChannelFeeds('proposalCandidateCanceled', data, client);
          });
@@ -459,6 +461,7 @@ module.exports = {
             data.msgSender.name =
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
+            data.proposer = data.msgSender;
 
             sendToChannelFeeds('proposalCandidateCreated', data, client);
          });
@@ -473,6 +476,7 @@ module.exports = {
             data.msgSender.name =
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
+            data.proposer = data.msgSender;
 
             sendToChannelFeeds('proposalCandidateUpdated', data, client);
          });
@@ -785,6 +789,36 @@ async function sendToNounsForum(proposalId, data, client) {
       }
 
       client.emit('nounsForumUpdate', thread, data);
+   });
+}
+
+/**
+ * @param {string} slug
+ * @param {object} data
+ * @param {Client} client
+ */
+async function sendToCandidateForum(slug, data, client) {
+   const forums = await NounsProposalForum.find({
+      isDeleted: { $ne: true },
+   }).exec();
+
+   forums.forEach(async forum => {
+      const channel = await fetchForumChannel(forum, client);
+      if (!channel) {
+         return;
+      }
+
+      const thread = await fetchCandidateForumThread(
+         slug,
+         forum,
+         channel,
+         data,
+      );
+      if (!thread) {
+         return;
+      }
+
+      client.emit('nounsCandidateForumUpdate', thread, data);
    });
 }
 
