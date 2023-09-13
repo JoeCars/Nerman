@@ -7,6 +7,7 @@ const Logger = require('../../../helpers/logger');
 const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
+const NounsCandidateForum = require('../../../db/schemas/NounsCandidateForum');
 const {
    fetchForumChannel,
    fetchForumThread,
@@ -808,7 +809,7 @@ async function sendToNounsForum(proposalId, data, client) {
  * @param {Client} client
  */
 async function sendToCandidateForum(slug, data, client) {
-   const forums = await NounsProposalForum.find({
+   const forums = await NounsCandidateForum.find({
       isDeleted: { $ne: true },
    }).exec();
 
