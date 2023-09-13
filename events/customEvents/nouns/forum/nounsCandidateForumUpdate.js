@@ -53,6 +53,8 @@ module.exports = {
                'events/nounsCandidateForumUpdate.js: Unknown data type.',
                {
                   data: data,
+                  threadId: thread.id,
+                  guildId: thread.guildId,
                },
             );
             throw new Error('Data does not match any known type.');
