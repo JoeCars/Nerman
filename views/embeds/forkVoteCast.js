@@ -13,11 +13,7 @@ const { hyperlink, inlineCode } = require('@discordjs/builders');
  * @param {string} proposalUrl
  * @param {boolean} hasMarkdown
  */
-exports.generatePropVoteCastEmbed = function (
-   vote,
-   proposalUrl,
-   hasMarkdown = true,
-) {
+exports.generateForkVoteCastEmbed = function (vote, hasMarkdown = true) {
    let voter = vote.voter.name;
    let choice = vote.choice;
    let votes = vote.votes;
@@ -29,14 +25,12 @@ exports.generatePropVoteCastEmbed = function (
       votes = inlineCode(votes);
    }
 
-   const title = vote.proposalTitle;
-   const titleUrl = `${proposalUrl}${vote.proposalId}`;
+   const title = 'Fork 0 | ' + vote.proposalTitle;
    const description = `${voter} voted ${choice} with ${votes} votes.\n\n${reason}`;
 
    const voteEmbed = new MessageEmbed()
       .setColor('#00FFFF')
       .setTitle(title)
-      .setURL(titleUrl)
       .setDescription(description);
 
    return voteEmbed;
