@@ -784,6 +784,19 @@ module.exports = {
             sendToChannelFeeds('forkProposalStatusChange', data, client);
          });
 
+         nounsFork.on('Quit', async data => {
+            Logger.info('events/ready.js: On ForkQuit.', {
+               quitter: data.msgSender.id,
+               numOfTokens: data.tokenIds.length,
+            });
+
+            data.msgSender.name =
+               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
+               (await shortenAddress(data.msgSender.id));
+
+            sendToChannelFeeds('forkQuit', data, client);
+         });
+
          nounsFork.on('VoteCast', async vote => {
             Logger.info('events/ready.js: On ForkVoteCast.', {
                proposalId: Number(vote.proposalId),

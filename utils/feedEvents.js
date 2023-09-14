@@ -60,6 +60,7 @@ events.set('forkAuctionBid', 'NounsForkAuctionHouse.ForkAuctionBid');
 // NounsFork.
 events.set('forkProposalCreated', 'NounsFork.ForkProposalCreated');
 events.set('forkProposalStatusChange', 'NounsFork.ForkProposalStatusChange');
+events.set('forkQuit', 'NounsFork.ForkQuit');
 events.set('forkVoteCast', 'NounsFork.ForkVoteCast');
 
 // NounsForkTokens.
