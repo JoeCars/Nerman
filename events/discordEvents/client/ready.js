@@ -761,7 +761,6 @@ module.exports = {
             sendToChannelFeeds('forkProposalStatusChange', data, client);
          });
 
-         // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
          nounsFork.on('ProposalQueued', async data => {
             Logger.info('events/ready.js: On ForkProposalQueued.', {
                id: `${data.id}`,
@@ -769,18 +768,6 @@ module.exports = {
             });
 
             data.status = 'Queued';
-            data.proposalTitle = await fetchProposalTitle(data.id);
-
-            sendToChannelFeeds('forkProposalStatusChange', data, client);
-         });
-
-         // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
-         nounsFork.on('ProposalVetoed', async data => {
-            Logger.info('events/ready.js: On ForkProposalVetoed.', {
-               id: `${data.id}`,
-            });
-
-            data.status = 'Vetoed';
             data.proposalTitle = await fetchProposalTitle(data.id);
 
             sendToChannelFeeds('forkProposalStatusChange', data, client);
