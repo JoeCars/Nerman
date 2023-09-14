@@ -48,8 +48,8 @@ module.exports = {
          );
          client.libraries.set('FederationNounsPool', federationNounsPool);
 
-         const nounsFork = new nerman.NounsForkToken(Nouns.provider);
-         client.libraries.set('NounsFork', nounsFork);
+         const nounsForkToken = new nerman.NounsForkToken(Nouns.provider);
+         client.libraries.set('NounsForkToken', nounsForkToken);
 
          const {
             guilds: { cache: guildCache },
@@ -612,7 +612,7 @@ module.exports = {
          // Nouns Fork Tokens
          // =============================================================
 
-         nounsFork.on('DelegateChanged', async data => {
+         nounsForkToken.on('DelegateChanged', async data => {
             Logger.info('ready.js: On ForkDelegateChanged', {
                delegator: data.delegator.id,
                fromDelegate: data.fromDelegate.id,
@@ -654,7 +654,7 @@ module.exports = {
             sendToChannelFeeds('forkDelegateChanged', data, client);
          });
 
-         nounsFork.on('Transfer', async data => {
+         nounsForkToken.on('Transfer', async data => {
             Logger.info('ready.js: On ForkTransfer', {
                from: data.from.id,
                to: data.to.id,
@@ -671,12 +671,151 @@ module.exports = {
             sendToChannelFeeds('transferForkNoun', data, client);
          });
 
-         nounsFork.on('NounCreated', async data => {
+         nounsForkToken.on('NounCreated', async data => {
             Logger.info('ready.js: On ForkNounCreated', {
                id: data.id,
             });
 
             sendToChannelFeeds('forkNounCreated', data, client);
+         });
+
+         // =============================================================
+         // Nouns Fork Auction House
+         // =============================================================
+         Nouns.on('AuctionCreated', async auction => {
+            Logger.info('events/ready.js: On AuctionCreated.', {
+               auctionId: `${auction.id}`,
+               auctionStartTime: `${auction.startTime}`,
+               auctionEndTime: `${auction.endTime}`,
+            });
+
+            sendToChannelFeeds('forkAuctionCreated', auction, client);
+         });
+
+         Nouns.on('AuctionBid', async data => {
+            Logger.info('events/ready.js: On AuctionBid.', {
+               nounId: `${data.id}`,
+               walletAddress: `${data.bidder.id}`,
+               ethereumWeiAmount: `${data.amount}`,
+               dataExtended: `${data.extended}`,
+            });
+
+            data.bidder.name =
+               (await Nouns.ensReverseLookup(data.bidder.id)) ??
+               (await shortenAddress(data.bidder.id));
+
+            sendToChannelFeeds('auctionBid', data, client);
+         });
+
+         // =============================================================
+         // Nouns Fork
+         // =============================================================
+
+         Nouns.on('ProposalCreatedWithRequirements', async data => {
+            data.description = data.description.substring(0, 500);
+
+            try {
+               const proposal = await Proposal.tryCreateProposal(data);
+               data.proposalTitle = proposal.fullTitle;
+            } catch (error) {
+               Logger.error('events/ready.js: Error creating a proposal.');
+            }
+
+            Logger.info(
+               'events/ready.js: On ProposalCreatedWithRequirements.',
+               {
+                  id: `${data.id}`,
+                  proposer: `${data.proposer.id}`,
+                  startBlock: data.startBlock,
+                  endBlock: data.endBlock,
+                  quorumVotes: `${data.quorumVotes}`,
+                  proposalThreshold: `${data.proposalThreshold}`,
+                  description: data.description,
+                  targets: `${data.targets}`,
+                  values: `${data.values}`,
+                  signatures: `${data.signatures}`,
+                  calldatas: `${data.calldatas}`,
+               },
+            );
+
+            data.nounsForumType = 'PropCreated';
+
+            sendToChannelFeeds('newProposalPoll', data, client);
+         });
+
+         Nouns.on('ProposalCanceled', async data => {
+            Logger.info('events/ready.js: On ProposalCanceled.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Canceled';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
+
+            sendToChannelFeeds('propStatusChange', data, client);
+         });
+
+         // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
+         Nouns.on('ProposalQueued', async data => {
+            Logger.info('events/ready.js: On ProposalQueued.', {
+               id: `${data.id}`,
+               eta: `${data.eta}`,
+            });
+
+            data.status = 'Queued';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
+
+            sendToChannelFeeds('propStatusChange', data, client);
+         });
+
+         // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
+         Nouns.on('ProposalVetoed', async data => {
+            Logger.info('events/ready.js: On ProposalVetoed.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Vetoed';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
+
+            sendToChannelFeeds('propStatusChange', data, client);
+         });
+
+         Nouns.on('ProposalExecuted', async data => {
+            Logger.info('events/ready.js: On ProposalExecuted.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Executed';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.nounsForumType = 'PropStatusChange';
+
+            sendToChannelFeeds('propStatusChange', data, client);
+         });
+
+         Nouns.on('VoteCast', async vote => {
+            Logger.info('events/ready.js: On VoteCast.', {
+               proposalId: Number(vote.proposalId),
+               voterId: vote.voter.id,
+               votes: Number(vote.votes),
+               supportDetailed: vote.supportDetailed,
+               reason: vote.reason,
+            });
+
+            if (vote.reason && vote.reason.length > REASON_LENGTH_LIMIT) {
+               vote.reason =
+                  vote.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
+            vote.voter.name =
+               (await Nouns.ensReverseLookup(vote.voter.id)) ??
+               (await shortenAddress(vote.voter.id));
+            vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
+            vote.nounsForumType = 'PropVoteCast';
+
+            sendToChannelFeeds('propVoteCast', vote, client);
          });
 
          // *************************************************************
