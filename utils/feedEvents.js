@@ -53,6 +53,16 @@ events.set('delegateChangedNoZero', 'NounsDAOTokens.DelegateChangedNoZero');
 events.set('nounCreated', 'NounsDAOTokens.NounCreated');
 events.set('transferNoun', 'NounsDAOTokens.TransferNoun');
 
+// NounsForkAuctionHouse.
+events.set('forkAuctionCreated', 'NounsForkAuctionHouse.ForkAuctionCreated');
+events.set('forkAuctionBid', 'NounsForkAuctionHouse.ForkAuctionBid');
+
+// NounsFork.
+events.set('forkProposalCreated', 'NounsFork.ForkProposalCreated');
+events.set('forkProposalStatusChange', 'NounsFork.ForkProposalStatusChange');
+events.set('forkQuit', 'NounsFork.ForkQuit');
+events.set('forkVoteCast', 'NounsFork.ForkVoteCast');
+
 // NounsForkTokens.
 events.set('forkDelegateChanged', 'NounsForkTokens.ForkDelegateChanged');
 events.set('transferForkNoun', 'NounsForkTokens.TransferForkNoun');
