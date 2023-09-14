@@ -51,6 +51,14 @@ module.exports = {
          const nounsForkToken = new nerman.NounsForkToken(Nouns.provider);
          client.libraries.set('NounsForkToken', nounsForkToken);
 
+         const nounsForkAuctionHouse = new nerman.NounsForkAuctionHouse(
+            Nouns.provider,
+         );
+         client.libraries.set('NounsForkAuctionHouse', nounsForkAuctionHouse);
+
+         const nounsFork = new nerman.NounsFork(Nouns.provider);
+         client.libraries.set('NounsFork', nounsFork);
+
          const {
             guilds: { cache: guildCache },
          } = client;
@@ -682,8 +690,8 @@ module.exports = {
          // =============================================================
          // Nouns Fork Auction House
          // =============================================================
-         Nouns.on('AuctionCreated', async auction => {
-            Logger.info('events/ready.js: On AuctionCreated.', {
+         nounsForkAuctionHouse.on('AuctionCreated', async auction => {
+            Logger.info('events/ready.js: On ForkAuctionCreated.', {
                auctionId: `${auction.id}`,
                auctionStartTime: `${auction.startTime}`,
                auctionEndTime: `${auction.endTime}`,
@@ -692,8 +700,8 @@ module.exports = {
             sendToChannelFeeds('forkAuctionCreated', auction, client);
          });
 
-         Nouns.on('AuctionBid', async data => {
-            Logger.info('events/ready.js: On AuctionBid.', {
+         nounsForkAuctionHouse.on('AuctionBid', async data => {
+            Logger.info('events/ready.js: On ForkAuctionBid.', {
                nounId: `${data.id}`,
                walletAddress: `${data.bidder.id}`,
                ethereumWeiAmount: `${data.amount}`,
@@ -704,17 +712,18 @@ module.exports = {
                (await Nouns.ensReverseLookup(data.bidder.id)) ??
                (await shortenAddress(data.bidder.id));
 
-            sendToChannelFeeds('auctionBid', data, client);
+            sendToChannelFeeds('forkAuctionBid', data, client);
          });
 
          // =============================================================
          // Nouns Fork
          // =============================================================
 
-         Nouns.on('ProposalCreatedWithRequirements', async data => {
+         nounsFork.on('ProposalCreatedWithRequirements', async data => {
             data.description = data.description.substring(0, 500);
 
             try {
+               // TODO: Update proposal schema.
                const proposal = await Proposal.tryCreateProposal(data);
                data.proposalTitle = proposal.fullTitle;
             } catch (error) {
@@ -722,7 +731,7 @@ module.exports = {
             }
 
             Logger.info(
-               'events/ready.js: On ProposalCreatedWithRequirements.',
+               'events/ready.js: On ForkProposalCreatedWithRequirements.',
                {
                   id: `${data.id}`,
                   proposer: `${data.proposer.id}`,
@@ -738,64 +747,58 @@ module.exports = {
                },
             );
 
-            data.nounsForumType = 'PropCreated';
-
-            sendToChannelFeeds('newProposalPoll', data, client);
+            sendToChannelFeeds('forkProposalCreated', data, client);
          });
 
-         Nouns.on('ProposalCanceled', async data => {
-            Logger.info('events/ready.js: On ProposalCanceled.', {
+         nounsFork.on('ProposalCanceled', async data => {
+            Logger.info('events/ready.js: On ForkProposalCanceled.', {
                id: `${data.id}`,
             });
 
             data.status = 'Canceled';
             data.proposalTitle = await fetchProposalTitle(data.id);
-            data.nounsForumType = 'PropStatusChange';
 
-            sendToChannelFeeds('propStatusChange', data, client);
+            sendToChannelFeeds('forkProposalStatusChange', data, client);
          });
 
          // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
-         Nouns.on('ProposalQueued', async data => {
-            Logger.info('events/ready.js: On ProposalQueued.', {
+         nounsFork.on('ProposalQueued', async data => {
+            Logger.info('events/ready.js: On ForkProposalQueued.', {
                id: `${data.id}`,
                eta: `${data.eta}`,
             });
 
             data.status = 'Queued';
             data.proposalTitle = await fetchProposalTitle(data.id);
-            data.nounsForumType = 'PropStatusChange';
 
-            sendToChannelFeeds('propStatusChange', data, client);
+            sendToChannelFeeds('forkProposalStatusChange', data, client);
          });
 
          // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
-         Nouns.on('ProposalVetoed', async data => {
-            Logger.info('events/ready.js: On ProposalVetoed.', {
+         nounsFork.on('ProposalVetoed', async data => {
+            Logger.info('events/ready.js: On ForkProposalVetoed.', {
                id: `${data.id}`,
             });
 
             data.status = 'Vetoed';
             data.proposalTitle = await fetchProposalTitle(data.id);
-            data.nounsForumType = 'PropStatusChange';
 
-            sendToChannelFeeds('propStatusChange', data, client);
+            sendToChannelFeeds('forkProposalStatusChange', data, client);
          });
 
-         Nouns.on('ProposalExecuted', async data => {
-            Logger.info('events/ready.js: On ProposalExecuted.', {
+         nounsFork.on('ProposalExecuted', async data => {
+            Logger.info('events/ready.js: On ForkProposalExecuted.', {
                id: `${data.id}`,
             });
 
             data.status = 'Executed';
             data.proposalTitle = await fetchProposalTitle(data.id);
-            data.nounsForumType = 'PropStatusChange';
 
-            sendToChannelFeeds('propStatusChange', data, client);
+            sendToChannelFeeds('forkProposalStatusChange', data, client);
          });
 
-         Nouns.on('VoteCast', async vote => {
-            Logger.info('events/ready.js: On VoteCast.', {
+         nounsFork.on('VoteCast', async vote => {
+            Logger.info('events/ready.js: On ForkVoteCast.', {
                proposalId: Number(vote.proposalId),
                voterId: vote.voter.id,
                votes: Number(vote.votes),
@@ -813,9 +816,8 @@ module.exports = {
                (await Nouns.ensReverseLookup(vote.voter.id)) ??
                (await shortenAddress(vote.voter.id));
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
-            vote.nounsForumType = 'PropVoteCast';
 
-            sendToChannelFeeds('propVoteCast', vote, client);
+            sendToChannelFeeds('forkVoteCast', vote, client);
          });
 
          // *************************************************************
