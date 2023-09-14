@@ -55,13 +55,26 @@ module.exports = {
          default:
             Logger.error('events/nounsForumUpdate.js: Unknown data type.', {
                data: data,
+               threadId: thread.id,
+               guildId: thread.guildId,
             });
             throw new Error('Data does not match any known type.');
       }
 
-      thread.send({
-         embeds: [embed],
-      });
+      thread
+         .send({
+            embeds: [embed],
+         })
+         .catch(error => {
+            Logger.error(
+               'events/nounsForumUpdate.js: Cannot send embed.',
+               {
+                  error: error,
+                  threadId: thread.id,
+                  guildId: thread.guildId,
+               },
+            );
+         });
 
       Logger.info('Successfully sent forum embed.');
    },

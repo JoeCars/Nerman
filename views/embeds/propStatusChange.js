@@ -3,15 +3,15 @@ const Poll = require('../../db/schemas/Poll');
 const Logger = require('../../helpers/logger');
 
 /**
- * @param {{id: string, status: string, title: string}} data
+ * @param {{id: string, status: string, proposalTitle: string}} data
  * @param {string} url
  */
 exports.generatePropStatusChangeEmbed = function (data, url) {
-   const title = data.title || `Proposal ${data.id}`;
+   const title = data.proposalTitle || `Proposal ${data.id}`;
    const description = `${url}${data.id}\n${data.status}`;
 
    const proposalEmbed = new MessageEmbed()
-      .setColor('#000000')
+      .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);
 

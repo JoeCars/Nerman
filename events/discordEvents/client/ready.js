@@ -7,9 +7,11 @@ const Logger = require('../../../helpers/logger');
 const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
+const NounsCandidateForum = require('../../../db/schemas/NounsCandidateForum');
 const {
    fetchForumChannel,
    fetchForumThread,
+   fetchCandidateForumThread,
 } = require('../../../helpers/forum');
 const Proposal = require('../../../db/schemas/Proposal');
 
@@ -287,7 +289,7 @@ module.exports = {
             });
 
             data.status = 'Canceled';
-            data.title = await fetchProposalTitle(data.id);
+            data.proposalTitle = await fetchProposalTitle(data.id);
             data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
@@ -303,7 +305,7 @@ module.exports = {
             });
 
             data.status = 'Queued';
-            data.title = await fetchProposalTitle(data.id);
+            data.proposalTitle = await fetchProposalTitle(data.id);
             data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
@@ -318,7 +320,7 @@ module.exports = {
             });
 
             data.status = 'Vetoed';
-            data.title = await fetchProposalTitle(data.id);
+            data.proposalTitle = await fetchProposalTitle(data.id);
             data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
@@ -332,7 +334,7 @@ module.exports = {
             });
 
             data.status = 'Executed';
-            data.title = await fetchProposalTitle(data.id);
+            data.proposalTitle = await fetchProposalTitle(data.id);
             data.nounsForumType = 'PropStatusChange';
 
             sendToChannelFeeds('propStatusChange', data, client);
@@ -410,8 +412,10 @@ module.exports = {
                (await Nouns.ensReverseLookup(data.proposer.id)) ??
                (await shortenAddress(data.proposer.id));
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.nounsForumType = 'CandidateFeedbackSent';
 
             sendToChannelFeeds('candidateFeedbackSent', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('FeedbackSent', async data => {
@@ -444,8 +448,11 @@ module.exports = {
             data.msgSender.name =
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
+            data.proposer = data.msgSender;
+            data.nounsForumType = 'ProposalCandidateCanceled';
 
             sendToChannelFeeds('proposalCandidateCanceled', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('ProposalCandidateCreated', async data => {
@@ -459,8 +466,11 @@ module.exports = {
             data.msgSender.name =
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
+            data.proposer = data.msgSender;
+            data.nounsForumType = 'ProposalCandidateCreated';
 
             sendToChannelFeeds('proposalCandidateCreated', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('ProposalCandidateUpdated', async data => {
@@ -473,8 +483,11 @@ module.exports = {
             data.msgSender.name =
                (await Nouns.ensReverseLookup(data.msgSender.id)) ??
                (await shortenAddress(data.msgSender.id));
+            data.proposer = data.msgSender;
+            data.nounsForumType = 'ProposalCandidateUpdated';
 
             sendToChannelFeeds('proposalCandidateUpdated', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          Nouns.on('SignatureAdded', async data => {
@@ -498,8 +511,10 @@ module.exports = {
             data.votes = await Nouns.NounsToken.Contract.getCurrentVotes(
                data.signer.id,
             );
+            data.nounsForumType = 'SignatureAdded';
 
             sendToChannelFeeds('signatureAdded', data, client);
+            sendToCandidateForum(data.slug, data, client);
          });
 
          // =============================================================
@@ -597,6 +612,48 @@ module.exports = {
          // Nouns Fork Tokens
          // =============================================================
 
+         nounsFork.on('DelegateChanged', async data => {
+            Logger.info('ready.js: On ForkDelegateChanged', {
+               delegator: data.delegator.id,
+               fromDelegate: data.fromDelegate.id,
+               toDelegate: data.toDelegate.id,
+            });
+
+            data.delegator.name =
+               (await Nouns.ensReverseLookup(data.delegator.id)) ??
+               (await shortenAddress(data.delegator.id));
+            data.fromDelegate.name =
+               (await Nouns.ensReverseLookup(data.fromDelegate.id)) ??
+               (await shortenAddress(data.fromDelegate.id));
+            data.toDelegate.name =
+               (await Nouns.ensReverseLookup(data.toDelegate.id)) ??
+               (await shortenAddress(data.toDelegate.id));
+
+            let numOfVotesChanged = 0;
+            try {
+               // The number of votes being changes is stored in receipt logs index 1 and 2.
+               // It is formatted as a single hex, where the first 64 digits after 0x is the previous vote count.
+               // And the second 64 digits after 0x is the new vote count of the delegate.
+               // To see this in detail, follow the link of the delegate changed event and check the receipt logs.
+               const event = data.event;
+               const receipt = await event.getTransactionReceipt();
+               if (receipt.logs[1]) {
+                  const hexData = receipt.logs[1].data;
+                  numOfVotesChanged = extractVoteChange(hexData);
+               }
+            } catch (error) {
+               Logger.error(
+                  "events/discordEvents/client/ready.js: On ForkDelegateChanged. There's been an error.",
+                  {
+                     error: error,
+                  },
+               );
+            }
+            data.numOfVotesChanged = numOfVotesChanged;
+
+            sendToChannelFeeds('forkDelegateChanged', data, client);
+         });
+
          nounsFork.on('Transfer', async data => {
             Logger.info('ready.js: On ForkTransfer', {
                from: data.from.id,
@@ -612,6 +669,14 @@ module.exports = {
                (await shortenAddress(data.to.id));
 
             sendToChannelFeeds('transferForkNoun', data, client);
+         });
+
+         nounsFork.on('NounCreated', async data => {
+            Logger.info('ready.js: On ForkNounCreated', {
+               id: data.id,
+            });
+
+            sendToChannelFeeds('forkNounCreated', data, client);
          });
 
          // *************************************************************
@@ -735,6 +800,36 @@ async function sendToNounsForum(proposalId, data, client) {
       }
 
       client.emit('nounsForumUpdate', thread, data);
+   });
+}
+
+/**
+ * @param {string} slug
+ * @param {object} data
+ * @param {Client} client
+ */
+async function sendToCandidateForum(slug, data, client) {
+   const forums = await NounsCandidateForum.find({
+      isDeleted: { $ne: true },
+   }).exec();
+
+   forums.forEach(async forum => {
+      const channel = await fetchForumChannel(forum, client);
+      if (!channel) {
+         return;
+      }
+
+      const thread = await fetchCandidateForumThread(
+         slug,
+         forum,
+         channel,
+         data,
+      );
+      if (!thread) {
+         return;
+      }
+
+      client.emit('nounsCandidateForumUpdate', thread, data);
    });
 }
 
