@@ -9,7 +9,7 @@ exports.generateForkProposalCreatedEmbed = function (proposal) {
    const proposalEmbed = new MessageEmbed()
       .setColor('#00FFFF')
       .setTitle(title)
-      .setDescription(`\n${proposalName}}`);
+      .setDescription(`\n${proposalName}`);
 
    return proposalEmbed;
 };
