@@ -14,7 +14,7 @@ exports.generatePostUpdateEmbed = function (data) {
    const url = `https://propdates-app.vercel.app/prop/${data.propId}`;
 
    let status = 'IN PROGRESS';
-   if (data.isComplete) {
+   if (data.isCompleted) {
       status = 'COMPLETE';
    }
    status = inlineCode(status);
