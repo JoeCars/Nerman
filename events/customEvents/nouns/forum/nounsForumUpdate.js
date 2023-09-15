@@ -18,6 +18,9 @@ const {
 const {
    generateFederationVoteEmbed,
 } = require('../../../../views/embeds/federation/voteCast');
+const {
+   generatePostUpdateEmbed,
+} = require('../../../../views/embeds/propdates/postUpdate');
 const Logger = require('../../../../helpers/logger');
 
 module.exports = {
@@ -52,6 +55,10 @@ module.exports = {
          case 'FederationVoteCast':
             embed = generateFederationVoteEmbed(data, propUrl);
             break;
+         case 'PostUpdate':
+            embed = generatePostUpdateEmbed(data, propUrl);
+            embed.title = 'Propdate';
+            break;
          default:
             Logger.error('events/nounsForumUpdate.js: Unknown data type.', {
                data: data,
@@ -66,14 +73,11 @@ module.exports = {
             embeds: [embed],
          })
          .catch(error => {
-            Logger.error(
-               'events/nounsForumUpdate.js: Cannot send embed.',
-               {
-                  error: error,
-                  threadId: thread.id,
-                  guildId: thread.guildId,
-               },
-            );
+            Logger.error('events/nounsForumUpdate.js: Cannot send embed.', {
+               error: error,
+               threadId: thread.id,
+               guildId: thread.guildId,
+            });
          });
 
       Logger.info('Successfully sent forum embed.');
