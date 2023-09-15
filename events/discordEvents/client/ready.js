@@ -725,14 +725,6 @@ module.exports = {
          nounsFork.on('ProposalCreatedWithRequirements', async data => {
             data.description = data.description.substring(0, 500);
 
-            try {
-               // TODO: Update proposal schema.
-               const proposal = await Proposal.tryCreateProposal(data);
-               data.proposalTitle = proposal.fullTitle;
-            } catch (error) {
-               Logger.error('events/ready.js: Error creating a proposal.');
-            }
-
             Logger.info(
                'events/ready.js: On ForkProposalCreatedWithRequirements.',
                {
@@ -749,6 +741,9 @@ module.exports = {
                   calldatas: `${data.calldatas}`,
                },
             );
+            const titleEndIndex = data.description.indexOf('\n');
+            const title = data.description.substring(1, titleEndIndex).trim(); // Title is formatted as '# Title \n'
+            data.proposalTitle = `Proposal ${data.id}: ${title}`;
 
             sendToChannelFeeds('forkProposalCreated', data, client);
          });
