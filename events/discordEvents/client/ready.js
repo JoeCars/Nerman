@@ -59,6 +59,9 @@ module.exports = {
          const nounsFork = new nerman.NounsFork(Nouns.provider);
          client.libraries.set('NounsFork', nounsFork);
 
+         const propdates = new nerman.Propdates(Nouns.provider);
+         client.libraries.set('Propdates', propdates);
+
          const {
             guilds: { cache: guildCache },
          } = client;
@@ -818,6 +821,29 @@ module.exports = {
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
 
             sendToChannelFeeds('forkVoteCast', vote, client);
+         });
+
+         // =============================================================
+         // Nouns Fork
+         // =============================================================
+
+         propdates.on('PostUpdate', async data => {
+            if (data.update.length > REASON_LENGTH_LIMIT) {
+               data.update =
+                  data.update.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            Logger.info('events/ready.js: On PostUpdate.', {
+               propId: data.propId,
+               isCompleted: data.isCompleted,
+               update: data.update,
+            });
+
+            data.proposalTitle = await fetchProposalTitle(data.propId);
+            data.nounsForumType = 'PostUpdate';
+
+            sendToChannelFeeds('postUpdate', data, client);
+            sendToNounsForum(data.propId, data, client);
          });
 
          // *************************************************************

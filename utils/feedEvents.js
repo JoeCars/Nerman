@@ -71,4 +71,7 @@ events.set('forkNounCreated', 'NounsForkTokens.ForkNounCreated');
 // NounsNymz.
 events.set('newPost', 'NounsNymz.NewPost');
 
+// NounsNymz.
+events.set('postUpdate', 'Propdates.PostUpdate');
+
 module.exports = events;
