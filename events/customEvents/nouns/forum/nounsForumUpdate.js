@@ -57,7 +57,7 @@ module.exports = {
             break;
          case 'PostUpdate':
             embed = generatePostUpdateEmbed(data, propUrl);
-            embed.title = 'Propdate'
+            embed.title = 'Propdate';
             break;
          default:
             Logger.error('events/nounsForumUpdate.js: Unknown data type.', {
