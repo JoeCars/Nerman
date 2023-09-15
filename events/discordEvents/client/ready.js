@@ -48,8 +48,19 @@ module.exports = {
          );
          client.libraries.set('FederationNounsPool', federationNounsPool);
 
-         const nounsFork = new nerman.NounsForkToken(Nouns.provider);
+         const nounsForkToken = new nerman.NounsForkToken(Nouns.provider);
+         client.libraries.set('NounsForkToken', nounsForkToken);
+
+         const nounsForkAuctionHouse = new nerman.NounsForkAuctionHouse(
+            Nouns.provider,
+         );
+         client.libraries.set('NounsForkAuctionHouse', nounsForkAuctionHouse);
+
+         const nounsFork = new nerman.NounsFork(Nouns.provider);
          client.libraries.set('NounsFork', nounsFork);
+
+         const propdates = new nerman.Propdates(Nouns.provider);
+         client.libraries.set('Propdates', propdates);
 
          const {
             guilds: { cache: guildCache },
@@ -612,7 +623,7 @@ module.exports = {
          // Nouns Fork Tokens
          // =============================================================
 
-         nounsFork.on('DelegateChanged', async data => {
+         nounsForkToken.on('DelegateChanged', async data => {
             Logger.info('ready.js: On ForkDelegateChanged', {
                delegator: data.delegator.id,
                fromDelegate: data.fromDelegate.id,
@@ -654,7 +665,7 @@ module.exports = {
             sendToChannelFeeds('forkDelegateChanged', data, client);
          });
 
-         nounsFork.on('Transfer', async data => {
+         nounsForkToken.on('Transfer', async data => {
             Logger.info('ready.js: On ForkTransfer', {
                from: data.from.id,
                to: data.to.id,
@@ -671,12 +682,168 @@ module.exports = {
             sendToChannelFeeds('transferForkNoun', data, client);
          });
 
-         nounsFork.on('NounCreated', async data => {
+         nounsForkToken.on('NounCreated', async data => {
             Logger.info('ready.js: On ForkNounCreated', {
                id: data.id,
             });
 
             sendToChannelFeeds('forkNounCreated', data, client);
+         });
+
+         // =============================================================
+         // Nouns Fork Auction House
+         // =============================================================
+         nounsForkAuctionHouse.on('AuctionCreated', async auction => {
+            Logger.info('events/ready.js: On ForkAuctionCreated.', {
+               auctionId: `${auction.id}`,
+               auctionStartTime: `${auction.startTime}`,
+               auctionEndTime: `${auction.endTime}`,
+            });
+
+            sendToChannelFeeds('forkAuctionCreated', auction, client);
+         });
+
+         nounsForkAuctionHouse.on('AuctionBid', async data => {
+            Logger.info('events/ready.js: On ForkAuctionBid.', {
+               nounId: `${data.id}`,
+               walletAddress: `${data.bidder.id}`,
+               ethereumWeiAmount: `${data.amount}`,
+               dataExtended: `${data.extended}`,
+            });
+
+            data.bidder.name =
+               (await Nouns.ensReverseLookup(data.bidder.id)) ??
+               (await shortenAddress(data.bidder.id));
+
+            sendToChannelFeeds('forkAuctionBid', data, client);
+         });
+
+         // =============================================================
+         // Nouns Fork
+         // =============================================================
+
+         nounsFork.on('ProposalCreatedWithRequirements', async data => {
+            data.description = data.description.substring(0, 500);
+
+            try {
+               // TODO: Update proposal schema.
+               const proposal = await Proposal.tryCreateProposal(data);
+               data.proposalTitle = proposal.fullTitle;
+            } catch (error) {
+               Logger.error('events/ready.js: Error creating a proposal.');
+            }
+
+            Logger.info(
+               'events/ready.js: On ForkProposalCreatedWithRequirements.',
+               {
+                  id: `${data.id}`,
+                  proposer: `${data.proposer.id}`,
+                  startBlock: data.startBlock,
+                  endBlock: data.endBlock,
+                  quorumVotes: `${data.quorumVotes}`,
+                  proposalThreshold: `${data.proposalThreshold}`,
+                  description: data.description,
+                  targets: `${data.targets}`,
+                  values: `${data.values}`,
+                  signatures: `${data.signatures}`,
+                  calldatas: `${data.calldatas}`,
+               },
+            );
+
+            sendToChannelFeeds('forkProposalCreated', data, client);
+         });
+
+         nounsFork.on('ProposalCanceled', async data => {
+            Logger.info('events/ready.js: On ForkProposalCanceled.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Canceled';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+
+            sendToChannelFeeds('forkProposalStatusChange', data, client);
+         });
+
+         nounsFork.on('ProposalQueued', async data => {
+            Logger.info('events/ready.js: On ForkProposalQueued.', {
+               id: `${data.id}`,
+               eta: `${data.eta}`,
+            });
+
+            data.status = 'Queued';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+
+            sendToChannelFeeds('forkProposalStatusChange', data, client);
+         });
+
+         nounsFork.on('ProposalExecuted', async data => {
+            Logger.info('events/ready.js: On ForkProposalExecuted.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Executed';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+
+            sendToChannelFeeds('forkProposalStatusChange', data, client);
+         });
+
+         nounsFork.on('Quit', async data => {
+            Logger.info('events/ready.js: On ForkQuit.', {
+               quitter: data.msgSender.id,
+               numOfTokens: data.tokenIds.length,
+            });
+
+            data.msgSender.name =
+               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
+               (await shortenAddress(data.msgSender.id));
+
+            sendToChannelFeeds('forkQuit', data, client);
+         });
+
+         nounsFork.on('VoteCast', async vote => {
+            Logger.info('events/ready.js: On ForkVoteCast.', {
+               proposalId: Number(vote.proposalId),
+               voterId: vote.voter.id,
+               votes: Number(vote.votes),
+               supportDetailed: vote.supportDetailed,
+               reason: vote.reason,
+            });
+
+            if (vote.reason && vote.reason.length > REASON_LENGTH_LIMIT) {
+               vote.reason =
+                  vote.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
+            vote.voter.name =
+               (await Nouns.ensReverseLookup(vote.voter.id)) ??
+               (await shortenAddress(vote.voter.id));
+            vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
+
+            sendToChannelFeeds('forkVoteCast', vote, client);
+         });
+
+         // =============================================================
+         // Nouns Fork
+         // =============================================================
+
+         propdates.on('PostUpdate', async data => {
+            if (data.update.length > REASON_LENGTH_LIMIT) {
+               data.update =
+                  data.update.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            Logger.info('events/ready.js: On PostUpdate.', {
+               propId: data.propId,
+               isCompleted: data.isCompleted,
+               update: data.update,
+            });
+
+            data.proposalTitle = await fetchProposalTitle(data.propId);
+            data.nounsForumType = 'PostUpdate';
+
+            sendToChannelFeeds('postUpdate', data, client);
+            sendToNounsForum(data.propId, data, client);
          });
 
          // *************************************************************
