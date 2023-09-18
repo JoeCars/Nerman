@@ -107,6 +107,25 @@ module.exports = {
       })
       .addSubcommand(subcommand => {
          return subcommand
+            .setName('remove')
+            .setDescription('Remove the event configuration for the channel.')
+            .addStringOption(option => {
+               return option
+                  .setName('event')
+                  .setDescription('The event to be removed.')
+                  .setRequired(true);
+            })
+            .addChannelOption(option => {
+               return option
+                  .setName('channel')
+                  .setDescription(
+                     'The channel that will lose the notification. The current channel by default.',
+                  )
+                  .setRequired(false);
+            });
+      })
+      .addSubcommand(subcommand => {
+         return subcommand
             .setName('display')
             .setDescription(
                'Display the event configuration of the given channel.',
