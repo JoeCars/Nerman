@@ -838,7 +838,6 @@ module.exports = {
             data.nounsForumType = 'PostUpdate';
 
             sendToChannelFeeds('postUpdate', data, client);
-            sendToNounsForum(data.propId, data, client);
          });
 
          // *************************************************************
