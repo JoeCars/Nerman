@@ -4,7 +4,7 @@ const Logger = require('../../../helpers/logger');
 const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const DEFAULT_PROPOSAL_NUMBER = 117;
-const DEFAULT_PROPOSAL_TITLE = 'Six Seasons And A Movie!';
+const DEFAULT_PROPOSAL_TITLE = '';
 const DEFAULT_PROPOSER_WALLET = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_PROPOSAL_DESCRIPTION = '';
 
@@ -20,15 +20,15 @@ module.exports = {
       })
       .addStringOption(option => {
          return option
-            .setName('proposal-title')
-            .setDescription('The proposal title.')
+            .setName('proposer-wallet')
+            .setDescription("The proposer's wallet address.")
             .setRequired(process.env.DEPLOY_STAGE !== 'development');
       })
       .addStringOption(option => {
          return option
-            .setName('proposer-wallet')
-            .setDescription("The proposer's wallet address.")
-            .setRequired(process.env.DEPLOY_STAGE !== 'development');
+            .setName('proposal-title')
+            .setDescription('The proposal title.')
+            .setRequired(false);
       })
       .addStringOption(option => {
          return option
@@ -56,10 +56,16 @@ module.exports = {
          interaction.options.getString('proposal-description') ??
          DEFAULT_PROPOSAL_DESCRIPTION;
 
+      let description = proposalTitle.trim();
+      if (description) {
+         description = `# ${proposalTitle} \n`;
+      }
+      description += proposalDescription;
+
       const nouns = interaction.client.libraries.get('NounsFork');
       nouns.emit('ProposalCreatedWithRequirements', {
          id: proposalNumber,
-         description: `# ${proposalTitle} \n ${proposalDescription}`,
+         description: description,
          proposer: { id: proposerWallet },
       });
 
