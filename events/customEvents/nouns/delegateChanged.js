@@ -27,9 +27,6 @@ module.exports = {
       Logger.info(
          'events/nouns/delegateChanged.js: Finished sending delegate change notification.',
          {
-            delegator: data.delegator.id,
-            newDelegate: data.toDelegate.id,
-            numOfVotesChanged: data.numOfVotesChanged,
             channelId: channel.id,
             guildId: channel.guildId,
          },
