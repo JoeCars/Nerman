@@ -99,7 +99,7 @@ module.exports = {
 
 async function createAbstainingUser(roleCache, anon, guildId, userId) {
    const eligibleChannels = await User.findEligibleChannels(roleCache, anon);
-   return await User.createUser(guildId, userId, eligibleChannels);
+   return User.createUser(guildId, userId, eligibleChannels);
 }
 
 async function updateVoteEmbed(client, channelId, messageId, updatedPoll) {
