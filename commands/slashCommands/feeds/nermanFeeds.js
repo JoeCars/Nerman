@@ -92,6 +92,21 @@ module.exports = {
       })
       .addSubcommand(subcommand => {
          return subcommand
+            .setName('add-all')
+            .setDescription(
+               'Add all event configurations to the given channel.',
+            )
+            .addChannelOption(option => {
+               return option
+                  .setName('channel')
+                  .setDescription(
+                     'The channel that will receive all notifications. The current channel by default.',
+                  )
+                  .setRequired(false);
+            });
+      })
+      .addSubcommand(subcommand => {
+         return subcommand
             .setName('remove-all')
             .setDescription(
                'Remove all event configurations for the given channel.',
