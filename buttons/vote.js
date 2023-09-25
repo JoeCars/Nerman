@@ -89,13 +89,7 @@ function createVoteModal(attachedPoll) {
       choice => choice[0].toUpperCase() + choice.substring(1),
    );
 
-   // const optionsString = attachedPoll.pollData.choices.join(', ');
    const optionsString = capitalizedOptions.join(', ');
-   // disabled until DJS SELECT MENU Modal supported
-   // const optionsMap = attachedPoll.pollData.choices.map(choice => ({
-   //    label: choice,
-   //    value: choice,
-   // }));
    const modal = new Modal().setCustomId('vote-modal').setTitle('Vote');
 
    const selectOptions = new TextInputComponent()
@@ -106,14 +100,6 @@ function createVoteModal(attachedPoll) {
       .setStyle('SHORT')
       .setMaxLength(100)
       .setRequired(true);
-
-   // disabled until DJS supports SELECT MENU Modal
-   // const selectOptions = new SelectMenuComponent()
-   //    .setCustomId('votingSelect')
-   //    .setPlaceholder('Make your selection(s)')
-   //    .addOptions(optionsMap)
-   //    .setMinValues(attachedPoll.config.voteAllowance)
-   //    .setMaxValues(attachedPoll.config.voteAllowance);
 
    const reason = new TextInputComponent()
       .setCustomId('voteReason')
