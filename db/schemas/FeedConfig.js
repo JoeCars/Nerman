@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 const events = require('../../utils/feedEvents');
 
 const FeedConfigSchema = new Schema(
@@ -49,6 +49,27 @@ const FeedConfigSchema = new Schema(
                   $ne: true,
                },
             }).exec();
+         },
+         async tryAddFeed(guildId, channelId, eventName) {
+            let feed = await this.findOne({
+               guildId: guildId,
+               channelId: channelId,
+               eventName: eventName,
+               isDeleted: {
+                  $ne: true,
+               },
+            }).exec();
+
+            if (!feed) {
+               feed = await this.create({
+                  _id: new Types.ObjectId(),
+                  guildId: guildId,
+                  channelId: channelId,
+                  eventName: eventName,
+               });
+            }
+
+            return feed;
          },
       },
    },
