@@ -1,6 +1,8 @@
 const { MessageEmbed } = require('discord.js');
 const { inlineCode } = require('@discordjs/builders');
 
+const UPDATE_MAX_LENGTH = 300;
+
 /**
  * @param {{
  * 	propId: number,
@@ -19,7 +21,13 @@ exports.generatePostUpdateEmbed = function (data) {
    }
    status = inlineCode(status);
 
-   const description = `Current Status: ${status}\n\n${data.update}`;
+   let update = data.update;
+   if (update.length > UPDATE_MAX_LENGTH) {
+      update = update.substring(0, UPDATE_MAX_LENGTH).trim();
+      update += '...';
+   }
+
+   const description = `Current Status: ${status}\n\n${update}`;
 
    return new MessageEmbed()
       .setColor('#00FFFF')
