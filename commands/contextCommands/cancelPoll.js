@@ -10,9 +10,6 @@ const { authorizeInteraction } = require('../../helpers/authorization');
 module.exports = {
    data: new ContextMenuCommandBuilder()
       .setName('Cancel Poll')
-      // .setDescription(
-      //    'Testing this context command for the cancel Poll command.'
-      // )
       .setType(ApplicationCommandType.Message),
    /**
     * @param {ContextMenuInteraction} interaction

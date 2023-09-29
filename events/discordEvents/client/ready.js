@@ -14,6 +14,7 @@ const {
    fetchCandidateForumThread,
 } = require('../../../helpers/forum');
 const Proposal = require('../../../db/schemas/Proposal');
+const { fetchAddressName } = require('../../../utils/nameCache');
 
 const REASON_LENGTH_LIMIT = 3000;
 
@@ -86,9 +87,7 @@ module.exports = {
             }
 
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
-            data.bidderName =
-               (await Nouns.ensReverseLookup(data.bidder)) ??
-               (await shortenAddress(data.bidder));
+            data.bidderName = await fetchAddressName(data.bidder, Nouns);
             data.proposalTitle = await fetchProposalTitle(data.propId);
 
             const GOVERNANCE_POOL_VOTING_ADDRESS = `0x6b2645b468A828a12fEA8C7D644445eB808Ec2B1`;
@@ -132,9 +131,7 @@ module.exports = {
             }
 
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
-            data.bidderName =
-               (await Nouns.ensReverseLookup(data.bidder)) ??
-               (await shortenAddress(data.bidder));
+            data.bidderName = await fetchAddressName(data.bidder, Nouns);
             data.proposalTitle = await fetchProposalTitle(data.propId);
 
             const GOVERNANCE_POOL_VOTING_ADDRESS = `0x6b2645b468A828a12fEA8C7D644445eB808Ec2B1`;
@@ -169,7 +166,7 @@ module.exports = {
                address: bidData.address,
             });
 
-            bidData.bidderName = bidData.ens || shortenAddress(bidData.address);
+            bidData.bidderName = await fetchAddressName(bidData.address, Nouns);
 
             sendToChannelFeeds('auctionEnd', bidData, client);
          });
@@ -182,15 +179,18 @@ module.exports = {
                event: data.event,
             });
 
-            data.delegator.name =
-               (await Nouns.ensReverseLookup(data.delegator.id)) ??
-               (await shortenAddress(data.delegator.id));
-            data.fromDelegate.name =
-               (await Nouns.ensReverseLookup(data.fromDelegate.id)) ??
-               (await shortenAddress(data.fromDelegate.id));
-            data.toDelegate.name =
-               (await Nouns.ensReverseLookup(data.toDelegate.id)) ??
-               (await shortenAddress(data.toDelegate.id));
+            data.delegator.name = await fetchAddressName(
+               data.delegator.id,
+               Nouns,
+            );
+            data.fromDelegate.name = await fetchAddressName(
+               data.fromDelegate.id,
+               Nouns,
+            );
+            data.toDelegate.name = await fetchAddressName(
+               data.toDelegate.id,
+               Nouns,
+            );
 
             let numOfVotesChanged = 0;
             try {
@@ -244,9 +244,7 @@ module.exports = {
             }
 
             vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
-            vote.voter.name =
-               (await Nouns.ensReverseLookup(vote.voter.id)) ??
-               (await shortenAddress(vote.voter.id));
+            vote.voter.name = await fetchAddressName(vote.voter.id, Nouns);
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
             vote.nounsForumType = 'PropVoteCast';
 
@@ -360,12 +358,8 @@ module.exports = {
                tokenId: `${data.tokenId}`,
             });
 
-            data.from.name =
-               (await Nouns.ensReverseLookup(data.from.id)) ??
-               (await shortenAddress(data.from.id));
-            data.to.name =
-               (await Nouns.ensReverseLookup(data.to.id)) ??
-               (await shortenAddress(data.to.id));
+            data.from.name = await fetchAddressName(data.from.id, Nouns);
+            data.to.name = await fetchAddressName(data.to.id, Nouns);
 
             sendToChannelFeeds('transferNoun', data, client);
          });
@@ -396,10 +390,7 @@ module.exports = {
                dataExtended: `${data.extended}`,
             });
 
-            data.bidder.name =
-               (await Nouns.ensReverseLookup(data.bidder.id)) ??
-               (await shortenAddress(data.bidder.id));
-
+            data.bidder.name = await fetchAddressName(data.bidder.id, Nouns);
             sendToChannelFeeds('auctionBid', data, client);
          });
 
@@ -416,12 +407,14 @@ module.exports = {
                reason: data.reason,
             });
 
-            data.msgSender.name =
-               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
-               (await shortenAddress(data.msgSender.id));
-            data.proposer.name =
-               (await Nouns.ensReverseLookup(data.proposer.id)) ??
-               (await shortenAddress(data.proposer.id));
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
+            data.proposer.name = await fetchAddressName(
+               data.proposer.id,
+               Nouns,
+            );
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
             data.nounsForumType = 'CandidateFeedbackSent';
 
@@ -437,9 +430,10 @@ module.exports = {
                reason: data.reason,
             });
 
-            data.msgSender.name =
-               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
-               (await shortenAddress(data.msgSender.id));
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
             data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
             data.proposalTitle = await fetchProposalTitle(data.proposalId);
             data.nounsForumType = 'FeedbackSent';
@@ -456,9 +450,10 @@ module.exports = {
                reason: data.reason,
             });
 
-            data.msgSender.name =
-               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
-               (await shortenAddress(data.msgSender.id));
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
             data.proposer = data.msgSender;
             data.nounsForumType = 'ProposalCandidateCanceled';
 
@@ -474,9 +469,10 @@ module.exports = {
                description: data.description,
             });
 
-            data.msgSender.name =
-               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
-               (await shortenAddress(data.msgSender.id));
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
             data.proposer = data.msgSender;
             data.nounsForumType = 'ProposalCandidateCreated';
 
@@ -491,9 +487,10 @@ module.exports = {
                reason: data.reason,
             });
 
-            data.msgSender.name =
-               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
-               (await shortenAddress(data.msgSender.id));
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
             data.proposer = data.msgSender;
             data.nounsForumType = 'ProposalCandidateUpdated';
 
@@ -513,12 +510,11 @@ module.exports = {
                reason: data.reason,
             });
 
-            data.proposer.name =
-               (await Nouns.ensReverseLookup(data.proposer.id)) ??
-               (await shortenAddress(data.proposer.id));
-            data.signer.name =
-               (await Nouns.ensReverseLookup(data.signer.id)) ??
-               (await shortenAddress(data.signer.id));
+            data.proposer.name = await fetchAddressName(
+               data.proposer.id,
+               Nouns,
+            );
+            data.signer.name = await fetchAddressName(data.signer.id, Nouns);
             data.votes = await Nouns.NounsToken.Contract.getCurrentVotes(
                data.signer.id,
             );
@@ -538,9 +534,7 @@ module.exports = {
                to: data.to.id,
             });
 
-            data.to.name =
-               (await Nouns.ensReverseLookup(data.to.id)) ??
-               (await shortenAddress(data.to.id));
+            data.to.name = await fetchAddressName(data.to.id, Nouns);
 
             sendToChannelFeeds('withdrawNounsFromEscrow', data, client);
          });
@@ -558,9 +552,7 @@ module.exports = {
                reason: data.reason,
             });
 
-            data.owner.name =
-               (await Nouns.ensReverseLookup(data.owner.id)) ??
-               (await shortenAddress(data.owner.id));
+            data.owner.name = await fetchAddressName(data.owner.id, Nouns);
 
             // Grabbing fork threshold numbers.
             const ESCROW_PROXY = '0x44d97D22B3d37d837cE4b22773aAd9d1566055D9';
@@ -593,13 +585,14 @@ module.exports = {
                tokensInEscrow: data.tokensInEscrow,
             });
 
-            data.forkTreasury.name =
-               (await Nouns.ensReverseLookup(data.forkTreasury.id)) ??
-               (await shortenAddress(data.forkTreasury.id));
-            data.forkToken.name =
-               (await Nouns.ensReverseLookup(data.forkToken.id)) ??
-               (await shortenAddress(data.forkToken.id));
-
+            data.forkTreasury.name = await fetchAddressName(
+               data.forkTreasury.id,
+               Nouns,
+            );
+            data.forkToken.name = await fetchAddressName(
+               data.forkToken.id,
+               Nouns,
+            );
             sendToChannelFeeds('executeFork', data, client);
          });
 
@@ -612,9 +605,7 @@ module.exports = {
                reason: data.reason,
             });
 
-            data.owner.name =
-               (await Nouns.ensReverseLookup(data.owner.id)) ??
-               (await shortenAddress(data.owner.id));
+            data.owner.name = await fetchAddressName(data.owner.id, Nouns);
 
             sendToChannelFeeds('joinFork', data, client);
          });
@@ -630,15 +621,18 @@ module.exports = {
                toDelegate: data.toDelegate.id,
             });
 
-            data.delegator.name =
-               (await Nouns.ensReverseLookup(data.delegator.id)) ??
-               (await shortenAddress(data.delegator.id));
-            data.fromDelegate.name =
-               (await Nouns.ensReverseLookup(data.fromDelegate.id)) ??
-               (await shortenAddress(data.fromDelegate.id));
-            data.toDelegate.name =
-               (await Nouns.ensReverseLookup(data.toDelegate.id)) ??
-               (await shortenAddress(data.toDelegate.id));
+            data.delegator.name = await fetchAddressName(
+               data.delegator.id,
+               Nouns,
+            );
+            data.fromDelegate.name = await fetchAddressName(
+               data.fromDelegate.id,
+               Nouns,
+            );
+            data.toDelegate.name = await fetchAddressName(
+               data.toDelegate.id,
+               Nouns,
+            );
 
             let numOfVotesChanged = 0;
             try {
@@ -672,12 +666,8 @@ module.exports = {
                tokenId: data.tokenId,
             });
 
-            data.from.name =
-               (await Nouns.ensReverseLookup(data.from.id)) ??
-               (await shortenAddress(data.from.id));
-            data.to.name =
-               (await Nouns.ensReverseLookup(data.to.id)) ??
-               (await shortenAddress(data.to.id));
+            data.from.name = await fetchAddressName(data.from.id, Nouns);
+            data.to.name = await fetchAddressName(data.to.id, Nouns);
 
             sendToChannelFeeds('transferForkNoun', data, client);
          });
@@ -711,9 +701,7 @@ module.exports = {
                dataExtended: `${data.extended}`,
             });
 
-            data.bidder.name =
-               (await Nouns.ensReverseLookup(data.bidder.id)) ??
-               (await shortenAddress(data.bidder.id));
+            data.bidder.name = await fetchAddressName(data.bidder.id, Nouns);
 
             sendToChannelFeeds('forkAuctionBid', data, client);
          });
@@ -788,10 +776,10 @@ module.exports = {
                numOfTokens: data.tokenIds.length,
             });
 
-            data.msgSender.name =
-               (await Nouns.ensReverseLookup(data.msgSender.id)) ??
-               (await shortenAddress(data.msgSender.id));
-
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
             sendToChannelFeeds('forkQuit', data, client);
          });
 
@@ -810,9 +798,7 @@ module.exports = {
             }
 
             vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
-            vote.voter.name =
-               (await Nouns.ensReverseLookup(vote.voter.id)) ??
-               (await shortenAddress(vote.voter.id));
+            vote.voter.name = await fetchAddressName(vote.voter.id, Nouns);
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
 
             sendToChannelFeeds('forkVoteCast', vote, client);
@@ -839,73 +825,6 @@ module.exports = {
 
             sendToChannelFeeds('postUpdate', data, client);
          });
-
-         // *************************************************************
-         //
-         // EXAMPLE METADATA
-         //
-         // *************************************************************
-
-         async function testing(nounId) {
-            Logger.info('events/ready.js: Testing noun retrieval.', {
-               nounId: `${nounId}`,
-            });
-
-            // Look up Owner of Noun by id
-            const ownerAddress = await Nouns.NounsToken.Contract.ownerOf(
-               nounId,
-            );
-
-            // Look up ENS from address
-            const ownerEns = await Nouns.ensReverseLookup(ownerAddress);
-
-            // Look up delegate from ownerAddress
-            const delegateAddress = await Nouns.NounsToken.Contract.delegates(
-               ownerAddress,
-            );
-
-            // Look up ENS from address
-            const delegateEns = await Nouns.ensReverseLookup(delegateAddress);
-
-            // Look up current votes for ownerAddress
-            const votingPower = await Nouns.NounsToken.Contract.getCurrentVotes(
-               delegateAddress,
-            );
-
-            Logger.debug('events/ready.js: Checking owner information', {
-               nounId: `${nounId}`,
-               ownerAddress: `${ownerAddress}`,
-               ownerEns: ownerEns ?? 'not found',
-               delegateAddress: delegateAddress,
-               delegateEns: delegateEns ?? 'not found',
-               votingPower: `${votingPower}`,
-            });
-
-            // Get Final Bid Data
-
-            const bid = await Nouns.NounsAuctionHouse.getLatestBidData(nounId);
-
-            //   bid : {
-            //     id: number,
-            //     block: numbre,
-            //     date: Date,
-            //     amount: number (ETH),
-            //     address: string,
-            //     ens: string
-            // }
-
-            if (bid != null) {
-               const name = bid.ens != null ? bid.ens : bid.address;
-
-               Logger.debug('events/ready.js: Checking bid information', {
-                  nounId: `${nounId}`,
-                  bidId: `${bid.id}`,
-                  bidAmount: `${bid.amount}`,
-                  newOwner: name,
-                  dateOfBid: bid.date.toLocaleString(),
-               });
-            }
-         }
       }
 
       runNouns().catch(error => {
@@ -1061,19 +980,12 @@ async function sendToChannelFeeds(eventName, data, client) {
 async function fetchProposalTitle(proposalId) {
    let title = `Proposal ${proposalId}`;
    try {
-      const newProposalTitle = await Proposal.fetchProposalTitle(proposalId);
-      if (newProposalTitle === title) {
-         const targetPoll = await Poll.findOne({
-            'pollData.title': {
-               $regex: new RegExp(`^prop\\s${Number(proposalId)}`, 'i'),
-            },
-         }).exec();
-         title = targetPoll ? targetPoll.pollData.title : title;
-      } else {
-         title = newProposalTitle;
-      }
+      const proposalTitle = await Proposal.fetchProposalTitle(proposalId);
+      title = proposalTitle;
    } catch (error) {
-      Logger.error('Unable to find poll for status change.');
+      Logger.error('Unable to find poll title.', {
+         proposalId: proposalId,
+      });
    }
    return title;
 }
