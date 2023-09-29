@@ -13,7 +13,7 @@ const UPDATE_MAX_LENGTH = 300;
  */
 exports.generatePostUpdateEmbed = function (data) {
    const title = `Propdate | ${data.proposalTitle}`;
-   const url = `https://propdates-app.vercel.app/prop/${data.propId}`;
+   const url = `https://propdates.wtf/prop/${data.propId}`;
 
    let status = 'IN PROGRESS';
    if (data.isCompleted) {
