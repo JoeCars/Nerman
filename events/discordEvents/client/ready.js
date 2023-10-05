@@ -560,9 +560,8 @@ module.exports = {
             );
             const totalSupply =
                await Nouns.NounsDAO.Contract.adjustedTotalSupply();
-            const thresholdNumber = Number(
-               await Nouns.NounsDAO.Contract.forkThreshold(),
-            );
+            const thresholdNumber =
+               Number(await Nouns.NounsDAO.Contract.forkThreshold()) + 1; // +1 because it needs to be strictly greater than forkThreshold().
 
             const currentPercentage = Math.floor(
                (currentEscrowAmount / thresholdNumber) * 100,
