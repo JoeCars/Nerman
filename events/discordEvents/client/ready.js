@@ -555,14 +555,14 @@ module.exports = {
             data.owner.name = await fetchAddressName(data.owner.id, Nouns);
 
             // Grabbing fork threshold numbers.
-            const ESCROW_PROXY = '0x44d97D22B3d37d837cE4b22773aAd9d1566055D9';
-            const currentEscrowAmount =
-               await Nouns.NounsToken.Contract.getCurrentVotes(ESCROW_PROXY);
-
-            const THRESHOLD_FRACTION = 0.2;
-            const totalSupply = await Nouns.NounsToken.Contract.totalSupply();
-            const thresholdNumber =
-               Math.floor(totalSupply * THRESHOLD_FRACTION) + 1; // Must be strictly greater than thresholdFraction. Hence + 1.
+            const currentEscrowAmount = Number(
+               await Nouns.NounsDAO.Contract.numTokensInForkEscrow(),
+            );
+            const totalSupply =
+               await Nouns.NounsDAO.Contract.adjustedTotalSupply();
+            const thresholdNumber = Number(
+               await Nouns.NounsDAO.Contract.forkThreshold(),
+            );
 
             const currentPercentage = Math.floor(
                (currentEscrowAmount / thresholdNumber) * 100,
