@@ -270,11 +270,11 @@ module.exports = {
          // newPoll.timeEnd = timeEndMilli.toISOString();
          // await newPoll.save();
 
-         updatedEmbed.setFooter(
-            `Poll #${newPoll.pollNumber} submitted by ${
+         updatedEmbed.setFooter({
+            text: `Poll #${newPoll.pollNumber} submitted by ${
                nickname ?? username
             }#${discriminator}`,
-         );
+         });
 
          let embedQuorum = Math.ceil(
             newPoll.allowedUsers.size * (channelConfig.quorum / 100),

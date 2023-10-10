@@ -181,11 +181,11 @@ module.exports = {
             },
          );
 
-         messageEmbed.setFooter(
-            `Poll #${associatedPoll.pollNumber} submitted by ${
+         messageEmbed.setFooter({
+            text: `Poll #${associatedPoll.pollNumber} submitted by ${
                nickname ?? username
             }#${discriminator}`,
-         );
+         });
 
          // l('MESSAGE EMBED WITH FOOTER WOW\n', messageEmbed);
 
@@ -436,7 +436,7 @@ module.exports = {
             // .setDescription(`${messageToUpdate.embeds[0].description ?? ''}`)
             .setDescription(description)
             .addFields(newEmbedFields)
-            .setFooter(footer);
+            .setFooter({ text: footer });
          // .setFooter(messageToUpdate.embeds[0].footer.text);
 
          console.log('updateEmbed => ', updateEmbed);
