@@ -18,6 +18,8 @@ const { fetchAddressName } = require('../../../utils/nameCache');
 
 const REASON_LENGTH_LIMIT = 3000;
 
+const MAX_PROPOSAL_TITLE = 96;
+
 // https://discord.com/developers/docs/topics/opcodes-and-status-codes
 const UNKNOWN_CHANNEL_ERROR_CODE = 10003;
 
@@ -264,8 +266,16 @@ module.exports = {
             try {
                const proposal = await Proposal.tryCreateProposal(data);
                data.proposalTitle = proposal.fullTitle;
+               if (data.proposalTitle.length >= MAX_PROPOSAL_TITLE) {
+                  data.proposalTitle =
+                     data.proposalTitle
+                        .substring(0, MAX_PROPOSAL_TITLE)
+                        .trim() + '...';
+               }
             } catch (error) {
-               Logger.error('events/ready.js: Error creating a proposal.');
+               Logger.error('events/ready.js: Error creating a proposal.', {
+                  error: error,
+               });
             }
 
             Logger.info(
@@ -986,5 +996,10 @@ async function fetchProposalTitle(proposalId) {
          proposalId: proposalId,
       });
    }
+
+   if (title.length >= MAX_PROPOSAL_TITLE) {
+      title = title.substring(0, MAX_PROPOSAL_TITLE).trim() + '...';
+   }
+
    return title;
 }

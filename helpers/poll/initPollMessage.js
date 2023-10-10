@@ -35,7 +35,6 @@ const initPollMessage = async ({
 
    voteActionRow.addComponents(voteBtn, abstainBtn);
 
-
    // todo need to build in logic for max character limits in Embeds
    const embedFields = [
       { name: '\u200B', value: '\u200B', inline: false },
@@ -66,13 +65,13 @@ const initPollMessage = async ({
       .setTitle(title)
       .setDescription(description)
       .addFields(embedFields)
-      .setFooter('Submitted by ...');
+      .setFooter({ text: 'Submitted by ...' });
 
    Logger.debug(
       'helpers/poll/initPollMessage.js: Finished initializing poll message.',
       {
          proposalTitle: title,
-      }
+      },
    );
 
    return {

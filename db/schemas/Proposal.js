@@ -30,7 +30,7 @@ const ProposalSchema = new Schema(
       },
       description: {
          type: String,
-         required: true,
+         default: '',
       },
       title: {
          type: String,

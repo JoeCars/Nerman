@@ -108,11 +108,11 @@ async function createPollEmbed(interaction, newPoll) {
       .setTitle(newPoll.pollData.title)
       .setDescription(newPoll.pollData.description)
       .addFields(embedFields)
-      .setFooter(
-         `Poll #${newPoll.pollNumber} submitted by ${
+      .setFooter({
+         text: `Poll #${newPoll.pollNumber} submitted by ${
             nickname ?? username
          }#${discriminator}`,
-      );
+      });
 
    return embed;
 }
