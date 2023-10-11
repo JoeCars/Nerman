@@ -5,6 +5,8 @@ const UrlConfig = require('../db/schemas/UrlConfig');
 const { TextChannel } = require('discord.js');
 const { hideLinkEmbed } = require('@discordjs/builders');
 
+const MAX_THREAD_NAME_LENGTH = 96;
+
 // https://discord.com/developers/docs/topics/opcodes-and-status-codes
 const UNKNOWN_CHANNEL_ERROR_CODE = 10003;
 
@@ -62,6 +64,11 @@ exports.fetchForumThread = async function fetchForumThread(
       let threadName = data.proposalTitle ?? `Proposal ${proposalId}`;
       threadName = threadName.split(' ').slice(1).join(' '); // Removing 'Proposal'.
 
+      if (threadName.length >= MAX_THREAD_NAME_LENGTH) {
+         threadName =
+            threadName.substring(0, MAX_THREAD_NAME_LENGTH).trim() + '...';
+      }
+
       thread = await channel.threads.create({
          name: threadName,
          message: {
@@ -105,7 +112,7 @@ exports.fetchCandidateForumThread = async function (
          data.slug
       }`;
 
-      const threadName = data.slug
+      let threadName = data.slug
          .trim()
          .split('-')
          .filter(word => {
@@ -115,6 +122,11 @@ exports.fetchCandidateForumThread = async function (
             return word[0].toUpperCase() + word.substring(1).toLowerCase();
          })
          .join(' ');
+
+      if (threadName.length >= MAX_THREAD_NAME_LENGTH) {
+         threadName =
+            threadName.substring(0, MAX_THREAD_NAME_LENGTH).trim() + '...';
+      }
 
       thread = await channel.threads.create({
          name: threadName,
