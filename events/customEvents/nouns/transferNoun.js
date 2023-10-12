@@ -15,15 +15,11 @@ module.exports = {
     *    tokenId: string}} data
     */
    async execute(channel, data) {
-      const noticeEmbed = generateTransferNounEmbed(data, false);
-      const messageEmbed = generateTransferNounEmbed(data, true);
+      const embed = generateTransferNounEmbed(data);
 
       try {
-         const message = await channel.send({
-            embeds: [noticeEmbed],
-         });
-         await message.edit({
-            embeds: [messageEmbed],
+         await channel.send({
+            embeds: [embed],
          });
       } catch (error) {
          return Logger.error('events/nouns/transferNoun.js: Received error.', {

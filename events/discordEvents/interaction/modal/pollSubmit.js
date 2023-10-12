@@ -354,11 +354,11 @@ module.exports = {
 
          let updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
 
-         updatedEmbed.setFooter(
-            `Poll #${newPoll.pollNumber} submitted by ${
+         updatedEmbed.setFooter({
+            text: `Poll #${newPoll.pollNumber} submitted by ${
                nickname ?? username
             }#${discriminator}`,
-         );
+         });
 
          let embedQuorum = Math.ceil(
             newPoll.allowedUsers.size * (quorum / 100),
@@ -424,7 +424,6 @@ module.exports = {
                const votes = results.distribution[key];
                const room = longestOption - label.length;
                let optionObj = new ResultBar(label, votes, room, votesMap);
-
 
                votesMap.set(label, optionObj);
                resultsArray.push(optionObj.completeBar);
