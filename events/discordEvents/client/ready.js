@@ -834,6 +834,52 @@ module.exports = {
 
             sendToChannelFeeds('postUpdate', data, client);
          });
+
+         // =============================================================
+         // Lil Nouns
+         // =============================================================
+         
+         Nouns.on('ProposalCreated', async data => {
+            data.description = data.description.substring(0, 500);
+
+            try {
+               const proposal = await Proposal.tryCreateProposal(data);
+               data.proposalTitle = proposal.fullTitle;
+               if (data.proposalTitle.length >= MAX_PROPOSAL_TITLE) {
+                  data.proposalTitle =
+                     data.proposalTitle
+                        .substring(0, MAX_PROPOSAL_TITLE)
+                        .trim() + '...';
+               }
+            } catch (error) {
+               Logger.error('events/ready.js: Error creating a proposal.', {
+                  error: error,
+               });
+            }
+
+            Logger.info(
+               'events/ready.js: On ProposalCreated.',
+               {
+                  id: `${data.id}`,
+                  proposer: `${data.proposer.id}`,
+                  startBlock: data.startBlock,
+                  endBlock: data.endBlock,
+                  quorumVotes: `${data.quorumVotes}`,
+                  proposalThreshold: `${data.proposalThreshold}`,
+                  description: data.description,
+                  targets: `${data.targets}`,
+                  values: `${data.values}`,
+                  signatures: `${data.signatures}`,
+                  calldatas: `${data.calldatas}`,
+               },
+            );
+
+            data.nounsForumType = 'PropCreated';
+
+            // sendToChannelFeeds('newProposalPoll', data, client);
+            sendToChannelFeeds('propCreated', data, client);
+            sendToLilNounsForum(data.id, data, client);
+         });
       }
 
       runNouns().catch(error => {
@@ -1002,4 +1048,33 @@ async function fetchProposalTitle(proposalId) {
    }
 
    return title;
+}
+/**
+ * @param {number} proposalId
+ * @param {object} data
+ * @param {Client} client
+ */
+async function sendToLilNounsForum(proposalId, data, client) {
+   const forums = await LilNounsProposalForum.find({
+      isDeleted: { $ne: true },
+   }).exec();
+
+   forums.forEach(async forum => {
+      const channel = await fetchForumChannel(forum, client);
+      if (!channel) {
+         return;
+      }
+
+      const thread = await fetchForumThread(
+         `${proposalId}`, // Mongoose only supports string keys.
+         forum,
+         channel,
+         data,
+      );
+      if (!thread) {
+         return;
+      }
+
+      client.emit('lilnounsForumUpdate', thread, data);
+   });
 }
