@@ -46,7 +46,7 @@ module.exports = {
       // todo connect this to the GuildConfig from the collection
       const channelConfig = await PollChannel.findOne(
          { channelId },
-         'maxUserProposal voteAllowance forAgainst',
+         'maxUserProposal voteAllowance forAgainst allowedRoles',
       ).exec();
 
       const countedPolls = await Poll.countDocuments({
@@ -55,7 +55,23 @@ module.exports = {
          status: 'open',
       });
 
-      await authorizeInteraction(interaction, 2);
+      const shouldAuthorize = await needsAuthorization(
+         channelConfig,
+         interaction,
+      );
+      if (shouldAuthorize) {
+         await authorizeInteraction(interaction, 2);
+      } else {
+         Logger.debug(
+            'commands/poll/createPoll.js: User authorized with voting role.',
+            {
+               userId: userId,
+               channelId: channelId,
+               guildId: interaction.guildId,
+            },
+         );
+      }
+
       if (countedPolls >= channelConfig.maxUserProposal) {
          throw new Error(
             `You have exceeded the maximum number (${channelConfig.maxUserProposal}) of active proposals permitted in this channel.`,
@@ -91,6 +107,21 @@ module.exports = {
       );
    },
 };
+
+async function needsAuthorization(channelConfig, interaction) {
+   for (const roleId of channelConfig.allowedRoles) {
+      const guildUser = await interaction.guild.members.fetch(
+         interaction.user.id,
+      );
+      const rolesCollection = guildUser.roles.valueOf();
+      const role = rolesCollection.get(roleId);
+
+      if (role) {
+         return false;
+      }
+   }
+   return true;
+}
 
 function createPollModal(channelConfig) {
    const modal = new Modal()
