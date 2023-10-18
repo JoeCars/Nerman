@@ -264,14 +264,7 @@ module.exports = {
             data.description = data.description.substring(0, 500);
 
             try {
-               const proposal = await Proposal.tryCreateProposal(data);
-               data.proposalTitle = proposal.fullTitle;
-               if (data.proposalTitle.length >= MAX_PROPOSAL_TITLE) {
-                  data.proposalTitle =
-                     data.proposalTitle
-                        .substring(0, MAX_PROPOSAL_TITLE)
-                        .trim() + '...';
-               }
+               await Proposal.tryCreateProposal(data);
             } catch (error) {
                Logger.error('events/ready.js: Error creating a proposal.', {
                   error: error,
@@ -295,6 +288,7 @@ module.exports = {
                },
             );
 
+            data.proposalTitle = await fetchProposalTitle(data.id);
             data.nounsForumType = 'PropCreated';
 
             sendToChannelFeeds('newProposalPoll', data, client);
