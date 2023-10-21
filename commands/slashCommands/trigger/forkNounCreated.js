@@ -26,7 +26,7 @@ module.exports = {
          interaction.options.getNumber('noun-id') ?? DEFAULT_NOUN_ID;
 
       const Nouns = interaction.client.libraries.get('NounsForkToken');
-      Nouns.emit('NounCreated', {
+      Nouns.trigger('NounCreated', {
          id: nounId,
       });
 

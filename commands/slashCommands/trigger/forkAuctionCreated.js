@@ -28,7 +28,7 @@ module.exports = {
       const nounsForkAuctionHouse = interaction.client.libraries.get(
          'NounsForkAuctionHouse',
       );
-      nounsForkAuctionHouse.emit('AuctionCreated', {
+      nounsForkAuctionHouse.trigger('AuctionCreated', {
          id: nounId,
       });
 

@@ -36,7 +36,7 @@ module.exports = {
          interaction.options.getNumber('token-number') ?? DEFAULT_TOKEN_NUMBER;
 
       const nouns = interaction.client.libraries.get('NounsFork');
-      nouns.emit('Quit', {
+      nouns.trigger('Quit', {
          msgSender: { id: quitter },
          tokenIds: new Array(tokenNumber),
       });

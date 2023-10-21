@@ -44,7 +44,7 @@ module.exports = {
          interaction.options.getNumber('noun-number') ?? DEFAULT_NOUN_NUMBER;
 
       const Nouns = interaction.client.libraries.get('NounsForkToken');
-      Nouns.emit('Transfer', {
+      Nouns.trigger('Transfer', {
          tokenId: transferNoun,
          from: { id: oldId },
          to: { id: newId },
