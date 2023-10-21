@@ -45,7 +45,7 @@ module.exports = {
          interaction.options.getString('bidder-address') ?? DEFAULT_WALLET;
 
       const nouns = interaction.client.libraries.get('NounsForkAuctionHouse');
-      nouns.emit('AuctionBid', {
+      nouns.trigger('AuctionBid', {
          id: nounId,
          amount: ethereumAmount * ETH_TO_WEI_RATE,
          bidder: {

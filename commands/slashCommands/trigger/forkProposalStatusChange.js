@@ -41,7 +41,7 @@ module.exports = {
          interaction.options.getString('proposal-status') ?? DEFAULT_STATUS;
 
       const nouns = interaction.client.libraries.get('NounsFork');
-      nouns.emit(`Proposal${propStatus}`, {
+      nouns.trigger(`Proposal${propStatus}`, {
          id: propNumber,
       });
 
