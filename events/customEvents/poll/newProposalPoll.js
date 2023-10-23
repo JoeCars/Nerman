@@ -7,6 +7,7 @@ const PollChannel = require('../../../db/schemas/PollChannel');
 const PollCount = require('../../../db/schemas/ChannelPollCount');
 const Poll = require('../../../db/schemas/Poll');
 const User = require('../../../db/schemas/User');
+const UrlConfig = require('../../../db/schemas/UrlConfig');
 const Logger = require('../../../helpers/logger');
 const { createNewProposalEmbed } = require('../../../helpers/proposalHelpers');
 
@@ -30,9 +31,11 @@ module.exports = {
          );
       }
 
+      const { propUrl } = await UrlConfig.fetchUrls(channel.guildId);
+
       const interaction = await channel.send({
          content: null,
-         embeds: [createNewProposalEmbed(proposal)],
+         embeds: [createNewProposalEmbed(proposal, propUrl)],
       });
 
       const {
@@ -79,7 +82,7 @@ module.exports = {
       const title = `Prop ${propId}: ${desc
          .match(new RegExp(/^#+\s+.+\n/))[0]
          .replaceAll(/^(#\s)|(\n+)$/g, '')}`;
-      const description = `https://nouns.wtf/vote/${propId}`;
+      const description = propUrl + propId;
 
       Logger.debug('events/poll/newProposalPoll.js: Checking proposal.', {
          guildId: guildId,
