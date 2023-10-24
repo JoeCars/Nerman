@@ -18,7 +18,7 @@ module.exports = {
                   .addChoices([
                      ['nouns.wtf', 'https://nouns.wtf/vote/'],
                      ['nounsagora.com', 'https://nounsagora.com/proposals/'],
-                     ['lilnouns.wtf', 'https://lilnouns.wtf/vote/nounsdao/'],
+                     ['lilnouns.wtf/nounsdao', 'https://lilnouns.wtf/vote/nounsdao/'],
                   ])
                   .setRequired(false);
             })
