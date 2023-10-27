@@ -63,10 +63,11 @@ module.exports = {
       description += proposalDescription;
 
       const nouns = interaction.client.libraries.get('NounsFork');
-      nouns.emit('ProposalCreatedWithRequirements', {
+      nouns.trigger('ProposalCreatedWithRequirements', {
          id: proposalNumber,
          description: description,
          proposer: { id: proposerWallet },
+         event: { transactionHash: '0x0000000000000000000' },
       });
 
       interaction.reply({

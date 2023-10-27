@@ -50,7 +50,7 @@ module.exports = {
       )}${nounsTransferredHex}`;
 
       const Nouns = interaction.client.libraries.get('NounsForkToken');
-      Nouns.emit('DelegateChanged', {
+      Nouns.trigger('DelegateChanged', {
          delegator: {
             id: delegatorId,
          },

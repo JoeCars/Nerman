@@ -2,7 +2,7 @@ const { MessageEmbed } = require('discord.js');
 
 exports.generateForkProposalCreatedEmbed = function (proposal) {
    const title = 'Fork 0 | New Proposal';
-   const titleUrl = `https://etherscan.io/tx/${data.event.transactionHash}`;
+   const titleUrl = `https://etherscan.io/tx/${proposal.event.transactionHash}`;
    let proposalName = `Proposal ${proposal.id}`;
    let proposalSubtitle = proposal.description.match(
       /^(#\s(?:\S+\s?)+(?:\S+\n?))/,

@@ -68,7 +68,7 @@ module.exports = {
          interaction.options.getString('vote-reason') ?? DEFAULT_REASON;
 
       const nouns = interaction.client.libraries.get('NounsFork');
-      nouns.emit('VoteCast', {
+      nouns.trigger('VoteCast', {
          proposalId: proposalId,
          voter: { id: voterId },
          votes: votes,

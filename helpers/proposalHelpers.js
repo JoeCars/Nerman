@@ -10,12 +10,15 @@ exports.getUrl = function (proposal) {
    return `https://nouns.wtf/vote/${proposal.id}`;
 };
 
-exports.createNewProposalEmbed = function (proposal) {
+exports.createNewProposalEmbed = function (
+   proposal,
+   propUrl = `https://nouns.wtf/vote/`,
+) {
    const title = 'New Proposal!';
    const description = `Proposal ${proposal.id}: ${proposal.description
       .match(/^#+\s+.+\n/)[0]
       .replaceAll(/^(#\s)|(\n+)$/g, '')}`;
-   const descriptionUrl = `https://nouns.wtf/vote/${proposal.id}`;
+   const descriptionUrl = propUrl + proposal.id;
 
    const proposalEmbed = new MessageEmbed()
       .setColor('#00FFFF')
