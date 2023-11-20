@@ -31,7 +31,7 @@ module.exports = {
       }
 
       Logger.info(
-         'events/nouns/signatureAdded.js: Finished generating proposalCandidateCreated embed.',
+         'events/nouns/signatureAdded.js: Finished generating signatureAdded embed.',
          {
             proposalSlug: data.slug,
             channelId: channel.id,

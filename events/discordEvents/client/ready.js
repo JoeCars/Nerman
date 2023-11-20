@@ -411,6 +411,10 @@ module.exports = {
                reason: data.reason,
             });
 
+            if (!data.slug.trim()) {
+               return Logger.warn('ready.js: SignatureAdded. Missing slug.');
+            }
+
             data.msgSender.name = await fetchAddressName(
                data.msgSender.id,
                Nouns,
@@ -454,6 +458,10 @@ module.exports = {
                reason: data.reason,
             });
 
+            if (!data.slug.trim()) {
+               return Logger.warn('ready.js: SignatureAdded. Missing slug.');
+            }
+
             data.msgSender.name = await fetchAddressName(
                data.msgSender.id,
                Nouns,
@@ -473,6 +481,10 @@ module.exports = {
                description: data.description,
             });
 
+            if (!data.slug.trim()) {
+               return Logger.warn('ready.js: SignatureAdded. Missing slug.');
+            }
+
             data.msgSender.name = await fetchAddressName(
                data.msgSender.id,
                Nouns,
@@ -490,6 +502,10 @@ module.exports = {
                slug: data.slug,
                reason: data.reason,
             });
+
+            if (!data.slug.trim()) {
+               return Logger.warn('ready.js: SignatureAdded. Missing slug.');
+            }
 
             data.msgSender.name = await fetchAddressName(
                data.msgSender.id,
@@ -513,6 +529,10 @@ module.exports = {
                signer: data.signer.id,
                reason: data.reason,
             });
+
+            if (!data.slug.trim()) {
+               return Logger.warn('ready.js: SignatureAdded. Missing slug.');
+            }
 
             data.proposer.name = await fetchAddressName(
                data.proposer.id,
