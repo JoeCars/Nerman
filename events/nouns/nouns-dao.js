@@ -1,8 +1,8 @@
 const { TextChannel } = require('discord.js');
 
-const UrlConfig = require('../../../db/schemas/UrlConfig');
-const Logger = require('../../../helpers/logger');
-const embeds = require('../../../views/embeds/contracts/nouns-dao');
+const UrlConfig = require('../../db/schemas/UrlConfig');
+const Logger = require('../../helpers/logger');
+const embeds = require('../../views/embeds/contracts/nouns-dao');
 
 module.exports = {
    name: 'federation',

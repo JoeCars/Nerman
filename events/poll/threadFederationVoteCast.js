@@ -1,11 +1,11 @@
 const { TextChannel } = require('discord.js');
 
-const Logger = require('../../../helpers/logger');
-const { findPollMessage } = require('../../../helpers/poll/thread');
+const Logger = require('../../helpers/logger');
+const { findPollMessage } = require('../../helpers/poll/thread');
 const {
    generateFederationVoteEmbed,
-} = require('../../../views/embeds/contracts/federation');
-const UrlConfig = require('../../../db/schemas/UrlConfig');
+} = require('../../views/embeds/contracts/federation');
+const UrlConfig = require('../../db/schemas/UrlConfig');
 
 module.exports = {
    name: 'threadFederationVoteCast',

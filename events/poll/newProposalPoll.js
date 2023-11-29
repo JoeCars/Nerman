@@ -2,14 +2,14 @@
 const { MessageEmbed, TextChannel } = require('discord.js');
 const { Types } = require('mongoose');
 
-const { initPollMessage } = require('../../../helpers/poll/initPollMessage');
-const PollChannel = require('../../../db/schemas/PollChannel');
-const PollCount = require('../../../db/schemas/ChannelPollCount');
-const Poll = require('../../../db/schemas/Poll');
-const User = require('../../../db/schemas/User');
-const UrlConfig = require('../../../db/schemas/UrlConfig');
-const Logger = require('../../../helpers/logger');
-const { createNewProposalEmbed } = require('../../../helpers/proposalHelpers');
+const { initPollMessage } = require('../../helpers/poll/initPollMessage');
+const PollChannel = require('../../db/schemas/PollChannel');
+const PollCount = require('../../db/schemas/ChannelPollCount');
+const Poll = require('../../db/schemas/Poll');
+const User = require('../../db/schemas/User');
+const UrlConfig = require('../../db/schemas/UrlConfig');
+const Logger = require('../../helpers/logger');
+const { createNewProposalEmbed } = require('../../helpers/proposalHelpers');
 
 module.exports = {
    name: 'newProposalPoll',

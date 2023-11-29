@@ -1,13 +1,13 @@
 const { ThreadChannel } = require('discord.js');
-const UrlConfig = require('../../../../db/schemas/UrlConfig');
+const UrlConfig = require('../../../db/schemas/UrlConfig');
 const {
    generateCandidateFeedbackSentEmbed,
    generateProposalCandidateCanceledEmbed,
    generateProposalCandidateCreatedEmbed,
    generateProposalCandidateUpdatedEmbed,
    generateSignatureAddedEmbed,
-} = require('../../../../views/embeds/contracts/nouns-dao-data');
-const Logger = require('../../../../helpers/logger');
+} = require('../../../views/embeds/contracts/nouns-dao-data');
+const Logger = require('../../../helpers/logger');
 
 module.exports = {
    name: 'nounsCandidateForumUpdate',

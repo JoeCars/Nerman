@@ -1,7 +1,7 @@
 const { TextChannel } = require('discord.js');
 
-const Logger = require('../../../helpers/logger');
-const embeds = require('../../../views/embeds/contracts/nouns-token');
+const Logger = require('../../helpers/logger');
+const embeds = require('../../views/embeds/contracts/nouns-token');
 
 module.exports = {
    name: 'nouns-token',

@@ -1,11 +1,7 @@
 const { TextChannel } = require('discord.js');
 
-const UrlConfig = require('../../../db/schemas/UrlConfig');
-const Logger = require('../../../helpers/logger');
-const {
-   generateFederationBidEmbed,
-   generateFederationVoteEmbed,
-} = require('../../../views/embeds/contracts/federation');
+const Logger = require('../../helpers/logger');
+const embeds = require('../../views/embeds/contracts/nouns-fork');
 
 module.exports = {
    name: 'federation',
@@ -18,15 +14,20 @@ module.exports = {
     */
    async execute(channel, data) {
       try {
-         const urls = await UrlConfig.fetchUrls(channel.guildId);
          let embed;
 
          switch (data.eventName) {
-            case 'BidPlaced':
-               embed = generateFederationBidEmbed(data, urls.propUrl, true);
+            case 'ForkProposalCreated':
+               embed = embeds.generateForkProposalCreatedEmbed(data);
                break;
-            case 'VoteCast':
-               embed = generateFederationVoteEmbed(data, urls.propUrl, true);
+            case 'ForkProposalStatusChange':
+               embed = embeds.generateForkProposalStatusChangeEmbed(data);
+               break;
+            case 'ForkQuit':
+               embed = embeds.generateForkQuitEmbed(data);
+               break;
+            case 'ForkVoteCast':
+               embed = embeds.generateForkVoteCastEmbed(data);
                break;
             default:
                throw new Error(

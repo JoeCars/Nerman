@@ -1,10 +1,10 @@
 const { TextChannel } = require('discord.js');
 
-const Logger = require('../../../helpers/logger');
-const { findPollMessage } = require('../../../helpers/poll/thread');
+const Logger = require('../../helpers/logger');
+const { findPollMessage } = require('../../helpers/poll/thread');
 const {
    generateThreadStatusEmbed,
-} = require('../../../views/embeds/threads');
+} = require('../../views/embeds/threads');
 
 module.exports = {
    name: 'threadStatusChange',

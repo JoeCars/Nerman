@@ -1,21 +1,21 @@
 const { ThreadChannel } = require('discord.js');
-const UrlConfig = require('../../../../db/schemas/UrlConfig');
+const UrlConfig = require('../../../db/schemas/UrlConfig');
 const {
    generatePropCreatedEmbed,
    generatePropStatusChangeEmbed,
    generatePropVoteCastEmbed,
-} = require('../../../../views/embeds/contracts/nouns-dao');
+} = require('../../../views/embeds/contracts/nouns-dao');
 const {
    generateFeedbackSentEmbed,
-} = require('../../../../views/embeds/contracts/nouns-dao-data');
+} = require('../../../views/embeds/contracts/nouns-dao-data');
 const {
    generateFederationBidEmbed,
    generateFederationVoteEmbed,
-} = require('../../../../views/embeds/contracts/federation');
+} = require('../../../views/embeds/contracts/federation');
 const {
    generatePostUpdateEmbed,
-} = require('../../../../views/embeds/contracts/propdates');
-const Logger = require('../../../../helpers/logger');
+} = require('../../../views/embeds/contracts/propdates');
+const Logger = require('../../../helpers/logger');
 
 module.exports = {
    name: 'nounsForumUpdate',

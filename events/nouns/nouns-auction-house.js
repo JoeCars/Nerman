@@ -1,10 +1,10 @@
 const { TextChannel } = require('discord.js');
 
-const Logger = require('../../../helpers/logger');
-const embeds = require('../../../views/embeds/contracts/nouns-fork-token');
+const Logger = require('../../helpers/logger');
+const embeds = require('../../views/embeds/contracts/nouns-auction-house');
 
 module.exports = {
-   name: 'nouns-fork-token',
+   name: 'nouns-auction-house',
 
    /**
     * @param {TextChannel} channel
@@ -17,25 +17,25 @@ module.exports = {
          let embed;
 
          switch (data.eventName) {
-            case 'ForkDelegateChanged':
-               embed = embeds.generateForkDelegateChangedEmbed(data);
+            case 'AuctionBid':
+               embed = embeds.generateAuctionBidEmbed(data);
                break;
-            case 'ForkNounCreated':
-               embed = embeds.generateForkNounCreatedEmbed(data);
+            case 'AuctionCreated':
+               embed = embeds.generateAuctionCreatedEmbed(data);
                break;
-            case 'TransferForkNoun':
-               embed = embeds.generateTransferForkNounEmbed(data);
+            case 'AuctionEnd':
+               embed = embeds.generateAuctionEndEmbed(data, true);
                break;
             default:
                throw new Error(
-                  'Event name does not match any supported Nouns Fork Token events.',
+                  'Event name does not match any supported Nouns Auction House events.',
                );
          }
 
          await channel.send({ embeds: [embed] });
 
          Logger.info(
-            `events/nouns/nouns-fork-token.js: Finished sending embed.`,
+            `events/nouns/nouns-auction-house.js: Finished sending embed.`,
             {
                eventName: data.eventName,
                channelId: channel.id,
@@ -43,7 +43,7 @@ module.exports = {
             },
          );
       } catch (error) {
-         Logger.error('events/nouns/nouns-fork-token.js: Received error.', {
+         Logger.error('events/nouns/nouns-auction-house.js: Received error.', {
             error: error,
             eventName: data.eventName,
             channelId: channel.id,
