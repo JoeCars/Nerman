@@ -3,7 +3,7 @@ const { TextChannel } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const {
    generatePropCreatedEmbed,
-} = require('../../../views/embeds/propCreated');
+} = require('../../../views/embeds/contracts/nouns-dao');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {

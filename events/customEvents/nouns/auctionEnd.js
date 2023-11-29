@@ -1,7 +1,9 @@
 const { TextChannel } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
-const { generateAuctionEndEmbed } = require('../../../views/embeds/auctionEnd');
+const {
+   generateAuctionEndEmbed,
+} = require('../../../views/embeds/contracts/nouns-auction-house');
 
 module.exports = {
    name: 'auctionEnd',

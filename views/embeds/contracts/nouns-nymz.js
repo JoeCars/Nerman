@@ -1,7 +1,7 @@
 const { MessageEmbed } = require('discord.js');
 const { hyperlink, bold } = require('@discordjs/builders');
 
-const shortenAddress = require('../../helpers/nouns/shortenAddress');
+const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 
 exports.getPostUrl = function (postId) {
    return `https://nouns.nymz.xyz/posts/${postId}`;

@@ -1,7 +1,14 @@
 const { MessageEmbed } = require('discord.js');
 const { inlineCode, hyperlink } = require('@discordjs/builders');
 
-const { findAccountENS } = require('../helpers');
+exports.generateThreadStatusEmbed = function (status) {
+   const threadEmbed = new MessageEmbed()
+      .setColor('#00FFFF')
+      .setDescription(`Proposal status changed to ${inlineCode(status)}`);
+   return threadEmbed;
+};
+
+const { findAccountENS } = require('../../helpers');
 
 exports.generateThreadVoteEmbed = async function (vote, nouns) {
    const {

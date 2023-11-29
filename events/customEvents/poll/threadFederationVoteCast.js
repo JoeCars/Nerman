@@ -4,7 +4,7 @@ const Logger = require('../../../helpers/logger');
 const { findPollMessage } = require('../../../helpers/poll/thread');
 const {
    generateFederationVoteEmbed,
-} = require('../../../views/embeds/federation/voteCast');
+} = require('../../../views/embeds/contracts/federation');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {

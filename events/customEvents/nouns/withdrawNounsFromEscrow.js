@@ -3,7 +3,7 @@ const { TextChannel } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const {
    generateWithdrawNounsFromEscrowEmbed,
-} = require('../../../views/embeds/withdrawNounsFromEscrow');
+} = require('../../../views/embeds/contracts/nouns-dao');
 
 module.exports = {
    name: 'withdrawNounsFromEscrow',

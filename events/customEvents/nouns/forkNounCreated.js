@@ -3,7 +3,7 @@ const { TextChannel } = require('discord.js');
 const Logger = require('../../../helpers/logger.js');
 const {
    generateNounCreatedEmbed,
-} = require('../../../views/embeds/nounCreated.js');
+} = require('../../../views/embeds/contracts/nouns-token');
 
 module.exports = {
    name: 'forkNounCreated',

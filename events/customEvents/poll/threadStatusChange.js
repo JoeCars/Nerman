@@ -4,7 +4,7 @@ const Logger = require('../../../helpers/logger');
 const { findPollMessage } = require('../../../helpers/poll/thread');
 const {
    generateThreadStatusEmbed,
-} = require('../../../views/embeds/threadStatusChange');
+} = require('../../../views/embeds/threads');
 
 module.exports = {
    name: 'threadStatusChange',

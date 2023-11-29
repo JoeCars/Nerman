@@ -2,25 +2,19 @@ const { ThreadChannel } = require('discord.js');
 const UrlConfig = require('../../../../db/schemas/UrlConfig');
 const {
    generatePropCreatedEmbed,
-} = require('../../../../views/embeds/propCreated');
-const {
    generatePropStatusChangeEmbed,
-} = require('../../../../views/embeds/propStatusChange');
-const {
    generatePropVoteCastEmbed,
-} = require('../../../../views/embeds/propVoteCast');
+} = require('../../../../views/embeds/contracts/nouns-dao');
 const {
    generateFeedbackSentEmbed,
-} = require('../../../../views/embeds/feedbackSent');
+} = require('../../../../views/embeds/contracts/nouns-dao-data');
 const {
    generateFederationBidEmbed,
-} = require('../../../../views/embeds/federation/bidPlaced');
-const {
    generateFederationVoteEmbed,
-} = require('../../../../views/embeds/federation/voteCast');
+} = require('../../../../views/embeds/contracts/federation');
 const {
    generatePostUpdateEmbed,
-} = require('../../../../views/embeds/propdates/postUpdate');
+} = require('../../../../views/embeds/contracts/propdates');
 const Logger = require('../../../../helpers/logger');
 
 module.exports = {

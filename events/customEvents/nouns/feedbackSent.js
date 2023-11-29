@@ -3,7 +3,7 @@ const { TextChannel } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const {
    generateFeedbackSentEmbed,
-} = require('../../../views/embeds/feedbackSent');
+} = require('../../../views/embeds/contracts/nouns-dao-data');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {

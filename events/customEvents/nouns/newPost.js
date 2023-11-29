@@ -1,7 +1,9 @@
 const { TextChannel } = require('discord.js');
 
 const Logger = require('../../../helpers/logger');
-const { generateNewPostEmbed } = require('../../../views/embeds/nounsNymzPost');
+const {
+   generateNewPostEmbed,
+} = require('../../../views/embeds/contracts/nouns-nymz');
 
 module.exports = {
    name: 'newPost',

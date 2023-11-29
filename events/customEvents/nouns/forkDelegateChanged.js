@@ -3,7 +3,7 @@ const { TextChannel } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const {
    generateDelegateChangedEmbed,
-} = require('../../../views/embeds/delegateChanged');
+} = require('../../../views/embeds/contracts/nouns-token');
 
 module.exports = {
    name: 'forkDelegateChanged',

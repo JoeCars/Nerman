@@ -2,19 +2,11 @@ const { ThreadChannel } = require('discord.js');
 const UrlConfig = require('../../../../db/schemas/UrlConfig');
 const {
    generateCandidateFeedbackSentEmbed,
-} = require('../../../../views/embeds/candidateFeedbackSent');
-const {
    generateProposalCandidateCanceledEmbed,
-} = require('../../../../views/embeds/proposalCandidateCanceled');
-const {
    generateProposalCandidateCreatedEmbed,
-} = require('../../../../views/embeds/proposalCandidateCreated');
-const {
    generateProposalCandidateUpdatedEmbed,
-} = require('../../../../views/embeds/proposalCandidateUpdated');
-const {
    generateSignatureAddedEmbed,
-} = require('../../../../views/embeds/signatureAdded');
+} = require('../../../../views/embeds/contracts/nouns-dao-data');
 const Logger = require('../../../../helpers/logger');
 
 module.exports = {

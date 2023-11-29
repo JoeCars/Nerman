@@ -1,7 +1,9 @@
 const { TextChannel } = require('discord.js');
 
 const Logger = require('../../../helpers/logger');
-const { generateJoinForkEmbed } = require('../../../views/embeds/joinFork');
+const {
+   generateJoinForkEmbed,
+} = require('../../../views/embeds/contracts/nouns-dao');
 
 module.exports = {
    name: 'joinFork',

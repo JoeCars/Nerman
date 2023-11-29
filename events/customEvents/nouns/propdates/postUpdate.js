@@ -2,7 +2,7 @@ const { TextChannel } = require('discord.js');
 
 const {
    generatePostUpdateEmbed,
-} = require('../../../../views/embeds/propdates/postUpdate');
+} = require('../../../../views/embeds/contracts/propdates');
 const Logger = require('../../../../helpers/logger');
 
 module.exports = {

@@ -4,7 +4,7 @@ const Logger = require('../../../helpers/logger');
 const { findPollMessage } = require('../../../helpers/poll/thread');
 const {
    generateFeedbackSentEmbed,
-} = require('../../../views/embeds/feedbackSent');
+} = require('../../../views/embeds/contracts/nouns-dao-data');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 
 module.exports = {

@@ -2,7 +2,7 @@ const { TextChannel } = require('discord.js');
 
 const { findPollMessage } = require('../../../helpers/poll/thread');
 const Logger = require('../../../helpers/logger');
-const { generateThreadVoteEmbed } = require('../../../views/embeds/threadVote');
+const { generateThreadVoteEmbed } = require('../../../views/embeds/threads');
 
 module.exports = {
    name: 'threadVote',

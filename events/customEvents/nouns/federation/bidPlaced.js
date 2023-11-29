@@ -3,7 +3,7 @@ const UrlConfig = require('../../../../db/schemas/UrlConfig');
 
 const {
    generateFederationBidEmbed,
-} = require('../../../../views/embeds/federation/bidPlaced');
+} = require('../../../../views/embeds/contracts/federation');
 const Logger = require('../../../../helpers/logger');
 
 module.exports = {

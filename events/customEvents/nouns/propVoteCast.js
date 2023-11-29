@@ -4,7 +4,7 @@ const Logger = require('../../../helpers/logger');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 const {
    generatePropVoteCastEmbed,
-} = require('../../../views/embeds/propVoteCast');
+} = require('../../../views/embeds/contracts/nouns-dao');
 
 module.exports = {
    name: 'propVoteCast',

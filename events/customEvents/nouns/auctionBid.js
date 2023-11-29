@@ -1,6 +1,6 @@
 const { TextChannel } = require('discord.js');
 
-const { generateAuctionBidEmbed } = require('../../../views/embeds/auctionBid');
+const { generateAuctionBidEmbed } = require('../../../views/embeds/contracts/nouns-auction-house');
 const Logger = require('../../../helpers/logger');
 
 module.exports = {

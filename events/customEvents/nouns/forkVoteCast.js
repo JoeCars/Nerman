@@ -3,7 +3,7 @@ const { TextChannel } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const {
    generateForkVoteCastEmbed,
-} = require('../../../views/embeds/forkVoteCast');
+} = require('../../../views/embeds/contracts/nouns-fork');
 
 module.exports = {
    name: 'forkVoteCast',

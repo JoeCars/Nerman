@@ -3,7 +3,7 @@ const { TextChannel } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const {
    generateTransferForkNounEmbed,
-} = require('../../../views/embeds/transferForkNoun');
+} = require('../../../views/embeds/contracts/nouns-fork-token');
 
 module.exports = {
    name: 'transferForkNoun',

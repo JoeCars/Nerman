@@ -4,7 +4,7 @@ const Logger = require('../../../helpers/logger');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 const {
    generatePropStatusChangeEmbed,
-} = require('../../../views/embeds/propStatusChange');
+} = require('../../../views/embeds/contracts/nouns-dao');
 
 module.exports = {
    name: 'propStatusChange',

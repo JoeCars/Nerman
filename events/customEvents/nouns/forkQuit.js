@@ -1,7 +1,9 @@
 const { TextChannel } = require('discord.js');
 
 const Logger = require('../../../helpers/logger');
-const { generateForkQuitEmbed } = require('../../../views/embeds/forkQuit');
+const {
+   generateForkQuitEmbed,
+} = require('../../../views/embeds/contracts/nouns-fork');
 
 module.exports = {
    name: 'forkQuit',

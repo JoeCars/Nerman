@@ -3,7 +3,7 @@ const { TextChannel } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 const {
    generateEscrowedToForkEmbed,
-} = require('../../../views/embeds/escrowedToFork');
+} = require('../../../views/embeds/contracts/nouns-dao');
 
 module.exports = {
    name: 'escrowedToFork',

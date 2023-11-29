@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 const { hyperlink } = require('@discordjs/builders');
-const { getEthAmount } = require('../helpers');
+const { getEthAmount } = require('../../helpers');
 
 /**
  * @param {{
@@ -21,4 +21,14 @@ exports.generateForkAuctionBidEmbed = function (data) {
       .setColor('#00FFFF')
       .setTitle(`Fork 0 | Auction Bid`)
       .setDescription(`${bidderLink} bid ${amount}Ξ on Noun ${data.id}`);
+};
+
+// TODO: Update image if the new nouns look different.
+exports.generateForkAuctionCreatedEmbed = function (data) {
+   const embed = new MessageEmbed()
+      .setColor('#00FFFF')
+      .setTitle(`Fork 0 | New Auction | Noun ${data.id}`)
+      .setImage(`http://noun.pics/${data.id}.png`);
+
+   return embed;
 };
