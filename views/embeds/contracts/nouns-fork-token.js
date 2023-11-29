@@ -1,5 +1,5 @@
 const { MessageEmbed } = require('discord.js');
-const { hyperlink } = require('@discordjs/builders');
+const { hyperlink, inlineCode } = require('@discordjs/builders');
 
 const DEFAULT_MINT_ID = '0x0000000000000000000000000000000000000000';
 
@@ -39,5 +39,39 @@ exports.generateTransferForkNounEmbed = function (data, hasMarkdown = true) {
       .setTitle(title)
       .setDescription(description)
       .setImage(`http://noun.pics/${data.tokenId}.png`);
+   return embed;
+};
+
+exports.generateForkDelegateChangedEmbed = function (data, hasMarkdown = true) {
+   const title = 'Fork 0 | Delegate Changed';
+   const titleUrl = `https://etherscan.io/tx/${data.event.transactionHash}`;
+
+   let delegator = data.delegator.name;
+   let newDelegate = data.toDelegate.name;
+   let voteCount = data.numOfVotesChanged;
+
+   if (hasMarkdown) {
+      delegator = hyperlink(
+         delegator,
+         `https://etherscan.io/address/${data.delegator.id}`,
+      );
+      newDelegate = hyperlink(
+         newDelegate,
+         `https://etherscan.io/address/${data.toDelegate.id}`,
+      );
+      voteCount = inlineCode(voteCount);
+   }
+
+   const message = `${delegator} delegated ${voteCount} votes to ${newDelegate}.`;
+
+   const embed = new MessageEmbed()
+      .setTitle(title)
+      .setColor('#00FFFF')
+      .setDescription(message);
+
+   if (hasMarkdown) {
+      embed.setURL(titleUrl);
+   }
+
    return embed;
 };
