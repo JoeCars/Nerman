@@ -19,14 +19,14 @@ module.exports = {
          let embed;
 
          switch (data.eventName) {
-            case 'BidPlaced':
+            case 'FederationBidPlaced':
                embed = embeds.generateFederationBidEmbed(
                   data,
                   urls.propUrl,
                   true,
                );
                break;
-            case 'VoteCast':
+            case 'FederationVoteCast':
                embed = embeds.generateFederationVoteEmbed(
                   data,
                   urls.propUrl,

@@ -18,8 +18,15 @@ function filterEvent(group) {
 function filterNounsContractEvents() {
    return [...events.entries()]
       .filter(([key, value]) => {
-         const eventGroup = value.substring(0, 8);
-         return eventGroup === 'NounsDAO';
+         const eventGroup = value.split('.')[0];
+         const isNounsDAO = eventGroup === 'NounsDAO';
+         const isNounsAuctionHouse = eventGroup === 'NounsAuctionHouse';
+         const isNounsToken = eventGroup === 'NounsToken';
+         const isNounsDAOData = eventGroup === 'NounsDAOData';
+
+         return (
+            isNounsDAO || isNounsAuctionHouse || isNounsToken || isNounsDAOData
+         );
       })
       .map(([key, value]) => {
          return [value, key];
@@ -29,8 +36,18 @@ function filterNounsContractEvents() {
 function filterNounsOtherEvents() {
    return [...events.entries()]
       .filter(([key, value]) => {
-         const eventGroup = value.substring(0, 8);
-         return eventGroup !== 'NounsDAO';
+         const eventGroup = value.split('.')[0];
+         const isNounsDAO = eventGroup === 'NounsDAO';
+         const isNounsAuctionHouse = eventGroup === 'NounsAuctionHouse';
+         const isNounsToken = eventGroup === 'NounsToken';
+         const isNounsDAOData = eventGroup === 'NounsDAOData';
+
+         return !(
+            isNounsDAO ||
+            isNounsAuctionHouse ||
+            isNounsToken ||
+            isNounsDAOData
+         );
       })
       .map(([key, value]) => {
          return [value, key];

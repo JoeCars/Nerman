@@ -23,13 +23,13 @@ module.exports = {
    /**
     *
     * @param {ThreadChannel} thread
-    * @param {{nounsForumType: string}} data
+    * @param {{eventName: string}} data
     */
    async execute(thread, data) {
       const propUrl = (await UrlConfig.fetchUrls(thread.guildId)).propUrl;
       let embed = undefined;
 
-      switch (data.nounsForumType) {
+      switch (data.eventName) {
          case 'PropVoteCast':
             embed = generatePropVoteCastEmbed(data, propUrl);
             embed.title = null;

@@ -18,7 +18,7 @@ module.exports = {
          let embed;
 
          switch (data.eventName) {
-            case 'New Post':
+            case 'NewPost':
                embed = await embeds.generateNewPostEmbed(data, nouns);
                break;
             default:
