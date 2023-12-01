@@ -4,7 +4,7 @@ const Logger = require('../../helpers/logger');
 const embeds = require('../../views/embeds/contracts/nouns-fork');
 
 module.exports = {
-   name: 'federation',
+   name: 'nouns-fork',
 
    /**
     * @param {TextChannel} channel

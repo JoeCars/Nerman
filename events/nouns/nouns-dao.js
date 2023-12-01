@@ -5,7 +5,7 @@ const Logger = require('../../helpers/logger');
 const embeds = require('../../views/embeds/contracts/nouns-dao');
 
 module.exports = {
-   name: 'federation',
+   name: 'nouns-dao',
 
    /**
     * @param {TextChannel} channel
