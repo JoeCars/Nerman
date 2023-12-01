@@ -29,14 +29,29 @@ class Router {
                },
             );
             if (error.code === UNKNOWN_CHANNEL_ERROR_CODE) {
-               feed.softDelete().catch(err => {
-                  Logger.error('helpers/router.js: Feed soft-delete failed.', {
-                     error: err,
-                     channelId: feed.channelId,
-                     guildId: feed.guildId,
-                     feedEvent: feed.eventName,
+               feed
+                  .softDelete()
+                  .then(() => {
+                     Logger.debug(
+                        'helpers/router.js: Feed soft-delete succeeded.',
+                        {
+                           channelId: feed.channelId,
+                           guildId: feed.guildId,
+                           feedEvent: feed.eventName,
+                        },
+                     );
+                  })
+                  .catch(err => {
+                     Logger.error(
+                        'helpers/router.js: Feed soft-delete failed.',
+                        {
+                           error: err,
+                           channelId: feed.channelId,
+                           guildId: feed.guildId,
+                           feedEvent: feed.eventName,
+                        },
+                     );
                   });
-               });
             }
          }
       }
