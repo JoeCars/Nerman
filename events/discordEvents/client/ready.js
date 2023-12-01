@@ -3,7 +3,7 @@ const { Collection, Client, Channel, TextChannel } = require('discord.js');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const Logger = require('../../../helpers/logger');
 const Router = require('../../../helpers/router');
-const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
+const { extractVoteChange } = require('../../../views/embeds/contracts/nouns-token');
 const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
 const NounsCandidateForum = require('../../../db/schemas/NounsCandidateForum');
 const {
