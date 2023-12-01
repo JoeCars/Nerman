@@ -8,7 +8,7 @@ exports.generateThreadStatusEmbed = function (status) {
    return threadEmbed;
 };
 
-const { findAccountENS } = require('../../helpers');
+const { findAccountENS } = require('../helpers');
 
 exports.generateThreadVoteEmbed = async function (vote, nouns) {
    const {
