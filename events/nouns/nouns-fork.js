@@ -31,19 +31,19 @@ module.exports = {
                break;
             default:
                throw new Error(
-                  'Event name does not match any supported Federation events.',
+                  'Event name does not match any supported Nouns Fork events.',
                );
          }
 
          await channel.send({ embeds: [embed] });
 
-         Logger.info(`events/nouns/federation.js: Finished sending embed.`, {
+         Logger.info(`events/nouns/nouns-fork.js: Finished sending embed.`, {
             eventName: data.eventName,
             channelId: channel.id,
             guildId: channel.guildId,
          });
       } catch (error) {
-         Logger.error('events/nouns/federation.js: Received error.', {
+         Logger.error('events/nouns/nouns-fork.js: Received error.', {
             error: error,
             eventName: data.eventName,
             channelId: channel.id,

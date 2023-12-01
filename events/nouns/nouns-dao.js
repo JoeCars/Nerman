@@ -52,7 +52,7 @@ module.exports = {
                break;
             default:
                throw new Error(
-                  'Event name does not match any supported Federation events.',
+                  'Event name does not match any supported Nouns DAO events.',
                );
          }
 
@@ -61,13 +61,13 @@ module.exports = {
             await message.edit({ embeds: [secondaryEmbed] });
          }
 
-         Logger.info(`events/nouns/federation.js: Finished sending embed.`, {
+         Logger.info(`events/nouns/nouns-dao.js: Finished sending embed.`, {
             eventName: data.eventName,
             channelId: channel.id,
             guildId: channel.guildId,
          });
       } catch (error) {
-         Logger.error('events/nouns/federation.js: Received error.', {
+         Logger.error('events/nouns/nouns-dao.js: Received error.', {
             error: error,
             eventName: data.eventName,
             channelId: channel.id,
