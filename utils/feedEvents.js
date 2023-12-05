@@ -6,7 +6,6 @@ events.set('federationBidPlaced', 'Federation.BidPlaced');
 events.set('federationVoteCast', 'Federation.VoteCast');
 
 // NermanPoll.
-events.set('newLilNounsProposalPoll', 'NermanPoll.NewLilNounsProposalPoll');
 events.set('newProposalPoll', 'NermanPoll.NewProposalPoll');
 events.set('threadFeedbackSent', 'NermanPoll.ThreadFeedbackSent');
 events.set('threadStatusChange', 'NermanPoll.ThreadStatusChange');
@@ -74,5 +73,8 @@ events.set('lilNounsProposalCreated', 'LilNouns.ProposalCreated');
 events.set('lilNounsProposalStatusChange', 'LilNouns.ProposalStatusChange');
 events.set('lilNounsVoteCast', 'LilNouns.VoteCast');
 events.set('lilNounsTransfer', 'LilNouns.Transfer');
+
+// LilNounsPolls.
+events.set('newLilNounsProposalPoll', 'LilNounsPoll.NewProposalPoll');
 
 module.exports = events;
