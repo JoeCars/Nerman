@@ -14,6 +14,7 @@ const {
    fetchCandidateForumThread,
 } = require('../../../helpers/forum');
 const Proposal = require('../../../db/schemas/Proposal');
+const LilNounsProposal = require('../../../db/schemas/LilNounsProposal');
 const { fetchAddressName } = require('../../../utils/nameCache');
 
 const REASON_LENGTH_LIMIT = 3000;
@@ -929,7 +930,7 @@ module.exports = {
             data.description = data.description.substring(0, 500);
 
             try {
-               await Proposal.tryCreateProposal(data);
+               await LilNounsProposal.tryCreateProposal(data);
             } catch (error) {
                Logger.error('events/ready.js: Error creating a proposal.', {
                   error: error,
@@ -945,7 +946,9 @@ module.exports = {
                },
             );
 
-            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               data.id,
+            );
             data.eventName = 'LilNounsProposalCreated';
 
             router.sendToFeed(data, 'lilNounsProposalCreated', 'lil-nouns');
@@ -957,7 +960,9 @@ module.exports = {
             });
 
             data.status = 'Canceled';
-            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               data.id,
+            );
             data.eventName = 'LilNounsProposalStatusChange';
 
             router.sendToFeed(
@@ -974,7 +979,9 @@ module.exports = {
             });
 
             data.status = 'Queued';
-            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               data.id,
+            );
             data.eventName = 'LilNounsProposalStatusChange';
 
             router.sendToFeed(
@@ -990,7 +997,9 @@ module.exports = {
             });
 
             data.status = 'Vetoed';
-            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               data.id,
+            );
             data.eventName = 'LilNounsProposalStatusChange';
 
             router.sendToFeed(
@@ -1006,7 +1015,9 @@ module.exports = {
             });
 
             data.status = 'Executed';
-            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               data.id,
+            );
             data.eventName = 'LilNounsProposalStatusChange';
 
             router.sendToFeed(
@@ -1030,7 +1041,9 @@ module.exports = {
                   vote.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
             }
 
-            vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
+            vote.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               vote.proposalId,
+            );
             vote.voter.name = await fetchAddressName(vote.voter.id, Nouns);
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
 
