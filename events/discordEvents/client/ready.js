@@ -952,6 +952,7 @@ module.exports = {
             data.eventName = 'LilNounsProposalCreated';
 
             router.sendToFeed(data, 'lilNounsProposalCreated', 'lil-nouns');
+            router.sendToFeed(data, 'newLilNounsProposalPoll');
          });
 
          lilNouns.on('ProposalCanceled', async data => {

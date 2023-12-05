@@ -6,6 +6,7 @@ events.set('federationBidPlaced', 'Federation.BidPlaced');
 events.set('federationVoteCast', 'Federation.VoteCast');
 
 // NermanPoll.
+events.set('newLilNounsProposalPoll', 'NermanPoll.NewLilNounsProposalPoll');
 events.set('newProposalPoll', 'NermanPoll.NewProposalPoll');
 events.set('threadFeedbackSent', 'NermanPoll.ThreadFeedbackSent');
 events.set('threadStatusChange', 'NermanPoll.ThreadStatusChange');
