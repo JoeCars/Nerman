@@ -33,7 +33,7 @@ module.exports = {
                embed = embeds.generateVoteCastEmbed(data, true);
                break;
             case 'LilNounsTransfer':
-               embed = embeds.generateVoteCastEmbed(data, true);
+               embed = embeds.generateTransferEmbed(data, true);
                break;
             default:
                throw new Error(
