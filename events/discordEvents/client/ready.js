@@ -3,7 +3,9 @@ const { Collection, Client, Channel, TextChannel } = require('discord.js');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const Logger = require('../../../helpers/logger');
 const Router = require('../../../helpers/router');
-const { extractVoteChange } = require('../../../views/embeds/contracts/nouns-token');
+const {
+   extractVoteChange,
+} = require('../../../views/embeds/contracts/nouns-token');
 const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
 const NounsCandidateForum = require('../../../db/schemas/NounsCandidateForum');
 const {
@@ -60,6 +62,9 @@ module.exports = {
 
          const propdates = new nerman.Propdates(Nouns.provider);
          client.libraries.set('Propdates', propdates);
+
+         const lilNouns = new nerman.LilNouns(Nouns.provider);
+         client.libraries.set('LilNouns', lilNouns);
 
          // =============================================================
          // Federation
@@ -891,6 +896,160 @@ module.exports = {
 
             data.eventName = 'PostUpdate';
             router.sendToFeed(data, 'postUpdate', 'propdates');
+         });
+
+         // =============================================================
+         // LilNouns
+         // =============================================================
+
+         lilNouns.on('AuctionBid', async data => {
+            Logger.info('events/ready.js: On LilNounsAuctionBid.', {
+               nounId: `${data.id}`,
+               walletAddress: `${data.bidder.id}`,
+               ethereumWeiAmount: `${data.amount}`,
+            });
+
+            data.bidder.name = await fetchAddressName(data.bidder.id, Nouns);
+            data.eventName = 'LilNounsAuctionBid';
+            router.sendToFeed(data, 'lilNounsAuctionBid', 'lil-nouns');
+         });
+
+         lilNouns.on('AuctionCreated', async data => {
+            Logger.info('events/ready.js: On LilNounsAuctionCreated.', {
+               auctionId: `${data.id}`,
+               auctionStartTime: `${data.startTime}`,
+               auctionEndTime: `${data.endTime}`,
+            });
+
+            data.eventName = 'LilNounsAuctionCreated';
+            router.sendToFeed(data, 'lilNounsAuctionCreated', 'lil-nouns');
+         });
+
+         lilNouns.on('ProposalCreatedWithRequirements', async data => {
+            data.description = data.description.substring(0, 500);
+
+            try {
+               await Proposal.tryCreateProposal(data);
+            } catch (error) {
+               Logger.error('events/ready.js: Error creating a proposal.', {
+                  error: error,
+               });
+            }
+
+            Logger.info(
+               'events/ready.js: On LilNounsProposalCreatedWithRequirements.',
+               {
+                  id: `${data.id}`,
+                  proposer: `${data.proposer.id}`,
+                  description: data.description,
+               },
+            );
+
+            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.eventName = 'LilNounsProposalCreated';
+
+            router.sendToFeed(data, 'lilNounsProposalCreated', 'lil-nouns');
+         });
+
+         lilNouns.on('ProposalCanceled', async data => {
+            Logger.info('events/ready.js: On LilNounsProposalCanceled.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Canceled';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.eventName = 'LilNounsProposalStatusChange';
+
+            router.sendToFeed(
+               data,
+               'lilNounsProposalStatusChange',
+               'lil-nouns',
+            );
+         });
+
+         lilNouns.on('ProposalQueued', async data => {
+            Logger.info('events/ready.js: On LilNounsProposalQueued.', {
+               id: `${data.id}`,
+               eta: `${data.eta}`,
+            });
+
+            data.status = 'Queued';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.eventName = 'LilNounsProposalStatusChange';
+
+            router.sendToFeed(
+               data,
+               'lilNounsProposalStatusChange',
+               'lil-nouns',
+            );
+         });
+
+         lilNouns.on('ProposalVetoed', async data => {
+            Logger.info('events/ready.js: On LilNounsProposalVetoed.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Vetoed';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.eventName = 'LilNounsProposalStatusChange';
+
+            router.sendToFeed(
+               data,
+               'lilNounsProposalStatusChange',
+               'lil-nouns',
+            );
+         });
+
+         lilNouns.on('ProposalExecuted', async data => {
+            Logger.info('events/ready.js: On LilNounsProposalExecuted.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Executed';
+            data.proposalTitle = await fetchProposalTitle(data.id);
+            data.eventName = 'LilNounsProposalStatusChange';
+
+            router.sendToFeed(
+               data,
+               'lilNounsProposalStatusChange',
+               'lil-nouns',
+            );
+         });
+
+         lilNouns.on('VoteCast', async vote => {
+            Logger.info('events/ready.js: On LilNounsVoteCast.', {
+               proposalId: Number(vote.proposalId),
+               voterId: vote.voter.id,
+               votes: Number(vote.votes),
+               supportDetailed: vote.supportDetailed,
+               reason: vote.reason,
+            });
+
+            if (vote.reason && vote.reason.length > REASON_LENGTH_LIMIT) {
+               vote.reason =
+                  vote.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
+            vote.voter.name = await fetchAddressName(vote.voter.id, Nouns);
+            vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
+
+            vote.eventName = 'LilNounsVoteCast';
+            router.sendToFeed(vote, 'lilNounsVoteCast', 'lil-nouns');
+         });
+
+         lilNouns.on('Transfer', async data => {
+            Logger.info('events/ready.js: On LilNounsTransfer.', {
+               fromId: `${data.from.id}`,
+               toId: `${data.to.id}`,
+               tokenId: `${data.tokenId}`,
+            });
+
+            data.from.name = await fetchAddressName(data.from.id, Nouns);
+            data.to.name = await fetchAddressName(data.to.id, Nouns);
+
+            data.eventName = 'LilNounsTransfer';
+            router.sendToFeed(data, 'lilNounsTransfer', 'lil-nouns');
          });
       }
 

@@ -66,4 +66,12 @@ events.set('forkNounCreated', 'NounsForkTokens.ForkNounCreated');
 // Propdates.
 events.set('postUpdate', 'Propdates.PostUpdate');
 
+// LilNouns
+events.set('lilNounsAuctionBid', 'LilNouns.AuctionBid');
+events.set('lilNounsAuctionCreated', 'LilNouns.AuctionCreated');
+events.set('lilNounsProposalCreated', 'LilNouns.ProposalCreated');
+events.set('lilNounsProposalStatusChange', 'LilNouns.ProposalStatusChange');
+events.set('lilNounsVoteCast', 'LilNouns.VoteCast');
+events.set('lilNounsTransfer', 'LilNouns.Transfer');
+
 module.exports = events;
