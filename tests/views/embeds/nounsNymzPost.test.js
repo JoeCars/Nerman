@@ -9,7 +9,7 @@ const {
    findUsername,
    getUsernameHyperlink,
    generatePostBody,
-} = require('../../../views/embeds/nounsNymzPost');
+} = require('../../../views/embeds/contracts/nouns-nymz');
 
 describe('views/embeds/nounsNymzPost.js tests', function () {
    describe('getPostUrl() tests', function () {
