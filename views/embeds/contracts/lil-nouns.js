@@ -24,7 +24,7 @@ exports.generateAuctionBidEmbed = function (data) {
 
    return new MessageEmbed()
       .setColor('#00FFFF')
-      .setTitle(`Lil Nouns Auction Bid`)
+      .setTitle(`Lil Nouns | Auction Bid`)
       .setDescription(`${bidderLink} bid ${amount}Ξ on ${lilNoun}`);
 };
 
@@ -37,7 +37,7 @@ exports.generateAuctionCreatedEmbed = function (data) {
    const embed = new MessageEmbed()
       .setColor('#00FFFF')
       .setDescription(lilNouns)
-      .setTitle(`New Lil Nouns Auction | Lil Noun ${data.id}`);
+      .setTitle(`New Auction | Lil Noun ${data.id}`);
 
    return embed;
 };
@@ -113,11 +113,11 @@ exports.generateVoteCastEmbed = function (vote, hasMarkdown = true) {
  * @param {boolean} hasMarkdown
  */
 exports.generateTransferEmbed = function (data, hasMarkdown = true) {
-   let title = `Lil Nouns | Transfer | Lil Noun ${data.tokenId}`;
+   let title = `Transfer | Lil Noun ${data.tokenId}`;
    if (data.from.id === data.to.id) {
-      title = `Lil Nouns | Stanky Shameless Washing | Noun ${data.tokenId}`;
+      title = `Stanky Shameless Washing | Lil Noun ${data.tokenId}`;
    } else if (data.from.id === DEFAULT_MINT_ID) {
-      title = `Lil Nouns | Mint | Noun ${data.tokenId}`;
+      title = `Mint | Lil Noun ${data.tokenId}`;
    }
 
    let fromWallet = data.from.name;
