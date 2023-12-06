@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { describe, it } = require('mocha');
 
-const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
+const { extractVoteChange } = require('../../../views/embeds/contracts/nouns-token');
 
 describe('views/embeds/nounsNymzPost.js tests', function () {
    describe('extractVoteChange() tests', function () {

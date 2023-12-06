@@ -94,6 +94,9 @@ exports.fetchCandidateForumThread = async function (
    channel,
    data,
 ) {
+   // Formatting slug, because MongoDB doesn't accept map keys with ".".
+   slug = slug.replace(/\./g, ',');
+
    let thread = undefined;
    try {
       if (forum.threads.get(slug)) {

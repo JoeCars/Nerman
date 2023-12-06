@@ -66,7 +66,7 @@ module.exports = {
             /^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/,
          );
          const optionRegex = new RegExp(
-            /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?(^for-or-against$)?(^nouns-dao$)?$/,
+            /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?(^for-or-against$)?(^nouns-dao$)?(^lil-nouns$)?$/,
          );
 
          // extract data from submitted modal
@@ -199,7 +199,7 @@ module.exports = {
          ) {
             return modal.editReply({
                content:
-                  'One or more of the Poll Channel Options you have entered does not match.\nYour options are: vote-allowance, live-results, anonymous-voting, for-or-against',
+                  'One or more of the Poll Channel Options you have entered does not match.\nYour options are: vote-allowance, live-results, anonymous-voting, for-or-against, nouns-dao, lil-nouns',
                ephermeral: true,
             });
          }
@@ -234,6 +234,11 @@ module.exports = {
 
          if (pollChannelOptions.includes('nouns-dao')) {
             await registerForPollEvents(guildId, channelId);
+         }
+
+         // Not included as a default option.
+         if (pollChannelOptions.includes('lil-nouns')) {
+            await registerLilNounsPollEvents(guildId, channelId);
          }
 
          Logger.info(
@@ -286,6 +291,34 @@ async function registerForPollEvents(guildId, channelId) {
    const pollEvents = [...events.entries()]
       .filter(([key, value]) => {
          return value.split('.')[0] === 'NermanPoll';
+      })
+      .map(([key, value]) => {
+         return key;
+      });
+
+   try {
+      for (let i = 0; i < pollEvents.length; ++i) {
+         await FeedConfig.create({
+            _id: new Types.ObjectId(),
+            guildId: guildId,
+            channelId: channelId,
+            eventName: pollEvents[i],
+         });
+      }
+   } catch (error) {
+      Logger.error(
+         'events/discordEvents/interaction/modal/pollChannelSubmit.js: Unable to register poll events.',
+         {
+            error: error,
+         },
+      );
+   }
+}
+
+async function registerLilNounsPollEvents(guildId, channelId) {
+   const pollEvents = [...events.entries()]
+      .filter(([key, value]) => {
+         return value.split('.')[0] === 'LilNounsPoll';
       })
       .map(([key, value]) => {
          return key;
