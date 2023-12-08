@@ -1,11 +1,11 @@
 const { Collection, Client, Channel, TextChannel } = require('discord.js');
 
 const GuildConfig = require('../../../db/schemas/GuildConfig');
-const FeedConfig = require('../../../db/schemas/FeedConfig');
-const Poll = require('../../../db/schemas/Poll');
 const Logger = require('../../../helpers/logger');
-const { extractVoteChange } = require('../../../views/embeds/delegateChanged');
-const shortenAddress = require('../../../helpers/nouns/shortenAddress');
+const Router = require('../../../helpers/router');
+const {
+   extractVoteChange,
+} = require('../../../views/embeds/contracts/nouns-token');
 const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
 const NounsCandidateForum = require('../../../db/schemas/NounsCandidateForum');
 const {
@@ -14,14 +14,12 @@ const {
    fetchCandidateForumThread,
 } = require('../../../helpers/forum');
 const Proposal = require('../../../db/schemas/Proposal');
+const LilNounsProposal = require('../../../db/schemas/LilNounsProposal');
 const { fetchAddressName } = require('../../../utils/nameCache');
 
 const REASON_LENGTH_LIMIT = 3000;
 
 const MAX_PROPOSAL_TITLE = 96;
-
-// https://discord.com/developers/docs/topics/opcodes-and-status-codes
-const UNKNOWN_CHANNEL_ERROR_CODE = 10003;
 
 module.exports = {
    name: 'ready',
@@ -38,6 +36,7 @@ module.exports = {
       await require('../../../db/index.js')(client);
 
       const _nerman = import('nerman');
+      const router = new Router(client);
 
       async function runNouns() {
          const nerman = await _nerman;
@@ -65,15 +64,12 @@ module.exports = {
          const propdates = new nerman.Propdates(Nouns.provider);
          client.libraries.set('Propdates', propdates);
 
-         const {
-            guilds: { cache: guildCache },
-         } = client;
+         const lilNouns = new nerman.LilNouns(Nouns.provider);
+         client.libraries.set('LilNouns', lilNouns);
 
-         // *************************************************************
-         //
-         // EXAMPLE EVENTS
-         //
-         // *************************************************************
+         // =============================================================
+         // Federation
+         // =============================================================
 
          federationNounsPool.on('BidPlaced', async data => {
             Logger.info('ready.js: On Federation BidPlaced.', {
@@ -112,10 +108,10 @@ module.exports = {
             }
             data.voteNumber = votes;
 
-            data.nounsForumType = 'FederationBidPlaced';
+            data.eventName = 'FederationBidPlaced';
 
-            sendToChannelFeeds('federationBidPlaced', data, client);
-            sendToChannelFeeds('threadFederationBidPlaced', data, client);
+            router.sendToFeed(data, 'federationBidPlaced', 'federation');
+            router.sendToFeed(data, 'threadFederationBidPlaced');
             sendToNounsForum(data.propId, data, client);
          });
 
@@ -143,12 +139,15 @@ module.exports = {
             );
             data.voteNumber = voting.votes;
 
-            data.nounsForumType = 'FederationVoteCast';
-
-            sendToChannelFeeds('federationVoteCast', data, client);
-            sendToChannelFeeds('threadFederationVoteCast', data, client);
+            data.eventName = 'FederationVoteCast';
+            router.sendToFeed(data, 'federationVoteCast', 'federation');
+            router.sendToFeed(data, 'threadFederationVoteCast');
             sendToNounsForum(data.propId, data, client);
          });
+
+         // =============================================================
+         // Nouns Auction House
+         // =============================================================
 
          Nouns.on('AuctionEnd', async data => {
             let bidData = undefined;
@@ -170,8 +169,37 @@ module.exports = {
 
             bidData.bidderName = await fetchAddressName(bidData.address, Nouns);
 
-            sendToChannelFeeds('auctionEnd', bidData, client);
+            bidData.eventName = 'AuctionEnd';
+            router.sendToFeed(bidData, 'auctionEnd', 'nouns-auction-house');
          });
+
+         Nouns.on('AuctionCreated', async auction => {
+            Logger.info('events/ready.js: On AuctionCreated.', {
+               auctionId: `${auction.id}`,
+               auctionStartTime: `${auction.startTime}`,
+               auctionEndTime: `${auction.endTime}`,
+            });
+
+            auction.eventName = 'AuctionCreated';
+            router.sendToFeed(auction, 'auctionCreated', 'nouns-auction-house');
+         });
+
+         Nouns.on('AuctionBid', async data => {
+            Logger.info('events/ready.js: On AuctionBid.', {
+               nounId: `${data.id}`,
+               walletAddress: `${data.bidder.id}`,
+               ethereumWeiAmount: `${data.amount}`,
+               dataExtended: `${data.extended}`,
+            });
+
+            data.bidder.name = await fetchAddressName(data.bidder.id, Nouns);
+            data.eventName = 'AuctionBid';
+            router.sendToFeed(data, 'auctionBid', 'nouns-auction-house');
+         });
+
+         // =============================================================
+         // Nouns Token
+         // =============================================================
 
          Nouns.on('DelegateChanged', async data => {
             Logger.info('ready.js: On DelegateChanged.', {
@@ -216,11 +244,39 @@ module.exports = {
             }
             data.numOfVotesChanged = numOfVotesChanged;
 
-            if (numOfVotesChanged) {
-               sendToChannelFeeds('delegateChangedNoZero', data, client);
+            data.eventName = 'DelegateChanged';
+            if (numOfVotesChanged !== 0) {
+               router.sendToFeed(data, 'delegateChangedNoZero', 'nouns-token');
             }
-            sendToChannelFeeds('delegateChanged', data, client);
+            router.sendToFeed(data, 'delegateChanged', 'nouns-token');
          });
+
+         Nouns.on('Transfer', async data => {
+            Logger.info('events/ready.js: On Transfer.', {
+               fromId: `${data.from.id}`,
+               toId: `${data.to.id}`,
+               tokenId: `${data.tokenId}`,
+            });
+
+            data.from.name = await fetchAddressName(data.from.id, Nouns);
+            data.to.name = await fetchAddressName(data.to.id, Nouns);
+
+            data.eventName = 'Transfer';
+            router.sendToFeed(data, 'transferNoun', 'nouns-token');
+         });
+
+         Nouns.on('NounCreated', async data => {
+            Logger.info('events/ready.js: On NounCreated.', {
+               nounId: `${data.id}`,
+            });
+
+            data.eventName = 'NounCreated';
+            router.sendToFeed(data, 'nounCreated', 'nouns-token');
+         });
+
+         // =============================================================
+         // NounsNymz
+         // =============================================================
 
          nounsNymz.on('NewPost', async post => {
             Logger.info('ready.js: On NewPost.', {
@@ -228,8 +284,13 @@ module.exports = {
                postTitle: post.title,
             });
 
-            sendToChannelFeeds('newPost', post, client);
+            post.eventName = 'NewPost';
+            router.sendToFeed(post, 'newPost', 'nouns-nymz');
          });
+
+         // =============================================================
+         // Nouns DAO
+         // =============================================================
 
          Nouns.on('VoteCast', async vote => {
             Logger.info('events/ready.js: On VoteCast.', {
@@ -248,13 +309,14 @@ module.exports = {
             vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
             vote.voter.name = await fetchAddressName(vote.voter.id, Nouns);
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
-            vote.nounsForumType = 'PropVoteCast';
+
+            vote.eventName = 'PropVoteCast';
 
             if (Number(vote.votes) === 0) {
-               sendToChannelFeeds('propVoteCastOnlyZero', vote, client);
+               router.sendToFeed(vote, 'propVoteCastOnlyZero', 'nouns-dao');
             } else {
-               sendToChannelFeeds('propVoteCast', vote, client);
-               sendToChannelFeeds('threadVote', vote, client);
+               router.sendToFeed(vote, 'propVoteCast', 'nouns-dao');
+               router.sendToFeed(vote, 'threadVote');
             }
 
             sendToNounsForum(vote.proposalId, vote, client);
@@ -289,10 +351,10 @@ module.exports = {
             );
 
             data.proposalTitle = await fetchProposalTitle(data.id);
-            data.nounsForumType = 'PropCreated';
+            data.eventName = 'PropCreated';
 
-            sendToChannelFeeds('newProposalPoll', data, client);
-            sendToChannelFeeds('propCreated', data, client);
+            router.sendToFeed(data, 'newProposalPoll');
+            router.sendToFeed(data, 'propCreated', 'nouns-dao');
             sendToNounsForum(data.id, data, client);
          });
 
@@ -303,14 +365,13 @@ module.exports = {
 
             data.status = 'Canceled';
             data.proposalTitle = await fetchProposalTitle(data.id);
-            data.nounsForumType = 'PropStatusChange';
+            data.eventName = 'PropStatusChange';
 
-            sendToChannelFeeds('propStatusChange', data, client);
-            sendToChannelFeeds('threadStatusChange', data, client);
+            router.sendToFeed(data, 'propStatusChange', 'nouns-dao');
+            router.sendToFeed(data, 'threadStatusChange');
             sendToNounsForum(data.id, data, client);
          });
 
-         // Nouns.on('ProposalQueued', (data: nerman.EventData.ProposalQueued) => {
          Nouns.on('ProposalQueued', async data => {
             Logger.info('events/ready.js: On ProposalQueued.', {
                id: `${data.id}`,
@@ -319,14 +380,13 @@ module.exports = {
 
             data.status = 'Queued';
             data.proposalTitle = await fetchProposalTitle(data.id);
-            data.nounsForumType = 'PropStatusChange';
+            data.eventName = 'PropStatusChange';
 
-            sendToChannelFeeds('propStatusChange', data, client);
-            sendToChannelFeeds('threadStatusChange', data, client);
+            router.sendToFeed(data, 'propStatusChange', 'nouns-dao');
+            router.sendToFeed(data, 'threadStatusChange');
             sendToNounsForum(data.id, data, client);
          });
 
-         // Nouns.on('ProposalVetoed', (data: nerman.EventData.ProposalVetoed) => {
          Nouns.on('ProposalVetoed', async data => {
             Logger.info('events/ready.js: On ProposalVetoed.', {
                id: `${data.id}`,
@@ -334,10 +394,10 @@ module.exports = {
 
             data.status = 'Vetoed';
             data.proposalTitle = await fetchProposalTitle(data.id);
-            data.nounsForumType = 'PropStatusChange';
+            data.eventName = 'PropStatusChange';
 
-            sendToChannelFeeds('propStatusChange', data, client);
-            sendToChannelFeeds('threadStatusChange', data, client);
+            router.sendToFeed(data, 'propStatusChange', 'nouns-dao');
+            router.sendToFeed(data, 'threadStatusChange');
             sendToNounsForum(data.id, data, client);
          });
 
@@ -348,189 +408,12 @@ module.exports = {
 
             data.status = 'Executed';
             data.proposalTitle = await fetchProposalTitle(data.id);
-            data.nounsForumType = 'PropStatusChange';
+            data.eventName = 'PropStatusChange';
 
-            sendToChannelFeeds('propStatusChange', data, client);
-            sendToChannelFeeds('threadStatusChange', data, client);
+            router.sendToFeed(data, 'propStatusChange', 'nouns-dao');
+            router.sendToFeed(data, 'threadStatusChange');
             sendToNounsForum(data.id, data, client);
          });
-
-         Nouns.on('Transfer', async data => {
-            Logger.info('events/ready.js: On Transfer.', {
-               fromId: `${data.from.id}`,
-               toId: `${data.to.id}`,
-               tokenId: `${data.tokenId}`,
-            });
-
-            data.from.name = await fetchAddressName(data.from.id, Nouns);
-            data.to.name = await fetchAddressName(data.to.id, Nouns);
-
-            sendToChannelFeeds('transferNoun', data, client);
-         });
-
-         Nouns.on('AuctionCreated', async auction => {
-            Logger.info('events/ready.js: On AuctionCreated.', {
-               auctionId: `${auction.id}`,
-               auctionStartTime: `${auction.startTime}`,
-               auctionEndTime: `${auction.endTime}`,
-            });
-
-            sendToChannelFeeds('auctionCreated', auction, client);
-         });
-
-         Nouns.on('NounCreated', async data => {
-            Logger.info('events/ready.js: On NounCreated.', {
-               nounId: `${data.id}`,
-            });
-
-            sendToChannelFeeds('nounCreated', data, client);
-         });
-
-         Nouns.on('AuctionBid', async data => {
-            Logger.info('events/ready.js: On AuctionBid.', {
-               nounId: `${data.id}`,
-               walletAddress: `${data.bidder.id}`,
-               ethereumWeiAmount: `${data.amount}`,
-               dataExtended: `${data.extended}`,
-            });
-
-            data.bidder.name = await fetchAddressName(data.bidder.id, Nouns);
-            sendToChannelFeeds('auctionBid', data, client);
-         });
-
-         // =============================================================
-         // Nouns DAO Data
-         // =============================================================
-
-         Nouns.on('CandidateFeedbackSent', async data => {
-            Logger.info('ready.js: On CandidateFeedbackSent', {
-               msgSender: data.msgSender.id,
-               proposer: data.proposer.id,
-               slug: data.slug,
-               support: data.support,
-               reason: data.reason,
-            });
-
-            data.msgSender.name = await fetchAddressName(
-               data.msgSender.id,
-               Nouns,
-            );
-            data.proposer.name = await fetchAddressName(
-               data.proposer.id,
-               Nouns,
-            );
-            data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
-            data.nounsForumType = 'CandidateFeedbackSent';
-
-            sendToChannelFeeds('candidateFeedbackSent', data, client);
-            sendToCandidateForum(data.slug, data, client);
-         });
-
-         Nouns.on('FeedbackSent', async data => {
-            Logger.info('ready.js: On FeedbackSent', {
-               msgSender: data.msgSender.id,
-               proposalId: data.proposalId,
-               support: data.support,
-               reason: data.reason,
-            });
-
-            data.msgSender.name = await fetchAddressName(
-               data.msgSender.id,
-               Nouns,
-            );
-            data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
-            data.proposalTitle = await fetchProposalTitle(data.proposalId);
-            data.nounsForumType = 'FeedbackSent';
-
-            sendToChannelFeeds('feedbackSent', data, client);
-            sendToChannelFeeds('threadFeedbackSent', data, client);
-            sendToNounsForum(data.proposalId, data, client);
-         });
-
-         Nouns.on('ProposalCandidateCanceled', async data => {
-            Logger.info('ready.js: On ProposalCandidateCanceled', {
-               msgSender: data.msgSender.id,
-               slug: data.slug,
-               reason: data.reason,
-            });
-
-            data.msgSender.name = await fetchAddressName(
-               data.msgSender.id,
-               Nouns,
-            );
-            data.proposer = data.msgSender;
-            data.nounsForumType = 'ProposalCandidateCanceled';
-
-            sendToChannelFeeds('proposalCandidateCanceled', data, client);
-            sendToCandidateForum(data.slug, data, client);
-         });
-
-         Nouns.on('ProposalCandidateCreated', async data => {
-            data.description = data.description.substring(0, 500);
-            Logger.info('ready.js: On ProposalCandidateCreated.', {
-               slug: data.slug,
-               proposer: data.msgSender.id,
-               description: data.description,
-            });
-
-            data.msgSender.name = await fetchAddressName(
-               data.msgSender.id,
-               Nouns,
-            );
-            data.proposer = data.msgSender;
-            data.nounsForumType = 'ProposalCandidateCreated';
-
-            sendToChannelFeeds('proposalCandidateCreated', data, client);
-            sendToCandidateForum(data.slug, data, client);
-         });
-
-         Nouns.on('ProposalCandidateUpdated', async data => {
-            Logger.info('ready.js: On ProposalCandidateUpdated', {
-               msgSender: data.msgSender.id,
-               slug: data.slug,
-               reason: data.reason,
-            });
-
-            data.msgSender.name = await fetchAddressName(
-               data.msgSender.id,
-               Nouns,
-            );
-            data.proposer = data.msgSender;
-            data.nounsForumType = 'ProposalCandidateUpdated';
-
-            sendToChannelFeeds('proposalCandidateUpdated', data, client);
-            sendToCandidateForum(data.slug, data, client);
-         });
-
-         Nouns.on('SignatureAdded', async data => {
-            if (data.reason > REASON_LENGTH_LIMIT) {
-               data.reason =
-                  data.reason.substring(0, REASON_LENGTH_LIMIT).trim() + '...';
-            }
-            Logger.info('ready.js: On SignatureAdded.', {
-               slug: data.slug,
-               proposer: data.proposer.id,
-               signer: data.signer.id,
-               reason: data.reason,
-            });
-
-            data.proposer.name = await fetchAddressName(
-               data.proposer.id,
-               Nouns,
-            );
-            data.signer.name = await fetchAddressName(data.signer.id, Nouns);
-            data.votes = await Nouns.NounsToken.Contract.getCurrentVotes(
-               data.signer.id,
-            );
-            data.nounsForumType = 'SignatureAdded';
-
-            sendToChannelFeeds('signatureAdded', data, client);
-            sendToCandidateForum(data.slug, data, client);
-         });
-
-         // =============================================================
-         // Nouns DAO Fork
-         // =============================================================
 
          Nouns.on('DAOWithdrawNounsFromEscrow', async data => {
             Logger.info('ready.js: On WithdrawNounsFromEscrow', {
@@ -540,7 +423,8 @@ module.exports = {
 
             data.to.name = await fetchAddressName(data.to.id, Nouns);
 
-            sendToChannelFeeds('withdrawNounsFromEscrow', data, client);
+            data.eventName = 'WithdrawNounsFromEscrow';
+            router.sendToFeed(data, 'withdrawNounsFromEscrow', 'nouns-dao');
          });
 
          Nouns.on('EscrowedToFork', async data => {
@@ -576,7 +460,8 @@ module.exports = {
             data.thresholdNumber = thresholdNumber;
             data.currentPercentage = currentPercentage;
 
-            sendToChannelFeeds('escrowedToFork', data, client);
+            data.eventName = 'EscrowedToFork';
+            router.sendToFeed(data, 'escrowedToFork', 'nouns-dao');
          });
 
          Nouns.on('ExecuteFork', async data => {
@@ -596,7 +481,9 @@ module.exports = {
                data.forkToken.id,
                Nouns,
             );
-            sendToChannelFeeds('executeFork', data, client);
+
+            data.eventName = 'ExecuteFork';
+            router.sendToFeed(data, 'executeFork', 'nouns-dao');
          });
 
          Nouns.on('JoinFork', async data => {
@@ -610,7 +497,170 @@ module.exports = {
 
             data.owner.name = await fetchAddressName(data.owner.id, Nouns);
 
-            sendToChannelFeeds('joinFork', data, client);
+            data.eventName = 'JoinFork';
+            router.sendToFeed(data, 'joinFork', 'nouns-dao');
+         });
+
+         // =============================================================
+         // Nouns DAO Data
+         // =============================================================
+
+         Nouns.on('CandidateFeedbackSent', async data => {
+            Logger.info('ready.js: On CandidateFeedbackSent', {
+               msgSender: data.msgSender.id,
+               proposer: data.proposer.id,
+               slug: data.slug,
+               support: data.support,
+               reason: data.reason,
+            });
+
+            if (!data.slug.trim()) {
+               return Logger.warn('ready.js: SignatureAdded. Missing slug.');
+            }
+
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
+            data.proposer.name = await fetchAddressName(
+               data.proposer.id,
+               Nouns,
+            );
+            data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.eventName = 'CandidateFeedbackSent';
+
+            router.sendToFeed(data, 'candidateFeedbackSent', 'nouns-dao-data');
+            sendToCandidateForum(data.slug, data, client);
+         });
+
+         Nouns.on('FeedbackSent', async data => {
+            Logger.info('ready.js: On FeedbackSent', {
+               msgSender: data.msgSender.id,
+               proposalId: data.proposalId,
+               support: data.support,
+               reason: data.reason,
+            });
+
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
+            data.supportVote = ['AGAINST', 'FOR', 'ABSTAIN'][data.support];
+            data.proposalTitle = await fetchProposalTitle(data.proposalId);
+            data.eventName = 'FeedbackSent';
+
+            router.sendToFeed(data, 'feedbackSent', 'nouns-dao-data');
+            router.sendToFeed(data, 'threadFeedbackSent');
+            sendToNounsForum(data.proposalId, data, client);
+         });
+
+         Nouns.on('ProposalCandidateCanceled', async data => {
+            Logger.info('ready.js: On ProposalCandidateCanceled', {
+               msgSender: data.msgSender.id,
+               slug: data.slug,
+               reason: data.reason,
+            });
+
+            if (!data.slug.trim()) {
+               return Logger.warn('ready.js: SignatureAdded. Missing slug.');
+            }
+
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
+            data.proposer = data.msgSender;
+            data.eventName = 'ProposalCandidateCanceled';
+
+            router.sendToFeed(
+               data,
+               'proposalCandidateCanceled',
+               'nouns-dao-data',
+            );
+            sendToCandidateForum(data.slug, data, client);
+         });
+
+         Nouns.on('ProposalCandidateCreated', async data => {
+            data.description = data.description.substring(0, 500);
+            Logger.info('ready.js: On ProposalCandidateCreated.', {
+               slug: data.slug,
+               proposer: data.msgSender.id,
+               description: data.description,
+            });
+
+            if (!data.slug.trim()) {
+               return Logger.warn('ready.js: SignatureAdded. Missing slug.');
+            }
+
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
+            data.proposer = data.msgSender;
+            data.eventName = 'ProposalCandidateCreated';
+
+            router.sendToFeed(
+               data,
+               'proposalCandidateCreated',
+               'nouns-dao-data',
+            );
+            sendToCandidateForum(data.slug, data, client);
+         });
+
+         Nouns.on('ProposalCandidateUpdated', async data => {
+            Logger.info('ready.js: On ProposalCandidateUpdated', {
+               msgSender: data.msgSender.id,
+               slug: data.slug,
+               reason: data.reason,
+            });
+
+            if (!data.slug.trim()) {
+               return Logger.warn('ready.js: SignatureAdded. Missing slug.');
+            }
+
+            data.msgSender.name = await fetchAddressName(
+               data.msgSender.id,
+               Nouns,
+            );
+            data.proposer = data.msgSender;
+            data.eventName = 'ProposalCandidateUpdated';
+
+            router.sendToFeed(
+               data,
+               'proposalCandidateUpdated',
+               'nouns-dao-data',
+            );
+            sendToCandidateForum(data.slug, data, client);
+         });
+
+         Nouns.on('SignatureAdded', async data => {
+            if (data.reason > REASON_LENGTH_LIMIT) {
+               data.reason =
+                  data.reason.substring(0, REASON_LENGTH_LIMIT).trim() + '...';
+            }
+            Logger.info('ready.js: On SignatureAdded.', {
+               slug: data.slug,
+               proposer: data.proposer.id,
+               signer: data.signer.id,
+               reason: data.reason,
+            });
+
+            if (!data.slug.trim()) {
+               return Logger.warn('ready.js: SignatureAdded. Missing slug.');
+            }
+
+            data.proposer.name = await fetchAddressName(
+               data.proposer.id,
+               Nouns,
+            );
+            data.signer.name = await fetchAddressName(data.signer.id, Nouns);
+            data.votes = await Nouns.NounsToken.Contract.getCurrentVotes(
+               data.signer.id,
+            );
+            data.eventName = 'SignatureAdded';
+
+            router.sendToFeed(data, 'signatureAdded', 'nouns-dao-data');
+            sendToCandidateForum(data.slug, data, client);
          });
 
          // =============================================================
@@ -659,7 +709,8 @@ module.exports = {
             }
             data.numOfVotesChanged = numOfVotesChanged;
 
-            sendToChannelFeeds('forkDelegateChanged', data, client);
+            data.eventName = 'ForkDelegateChanged';
+            router.sendToFeed(data, 'forkDelegateChanged', 'nouns-fork-token');
          });
 
          nounsForkToken.on('Transfer', async data => {
@@ -672,7 +723,8 @@ module.exports = {
             data.from.name = await fetchAddressName(data.from.id, Nouns);
             data.to.name = await fetchAddressName(data.to.id, Nouns);
 
-            sendToChannelFeeds('transferForkNoun', data, client);
+            data.eventName = 'TransferForkNoun';
+            router.sendToFeed(data, 'transferForkNoun', 'nouns-fork-token');
          });
 
          nounsForkToken.on('NounCreated', async data => {
@@ -680,7 +732,8 @@ module.exports = {
                id: data.id,
             });
 
-            sendToChannelFeeds('forkNounCreated', data, client);
+            data.eventName = 'ForkNounCreated';
+            router.sendToFeed(data, 'forkNounCreated', 'nouns-fork-token');
          });
 
          // =============================================================
@@ -693,7 +746,12 @@ module.exports = {
                auctionEndTime: `${auction.endTime}`,
             });
 
-            sendToChannelFeeds('forkAuctionCreated', auction, client);
+            auction.eventName = 'ForkAuctionCreated';
+            router.sendToFeed(
+               auction,
+               'forkAuctionCreated',
+               'nouns-fork-auction-house',
+            );
          });
 
          nounsForkAuctionHouse.on('AuctionBid', async data => {
@@ -706,7 +764,12 @@ module.exports = {
 
             data.bidder.name = await fetchAddressName(data.bidder.id, Nouns);
 
-            sendToChannelFeeds('forkAuctionBid', data, client);
+            data.eventName = 'ForkAuctionBid';
+            router.sendToFeed(
+               data,
+               'forkAuctionBid',
+               'nouns-fork-auction-house',
+            );
          });
 
          // =============================================================
@@ -736,7 +799,8 @@ module.exports = {
             const title = data.description.substring(1, titleEndIndex).trim(); // Title is formatted as '# Title \n'
             data.proposalTitle = `Proposal ${data.id}: ${title}`;
 
-            sendToChannelFeeds('forkProposalCreated', data, client);
+            data.eventName = 'ForkProposalCreated';
+            router.sendToFeed(data, 'forkProposalCreated', 'nouns-fork');
          });
 
          nounsFork.on('ProposalCanceled', async data => {
@@ -747,7 +811,8 @@ module.exports = {
             data.status = 'Canceled';
             data.proposalTitle = await fetchProposalTitle(data.id);
 
-            sendToChannelFeeds('forkProposalStatusChange', data, client);
+            data.eventName = 'ForkProposalStatusChange';
+            router.sendToFeed(data, 'forkProposalStatusChange', 'nouns-fork');
          });
 
          nounsFork.on('ProposalQueued', async data => {
@@ -759,7 +824,8 @@ module.exports = {
             data.status = 'Queued';
             data.proposalTitle = await fetchProposalTitle(data.id);
 
-            sendToChannelFeeds('forkProposalStatusChange', data, client);
+            data.eventName = 'ForkProposalStatusChange';
+            router.sendToFeed(data, 'forkProposalStatusChange', 'nouns-fork');
          });
 
          nounsFork.on('ProposalExecuted', async data => {
@@ -770,7 +836,8 @@ module.exports = {
             data.status = 'Executed';
             data.proposalTitle = await fetchProposalTitle(data.id);
 
-            sendToChannelFeeds('forkProposalStatusChange', data, client);
+            data.eventName = 'ForkProposalStatusChange';
+            router.sendToFeed(data, 'forkProposalStatusChange', 'nouns-fork');
          });
 
          nounsFork.on('Quit', async data => {
@@ -783,7 +850,9 @@ module.exports = {
                data.msgSender.id,
                Nouns,
             );
-            sendToChannelFeeds('forkQuit', data, client);
+
+            data.eventName = 'ForkQuit';
+            router.sendToFeed(data, 'forkQuit', 'nouns-fork');
          });
 
          nounsFork.on('VoteCast', async vote => {
@@ -804,11 +873,12 @@ module.exports = {
             vote.voter.name = await fetchAddressName(vote.voter.id, Nouns);
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
 
-            sendToChannelFeeds('forkVoteCast', vote, client);
+            vote.eventName = 'ForkVoteCast';
+            router.sendToFeed(vote, 'forkVoteCast', 'nouns-fork');
          });
 
          // =============================================================
-         // Nouns Fork
+         // Propdates
          // =============================================================
 
          propdates.on('PostUpdate', async data => {
@@ -824,9 +894,176 @@ module.exports = {
             });
 
             data.proposalTitle = await fetchProposalTitle(data.propId);
-            data.nounsForumType = 'PostUpdate';
 
-            sendToChannelFeeds('postUpdate', data, client);
+            data.eventName = 'PostUpdate';
+            router.sendToFeed(data, 'postUpdate', 'propdates');
+         });
+
+         // =============================================================
+         // LilNouns
+         // =============================================================
+
+         lilNouns.on('AuctionBid', async data => {
+            Logger.info('events/ready.js: On LilNounsAuctionBid.', {
+               nounId: `${data.id}`,
+               walletAddress: `${data.bidder.id}`,
+               ethereumWeiAmount: `${data.amount}`,
+            });
+
+            data.bidder.name = await fetchAddressName(data.bidder.id, Nouns);
+            data.eventName = 'LilNounsAuctionBid';
+            router.sendToFeed(data, 'lilNounsAuctionBid', 'lil-nouns');
+         });
+
+         lilNouns.on('AuctionCreated', async data => {
+            Logger.info('events/ready.js: On LilNounsAuctionCreated.', {
+               auctionId: `${data.id}`,
+               auctionStartTime: `${data.startTime}`,
+               auctionEndTime: `${data.endTime}`,
+            });
+
+            data.eventName = 'LilNounsAuctionCreated';
+            router.sendToFeed(data, 'lilNounsAuctionCreated', 'lil-nouns');
+         });
+
+         lilNouns.on('ProposalCreatedWithRequirements', async data => {
+            data.description = data.description.substring(0, 500);
+
+            try {
+               await LilNounsProposal.tryCreateProposal(data);
+            } catch (error) {
+               Logger.error('events/ready.js: Error creating a proposal.', {
+                  error: error,
+               });
+            }
+
+            Logger.info(
+               'events/ready.js: On LilNounsProposalCreatedWithRequirements.',
+               {
+                  id: `${data.id}`,
+                  proposer: `${data.proposer.id}`,
+                  description: data.description,
+               },
+            );
+
+            data.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               data.id,
+            );
+            data.eventName = 'LilNounsProposalCreated';
+
+            router.sendToFeed(data, 'lilNounsProposalCreated', 'lil-nouns');
+            router.sendToFeed(data, 'newLilNounsProposalPoll');
+         });
+
+         lilNouns.on('ProposalCanceled', async data => {
+            Logger.info('events/ready.js: On LilNounsProposalCanceled.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Canceled';
+            data.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               data.id,
+            );
+            data.eventName = 'LilNounsProposalStatusChange';
+
+            router.sendToFeed(
+               data,
+               'lilNounsProposalStatusChange',
+               'lil-nouns',
+            );
+         });
+
+         lilNouns.on('ProposalQueued', async data => {
+            Logger.info('events/ready.js: On LilNounsProposalQueued.', {
+               id: `${data.id}`,
+               eta: `${data.eta}`,
+            });
+
+            data.status = 'Queued';
+            data.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               data.id,
+            );
+            data.eventName = 'LilNounsProposalStatusChange';
+
+            router.sendToFeed(
+               data,
+               'lilNounsProposalStatusChange',
+               'lil-nouns',
+            );
+         });
+
+         lilNouns.on('ProposalVetoed', async data => {
+            Logger.info('events/ready.js: On LilNounsProposalVetoed.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Vetoed';
+            data.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               data.id,
+            );
+            data.eventName = 'LilNounsProposalStatusChange';
+
+            router.sendToFeed(
+               data,
+               'lilNounsProposalStatusChange',
+               'lil-nouns',
+            );
+         });
+
+         lilNouns.on('ProposalExecuted', async data => {
+            Logger.info('events/ready.js: On LilNounsProposalExecuted.', {
+               id: `${data.id}`,
+            });
+
+            data.status = 'Executed';
+            data.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               data.id,
+            );
+            data.eventName = 'LilNounsProposalStatusChange';
+
+            router.sendToFeed(
+               data,
+               'lilNounsProposalStatusChange',
+               'lil-nouns',
+            );
+         });
+
+         lilNouns.on('VoteCast', async vote => {
+            Logger.info('events/ready.js: On LilNounsVoteCast.', {
+               proposalId: Number(vote.proposalId),
+               voterId: vote.voter.id,
+               votes: Number(vote.votes),
+               supportDetailed: vote.supportDetailed,
+               reason: vote.reason,
+            });
+
+            if (vote.reason && vote.reason.length > REASON_LENGTH_LIMIT) {
+               vote.reason =
+                  vote.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
+            }
+
+            vote.proposalTitle = await LilNounsProposal.fetchProposalTitle(
+               vote.proposalId,
+            );
+            vote.voter.name = await fetchAddressName(vote.voter.id, Nouns);
+            vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];
+
+            vote.eventName = 'LilNounsVoteCast';
+            router.sendToFeed(vote, 'lilNounsVoteCast', 'lil-nouns');
+         });
+
+         lilNouns.on('Transfer', async data => {
+            Logger.info('events/ready.js: On LilNounsTransfer.', {
+               fromId: `${data.from.id}`,
+               toId: `${data.to.id}`,
+               tokenId: `${data.tokenId}`,
+            });
+
+            data.from.name = await fetchAddressName(data.from.id, Nouns);
+            data.to.name = await fetchAddressName(data.to.id, Nouns);
+
+            data.eventName = 'LilNounsTransfer';
+            router.sendToFeed(data, 'lilNounsTransfer', 'lil-nouns');
          });
       }
 
@@ -914,67 +1151,6 @@ async function sendToCandidateForum(slug, data, client) {
 
       client.emit('nounsCandidateForumUpdate', thread, data);
    });
-}
-
-/**
- * @param {string} eventName
- * @param {object} data
- * @param {Client} client
- */
-async function sendToChannelFeeds(eventName, data, client) {
-   let feeds;
-   try {
-      feeds = await FeedConfig.findChannels(eventName);
-   } catch (error) {
-      return Logger.error('Unable to retrieve feed config.', {
-         error: error,
-      });
-   }
-
-   feeds
-      .filter(feed => {
-         return feed && feed.guildId && feed.channelId;
-      })
-      .forEach(async feed => {
-         try {
-            const channel = await client.channels.fetch(feed.channelId);
-            if (channel) {
-               client.emit(eventName, channel, data);
-            }
-         } catch (error) {
-            Logger.error(
-               'events/discordEvents/client/ready.js: Received an error.',
-               {
-                  error: error,
-                  channelId: feed.channelId,
-               },
-            );
-
-            if (error.code === UNKNOWN_CHANNEL_ERROR_CODE) {
-               feed.isDeleted = true;
-               feed
-                  .save()
-                  .then(() => {
-                     Logger.debug(
-                        "events/discordEvents/client/ready.js: Soft-deleted the non-existant channel's feed config.",
-                        {
-                           channelId: feed.channelId,
-                           guildId: feed.guildId,
-                           feedEvent: feed.eventName,
-                        },
-                     );
-                  })
-                  .catch(err => {
-                     Logger.error(
-                        'events/discordEvents/client/ready.js: Unable to soft-delete the feed config.',
-                        {
-                           error: err,
-                        },
-                     );
-                  });
-            }
-         }
-      });
 }
 
 /**

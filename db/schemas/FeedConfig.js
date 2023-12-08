@@ -72,6 +72,12 @@ const FeedConfigSchema = new Schema(
             return feed;
          },
       },
+      methods: {
+         async softDelete() {
+            this.isDeleted = true;
+            return this.save();
+         },
+      },
    },
 );
 

@@ -18,8 +18,28 @@ function filterEvent(group) {
 function filterNounsContractEvents() {
    return [...events.entries()]
       .filter(([key, value]) => {
-         const eventGroup = value.substring(0, 8);
-         return eventGroup === 'NounsDAO';
+         const eventGroup = value.split('.')[0];
+         const isNounsDAO = eventGroup === 'NounsDAO';
+         const isNounsAuctionHouse = eventGroup === 'NounsAuctionHouse';
+         const isNounsToken = eventGroup === 'NounsToken';
+         const isNounsDAOData = eventGroup === 'NounsDAOData';
+
+         return (
+            isNounsDAO || isNounsAuctionHouse || isNounsToken || isNounsDAOData
+         );
+      })
+      .map(([key, value]) => {
+         return [value, key];
+      });
+}
+
+function filterLilNounsEvents() {
+   return [...events.entries()]
+      .filter(([key, value]) => {
+         const eventGroup = value.split('.')[0];
+         const isLilNouns = eventGroup === 'LilNouns';
+
+         return isLilNouns;
       })
       .map(([key, value]) => {
          return [value, key];
@@ -29,8 +49,20 @@ function filterNounsContractEvents() {
 function filterNounsOtherEvents() {
    return [...events.entries()]
       .filter(([key, value]) => {
-         const eventGroup = value.substring(0, 8);
-         return eventGroup !== 'NounsDAO';
+         const eventGroup = value.split('.')[0];
+         const isNounsDAO = eventGroup === 'NounsDAO';
+         const isNounsAuctionHouse = eventGroup === 'NounsAuctionHouse';
+         const isNounsToken = eventGroup === 'NounsToken';
+         const isNounsDAOData = eventGroup === 'NounsDAOData';
+         const isLilNouns = eventGroup === 'LilNouns';
+
+         return !(
+            isNounsDAO ||
+            isNounsAuctionHouse ||
+            isNounsToken ||
+            isNounsDAOData ||
+            isLilNouns
+         );
       })
       .map(([key, value]) => {
          return [value, key];
@@ -52,12 +84,33 @@ module.exports = {
                   .setName('nouns-contracts')
                   .setDescription('Nouns contract events.')
                   .addStringOption(option => {
-                     const federationEvents = filterNounsContractEvents();
+                     const nounsEvents = filterNounsContractEvents();
                      return option
                         .setName('event')
                         .setDescription('The event to register.')
                         .setRequired(true)
-                        .addChoices(federationEvents);
+                        .addChoices(nounsEvents);
+                  })
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will receive the notifications.',
+                        )
+                        .setRequired(false);
+                  });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('lil-nouns')
+                  .setDescription('LilNouns events.')
+                  .addStringOption(option => {
+                     const lilNounsEvents = filterLilNounsEvents();
+                     return option
+                        .setName('event')
+                        .setDescription('The event to register.')
+                        .setRequired(true)
+                        .addChoices(lilNounsEvents);
                   })
                   .addChannelOption(option => {
                      return option
@@ -73,12 +126,12 @@ module.exports = {
                   .setName('nouns-others')
                   .setDescription('General nouns events.')
                   .addStringOption(option => {
-                     const federationEvents = filterNounsOtherEvents();
+                     const generalEvents = filterNounsOtherEvents();
                      return option
                         .setName('event')
                         .setDescription('The event to register.')
                         .setRequired(true)
-                        .addChoices(federationEvents);
+                        .addChoices(generalEvents);
                   })
                   .addChannelOption(option => {
                      return option
