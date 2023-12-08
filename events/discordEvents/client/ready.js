@@ -169,8 +169,8 @@ module.exports = {
 
             bidData.bidderName = await fetchAddressName(bidData.address, Nouns);
 
-            data.eventName = 'AuctionEnd';
-            router.sendToFeed(data, 'auctionEnd', 'nouns-auction-house');
+            bidData.eventName = 'AuctionEnd';
+            router.sendToFeed(bidData, 'auctionEnd', 'nouns-auction-house');
          });
 
          Nouns.on('AuctionCreated', async auction => {
