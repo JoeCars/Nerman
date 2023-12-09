@@ -7,9 +7,10 @@ const PollChannel = require('../../db/schemas/PollChannel');
 const PollCount = require('../../db/schemas/ChannelPollCount');
 const Poll = require('../../db/schemas/Poll');
 const User = require('../../db/schemas/User');
-const UrlConfig = require('../../db/schemas/UrlConfig');
 const Logger = require('../../helpers/logger');
-const { createNewProposalEmbed } = require('../../helpers/proposalHelpers');
+const {
+   generateProposalCreatedEmbed,
+} = require('../../views/embeds/contracts/lil-nouns');
 
 module.exports = {
    name: 'newLilNounsProposalPoll',
@@ -31,11 +32,9 @@ module.exports = {
          );
       }
 
-      const { propUrl } = await UrlConfig.fetchUrls(channel.guildId);
-
       const interaction = await channel.send({
          content: null,
-         embeds: [createNewProposalEmbed(proposal, propUrl)],
+         embeds: [generateProposalCreatedEmbed(proposal)],
       });
 
       const {
@@ -79,8 +78,8 @@ module.exports = {
 
       const { id: propId, description: desc } = proposal;
 
-      const title = proposal.proposalTitle;
-      const description = propUrl + propId;
+      const title = 'Lil Nouns | ' + proposal.proposalTitle;
+      const description = 'https://lilnouns.wtf/vote/' + propId;
 
       Logger.debug('events/poll/newProposalPoll.js: Checking proposal.', {
          guildId: guildId,
