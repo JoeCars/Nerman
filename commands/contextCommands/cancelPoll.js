@@ -4,9 +4,8 @@ const {
    MessageContextMenuCommandInteraction,
    TextInputBuilder,
    ContextMenuCommandBuilder,
+   ApplicationCommandType,
 } = require('discord.js');
-
-const { ApplicationCommandType } = require('discord-api-types/v9');
 
 const Poll = require('../../db/schemas/Poll');
 const Logger = require('../../helpers/logger');
