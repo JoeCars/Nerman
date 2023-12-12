@@ -47,7 +47,6 @@ module.exports = {
       }
 
       // Actually retrieve configuration
-      // todo connect this to the GuildConfig from the collection
       const channelConfig = await PollChannel.findOne(
          { channelId },
          'maxUserProposal voteAllowance forAgainst allowedRoles',
@@ -81,18 +80,6 @@ module.exports = {
             `You have exceeded the maximum number (${channelConfig.maxUserProposal}) of active proposals permitted in this channel.`,
          );
       }
-
-      // disabled until we nail down the cross-guild permissions on this command
-      // if (
-      //    !memberPermissions.has('MANAGE_GUILD') &&
-      //    countedPolls >= channelConfig.maxUserProposal
-      // ) {
-      //    return interaction.reply({
-      //       content:
-      //          'You have exceeded the amount of allowed polls in this channel. You must wait until your current poll is closed.',
-      //       ephemeral: true,
-      //    });
-      // }
 
       const modal = createPollModal(channelConfig);
 
@@ -132,24 +119,6 @@ function createPollModal(channelConfig) {
       .setCustomId('modal-create-poll')
       .setTitle('Create Poll');
 
-   // const channelOptions = channelConfigs.map(
-   //    ({ channelId, channelName }) => ({
-   //       label: channelName,
-   //       value: channelId,
-   //    })
-   // );
-   // console.log(channelOptions);
-   // const pollType = new SelectMenuComponent()
-   //    .setCustomId('pollType')
-   //    .setPlaceholder('Select Poll Channel')
-   //    .addOptions(channelOptions)
-   //    .setMinValues(1)
-   //    .setMaxValues(1);
-   // console.log(pollType);
-   // return interaction.reply({
-   // content: 'canceling this for testing purposes',
-   // ephemeral: true,
-   // });
    const createPollComponents = [];
 
    const pollTitle = new TextInputBuilder()

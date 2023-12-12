@@ -5,7 +5,6 @@ const {
 } = require('discord.js');
 
 const {
-   SelectMenuComponent,
    showModal,
 } = require('discord-modals');
 

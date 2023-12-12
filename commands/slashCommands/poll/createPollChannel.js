@@ -50,14 +50,6 @@ module.exports = {
 
       await authorizeInteraction(interaction, 2);
 
-      // disabled until we nail down the cross-guild permissions on this command
-      // if (!memberPermissions.has('MANAGE_GUILD')) {
-      //    return interaction.reply({
-      //       content: 'Only guild managers have access to this.',
-      //       ephemeral: true,
-      //    });
-      // }
-
       if (!channel.isText()) {
          return interaction.reply({
             content:
@@ -66,13 +58,6 @@ module.exports = {
          });
       }
 
-      // const configCheck = await PollChannel.countDocuments({
-      //    channelId,
-      // });
-
-      // const guildConfig = await GuildConfig.exists({
-      //    guildId: guildId,
-      // }).exec();
       const guildConfig = await guildConfigs.has(guildId);
       if (!guildConfig) {
          throw new Error(
@@ -88,42 +73,6 @@ module.exports = {
          });
       }
 
-      // const channelConfigs = await PollChannel.find(
-      //    {},
-      //    'channelId channelName maxUserProposal'
-      // );
-
-      // Fetch all guild channels that are text channels and don't have an existing configuration
-      // const guildChannels = await channels
-      //    .fetch()
-      //    .then(allChannels =>
-      //       allChannels.filter(
-      //          ({ type, id }) =>
-      //             type === 'GUILD_TEXT' &&
-      //             !channelConfigs.some(config => id === config.channelId)
-      //       )
-      //    )
-      //    .catch(err => console.error(err));
-
-      // if (!guildChannels) {
-      //    return interaction.reply({
-      //       content:
-      //          'There are no available channels to create a new configuration for. Either there are no existing text channels, or they all have existing configurations. Existing configurations can be edited through context menu, but not overwritten by <Nerman create-poll-channel> command.',
-      //       ephemeral: true,
-      //    });
-      // }
-
-      // const channelOptions = guildChannels.map(({ id, name }) => ({
-      //    label: name,
-      //    value: id,
-      // }));
-
-      // console.log({ channelOptions });
-
-      // const roleOptions = roleCache.map(({ id, name }) => ({
-      //    label: name,
-      //    value: id,
-      // }));
       const roleOptions = await gRoles
          .fetch()
          .then(fetchedRoles =>
@@ -142,9 +91,6 @@ module.exports = {
                },
             );
          });
-      // const roleOptions = roleCache
-      //    .filter(({ id }) => id !== everyoneId)
-      //    .map(({ id, name }) => ({ label: name, value: id }));
 
       if (!roleOptions.length) {
          return interaction.reply({
@@ -186,12 +132,6 @@ function createPollChannelModal(roleOptions) {
       .setCustomId('modal-create-poll-channel')
       .setTitle('Create Polling Channel');
 
-   // const pollChannel = new SelectMenuComponent()
-   //    .setCustomId('pollChannel')
-   //    .setPlaceholder('Select Polling Channel')
-   //    .addOptions(channelOptions)
-   //    .setMinValues(1)
-   //    .setMaxValues(1);
    const votingRoles = new TextInputBuilder()
       .setCustomId('votingRoles')
       .setLabel('Choose Voting Roles')
@@ -200,14 +140,7 @@ function createPollChannelModal(roleOptions) {
       .setStyle('SHORT')
       .setMaxLength(100)
       .setRequired(true);
-   //disabled until modals are supported
-   // const votingRoles = new SelectMenuComponent()
-   //    .setCustomId('votingRoles')
-   //    .setPlaceholder('Allowed Voting Roles')
-   //    .addOptions(roleOptions)
-   //    .setMinValues(1)
-   //    .setMaxValues(roleOptions.length);
-   // todo DURATION REGEX THEN PARSE- DURATION MAX OUT 999 hours
+
    const pollDuration = new TextInputBuilder()
       .setCustomId('pollDuration')
       .setLabel('Poll Duration (hours)')
@@ -228,11 +161,8 @@ function createPollChannelModal(roleOptions) {
 
    const pollQuorum = new TextInputBuilder()
       .setCustomId('pollQuorumThreshold')
-      // .setLabel('Choose Quorum and Threshold %')
       .setLabel('Choose Quorum %')
-      // .setPlaceholder('Eg) 20:10 <= (quorum:threshold)')
       .setPlaceholder('Eg) 30.5')
-      // .setDefaultValue('30.5:30')
       .setDefaultValue('30.5')
       .setStyle('SHORT')
       .setMaxLength(15)
@@ -250,34 +180,7 @@ function createPollChannelModal(roleOptions) {
       .setStyle('SHORT')
       .setMaxLength(100);
 
-   // disabled until DJS add back support for SelectMenus in Modals
-   // const pollChannelOptions = new SelectMenuComponent()
-   //    .setCustomId('pollChannelOptions')
-   //    .setPlaceholder('Select Channel Options (if any)')
-   //    .addOptions(
-   //       {
-   //          label: 'Anonymous Voting',
-   //          value: 'anonymous-voting',
-   //          description:
-   //             'Only participation is recorded, results are anonymous.',
-   //       },
-   //       {
-   //          label: 'Live Results',
-   //          value: 'live-results',
-   //          description:
-   //             'Display visual feed of results as polling occurs.',
-   //       },
-   //       {
-   //          label: 'Vote Allowance',
-   //          value: 'vote-allowance',
-   //          description:
-   //             'Enables custom vote allowance # on create-poll command.',
-   //       }
-   //    )
-   //    .setMinValues(0)
-   //    .setMaxValues(3);
    modal.addComponents(
-      // pollChannel,
       votingRoles,
       pollDuration,
       maxProposals,
