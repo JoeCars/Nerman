@@ -3,7 +3,7 @@ const {
    ModalBuilder,
    TextInputBuilder,
 } = require('discord.js');
-const { showModal } = require('discord-modals');
+
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const Logger = require('../../../helpers/logger');
@@ -83,7 +83,7 @@ module.exports = {
 
       const modal = createPollModal(channelConfig);
 
-      await showModal(modal, {
+      await interaction.showModal(modal, {
          client: client,
          interaction: interaction,
       });

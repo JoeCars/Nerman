@@ -5,7 +5,6 @@ const {
    TextInputBuilder,
 } = require('discord.js');
 const { ContextMenuCommandBuilder } = require('@discordjs/builders');
-const { showModal } = require('discord-modals');
 const { ApplicationCommandType } = require('discord-api-types/v9');
 
 const Poll = require('../../db/schemas/Poll');
@@ -57,7 +56,7 @@ module.exports = {
 
          const confirmModal = createConfirmationModal(targetId);
 
-         await showModal(confirmModal, {
+         await interaction.showModal(confirmModal, {
             client: client,
             interaction: interaction,
          });
