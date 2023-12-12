@@ -1,5 +1,9 @@
-const { CommandInteraction, ModalBuilder } = require('discord.js');
-const { TextInputComponent, showModal } = require('discord-modals');
+const {
+   CommandInteraction,
+   ModalBuilder,
+   TextInputBuilder,
+} = require('discord.js');
+const { showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const Logger = require('../../../helpers/logger');
@@ -148,7 +152,7 @@ function createPollModal(channelConfig) {
    // });
    const createPollComponents = [];
 
-   const pollTitle = new TextInputComponent()
+   const pollTitle = new TextInputBuilder()
       .setCustomId('pollTitle')
       .setLabel('Title')
       .setPlaceholder('Poll title, or your main question.')
@@ -156,7 +160,7 @@ function createPollModal(channelConfig) {
       .setMaxLength(100)
       .setRequired(true);
 
-   const pollDescription = new TextInputComponent()
+   const pollDescription = new TextInputBuilder()
       .setCustomId('pollDescription')
       .setLabel('Description')
       .setPlaceholder(
@@ -166,7 +170,7 @@ function createPollModal(channelConfig) {
       .setMaxLength(2000)
       .setRequired(false);
 
-   const pollChoices = new TextInputComponent()
+   const pollChoices = new TextInputBuilder()
       .setCustomId('pollChoices')
       .setLabel('Choices')
       .setPlaceholder(
@@ -184,7 +188,7 @@ function createPollModal(channelConfig) {
    }
 
    if (channelConfig.voteAllowance) {
-      const pollAllowance = new TextInputComponent()
+      const pollAllowance = new TextInputBuilder()
          .setCustomId('voteAllowance')
          .setLabel('Votes Per User')
          .setPlaceholder('# of votes is a single user allowed.')

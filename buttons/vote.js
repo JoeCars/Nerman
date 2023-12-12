@@ -1,9 +1,14 @@
 const {
-   TextInputComponent,
+   ModalBuilder,
+   ButtonInteraction,
+   TextInputBuilder,
+} = require('discord.js');
+
+const {
    SelectMenuComponent,
    showModal,
 } = require('discord-modals');
-const { ModalBuilder, ButtonInteraction } = require('discord.js');
+
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
 const Logger = require('../helpers/logger');
@@ -91,7 +96,7 @@ function createVoteModal(attachedPoll) {
    const optionsString = capitalizedOptions.join(', ');
    const modal = new ModalBuilder().setCustomId('vote-modal').setTitle('Vote');
 
-   const selectOptions = new TextInputComponent()
+   const selectOptions = new TextInputBuilder()
       .setCustomId('votingSelect')
       .setLabel(`Type ${attachedPoll.pollData.voteAllowance} Choice(s)`)
       .setPlaceholder(optionsString)
@@ -100,7 +105,7 @@ function createVoteModal(attachedPoll) {
       .setMaxLength(100)
       .setRequired(true);
 
-   const reason = new TextInputComponent()
+   const reason = new TextInputBuilder()
       .setCustomId('voteReason')
       .setLabel('Reason')
       .setPlaceholder('Explain your vote.')

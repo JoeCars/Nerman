@@ -2,9 +2,10 @@ const {
    ModalBuilder,
    EmbedBuilder,
    MessageContextMenuCommandInteraction,
+   TextInputBuilder,
 } = require('discord.js');
 const { ContextMenuCommandBuilder } = require('@discordjs/builders');
-const { TextInputComponent, showModal } = require('discord-modals');
+const { showModal } = require('discord-modals');
 const { ApplicationCommandType } = require('discord-api-types/v9');
 
 const Poll = require('../../db/schemas/Poll');
@@ -106,7 +107,7 @@ function createConfirmationModal(targetId) {
       .setCustomId(`cancel-modal-${targetId}`)
       .setTitle('Cancel Poll?');
 
-   const confirmCancel = new TextInputComponent()
+   const confirmCancel = new TextInputBuilder()
       .setCustomId('confirmCancel')
       .setLabel(`Type 'confirm' (no quotes) then submit.`)
       .setPlaceholder('confirm')

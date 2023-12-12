@@ -1,5 +1,9 @@
-const { ModalBuilder, CommandInteraction } = require('discord.js');
-const { TextInputComponent, showModal } = require('discord-modals');
+const {
+   ModalBuilder,
+   CommandInteraction,
+   TextInputBuilder,
+} = require('discord.js');
+const { showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
@@ -188,7 +192,7 @@ function createPollChannelModal(roleOptions) {
    //    .addOptions(channelOptions)
    //    .setMinValues(1)
    //    .setMaxValues(1);
-   const votingRoles = new TextInputComponent()
+   const votingRoles = new TextInputBuilder()
       .setCustomId('votingRoles')
       .setLabel('Choose Voting Roles')
       .setPlaceholder(placeholder)
@@ -204,7 +208,7 @@ function createPollChannelModal(roleOptions) {
    //    .setMinValues(1)
    //    .setMaxValues(roleOptions.length);
    // todo DURATION REGEX THEN PARSE- DURATION MAX OUT 999 hours
-   const pollDuration = new TextInputComponent()
+   const pollDuration = new TextInputBuilder()
       .setCustomId('pollDuration')
       .setLabel('Poll Duration (hours)')
       .setPlaceholder('Eg) 60')
@@ -212,7 +216,7 @@ function createPollChannelModal(roleOptions) {
       .setMaxLength(4)
       .setRequired(true);
 
-   const maxProposals = new TextInputComponent()
+   const maxProposals = new TextInputBuilder()
       .setCustomId('maxProposals')
       .setLabel('Max Active Polls Per User')
       .setPlaceholder(
@@ -222,7 +226,7 @@ function createPollChannelModal(roleOptions) {
       .setMaxLength(3)
       .setRequired(true);
 
-   const pollQuorum = new TextInputComponent()
+   const pollQuorum = new TextInputBuilder()
       .setCustomId('pollQuorumThreshold')
       // .setLabel('Choose Quorum and Threshold %')
       .setLabel('Choose Quorum %')
@@ -234,7 +238,7 @@ function createPollChannelModal(roleOptions) {
       .setMaxLength(15)
       .setRequired(true);
 
-   const pollChannelOptions = new TextInputComponent()
+   const pollChannelOptions = new TextInputBuilder()
       .setCustomId('pollChannelOptions')
       .setLabel('Choose Channel Options (if any)')
       .setPlaceholder(
