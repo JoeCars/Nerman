@@ -1,5 +1,5 @@
-const { CommandInteraction } = require('discord.js');
-const { codeBlock } = require('@discordjs/builders');
+const { CommandInteraction, codeBlock } = require('discord.js');
+
 const Logger = require('../../../helpers/logger');
 const UrlConfig = require('../../../db/schemas/UrlConfig');
 

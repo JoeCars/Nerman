@@ -1,11 +1,9 @@
-const { Collection } = require('discord.js');
+const { Collection, REST, Routes } = require('discord.js');
+
 const { getFiles } = require('../utils/functions');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
 const importNermanJS = require('../utils/nouns/importNerman');
 const Logger = require('../helpers/logger');
-// todo use for permissions validation later on
-// const { Perms } = require('../validation/permissions');
+
 const clientId = process.env.DISCORD_CLIENT_ID;
 const token = process.env.DISCORD_TOKEN;
 

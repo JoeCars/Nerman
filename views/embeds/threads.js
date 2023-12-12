@@ -1,5 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
-const { inlineCode, hyperlink } = require('@discordjs/builders');
+const { EmbedBuilder, inlineCode, hyperlink } = require('discord.js');
 
 exports.generateThreadStatusEmbed = function (status) {
    const threadEmbed = new EmbedBuilder()

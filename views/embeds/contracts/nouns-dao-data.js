@@ -1,5 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
-const { hyperlink, inlineCode } = require('@discordjs/builders');
+const { EmbedBuilder, hyperlink, inlineCode } = require('discord.js');
 
 const PROPOSAL_REASON_LENGTH = 1500;
 const DISCORD_TITLE_LIMIT = 250; // Actually 256 but leaving space for ellipses.

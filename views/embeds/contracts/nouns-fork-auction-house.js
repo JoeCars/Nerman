@@ -1,5 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
-const { hyperlink } = require('@discordjs/builders');
+const { EmbedBuilder, hyperlink } = require('discord.js');
 const { getEthAmount } = require('../../helpers');
 
 /**

@@ -1,5 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
-const { inlineCode, hyperlink } = require('@discordjs/builders');
+const { EmbedBuilder, inlineCode, hyperlink } = require('discord.js');
 
 const DEFAULT_MINT_ID = '0x0000000000000000000000000000000000000000';
 

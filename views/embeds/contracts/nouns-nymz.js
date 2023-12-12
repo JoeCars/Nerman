@@ -1,5 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
-const { hyperlink, bold } = require('@discordjs/builders');
+const { EmbedBuilder, hyperlink, bold } = require('discord.js');
 
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
 

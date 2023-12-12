@@ -1,6 +1,5 @@
-const { CommandInteraction } = require('discord.js');
+const { CommandInteraction, codeBlock } = require('discord.js');
 const { Types } = require('mongoose');
-const { codeBlock } = require('@discordjs/builders');
 
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');

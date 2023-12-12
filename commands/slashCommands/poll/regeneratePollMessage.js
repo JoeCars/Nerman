@@ -1,9 +1,9 @@
 const {
    CommandInteraction,
    EmbedBuilder,
-   EmbedBuilder,
+   roleMention,
+   codeBlock,
 } = require('discord.js');
-const { roleMention, codeBlock } = require('@discordjs/builders');
 
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');

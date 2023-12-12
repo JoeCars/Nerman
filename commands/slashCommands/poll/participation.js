@@ -1,5 +1,4 @@
-const { CommandInteraction } = require('discord.js');
-const { codeBlock } = require('@discordjs/builders');
+const { CommandInteraction, codeBlock } = require('discord.js');
 
 const { Types } = require('mongoose');
 const User = require('../../../db/schemas/User');

@@ -1,10 +1,4 @@
-const { Modal } = require('discord-modals');
-
-const {
-   ButtonInteraction,
-   ModalSubmitInteraction,
-   EmbedBuilder,
-} = require('discord.js');
+const { ModalSubmitInteraction, EmbedBuilder } = require('discord.js');
 
 const Poll = require('../../../../db/schemas/Poll');
 const Logger = require('../../../../helpers/logger');

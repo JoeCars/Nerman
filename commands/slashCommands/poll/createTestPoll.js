@@ -1,4 +1,5 @@
-const { CommandInteraction, EmbedBuilder } = require('discord.js');
+const { CommandInteraction, EmbedBuilder, codeBlock } = require('discord.js');
+
 const Poll = require('../../../db/schemas/Poll');
 const User = require('../../../db/schemas/User');
 const PollChannel = require('../../../db/schemas/PollChannel');
@@ -7,7 +8,6 @@ const Vote = require('../../../db/schemas/Vote');
 const mongoose = require('mongoose');
 const { longestString } = require('../../../helpers/poll');
 const ResultBar = require('../../../structures/ResultBar');
-const { codeBlock } = require('@discordjs/builders');
 const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {

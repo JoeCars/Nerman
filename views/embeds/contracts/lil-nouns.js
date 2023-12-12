@@ -1,5 +1,10 @@
-const { EmbedBuilder } = require('discord.js');
-const { hyperlink, hideLinkEmbed, inlineCode } = require('@discordjs/builders');
+const {
+   EmbedBuilder,
+   hyperlink,
+   hideLinkEmbed,
+   inlineCode,
+} = require('discord.js');
+
 const { getEthAmount } = require('../../helpers');
 
 const DEFAULT_MINT_ID = '0x0000000000000000000000000000000000000000';

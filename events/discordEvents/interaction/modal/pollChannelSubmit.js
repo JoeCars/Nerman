@@ -1,15 +1,15 @@
-const { Modal } = require('discord-modals');
+const { ModalSubmitInteraction } = require('discord.js');
 const { Types } = require('mongoose');
+
 const PollChannel = require('../../../../db/schemas/PollChannel');
 const FeedConfig = require('../../../../db/schemas/FeedConfig');
-// const GuildConfig = require('../../db/schemas/GuildConfig');
 const Logger = require('../../../../helpers/logger');
 const events = require('../../../../utils/feedEvents');
 
 module.exports = {
    name: 'modalSubmit',
    /**
-    * @param {Modal} modal
+    * @param {ModalSubmitInteraction} modal
     */
    async execute(modal) {
       Logger.info(

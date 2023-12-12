@@ -1,5 +1,9 @@
-const { EmbedBuilder, MessageButton, MessageActionRow } = require('discord.js');
-const { roleMention } = require('@discordjs/builders');
+const {
+   EmbedBuilder,
+   ButtonBuilder,
+   ActionRowBuilder,
+   roleMention,
+} = require('discord.js');
 
 const Logger = require('../logger');
 
@@ -21,14 +25,14 @@ const initPollMessage = async ({
       .map(role => (role !== everyoneId ? roleMention(role) : '@everyone'))
       .join(' ');
 
-   const voteActionRow = new MessageActionRow();
+   const voteActionRow = new ActionRowBuilder();
 
-   const voteBtn = new MessageButton()
+   const voteBtn = new ButtonBuilder()
       .setCustomId('vote')
       .setLabel('Vote')
       .setStyle('PRIMARY');
 
-   const abstainBtn = new MessageButton()
+   const abstainBtn = new ButtonBuilder()
       .setCustomId('abstain')
       .setLabel('Abstain')
       .setStyle('SECONDARY');

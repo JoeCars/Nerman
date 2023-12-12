@@ -1,7 +1,10 @@
-const { EmbedBuilder, MessageButton, MessageActionRow } = require('discord.js');
-const { Modal } = require('discord-modals');
+const {
+   EmbedBuilder,
+   codeBlock,
+   ModalSubmitInteraction,
+} = require('discord.js');
 const { Types } = require('mongoose');
-const { roleMention, codeBlock } = require('@discordjs/builders');
+
 const { initPollMessage } = require('../../../../helpers/poll/initPollMessage');
 const ResultBar = require('../../../../structures/ResultBar');
 const User = require('../../../../db/schemas/User');
@@ -18,7 +21,7 @@ const { logToObject, formatDate } = require('../../../../utils/functions');
 module.exports = {
    name: 'modalSubmit',
    /**
-    * @param {Modal} modal
+    * @param {ModalSubmitInteraction} modal
     */
    async execute(modal) {
       Logger.info('events/poll/pollSubmit.js: Attempting to submit a poll.', {

@@ -1,5 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
-const { hyperlink, inlineCode } = require('@discordjs/builders');
+const { EmbedBuilder, hyperlink, inlineCode } = require('discord.js');
 
 exports.generateForkProposalCreatedEmbed = function (proposal) {
    const title = 'Fork 0 | New Proposal';

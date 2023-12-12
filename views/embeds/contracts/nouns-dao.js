@@ -1,10 +1,10 @@
-const { EmbedBuilder } = require('discord.js');
 const {
+   EmbedBuilder,
    hyperlink,
    inlineCode,
    italic,
    hideLinkEmbed,
-} = require('@discordjs/builders');
+} = require('discord.js');
 
 const PROPOSAL_REASON_LENGTH = 1500;
 

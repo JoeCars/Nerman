@@ -1,6 +1,5 @@
 const { Collection } = require('discord.js');
-// todo can use for cvlaidation later on, not right now though
-// const { Events } = require('../validation/eventNames');
+
 const { getFiles } = require('../utils/functions');
 const Logger = require('../helpers/logger');
 

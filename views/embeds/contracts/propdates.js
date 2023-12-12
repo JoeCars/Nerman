@@ -1,5 +1,4 @@
-const { EmbedBuilder } = require('discord.js');
-const { inlineCode } = require('@discordjs/builders');
+const { EmbedBuilder, inlineCode } = require('discord.js');
 
 const UPDATE_MAX_LENGTH = 300;
 

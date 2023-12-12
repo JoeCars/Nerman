@@ -1,5 +1,4 @@
-const { CommandInteraction } = require('discord.js');
-const { inlineCode } = require('@discordjs/builders');
+const { CommandInteraction, inlineCode } = require('discord.js');
 
 const FeedConfig = require('../../../db/schemas/FeedConfig');
 const Logger = require('../../../helpers/logger');

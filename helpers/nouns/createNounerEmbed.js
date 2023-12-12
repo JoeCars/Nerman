@@ -1,5 +1,5 @@
-const { EmbedBuilder } = require('discord.js');
-const { hyperlink, codeBlock } = require('@discordjs/builders');
+const { EmbedBuilder, hyperlink, codeBlock } = require('discord.js');
+
 const Logger = require('../logger');
 
 module.exports = async data => {
