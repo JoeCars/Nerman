@@ -1,4 +1,4 @@
-const { ContextMenuCommandBuilder } = require('@discordjs/builders');
+const { ContextMenuCommandBuilder } = require('discord.js');
 const { ApplicationCommandType } = require('discord-api-types/v9');
 const codeBlock = require('discord.js').Formatters.codeBlock;
 
