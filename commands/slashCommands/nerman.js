@@ -138,6 +138,19 @@ module.exports = {
                   )
                   .setRequired(true);
             });
+      })
+      .addSubcommand(subcommand => {
+         return subcommand
+            .setName('register-lilnouns-forum')
+            .setDescription('Register a lil nouns forum.')
+            .addChannelOption(option => {
+               return option
+                  .setName('lil-forum-channel')
+                  .setDescription(
+                     'The forum channel being set to a lil nouns forum.',
+                  )
+                  .setRequired(true);
+            });
       }),
 
    async execute() {
