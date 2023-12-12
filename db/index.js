@@ -1,6 +1,5 @@
 // Package Dependencies
-const { inlineCode, codeBlock } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, inlineCode, codeBlock } = require('discord.js');
 require('dotenv').config();
 const mongoose = require('mongoose');
 // Personal Imports
