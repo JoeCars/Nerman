@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const {
    hyperlink,
    inlineCode,
@@ -47,7 +47,7 @@ exports.generateEscrowedToForkEmbed = function (data) {
 
    const url = `https://nouns.wtf/fork/${data.forkId}`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)
@@ -75,7 +75,7 @@ exports.generateExecuteForkEmbed = function (data) {
       data.tokensInEscrow,
    )} tokens!`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)
@@ -118,7 +118,7 @@ exports.generateJoinForkEmbed = function (data) {
    const description =
       `${owner} joined ${fork} with ${tokens} token(s).` + reason;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)
@@ -132,7 +132,7 @@ exports.generatePropCreatedEmbed = function (proposal, proposalUrl) {
    const proposalName = proposal.proposalTitle;
    const url = `${proposalUrl}${proposal.id}`;
 
-   const proposalEmbed = new MessageEmbed()
+   const proposalEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(`\u200B\n${proposalName}\n\n${hideLinkEmbed(url)}`);
@@ -148,7 +148,7 @@ exports.generatePropStatusChangeEmbed = function (data, url) {
    const title = data.proposalTitle || `Proposal ${data.id}`;
    const description = `${url}${data.id}\n${data.status}`;
 
-   const proposalEmbed = new MessageEmbed()
+   const proposalEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);
@@ -188,7 +188,7 @@ exports.generatePropVoteCastEmbed = function (
    const titleUrl = `${proposalUrl}${vote.proposalId}`;
    const description = `${voter} voted ${choice} with ${votes} votes.\n\n${reason}`;
 
-   const voteEmbed = new MessageEmbed()
+   const voteEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setURL(titleUrl)
@@ -212,7 +212,7 @@ exports.generateWithdrawNounsFromEscrowEmbed = function (data) {
 
    const description = `${withdrawer} withdrew ${nounsWithdrawn} tokens from escrow.`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);

@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { inlineCode } = require('@discordjs/builders');
 
 const UPDATE_MAX_LENGTH = 300;
@@ -29,7 +29,7 @@ exports.generatePostUpdateEmbed = function (data) {
 
    const description = `Current Status: ${status}\n\n${update}`;
 
-   return new MessageEmbed()
+   return new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)

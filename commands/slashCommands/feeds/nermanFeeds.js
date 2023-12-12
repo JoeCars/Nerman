@@ -89,7 +89,7 @@ module.exports = {
                         .setName('event')
                         .setDescription('The event to register.')
                         .setRequired(true)
-                        .addChoices(nounsEvents);
+                        .addChoices(...nounsEvents);
                   })
                   .addChannelOption(option => {
                      return option
@@ -110,7 +110,7 @@ module.exports = {
                         .setName('event')
                         .setDescription('The event to register.')
                         .setRequired(true)
-                        .addChoices(lilNounsEvents);
+                        .addChoices(...lilNounsEvents);
                   })
                   .addChannelOption(option => {
                      return option
@@ -131,7 +131,7 @@ module.exports = {
                         .setName('event')
                         .setDescription('The event to register.')
                         .setRequired(true)
-                        .addChoices(generalEvents);
+                        .addChoices(...generalEvents);
                   })
                   .addChannelOption(option => {
                      return option

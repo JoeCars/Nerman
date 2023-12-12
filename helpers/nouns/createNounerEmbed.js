@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { hyperlink, codeBlock } = require('@discordjs/builders');
 const Logger = require('../logger');
 
@@ -16,7 +16,7 @@ module.exports = async data => {
             delegateVotingPower: data.delegateVotingPower,
             delegateNounsOwned: data.delegateNounsOwned,
             delegateNounsDelegated: data.delegateNounsDelegated,
-         }
+         },
       );
       // const { address, ens, owned, delegated } = data;
 
@@ -40,21 +40,21 @@ module.exports = async data => {
 
       const ownerHyperlink = hyperlink(
          addressPrint,
-         `https://etherscan.io/address/${addressPrint}`
+         `https://etherscan.io/address/${addressPrint}`,
       );
       const delegateHyperlink = hyperlink(
          delegateAddressPrint,
-         `https://etherscan.io/address/${delegateAddressPrint}`
+         `https://etherscan.io/address/${delegateAddressPrint}`,
       );
 
       const addressCodeBlock = codeBlock(
-         `Voting Power: ${ownerVotingPower}\n----------------\n - owned: ${ownerNounsOwned}\n - delegations: ${ownerNounsDelegated}`
+         `Voting Power: ${ownerVotingPower}\n----------------\n - owned: ${ownerNounsOwned}\n - delegations: ${ownerNounsDelegated}`,
       );
       const delegateCodeBlock = codeBlock(
-         `Voting Power: ${delegateVotingPower}\n----------------\n - owned: ${delegateNounsOwned}\n - delegations: ${delegateNounsDelegated}`
+         `Voting Power: ${delegateVotingPower}\n----------------\n - owned: ${delegateNounsOwned}\n - delegations: ${delegateNounsDelegated}`,
       );
 
-      const nounerEmbed = new MessageEmbed();
+      const nounerEmbed = new EmbedBuilder();
 
       if (delegating) {
          nounerEmbed.setColor('#00FFFF').addFields(
@@ -66,7 +66,7 @@ module.exports = async data => {
             {
                name: `**DELEGATE**`,
                value: `${delegateHyperlink}\n${delegateCodeBlock}`,
-            }
+            },
          );
       } else {
          nounerEmbed.setColor('#00FFFF').addFields({
@@ -88,7 +88,7 @@ module.exports = async data => {
             delegateVotingPower: data.delegateVotingPower,
             delegateNounsOwned: data.delegateNounsOwned,
             delegateNounsDelegated: data.delegateNounsDelegated,
-         }
+         },
       );
 
       return nounerEmbed;

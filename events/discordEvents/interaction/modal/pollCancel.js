@@ -3,7 +3,7 @@ const { Modal } = require('discord-modals');
 const {
    ButtonInteraction,
    ModalSubmitInteraction,
-   MessageEmbed,
+   EmbedBuilder,
 } = require('discord.js');
 
 const Poll = require('../../../../db/schemas/Poll');
@@ -44,7 +44,7 @@ module.exports = {
 
          if (!confirm) {
             throw new Error(
-               'Please ensure you have correctly typed ***confirm*** if you wish to cancel this poll.'
+               'Please ensure you have correctly typed ***confirm*** if you wish to cancel this poll.',
             );
          }
 
@@ -79,8 +79,8 @@ module.exports = {
             },
          ];
 
-         const cancelEmbed = new MessageEmbed(
-            targetMessage.embeds[0]
+         const cancelEmbed = new EmbedBuilder(
+            targetMessage.embeds[0],
          ).spliceFields(1, 4, cancelFields);
 
          await targetMessage.edit({

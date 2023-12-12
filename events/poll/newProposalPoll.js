@@ -1,5 +1,5 @@
 // todo I should rename newProposal to reduce confusion maybe? Will workshop it
-const { MessageEmbed, TextChannel } = require('discord.js');
+const { EmbedBuilder, TextChannel } = require('discord.js');
 const { Types } = require('mongoose');
 
 const { initPollMessage } = require('../../helpers/poll/initPollMessage');
@@ -262,7 +262,7 @@ module.exports = {
 
          await Promise.all(updateVoterPromise);
 
-         const updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
+         const updatedEmbed = new EmbedBuilder(messageObject.embeds[0]);
 
          // const timeEndMilli = new Date(
          //    newPoll.timeCreated.getTime() + durationMs

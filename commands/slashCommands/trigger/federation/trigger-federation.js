@@ -21,7 +21,7 @@ module.exports = {
                   .setName('vote-choice')
                   .setDescription('The side being bid for.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
-                  .addChoices([
+                  .addChoices(...[
                      ['Against', 0],
                      ['For', 1],
                      ['Abstain', 2],
@@ -61,7 +61,7 @@ module.exports = {
                   .setName('vote-choice')
                   .setDescription('The side being bid for.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
-                  .addChoices([
+                  .addChoices(...[
                      ['Against', 0],
                      ['For', 1],
                      ['Abstain', 2],

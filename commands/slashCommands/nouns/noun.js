@@ -1,6 +1,6 @@
 const {
    MessageAttachment,
-   MessageEmbed,
+   EmbedBuilder,
    CommandInteraction,
 } = require('discord.js');
 const fetch = require('node-fetch');

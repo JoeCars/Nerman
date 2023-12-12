@@ -1,4 +1,4 @@
-const { ButtonInteraction, MessageEmbed } = require('discord.js');
+const { ButtonInteraction, EmbedBuilder } = require('discord.js');
 const User = require('../db/schemas/User');
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
@@ -109,7 +109,7 @@ async function updateVoteEmbed(client, channelId, messageId, updatedPoll) {
       .get(channelId)
       .messages.fetch(messageId);
 
-   const updateEmbed = new MessageEmbed(message.embeds[0]);
+   const updateEmbed = new EmbedBuilder(message.embeds[0]);
 
    updateEmbed.spliceFields(
       updateEmbed.fields.findIndex(({ name }) => name === 'Abstains'),

@@ -1,5 +1,6 @@
 // Package Dependencies
 const { inlineCode, codeBlock } = require('@discordjs/builders');
+const { EmbedBuilder } = require('discord.js');
 require('dotenv').config();
 const mongoose = require('mongoose');
 // Personal Imports
@@ -356,6 +357,9 @@ module.exports = async client => {
                         resultsOutput = codeBlock(resultsArray.join('\n'));
 
                         let closedEmbed = message.embeds[0];
+                        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>');
+                        console.log(closedEmbed);
+                        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>');
 
                         closedEmbed.setTitle(`${closedEmbed.title}`);
 

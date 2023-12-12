@@ -2,7 +2,7 @@ const { Modal } = require('discord-modals');
 const {
    ButtonInteraction,
    ModalSubmitInteraction,
-   MessageEmbed,
+   EmbedBuilder,
 } = require('discord.js');
 const {
    userMention,
@@ -255,7 +255,7 @@ module.exports = {
          .get(channelId)
          .messages.fetch(messageId);
 
-      const updateEmbed = new MessageEmbed(message.embeds[0]);
+      const updateEmbed = new EmbedBuilder(message.embeds[0]);
 
       updateEmbed.spliceFields(
          updateEmbed.fields.findIndex(({ name }) => name === 'Voters'),
@@ -330,7 +330,7 @@ module.exports = {
             const propText = matches[0];
             const propId = matches[1];
 
-            const threadEmbed = new MessageEmbed()
+            const threadEmbed = new EmbedBuilder()
                .setColor('#00FFFF')
                .setDescription(
                   `${
@@ -379,31 +379,7 @@ module.exports = {
          }
       } else {
          try {
-            // if (!guildNouncilIds.includes(channelId)) {
-            //    const threadEmbed = new MessageEmbed()
-            //       .setColor('#00FFFF')
-            //       .setDescription(
-            //          `${
-            //             guildNouncilIds.includes(channelId)
-            //                ? 'Anon Nouncillor'
-            //                : !pollOptions.anonymous
-            //                ? userMention(userId)
-            //                : 'Anon'
-            //          } voted ${inlineCode(voteArray.join(' '))}.${
-            //             !!voteReason ? `\n\n${voteReason.trim()}` : ``
-            //          }`
-            //       );
-            //    // .setDescription(
-            //    //    `${
-            //    //       !pollOptions.anonymous
-            //    //          ? userMention(userId)
-            //    //          : !guildNouncilIds.includes(channelId)
-            //    //          ? 'Anon'
-            //    //          : 'Anon Nouncillor'
-            //    //    } voted ${inlineCode(voteArray.join(' '))}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
-            //    // );
-            // }
-            const threadEmbed = new MessageEmbed()
+            const threadEmbed = new EmbedBuilder()
                .setColor('#00FFFF')
                .setDescription(
                   `${
@@ -418,32 +394,6 @@ module.exports = {
                         : inlineCode(voteArray.join(' '))
                   }.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`,
                );
-            //    .setDescription(
-            //       `${
-            //          !pollOptions.anonymous
-            //             ? userMention(userId)
-            //             : !guildNouncilIds.includes(channelId)
-            //             ? 'Anon'
-            //             : 'Anon Nouncillor'
-            //       } voted ${inlineCode(voteArray.join(' '))}.${
-            //          !!voteReason ? `\n\n${voteReason.trim()}` : ``
-            //       }`
-            // );
-            //    .setDescription(
-            //       `Anon Nouncillor voted ${inlineCode(voteArray.join(' '))}.${
-            //          !!voteReason ? `\n\n${voteReason.trim()}` : ``
-            //       }`
-            // );
-            // .setDescription(
-            //    `${
-            //       pollOptions.anonymous
-            //          ? 'Anon Nouncillor'
-            //          : userMention(userId)
-            //    } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
-            //       propText,
-            //       `https://nouns.wtf/vote/${propId}`
-            //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
-            // );
 
             const thread = await message.thread.fetch();
             // await message.thread.fetch();

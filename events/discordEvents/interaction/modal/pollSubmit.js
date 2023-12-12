@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
+const { EmbedBuilder, MessageButton, MessageActionRow } = require('discord.js');
 const { Modal } = require('discord-modals');
 const { Types } = require('mongoose');
 const { roleMention, codeBlock } = require('@discordjs/builders');
@@ -352,7 +352,7 @@ module.exports = {
 
          await Promise.all(updateVoterPromise);
 
-         let updatedEmbed = new MessageEmbed(messageObject.embeds[0]);
+         let updatedEmbed = new EmbedBuilder(messageObject.embeds[0]);
 
          updatedEmbed.setFooter({
             text: `Poll #${newPoll.pollNumber} submitted by ${

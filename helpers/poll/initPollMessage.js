@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageButton, MessageActionRow } = require('discord.js');
+const { EmbedBuilder, MessageButton, MessageActionRow } = require('discord.js');
 const { roleMention } = require('@discordjs/builders');
 
 const Logger = require('../logger');
@@ -60,7 +60,7 @@ const initPollMessage = async ({
    //    });
    // }
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#ffffff')
       .setTitle(title)
       .setDescription(description)

@@ -1,6 +1,6 @@
 const {
    CommandInteraction,
-   MessageEmbed,
+   EmbedBuilder,
    EmbedBuilder,
 } = require('discord.js');
 const { roleMention, codeBlock } = require('@discordjs/builders');
@@ -239,9 +239,6 @@ module.exports = {
             messageToUpdate.delete();
          }
       } else {
-         // disabled for meow
-         // const updateEmbed = new MessageEmbed(messageToUpdate.embeds[0]);
-
          const embedTitle = associatedPoll.pollData.title;
 
          const mentions = await channelConfig.allowedRoles
@@ -429,7 +426,7 @@ module.exports = {
          // }
 
          console.log({ title, description, newEmbedFields, footer });
-         let updateEmbed = new MessageEmbed()
+         let updateEmbed = new EmbedBuilder()
             .setColor(`#ffffff`)
             .setTitle(title)
             // .setTitle(embedTitle)

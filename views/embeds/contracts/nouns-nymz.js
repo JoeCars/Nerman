@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { hyperlink, bold } = require('@discordjs/builders');
 
 const shortenAddress = require('../../../helpers/nouns/shortenAddress');
@@ -53,7 +53,7 @@ exports.generateNewPostEmbed = async function (post, Nouns) {
       username = `${bold('Anon -')} ${username}`;
    }
    const body = exports.generatePostBody(post, username);
-   return new MessageEmbed()
+   return new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(body)

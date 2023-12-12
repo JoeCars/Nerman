@@ -1,4 +1,4 @@
-const { MessageEmbed, ContextMenuInteraction } = require('discord.js');
+const { EmbedBuilder, ContextMenuInteraction } = require('discord.js');
 const { ContextMenuCommandBuilder } = require('@discordjs/builders');
 const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const { ApplicationCommandType } = require('discord-api-types/v9');

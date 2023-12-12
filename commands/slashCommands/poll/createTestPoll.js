@@ -1,4 +1,4 @@
-const { CommandInteraction, MessageEmbed } = require('discord.js');
+const { CommandInteraction, EmbedBuilder } = require('discord.js');
 const Poll = require('../../../db/schemas/Poll');
 const User = require('../../../db/schemas/User');
 const PollChannel = require('../../../db/schemas/PollChannel');
@@ -103,7 +103,7 @@ async function createPollEmbed(interaction, newPoll) {
       user: { username, discriminator },
    } = interaction.guild.members.cache.get(newPoll.creatorId);
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#ffffff')
       .setTitle(newPoll.pollData.title)
       .setDescription(newPoll.pollData.description)

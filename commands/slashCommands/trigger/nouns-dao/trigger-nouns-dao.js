@@ -50,7 +50,7 @@ module.exports = {
                   .setName('proposal-status')
                   .setDescription('The proposal status.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
-                  .addChoices([
+                  .addChoices(...[
                      ['Canceled', 'Canceled'],
                      ['Queued', 'Queued'],
                      ['Vetoed', 'Vetoed'],
@@ -85,7 +85,7 @@ module.exports = {
                   .setName('vote-choice')
                   .setDescription('The vote choice.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
-                  .addChoices([
+                  .addChoices(...[
                      ['Against', 0],
                      ['For', 1],
                      ['Abstain', 2],

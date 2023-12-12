@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { hyperlink, inlineCode } = require('@discordjs/builders');
 
 exports.generateForkProposalCreatedEmbed = function (proposal) {
@@ -13,7 +13,7 @@ exports.generateForkProposalCreatedEmbed = function (proposal) {
       proposalName = `${proposalName}: ${proposalSubtitle}`;
    }
 
-   const proposalEmbed = new MessageEmbed()
+   const proposalEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(`\n${proposalName}`)
@@ -31,7 +31,7 @@ exports.generateForkProposalStatusChangeEmbed = function (data) {
    title = 'Fork 0 | ' + title;
    const description = data.status;
 
-   const proposalEmbed = new MessageEmbed()
+   const proposalEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);
@@ -55,7 +55,7 @@ exports.generateForkQuitEmbed = function (data) {
    const tokenNumber = inlineCode(data.tokenIds.length);
    const description = `${quitter} quit with ${tokenNumber} token(s).`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);
@@ -90,7 +90,7 @@ exports.generateForkVoteCastEmbed = function (vote, hasMarkdown = true) {
    const title = 'Fork 0 | ' + vote.proposalTitle;
    const description = `${voter} voted ${choice} with ${votes} votes.\n\n${reason}`;
 
-   const voteEmbed = new MessageEmbed()
+   const voteEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);
