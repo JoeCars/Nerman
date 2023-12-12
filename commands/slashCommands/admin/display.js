@@ -1,5 +1,4 @@
-const { CommandInteraction } = require('discord.js');
-const { memberNicknameMention } = require('@discordjs/builders');
+const { CommandInteraction, userMention } = require('discord.js');
 
 const Admin = require('../../../db/schemas/Admin');
 const Logger = require('../../../helpers/logger');
@@ -62,7 +61,7 @@ function generateAdminDisplay(admins) {
 
    return admins
       .map(admin => {
-         return memberNicknameMention(admin.userId);
+         return userMention(admin.userId);
       })
       .join('\n');
 }

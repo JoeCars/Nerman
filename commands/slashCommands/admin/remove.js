@@ -1,5 +1,4 @@
-const { CommandInteraction } = require('discord.js');
-const { memberNicknameMention } = require('@discordjs/builders');
+const { CommandInteraction, userMention } = require('discord.js');
 
 const Admin = require('../../../db/schemas/Admin');
 const Logger = require('../../../helpers/logger');
@@ -44,14 +43,14 @@ module.exports = {
       if (config) {
          await interaction.reply({
             ephemeral: true,
-            content: `You have successfully removed ${memberNicknameMention(
+            content: `You have successfully removed ${userMention(
                removedAdmin.id,
             )} as an admin.`,
          });
       } else {
          await interaction.reply({
             ephemeral: true,
-            content: `${memberNicknameMention(
+            content: `${userMention(
                removedAdmin.id,
             )} was not registered as an admin. Nothing was changed.`,
          });

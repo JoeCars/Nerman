@@ -1,4 +1,4 @@
-const { CommandInteraction, memberNicknameMention } = require('discord.js');
+const { CommandInteraction, userMention } = require('discord.js');
 const { Types } = require('mongoose');
 
 const Admin = require('../../../db/schemas/Admin');
@@ -70,7 +70,7 @@ module.exports = {
 
       await interaction.reply({
          ephemeral: true,
-         content: `You have successfully added ${memberNicknameMention(
+         content: `You have successfully added ${userMention(
             newAdmin.id,
          )} as a new admin.`,
       });
