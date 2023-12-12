@@ -16,14 +16,15 @@ module.exports = {
                   .setName('proposal-url')
                   .setDescription('The URL for all future proposals.')
                   .addChoices(
-                     ...[
-                        ['nouns.wtf', 'https://nouns.wtf/vote/'],
-                        ['nounsagora.com', 'https://nounsagora.com/proposals/'],
-                        [
-                           'lilnouns.wtf/nounsdao',
-                           'https://lilnouns.wtf/vote/nounsdao/',
-                        ],
-                     ],
+                     { name: 'nouns.wtf', value: 'https://nouns.wtf/vote/' },
+                     {
+                        name: 'nounsagora.com',
+                        value: 'https://nounsagora.com/proposals/',
+                     },
+                     {
+                        name: 'lilnouns.wtf/nounsdao',
+                        value: 'https://lilnouns.wtf/vote/nounsdao/',
+                     },
                   )
                   .setRequired(false);
             })

@@ -22,11 +22,9 @@ module.exports = {
                   .setDescription('The side being bid for.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
                   .addChoices(
-                     ...[
-                        ['Against', 0],
-                        ['For', 1],
-                        ['Abstain', 2],
-                     ],
+                     { name: 'Against', value: 0 },
+                     { name: 'For', value: 1 },
+                     { name: 'Abstain', value: 2 },
                   );
             })
             .addNumberOption(option => {
@@ -64,11 +62,9 @@ module.exports = {
                   .setDescription('The side being bid for.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
                   .addChoices(
-                     ...[
-                        ['Against', 0],
-                        ['For', 1],
-                        ['Abstain', 2],
-                     ],
+                     { name: 'Against', value: 0 },
+                     { name: 'For', value: 1 },
+                     { name: 'Abstain', value: 2 },
                   );
             })
             .addNumberOption(option => {

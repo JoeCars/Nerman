@@ -51,12 +51,10 @@ module.exports = {
                   .setDescription('The proposal status.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
                   .addChoices(
-                     ...[
-                        ['Canceled', 'Canceled'],
-                        ['Queued', 'Queued'],
-                        ['Vetoed', 'Vetoed'],
-                        ['Executed', 'Executed'],
-                     ],
+                     { name: 'Canceled', value: 'Canceled' },
+                     { name: 'Queued', value: 'Queued' },
+                     { name: 'Vetoed', value: 'Vetoed' },
+                     { name: 'Executed', value: 'Executed' },
                   );
             });
       })
@@ -88,11 +86,9 @@ module.exports = {
                   .setDescription('The vote choice.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
                   .addChoices(
-                     ...[
-                        ['Against', 0],
-                        ['For', 1],
-                        ['Abstain', 2],
-                     ],
+                     { name: 'Against', value: 0 },
+                     { name: 'For', value: 1 },
+                     { name: 'Abstain', value: 2 },
                   );
             })
             .addStringOption(option => {

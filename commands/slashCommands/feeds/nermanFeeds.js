@@ -5,17 +5,6 @@ const events = require('../../../utils/feedEvents');
 
 // Note. Discord supports up to a maximum of 25 drop-down options.
 // Hence why we need to filter them.
-function filterEvent(group) {
-   return [...events.entries()]
-      .filter(([key, value]) => {
-         const eventGroup = value.split('.')[0];
-         return eventGroup === group;
-      })
-      .map(([key, value]) => {
-         return [value.split('.')[1], key];
-      });
-}
-
 function filterNounsContractEvents() {
    return [...events.entries()]
       .filter(([key, value]) => {
@@ -30,7 +19,7 @@ function filterNounsContractEvents() {
          );
       })
       .map(([key, value]) => {
-         return [value, key];
+         return { name: value, value: key };
       });
 }
 
@@ -43,7 +32,7 @@ function filterLilNounsEvents() {
          return isLilNouns;
       })
       .map(([key, value]) => {
-         return [value, key];
+         return { name: value, value: key };
       });
 }
 
@@ -66,7 +55,7 @@ function filterNounsOtherEvents() {
          );
       })
       .map(([key, value]) => {
-         return [value, key];
+         return { name: value, value: key };
       });
 }
 
