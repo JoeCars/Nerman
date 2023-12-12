@@ -1,5 +1,5 @@
-const { CommandInteraction } = require('discord.js');
-const { Modal, TextInputComponent, showModal } = require('discord-modals');
+const { CommandInteraction, ModalBuilder } = require('discord.js');
+const { TextInputComponent, showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const Logger = require('../../../helpers/logger');
@@ -124,7 +124,7 @@ async function needsAuthorization(channelConfig, interaction) {
 }
 
 function createPollModal(channelConfig) {
-   const modal = new Modal()
+   const modal = new ModalBuilder()
       .setCustomId('modal-create-poll')
       .setTitle('Create Poll');
 

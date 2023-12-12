@@ -1,5 +1,5 @@
-const { CommandInteraction } = require('discord.js');
-const { Modal, TextInputComponent, showModal } = require('discord-modals');
+const { ModalBuilder, CommandInteraction } = require('discord.js');
+const { TextInputComponent, showModal } = require('discord-modals');
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
@@ -178,7 +178,7 @@ function createPollChannelModal(roleOptions) {
       placeholder = placeholder.substring(0, 99);
    }
 
-   const modal = new Modal()
+   const modal = new ModalBuilder()
       .setCustomId('modal-create-poll-channel')
       .setTitle('Create Polling Channel');
 
