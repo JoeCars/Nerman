@@ -1,8 +1,8 @@
 const {
    ContextMenuCommandBuilder,
    ApplicationCommandType,
+   codeBlock,
 } = require('discord.js');
-const codeBlock = require('discord.js').Formatters.codeBlock;
 
 const Poll = require('../../db/schemas/Poll');
 const Vote = require('../../db/schemas/Vote');
