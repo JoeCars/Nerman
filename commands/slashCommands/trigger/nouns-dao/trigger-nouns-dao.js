@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 
 const Logger = require('../../../../helpers/logger');
 
@@ -50,12 +50,14 @@ module.exports = {
                   .setName('proposal-status')
                   .setDescription('The proposal status.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
-                  .addChoices(...[
-                     ['Canceled', 'Canceled'],
-                     ['Queued', 'Queued'],
-                     ['Vetoed', 'Vetoed'],
-                     ['Executed', 'Executed'],
-                  ]);
+                  .addChoices(
+                     ...[
+                        ['Canceled', 'Canceled'],
+                        ['Queued', 'Queued'],
+                        ['Vetoed', 'Vetoed'],
+                        ['Executed', 'Executed'],
+                     ],
+                  );
             });
       })
       .addSubcommand(subcommand => {
@@ -85,11 +87,13 @@ module.exports = {
                   .setName('vote-choice')
                   .setDescription('The vote choice.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
-                  .addChoices(...[
-                     ['Against', 0],
-                     ['For', 1],
-                     ['Abstain', 2],
-                  ]);
+                  .addChoices(
+                     ...[
+                        ['Against', 0],
+                        ['For', 1],
+                        ['Abstain', 2],
+                     ],
+                  );
             })
             .addStringOption(option => {
                return option

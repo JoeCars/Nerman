@@ -1,5 +1,4 @@
-const { CommandInteraction } = require('discord.js');
-const { memberNicknameMention } = require('@discordjs/builders');
+const { CommandInteraction, memberNicknameMention } = require('discord.js');
 const { Types } = require('mongoose');
 
 const Admin = require('../../../db/schemas/Admin');

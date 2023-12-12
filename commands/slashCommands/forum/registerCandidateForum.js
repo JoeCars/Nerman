@@ -1,5 +1,5 @@
-const { CommandInteraction } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { CommandInteraction, SlashCommandBuilder } = require('discord.js');
+
 const NounsCandidateForum = require('../../../db/schemas/NounsCandidateForum');
 const Logger = require('../../../helpers/logger');
 const { authorizeInteraction } = require('../../../helpers/authorization');

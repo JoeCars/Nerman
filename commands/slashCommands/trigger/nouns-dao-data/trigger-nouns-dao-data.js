@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 
 const Logger = require('../../../../helpers/logger');
 
@@ -33,11 +33,13 @@ module.exports = {
                   .setName('vote-choice')
                   .setDescription('The side being voted for.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
-                  .addChoices(...[
-                     ['Against', 0],
-                     ['For', 1],
-                     ['Abstain', 2],
-                  ]);
+                  .addChoices(
+                     ...[
+                        ['Against', 0],
+                        ['For', 1],
+                        ['Abstain', 2],
+                     ],
+                  );
             })
             .addStringOption(option => {
                return option
@@ -68,11 +70,13 @@ module.exports = {
                   .setName('vote-choice')
                   .setDescription('The side being voted for.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development')
-                  .addChoices(...[
-                     ['Against', 0],
-                     ['For', 1],
-                     ['Abstain', 2],
-                  ]);
+                  .addChoices(
+                     ...[
+                        ['Against', 0],
+                        ['For', 1],
+                        ['Abstain', 2],
+                     ],
+                  );
             })
             .addStringOption(option => {
                return option

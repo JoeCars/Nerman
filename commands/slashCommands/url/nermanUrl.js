@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const Logger = require('../../../helpers/logger');
 
 // !test this is going to be testing passing Nerman.js in as an argument, so I'm attempting to make this a async thang?
@@ -15,11 +15,16 @@ module.exports = {
                return option
                   .setName('proposal-url')
                   .setDescription('The URL for all future proposals.')
-                  .addChoices(...[
-                     ['nouns.wtf', 'https://nouns.wtf/vote/'],
-                     ['nounsagora.com', 'https://nounsagora.com/proposals/'],
-                     ['lilnouns.wtf/nounsdao', 'https://lilnouns.wtf/vote/nounsdao/'],
-                  ])
+                  .addChoices(
+                     ...[
+                        ['nouns.wtf', 'https://nouns.wtf/vote/'],
+                        ['nounsagora.com', 'https://nounsagora.com/proposals/'],
+                        [
+                           'lilnouns.wtf/nounsdao',
+                           'https://lilnouns.wtf/vote/nounsdao/',
+                        ],
+                     ],
+                  )
                   .setRequired(false);
             })
             .addStringOption(option => {

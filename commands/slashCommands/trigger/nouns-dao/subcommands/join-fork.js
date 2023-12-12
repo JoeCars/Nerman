@@ -1,5 +1,5 @@
 const { CommandInteraction } = require('discord.js');
-const { SlashCommandBuilder } = require('@discordjs/builders');
+
 const Logger = require('../../../../../helpers/logger');
 const {
    authorizeInteraction,

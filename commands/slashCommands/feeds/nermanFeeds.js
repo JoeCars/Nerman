@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
+
 const Logger = require('../../../helpers/logger');
 const events = require('../../../utils/feedEvents');
 
