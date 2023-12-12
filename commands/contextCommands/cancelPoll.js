@@ -1,4 +1,7 @@
-const { EmbedBuilder, ContextMenuInteraction } = require('discord.js');
+const {
+   EmbedBuilder,
+   MessageContextMenuCommandInteraction,
+} = require('discord.js');
 const { ContextMenuCommandBuilder } = require('@discordjs/builders');
 const { Modal, TextInputComponent, showModal } = require('discord-modals');
 const { ApplicationCommandType } = require('discord-api-types/v9');
@@ -12,7 +15,7 @@ module.exports = {
       .setName('Cancel Poll')
       .setType(ApplicationCommandType.Message),
    /**
-    * @param {ContextMenuInteraction} interaction
+    * @param {MessageContextMenuCommandInteraction} interaction
     */
    async execute(interaction) {
       Logger.info(

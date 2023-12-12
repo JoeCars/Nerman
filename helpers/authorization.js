@@ -1,9 +1,9 @@
-const { GuildMember, Permissions, Interaction } = require('discord.js');
+const { GuildMember, Permissions, BaseInteraction } = require('discord.js');
 const Admin = require('../db/schemas/Admin');
 const Logger = require('./logger');
 
 /**
- * @param {Interaction} interaction
+ * @param {BaseInteraction} interaction
  * @param {number} permissionLevel
  */
 exports.authorizeInteraction = async function (interaction, permissionLevel) {
