@@ -1,27 +1,27 @@
 require('dotenv').config();
 const fs = require('fs');
 
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const token = process.env.DISCORD_TOKEN;
 
 const Logger = require('./helpers/logger');
 
 const client = new Client({
    intents: [
-      Intents.FLAGS.GUILDS,
-      Intents.FLAGS.GUILD_MESSAGES,
-      Intents.FLAGS.GUILD_MEMBERS,
-      Intents.FLAGS.GUILD_PRESENCES,
-      Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS,
-      Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-      Intents.FLAGS.GUILD_WEBHOOKS,
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.GuildMembers,
+      GatewayIntentBits.GuildPresences,
+      GatewayIntentBits.GuildEmojisAndStickers,
+      GatewayIntentBits.GuildMessageReactions,
+      GatewayIntentBits.GuildWebhooks,
    ],
 });
 const discordModals = require('discord-modals');
 discordModals(client);
 
 ['events', 'commands', 'buttons'].forEach(handler =>
-   require(`./handlers/${handler}.js`)(client, (reload = false))
+   require(`./handlers/${handler}.js`)(client, (reload = false)),
 );
 
 client.on('shardError', error => {
