@@ -282,9 +282,9 @@ module.exports = {
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
-         updatedEmbed.fields[1].value = embedQuorum.toString(); // quorum
+         updatedEmbed.data.fields[1].value = embedQuorum.toString(); // quorum
 
-         updatedEmbed.fields[4].value = `<t:${Math.floor(
+         updatedEmbed.data.fields[4].value = `<t:${Math.floor(
             newPoll.timeEnd.getTime() / 1000,
          )}:f>`; // timeEnd
 
