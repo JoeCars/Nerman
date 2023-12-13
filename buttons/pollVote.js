@@ -8,13 +8,13 @@ const {
 } = require('discord.js');
 const { Types } = require('mongoose');
 
-const Poll = require('../../../../db/schemas/Poll');
-const User = require('../../../../db/schemas/User');
-const Vote = require('../../../../db/schemas/Vote');
-const Logger = require('../../../../helpers/logger');
+const Poll = require('../db/schemas/Poll');
+const User = require('../db/schemas/User');
+const Vote = require('../db/schemas/Vote');
+const Logger = require('../helpers/logger');
 
-const { longestString } = require('../../../../helpers/poll');
-const ResultBar = require('../../../../structures/ResultBar');
+const { longestString } = require('../helpers/poll');
+const ResultBar = require('../structures/ResultBar');
 
 const nouncilId = process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 const jtsNouncilId = process.env.JTS_NOUNCIL_ID;
@@ -23,7 +23,7 @@ const doppelId = process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
 const guildNouncilIds = [nouncilId, jtsNouncilId, doppelId];
 
 module.exports = {
-   name: 'modalSubmit',
+   id: 'vote-modal',
    /**
     * @param {ModalSubmitInteraction} interaction
     */
@@ -60,7 +60,7 @@ module.exports = {
 
       const pollOptions = await pollStatus.pollOptions();
 
-      let voteArray = modal.getTextInputValue('votingSelect');
+      let voteArray = modal.fields.getTextInputValue('votingSelect');
 
       if (voteArray !== null) {
          voteArray = voteArray
@@ -108,7 +108,7 @@ module.exports = {
 
       // disabled until DJS SELECT MENUS Modal supported
       // const voteArray = modal.getSelectMenuValues('votingSelect');
-      const voteReason = modal.getTextInputValue('voteReason');
+      const voteReason = modal.fields.getTextInputValue('voteReason');
 
       if (pollStatus.status === 'closed') {
          return modal.editReply({

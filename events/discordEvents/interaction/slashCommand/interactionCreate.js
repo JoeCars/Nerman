@@ -9,10 +9,14 @@ module.exports = {
     * @returns
     */
    async execute(interaction) {
-      if (!interaction.isCommand() && !interaction.isContextMenu()) return;
+      if (!interaction.isContextMenuCommand() && !interaction.isCommand()) {
+         return;
+      }
 
       const command = interaction.client.commands.get(interaction.commandName);
-      if (!command) return;
+      if (!command) {
+         return;
+      }
 
       let commandName = interaction.commandName;
 

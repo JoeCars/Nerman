@@ -8,7 +8,9 @@ module.exports = {
     * @param {ButtonInteraction} interaction
     */
    execute(interaction) {
-      if (!interaction.isButton()) return;
+      if (!interaction.isModalSubmit() && !interaction.isButton()) {
+         return;
+      }
 
       Logger.info(
          'events/buttonInteraction.js: Handling a button interaction.',
@@ -18,7 +20,7 @@ module.exports = {
             guildId: interaction.guildId,
             channelId: interaction.channelId,
             userId: interaction.user.id,
-         }
+         },
       );
 
       const {
@@ -26,7 +28,6 @@ module.exports = {
          customId,
          member: { permissions },
       } = interaction;
-
 
       const button = client.buttons.get(customId);
 
@@ -39,7 +40,7 @@ module.exports = {
                guildId: interaction.guildId,
                channelId: interaction.channelId,
                userId: interaction.user.id,
-            }
+            },
          );
 
          return interaction.reply({
@@ -58,7 +59,7 @@ module.exports = {
             guildId: interaction.guildId,
             channelId: interaction.channelId,
             userId: interaction.user.id,
-         }
+         },
       );
    },
 };

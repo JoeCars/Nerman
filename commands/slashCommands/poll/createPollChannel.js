@@ -3,6 +3,8 @@ const {
    CommandInteraction,
    TextInputBuilder,
    TextInputStyle,
+   ChannelType,
+   ActionRowBuilder,
 } = require('discord.js');
 
 const Poll = require('../../../db/schemas/Poll');
@@ -51,7 +53,7 @@ module.exports = {
 
       await authorizeInteraction(interaction, 2);
 
-      if (!channel.isText()) {
+      if (channel.type !== ChannelType.GuildText) {
          return interaction.reply({
             content:
                'Polling can only be configured within text based channels.',
@@ -138,6 +140,7 @@ function createPollChannelModal(roleOptions) {
       .setStyle(TextInputStyle.Short)
       .setMaxLength(100)
       .setRequired(true);
+   const votingActionRow = new ActionRowBuilder().addComponents(votingRoles);
 
    const pollDuration = new TextInputBuilder()
       .setCustomId('pollDuration')
@@ -146,6 +149,7 @@ function createPollChannelModal(roleOptions) {
       .setStyle(TextInputStyle.Short)
       .setMaxLength(4)
       .setRequired(true);
+   const durationActionRow = new ActionRowBuilder().addComponents(pollDuration);
 
    const maxProposals = new TextInputBuilder()
       .setCustomId('maxProposals')
@@ -156,6 +160,7 @@ function createPollChannelModal(roleOptions) {
       .setStyle(TextInputStyle.Short)
       .setMaxLength(3)
       .setRequired(true);
+   const maxPollsActionRow = new ActionRowBuilder().addComponents(maxProposals);
 
    const pollQuorum = new TextInputBuilder()
       .setCustomId('pollQuorumThreshold')
@@ -165,6 +170,7 @@ function createPollChannelModal(roleOptions) {
       .setStyle(TextInputStyle.Short)
       .setMaxLength(15)
       .setRequired(true);
+   const quorumActionRow = new ActionRowBuilder().addComponents(pollQuorum);
 
    const pollChannelOptions = new TextInputBuilder()
       .setCustomId('pollChannelOptions')
@@ -175,13 +181,16 @@ function createPollChannelModal(roleOptions) {
       .setValue('anonymous-voting, live-results, for-or-against, nouns-dao')
       .setStyle(TextInputStyle.Short)
       .setMaxLength(100);
+   const optionsActionRow = new ActionRowBuilder().addComponents(
+      pollChannelOptions,
+   );
 
    modal.addComponents(
-      votingRoles,
-      pollDuration,
-      maxProposals,
-      pollQuorum,
-      pollChannelOptions,
+      votingActionRow,
+      durationActionRow,
+      maxPollsActionRow,
+      quorumActionRow,
+      optionsActionRow,
    );
 
    Logger.info(

@@ -1,13 +1,13 @@
 const { ModalSubmitInteraction } = require('discord.js');
 const { Types } = require('mongoose');
 
-const PollChannel = require('../../../../db/schemas/PollChannel');
-const FeedConfig = require('../../../../db/schemas/FeedConfig');
-const Logger = require('../../../../helpers/logger');
-const events = require('../../../../utils/feedEvents');
+const PollChannel = require('../db/schemas/PollChannel');
+const FeedConfig = require('../db/schemas/FeedConfig');
+const Logger = require('../helpers/logger');
+const events = require('../utils/feedEvents');
 
 module.exports = {
-   name: 'modalSubmit',
+   id: 'modal-create-poll-channel',
    /**
     * @param {ModalSubmitInteraction} modal
     */
@@ -75,15 +75,17 @@ module.exports = {
          // disabled until modals are supported
          // const votingRoles = modal.getSelectMenuValues('votingRoles');
          // !testing voting roles from text input
-         const votingRoles = modal
+         const votingRoles = modal.fields
             .getTextInputValue('votingRoles')
             .split(',')
             .map(x => x.trim())
             .filter(v => v !== '');
-         let pollDuration = modal.getTextInputValue('pollDuration');
-         const maxProposals = parseInt(modal.getTextInputValue('maxProposals'));
-         // let pollQuorum = modal.getTextInputValue('pollQuorumThreshold');
-         let pollQuorumThreshold = modal.getTextInputValue(
+         let pollDuration = modal.fields.getTextInputValue('pollDuration');
+         const maxProposals = parseInt(
+            modal.fields.getTextInputValue('maxProposals'),
+         );
+         // let pollQuorum = modal.fields.getTextInputValue('pollQuorumThreshold');
+         let pollQuorumThreshold = modal.fields.getTextInputValue(
             'pollQuorumThreshold',
          );
 
@@ -115,10 +117,10 @@ module.exports = {
             });
          }
 
-         const pollChannelOptions = modal.getTextInputValue(
+         const pollChannelOptions = modal.fields.getTextInputValue(
             'pollChannelOptions',
          )
-            ? modal
+            ? modal.fields
                  .getTextInputValue('pollChannelOptions')
                  .split(',')
                  .map(x => x.trim())

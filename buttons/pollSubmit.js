@@ -5,21 +5,21 @@ const {
 } = require('discord.js');
 const { Types } = require('mongoose');
 
-const { initPollMessage } = require('../../../../helpers/poll/initPollMessage');
-const ResultBar = require('../../../../structures/ResultBar');
-const User = require('../../../../db/schemas/User');
-const Poll = require('../../../../db/schemas/Poll');
-const PollChannel = require('../../../../db/schemas/PollChannel');
-const PollCount = require('../../../../db/schemas/ChannelPollCount');
-const Logger = require('../../../../helpers/logger');
+const { initPollMessage } = require('../helpers/poll/initPollMessage');
+const ResultBar = require('../structures/ResultBar');
+const User = require('../db/schemas/User');
+const Poll = require('../db/schemas/Poll');
+const PollChannel = require('../db/schemas/PollChannel');
+const PollCount = require('../db/schemas/ChannelPollCount');
+const Logger = require('../helpers/logger');
 
-const { drawBar, longestString } = require('../../../../helpers/poll');
-const { logToObject, formatDate } = require('../../../../utils/functions');
+const { drawBar, longestString } = require('../helpers/poll');
+const { logToObject, formatDate } = require('../utils/functions');
 
 // const { create}
 
 module.exports = {
-   name: 'modalSubmit',
+   id: 'modal-create-poll',
    /**
     * @param {ModalSubmitInteraction} modal
     */
@@ -77,8 +77,9 @@ module.exports = {
       // });
 
       // extract data from submitted modal
-      const title = modal.getTextInputValue('pollTitle');
-      const description = modal.getTextInputValue('pollDescription') ?? '';
+      const title = modal.fields.getTextInputValue('pollTitle');
+      const description =
+         modal.fields.getTextInputValue('pollDescription') ?? '';
 
       let options;
 
@@ -89,7 +90,7 @@ module.exports = {
          options = [
             // const options = [
             ...new Set(
-               modal
+               modal.fields
                   .getTextInputValue('pollChoices')
                   .split(',')
                   .map(x => x.trim().toLowerCase())
@@ -97,10 +98,11 @@ module.exports = {
             ),
          ];
       }
-      let voteAllowance = modal.getTextInputValue('voteAllowance') ?? 1;
-      // let voteAllowance = parseInt(
-      //    modal.getTextInputValue('voteAllowance') ?? 1
-      // );
+
+      let voteAllowance = 1;
+      if (channelConfig.voteAllowance) {
+         voteAllowance = modal.fields.getTextInputValue('voteAllowance');
+      }
 
       Logger.debug('events/poll/pollSubmit.js: Checking vote options.', {
          channelId: modal.channelId,
@@ -111,7 +113,7 @@ module.exports = {
       });
 
       if (isNaN(voteAllowance)) {
-         voteAllowance = `${modal.getTextInputValue('voteAllowance')}`;
+         voteAllowance = `${modal.fields.getTextInputValue('voteAllowance')}`;
       }
 
       // return modal.editReply({ content: 'Return early', ephemeral: true });
@@ -355,7 +357,7 @@ module.exports = {
 
          await Promise.all(updateVoterPromise);
 
-         let updatedEmbed = new EmbedBuilder(messageObject.embeds[0]);
+         const updatedEmbed = new EmbedBuilder(messageObject.embeds[0].data);
 
          updatedEmbed.setFooter({
             text: `Poll #${newPoll.pollNumber} submitted by ${
@@ -369,33 +371,12 @@ module.exports = {
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : embedQuorum > 0 ? 1 : 0;
 
-         updatedEmbed.fields.find(({ name }) => name === 'Quorum').value =
+         updatedEmbed.data.fields.find(({ name }) => name === 'Quorum').value =
             embedQuorum.toString();
 
-         // if (updatedEmbed.fields.length === 6) {
-         //    const votesAmount = Math.floor(
-         //       newPoll.allowedUsers.size * (channelConfig.voteThreshold / 100)
-         //    );
-         //    updatedEmbed.fields[2].value = `${votesAmount >= 1 ? votesAmount : 1}`; // voteThreshold
-         //    updatedEmbed.fields[5].value = `<t:${Math.floor(
-         //       newPoll.timeEnd.getTime() / 1000
-         //    )}:f>`; // timeEnd
-         // } else {
-
-         updatedEmbed.fields.find(
+         updatedEmbed.data.fields.find(
             ({ name }) => name === 'Voting Closes',
-         ).value = `<t:${Math.floor(newPoll.timeEnd.getTime() / 1000)}:f>`; // timeEnd
-         // }
-
-         /**
-          *
-          *
-          *
-          *
-          *
-          *
-          *
-          */
+         ).value = `<t:${Math.floor(newPoll.timeEnd.getTime() / 1000)}:f>`;
 
          // todo Extract code into module
          if (channelConfig.liveVisualFeed) {
@@ -442,17 +423,6 @@ module.exports = {
                inline: false,
             });
          }
-
-         /**
-          *
-          *
-          *
-          *
-          *
-          *
-          *
-          *
-          */
 
          const threadName =
             title.length <= 100 ? title : `${title.substring(0, 96)}...`;

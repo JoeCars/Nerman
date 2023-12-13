@@ -1,10 +1,10 @@
 const { ModalSubmitInteraction, EmbedBuilder } = require('discord.js');
 
-const Poll = require('../../../../db/schemas/Poll');
-const Logger = require('../../../../helpers/logger');
+const Poll = require('../db/schemas/Poll');
+const Logger = require('../helpers/logger');
 
 module.exports = {
-   name: 'modalSubmit',
+   id: 'cancel-modal',
    /**
     *
     * @param {ModalSubmitInteraction} modal
@@ -28,7 +28,7 @@ module.exports = {
          } = modal;
 
          const confirm =
-            modal.getTextInputValue('confirmCancel').toLowerCase() ===
+            modal.fields.getTextInputValue('confirmCancel').toLowerCase() ===
             'confirm';
 
          Logger.debug('events/poll/pollCancel.js: Checking confirmation.', {
