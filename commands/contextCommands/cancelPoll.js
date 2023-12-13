@@ -6,6 +6,7 @@ const {
    ContextMenuCommandBuilder,
    ApplicationCommandType,
    TextInputStyle,
+   ActionRowBuilder,
 } = require('discord.js');
 
 const Poll = require('../../db/schemas/Poll');
@@ -112,6 +113,8 @@ function createConfirmationModal(targetId) {
       .setMaxLength(100)
       .setRequired(true);
 
-   confirmModal.addComponents(confirmCancel);
+   confirmModal.addComponents(
+      new ActionRowBuilder().addComponents(confirmCancel),
+   );
    return confirmModal;
 }

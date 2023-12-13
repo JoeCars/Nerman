@@ -49,7 +49,7 @@ module.exports = {
             messageId: messageId,
          });
 
-         const targetMessage = await messages.fetch(messageId);
+         const targetMessage = await modal.channel.messages.fetch(messageId);
          const targetPoll = await Poll.findOne({
             messageId: messageId,
             guildId: guildId,
@@ -74,8 +74,8 @@ module.exports = {
          ];
 
          const cancelEmbed = new EmbedBuilder(
-            targetMessage.embeds[0],
-         ).spliceFields(1, 4, cancelFields);
+            targetMessage.embeds[0].data,
+         ).spliceFields(1, 4, ...cancelFields);
 
          await targetMessage.edit({
             content: null,

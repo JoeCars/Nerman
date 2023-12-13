@@ -29,7 +29,11 @@ module.exports = {
          member: { permissions },
       } = interaction;
 
-      const button = client.buttons.get(customId);
+      let buttonId = customId;
+      if (customId.includes('cancel-modal')) {
+         buttonId = 'cancel-modal';
+      }
+      const button = client.buttons.get(buttonId);
 
       if (button.permission && !permissions.has(button.permission)) {
          Logger.warn(
