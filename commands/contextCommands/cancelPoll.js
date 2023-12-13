@@ -5,6 +5,7 @@ const {
    TextInputBuilder,
    ContextMenuCommandBuilder,
    ApplicationCommandType,
+   TextInputStyle,
 } = require('discord.js');
 
 const Poll = require('../../db/schemas/Poll');
@@ -56,10 +57,7 @@ module.exports = {
 
          const confirmModal = createConfirmationModal(targetId);
 
-         await interaction.showModal(confirmModal, {
-            client: client,
-            interaction: interaction,
-         });
+         await interaction.showModal(confirmModal.toJSON());
 
          Logger.info(
             'commands/context/cancelPoll.js: Successfully cancelled the poll.',
@@ -110,7 +108,7 @@ function createConfirmationModal(targetId) {
       .setCustomId('confirmCancel')
       .setLabel(`Type 'confirm' (no quotes) then submit.`)
       .setPlaceholder('confirm')
-      .setStyle('SHORT')
+      .setStyle(TextInputStyle.Short)
       .setMaxLength(100)
       .setRequired(true);
 

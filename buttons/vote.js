@@ -2,6 +2,7 @@ const {
    ModalBuilder,
    ButtonInteraction,
    TextInputBuilder,
+   TextInputStyle,
 } = require('discord.js');
 
 const Poll = require('../db/schemas/Poll');
@@ -64,10 +65,7 @@ module.exports = {
       const modal = createVoteModal(attachedPoll);
 
       try {
-         await interaction.showModal(modal, {
-            client: interaction.client,
-            interaction: interaction,
-         });
+         await interaction.showModal(modal.toJSON());
       } catch (error) {
          Logger.error('buttons/vote.js: Received an error.', {
             error: error,
@@ -95,8 +93,8 @@ function createVoteModal(attachedPoll) {
       .setCustomId('votingSelect')
       .setLabel(`Type ${attachedPoll.pollData.voteAllowance} Choice(s)`)
       .setPlaceholder(optionsString)
-      .setDefaultValue(optionsString)
-      .setStyle('SHORT')
+      .setValue(optionsString)
+      .setStyle(TextInputStyle.Short)
       .setMaxLength(100)
       .setRequired(true);
 
@@ -104,7 +102,7 @@ function createVoteModal(attachedPoll) {
       .setCustomId('voteReason')
       .setLabel('Reason')
       .setPlaceholder('Explain your vote.')
-      .setStyle('LONG');
+      .setStyle(TextInputStyle.Paragraph);
 
    modal.addComponents(selectOptions, reason);
    return modal;

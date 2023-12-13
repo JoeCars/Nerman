@@ -3,6 +3,7 @@ const {
    ButtonBuilder,
    ActionRowBuilder,
    roleMention,
+   ButtonStyle,
 } = require('discord.js');
 
 const Logger = require('../logger');
@@ -30,12 +31,12 @@ const initPollMessage = async ({
    const voteBtn = new ButtonBuilder()
       .setCustomId('vote')
       .setLabel('Vote')
-      .setStyle('PRIMARY');
+      .setStyle(ButtonStyle.Primary);
 
    const abstainBtn = new ButtonBuilder()
       .setCustomId('abstain')
       .setLabel('Abstain')
-      .setStyle('SECONDARY');
+      .setStyle(ButtonStyle.Secondary);
 
    voteActionRow.addComponents(voteBtn, abstainBtn);
 

@@ -2,6 +2,7 @@ const {
    ModalBuilder,
    CommandInteraction,
    TextInputBuilder,
+   TextInputStyle,
 } = require('discord.js');
 
 const Poll = require('../../../db/schemas/Poll');
@@ -102,10 +103,7 @@ module.exports = {
 
       const modal = createPollChannelModal(roleOptions);
 
-      await interaction.showModal(modal, {
-         client: interaction.client,
-         interaction: interaction,
-      });
+      await interaction.showModal(modal.toJSON());
 
       Logger.info(
          'commands/nerman/poll/createPollChannel.js: Finished creating poll channel.',
@@ -136,8 +134,8 @@ function createPollChannelModal(roleOptions) {
       .setCustomId('votingRoles')
       .setLabel('Choose Voting Roles')
       .setPlaceholder(placeholder)
-      .setDefaultValue(placeholder)
-      .setStyle('SHORT')
+      .setValue(placeholder)
+      .setStyle(TextInputStyle.Short)
       .setMaxLength(100)
       .setRequired(true);
 
@@ -145,7 +143,7 @@ function createPollChannelModal(roleOptions) {
       .setCustomId('pollDuration')
       .setLabel('Poll Duration (hours)')
       .setPlaceholder('Eg) 60')
-      .setStyle('SHORT')
+      .setStyle(TextInputStyle.Short)
       .setMaxLength(4)
       .setRequired(true);
 
@@ -155,7 +153,7 @@ function createPollChannelModal(roleOptions) {
       .setPlaceholder(
          'Choose maximum number of active polls allowed per user with voting role.',
       )
-      .setStyle('SHORT')
+      .setStyle(TextInputStyle.Short)
       .setMaxLength(3)
       .setRequired(true);
 
@@ -163,8 +161,8 @@ function createPollChannelModal(roleOptions) {
       .setCustomId('pollQuorumThreshold')
       .setLabel('Choose Quorum %')
       .setPlaceholder('Eg) 30.5')
-      .setDefaultValue('30.5')
-      .setStyle('SHORT')
+      .setValue('30.5')
+      .setStyle(TextInputStyle.Short)
       .setMaxLength(15)
       .setRequired(true);
 
@@ -174,10 +172,8 @@ function createPollChannelModal(roleOptions) {
       .setPlaceholder(
          'anonymous-voting, live-results, vote-allowance, for-or-against, nouns-dao, lil-nouns',
       )
-      .setDefaultValue(
-         'anonymous-voting, live-results, for-or-against, nouns-dao',
-      )
-      .setStyle('SHORT')
+      .setValue('anonymous-voting, live-results, for-or-against, nouns-dao')
+      .setStyle(TextInputStyle.Short)
       .setMaxLength(100);
 
    modal.addComponents(
