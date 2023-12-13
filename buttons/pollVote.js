@@ -25,7 +25,7 @@ const guildNouncilIds = [nouncilId, jtsNouncilId, doppelId];
 module.exports = {
    id: 'vote-modal',
    /**
-    * @param {ModalSubmitInteraction} interaction
+    * @param {ModalSubmitInteraction} modal
     */
    async execute(modal) {
       Logger.info('events/poll/pollVote.js: Attempting to submit vote.', {
@@ -254,7 +254,7 @@ module.exports = {
       const updateEmbed = new EmbedBuilder(message.embeds[0]);
 
       updateEmbed.spliceFields(
-         updateEmbed.fields.findIndex(({ name }) => name === 'Voters'),
+         updateEmbed.data.fields.findIndex(({ name }) => name === 'Voters'),
          1,
          {
             name: 'Voters',
@@ -265,9 +265,9 @@ module.exports = {
 
       // NOTE: This is just to fix open polls without Voting Closes fields
       // todo remove later when I find out the specific root of this issue
-      if (!updateEmbed.fields.find(({ name }) => name === 'Quorum')) {
+      if (!updateEmbed.data.fields.find(({ name }) => name === 'Quorum')) {
          updateEmbed.spliceFields(
-            updateEmbed.fields.findIndex(({ name }) => name === 'Voters'),
+            updateEmbed.data.fields.findIndex(({ name }) => name === 'Voters'),
             0,
             {
                name: 'Quorum',
@@ -279,9 +279,13 @@ module.exports = {
 
       // NOTE: This is just to fix open polls without Voting Closes fields
       // todo remove later when I find out the specific root of this issue
-      if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
+      if (
+         !updateEmbed.data.fields.find(({ name }) => name === 'Voting Closes')
+      ) {
          updateEmbed.spliceFields(
-            updateEmbed.fields.findIndex(({ name }) => name === 'Abstains') + 1,
+            updateEmbed.data.fields.findIndex(
+               ({ name }) => name === 'Abstains',
+            ) + 1,
             0,
             {
                name: 'Voting Closes',
@@ -294,17 +298,8 @@ module.exports = {
       }
 
       if (pollOptions.liveVisualFeed) {
-         // !testing OLD
-
-         // updateEmbed.spliceFields(1, 1, {
-         //    name: 'Results',
-         //    value: resultsOutput,
-         //    inline: false,
-         // });
-
-         // !testing NEW
          updateEmbed.spliceFields(
-            updateEmbed.fields.findIndex(({ name }) => name === 'Results'),
+            updateEmbed.data.fields.findIndex(({ name }) => name === 'Results'),
             1,
             {
                name: 'Results',

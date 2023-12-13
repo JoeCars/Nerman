@@ -3,6 +3,7 @@ const {
    ButtonInteraction,
    TextInputBuilder,
    TextInputStyle,
+   ActionRowBuilder,
 } = require('discord.js');
 
 const Poll = require('../db/schemas/Poll');
@@ -97,13 +98,15 @@ function createVoteModal(attachedPoll) {
       .setStyle(TextInputStyle.Short)
       .setMaxLength(100)
       .setRequired(true);
+   const optionsActionRow = new ActionRowBuilder().addComponents(selectOptions);
 
    const reason = new TextInputBuilder()
       .setCustomId('voteReason')
       .setLabel('Reason')
       .setPlaceholder('Explain your vote.')
       .setStyle(TextInputStyle.Paragraph);
+   const reasonActionRow = new ActionRowBuilder().addComponents(reason);
 
-   modal.addComponents(selectOptions, reason);
+   modal.addComponents(optionsActionRow, reasonActionRow);
    return modal;
 }

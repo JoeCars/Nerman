@@ -54,21 +54,10 @@ const initPollMessage = async ({
       embedFields: embedFields,
    });
 
-   // disabled until Joel decides if we need this here
-   // if (channelConfig.voteThreshold > 0) {
-   //    console.log('THRESHOLD IS ABOVE 0');
-
-   //    embedFields.splice(2, 0, {
-   //       name: 'Vote Threshold',
-   //       value: '...',
-   //       inline: true,
-   //    });
-   // }
-
    const embed = new EmbedBuilder()
       .setColor('#ffffff')
       .setTitle(title)
-      .setDescription(description)
+      .setDescription(description || null)
       .addFields(embedFields)
       .setFooter({ text: 'Submitted by ...' });
 
