@@ -86,10 +86,6 @@ module.exports = {
 
       const modal = createPollModal(channelConfig);
 
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-      console.log(modal);
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-
       await interaction.showModal(modal.toJSON());
 
       Logger.info(
