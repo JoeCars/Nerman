@@ -50,17 +50,7 @@ module.exports = {
 
       await interaction.deferReply({ ephemeral: true });
 
-      // if (!(await PollChannel.countDocuments({ channelId }))) {
-      // disabled until we find a better way to handle the cross-guild admin permissions when accessing bot commands
-      // if (!roleCache.has(guildAdminId)) {
-      // throw new Error('This is an admin-only command');
-      // }
-
-      // todo later on change permissions associated with this, once we decide one how to tdeal with the cross guild shenanigans
-
       await authorizeInteraction(interaction, 3);
-
-      // return await interaction.editReply({ content: 'TEST END' });
 
       // todo maybe convert this over to access the config from the guildConfigs collection within Nerman -- going to wait on migratiung these over for now, only sticking to using it this way where I need it, until I can account for new error/security issues in this method
       const configExists = await PollChannel.configExists(channelId);
@@ -119,8 +109,9 @@ module.exports = {
          ])
          .exec();
 
-      if (associatedPoll === null)
+      if (associatedPoll === null) {
          throw new Error('This message has no polls associated with it.');
+      }
 
       const {
          // client,
@@ -145,14 +136,14 @@ module.exports = {
       }
 
       if (!embedOnly) {
-         let messageObject = await initPollMessage({
+         const messageObject = await initPollMessage({
             title,
             description,
             channelConfig,
             everyoneId,
          });
 
-         let messageEmbed = messageObject.embeds[0];
+         const messageEmbed = messageObject.embeds[0];
 
          Logger.debug(
             'commands/nerman/poll/regeneratePollMessage.js: Retrieved message embed.',
@@ -187,23 +178,16 @@ module.exports = {
             }#${discriminator}`,
          });
 
-         // l('MESSAGE EMBED WITH FOOTER WOW\n', messageEmbed);
-
          let embedQuorum = await Math.ceil(
             associatedPoll.allowedUsers.size * (channelConfig.quorum / 100),
          );
 
          embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
 
-         // messageEmbed.fields[1].value = embedQuorum.toString();
-         messageEmbed.fields.find(({ name }) => name === 'Quorum').value =
+         messageEmbed.data.fields.find(({ name }) => name === 'Quorum').value =
             embedQuorum.toString();
-         // l('MESSAGE EMBED WITH QUORUM TOO?!\n', messageEmbed);
 
-         // messageEmbed.fields[4].value = `<t:${Math.floor(
-         //    associatedPoll.timeEnd.getTime() / 1000
-         // )}:f>`;
-         messageEmbed.fields.find(
+         messageEmbed.data.fields.find(
             ({ name }) => name === 'Voting Closes',
          ).value = `<t:${Math.floor(
             associatedPoll.timeEnd.getTime() / 1000,
@@ -239,24 +223,13 @@ module.exports = {
             messageToUpdate.delete();
          }
       } else {
-         const embedTitle = associatedPoll.pollData.title;
-
          const mentions = await channelConfig.allowedRoles
             .map(role =>
                role !== everyoneId ? roleMention(role) : '@everyone',
             )
             .join(' ');
 
-         // disabled for meow
-         // updateEmbed.setTitle(embedTitle);
-
-         // updateEmbed.setFooter(
-         //    `Poll #${associatedPoll.pollNumber} submitted by ${
-         //       nickname ?? username
-         //    }#${discriminator}`,
-         // );
-
-         let embedQuorum = Math.ceil(
+         const embedQuorum = Math.ceil(
             associatedPoll.allowedUsers.size * (channelConfig.quorum / 100),
          );
 
@@ -265,7 +238,7 @@ module.exports = {
             messageToUpdate.embeds[0]?.description,
          );
 
-         let newEmbedFields = [
+         const newEmbedFields = [
             { name: '\u200B', value: '\u200B', inline: false },
             { name: 'Quorum', value: `${embedQuorum}`, inline: true },
             {
@@ -323,7 +296,7 @@ module.exports = {
                   associatedPoll.config,
                );
 
-               let resultsArray = associatedPoll.config.voteThreshold
+               const resultsArray = associatedPoll.config.voteThreshold
                   ? [
                        `Threshold: ${associatedPoll.voteThreshold} ${
                           associatedPoll.voteThreshold > 1 ? 'votes' : 'vote'
@@ -334,50 +307,28 @@ module.exports = {
                let resultsOutput = [];
 
                const barWidth = 8;
-               let totalVotes = results.totalVotes;
-               // let totalVotes = associatedPoll.results.totalVotes;
+               const totalVotes = results.totalVotes;
 
-               let votesMap = new Map([
+               const votesMap = new Map([
                   ['maxLength', barWidth],
                   ['totalVotes', totalVotes],
                ]);
                for (const key in results.distribution) {
                   const label = key[0].toUpperCase() + key.substring(1);
 
-                  console.log('db/index.js -- label => ', label);
-                  console.log('db/index.js -- label.length => ', label.length);
-                  console.log(
-                     'db/index.js -- logging :  longestOption - label.length => ',
-                     longestOption - label.length,
-                  );
                   const votes = results.distribution[key];
                   const room = longestOption - label.length;
-                  let optionObj = new ResultBar(label, votes, room, votesMap);
-
-                  console.log('optionObj => ', optionObj);
-                  console.log(
-                     'optionObj.completeBar => ',
-                     optionObj.completeBar,
-                  );
+                  const optionObj = new ResultBar(label, votes, room, votesMap);
 
                   votesMap.set(label, optionObj);
-                  // resultsArray.splice(-1, 0, optionObj.completeBar);
                   resultsArray.push(optionObj.completeBar);
                }
 
                resultsArray.push(`\nAbstains: ${associatedPoll.abstains.size}`);
 
-               // console.log(votesMap);
-
-               // resultsOutput = resultsArray.join('\n');
                resultsOutput = codeBlock(resultsArray.join('\n'));
 
                embedResults = resultsOutput;
-
-               console.log(
-                  'commands/slashCommands/poll/regeneratePollMessage.js: \nif(liveVisualFeed === true)\nif(!embedResults) TRUE\nnewly created embedResults => ',
-                  embedResults,
-               );
             }
 
             newEmbedFields.splice(1, 0, {
@@ -387,19 +338,7 @@ module.exports = {
             });
          }
 
-         console.log('newEmbedFields => ', newEmbedFields);
-
-         console.log(
-            'messageToUpdate?.embeds[0].footer => ',
-            messageToUpdate.embeds[0]?.footer,
-         );
-
-         console.log(
-            'messageToUpdate?.embeds[0].footer.text => ',
-            messageToUpdate.embeds[0]?.footer.text,
-         );
          let footer = messageToUpdate.embeds[0]?.footer.text;
-         // let description = messageToUpdate.embeds[0]?.description;
 
          if (!footer) {
             const {
@@ -407,71 +346,15 @@ module.exports = {
                user: { discriminator },
             } = memberCache.get(associatedPoll.creatorId);
 
-            console.log({ discriminator });
-            console.log({ displayName });
-
             footer = `Poll #${associatedPoll.pollNumber} submitted by ${displayName}#${discriminator}`;
          }
 
-         // if (!description) {
-         //    const {
-         //       displayName,
-         //       user: { discriminator },
-         //    } = memberCache.get(associatedPoll.creatorId);
-
-         //    console.log({ discriminator });
-         //    console.log({ displayName });
-
-         //    footer = `Poll #${associatedPoll.pollNumber} submitted by ${displayName}#${discriminator}`;
-         // }
-
-         console.log({ title, description, newEmbedFields, footer });
-         let updateEmbed = new EmbedBuilder()
+         const updateEmbed = new EmbedBuilder()
             .setColor(`#ffffff`)
             .setTitle(title)
-            // .setTitle(embedTitle)
-            // .setDescription(`${messageToUpdate.embeds[0].description ?? ''}`)
             .setDescription(description)
             .addFields(newEmbedFields)
             .setFooter({ text: footer });
-         // .setFooter(messageToUpdate.embeds[0].footer.text);
-
-         console.log('updateEmbed => ', updateEmbed);
-
-         // embedQuorum = embedQuorum > 1 ? embedQuorum : 1;
-
-         // disabled for meow
-         // if (updateEmbed.fields[1]) {
-         // if (!!updateEmbed.fields.find(({ name }) => name === 'Quorum')) {
-         //    updateEmbed.fields.find(({ name }) => name === 'Quorum').value =
-         //       embedQuorum.toString();
-         // }
-
-         // if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
-         //    const timeClose = {
-         //       name: 'Voting Closes',
-         //       value: `<t:${Math.floor(
-         //          associatedPoll.timeEnd.getTime() / 1000
-         //       )}:f>`,
-         //       inline: false,
-         //    };
-
-         //    updateEmbed.spliceFields(updateEmbed.fields.length, 0, timeClose);
-         // }
-
-         // newEmbed.addFields(newEmbedFields);
-
-         // disabled for meow
-         // if (
-         //    !!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')
-         // ) {
-         //    // if (updateEmbed.fields[4]) {
-         //    updateEmbed.fields.find(
-         //       ({ name }) => name === 'Voting Closes'
-         //    ).value = `<t:${Math.floor(
-         //       associatedPoll.timeEnd.getTime() / 1000
-         //    )}:f>`;
-         // }
 
          if (associatedPoll.status === 'closed') {
             const eligibleVoters = associatedPoll.allowedUsers.size;
@@ -498,12 +381,7 @@ module.exports = {
                   .join(', ')} - Tied`;
             }
 
-            let failedChecks = [];
-
-            console.log(
-               'nerman/admin/regeneratePollMessages.js -- jsfailedChecks before checks=> ',
-               failedChecks,
-            );
+            const failedChecks = [];
 
             if (results.quorumPass === false) {
                failedChecks.push('quorum');
@@ -512,30 +390,6 @@ module.exports = {
             if (results.thresholdPass === false) {
                failedChecks.push('vote threshold');
             }
-
-            console.log(
-               'nerman/admin/regeneratePollMessages.js -- jsfailedChecks after checks=> ',
-               failedChecks,
-            );
-
-            console.log(
-               'admin/regeneratePollMessage.js -- associatedPoll.pollSucceeded PRE checks => ',
-               associatedPoll.pollSucceeded,
-            );
-
-            // if (failedChecks.length) {
-            //    associatedPoll.pollSucceeded = false;
-            //    winningResult = `Poll failed to meet ${failedChecks.join(
-            //       ' and '
-            //    )}.`;
-            // } else {
-            //    associatedPoll.pollSucceeded = true;
-            // }
-
-            // console.log(
-            //    'admin/regeneratePollMessage.js -- associatedPoll.pollSucceeded POST checks => ',
-            //    associatedPoll.pollSucceeded
-            // );
 
             const longestOption = longestString(
                associatedPoll.pollData.choices,
@@ -551,9 +405,9 @@ module.exports = {
             let resultsOutput = [];
 
             const barWidth = 8;
-            let totalVotes = associatedPoll.results.totalVotes;
+            const totalVotes = associatedPoll.results.totalVotes;
 
-            let votesMap = new Map([
+            const votesMap = new Map([
                ['maxLength', barWidth],
                ['totalVotes', totalVotes],
             ]);
@@ -563,31 +417,13 @@ module.exports = {
 
                const votes = results.distribution[key];
                const room = longestOption - label.length;
-               let optionObj = new ResultBar(label, votes, room, votesMap);
+               const optionObj = new ResultBar(label, votes, room, votesMap);
 
                votesMap.set(label, optionObj);
-               // resultsArray.splice(-1, 0, optionObj.completeBar);
                resultsArray.push(optionObj.completeBar);
             }
 
-            // resultsOutput = resultsArray.join('\n');
             resultsOutput = codeBlock(resultsArray.join('\n'));
-
-            // let closedEmbed = message.embeds[0];
-            // console.log({ closedEmbed });
-
-            // closedEmbed.setTitle(`${closedEmbed.title}`);
-
-            // console.log({ closedEmbed });
-
-            console.log(
-               'admin/regeneratePollMessage.js -- associatedPoll.countVoters =>',
-               associatedPoll.countVoters,
-            );
-            console.log(
-               'admin/regeneratePollMessage.js -- associatedPoll.countAbstains =>',
-               associatedPoll.countAbstains,
-            );
 
             const votersValue = `Quorum: ${
                associatedPoll.voterQuorum
@@ -613,30 +449,7 @@ module.exports = {
                },
             ];
 
-            // const closedFields = [
-            //    {
-            //       name: 'RESULTS',
-            //       value: codeBlock(winningResult),
-            //       inline: false,
-            //    },
-            //    {
-            //       name: 'VOTES',
-            //       value: resultsOutput,
-            //       inline: false,
-            //    },
-            //    {
-            //       name: 'VOTERS',
-            //       value: codeBlock(
-            //          `Quorum: ${associatedPoll.voterQuorum}\n\nEligible: ${eligibleVoters}\nSubmitted: ${associatedPoll.countVoters}\nAbstained: ${associatedPoll.countAbstains}\n\nParticipation Rate: ${associatedPoll.participation}%`
-            //       ),
-            //       inline: false,
-            //    },
-            // ];
-
             updateEmbed.spliceFields(1, 4, closedFields);
-
-            console.log('updateEmbed.fields');
-            console.log(updateEmbed.fields);
 
             messageToUpdate.edit({
                content: mentions,
@@ -654,24 +467,17 @@ module.exports = {
 
             updateEmbed.spliceFields(1, 4, closedFields);
 
-            console.log('updateEmbed.fields');
-            console.log(updateEmbed.fields);
-
             messageToUpdate.edit({
                content: null,
                embeds: [updateEmbed],
                components: [],
             });
          } else {
-            console.log('updateEmbed => ', updateEmbed);
-
             try {
                messageToUpdate.edit({
                   content: mentions,
                   embeds: [updateEmbed],
                });
-
-               console.log(messageToUpdate.embeds);
             } catch (error) {
                console.error(error);
             }
