@@ -1,15 +1,10 @@
-const {
-   ModalBuilder,
-   ButtonInteraction,
-   TextInputBuilder,
-   TextInputStyle,
-   ActionRowBuilder,
-} = require('discord.js');
+const { ButtonInteraction } = require('discord.js');
 
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
 const Logger = require('../helpers/logger');
 const { checkUserEligibility } = require('../helpers/buttonEligibility');
+const { generateVoteModal } = require('../views/modals');
 
 module.exports = {
    id: 'vote',
@@ -39,7 +34,7 @@ module.exports = {
          },
       } = interaction;
 
-      const { allowedRoles, anonymous: anon } = await PollChannel.findOne(
+      const { allowedRoles } = await PollChannel.findOne(
          { channelId },
          'allowedRoles',
       ).exec();
@@ -63,7 +58,7 @@ module.exports = {
          });
       }
 
-      const modal = createVoteModal(attachedPoll);
+      const modal = generateVoteModal(attachedPoll);
 
       try {
          await interaction.showModal(modal.toJSON());
@@ -81,32 +76,3 @@ module.exports = {
       });
    },
 };
-
-function createVoteModal(attachedPoll) {
-   const capitalizedOptions = attachedPoll.pollData.choices.map(
-      choice => choice[0].toUpperCase() + choice.substring(1),
-   );
-
-   const optionsString = capitalizedOptions.join(', ');
-   const modal = new ModalBuilder().setCustomId('vote-modal').setTitle('Vote');
-
-   const selectOptions = new TextInputBuilder()
-      .setCustomId('votingSelect')
-      .setLabel(`Type ${attachedPoll.pollData.voteAllowance} Choice(s)`)
-      .setPlaceholder(optionsString)
-      .setValue(optionsString)
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(100)
-      .setRequired(true);
-   const optionsActionRow = new ActionRowBuilder().addComponents(selectOptions);
-
-   const reason = new TextInputBuilder()
-      .setCustomId('voteReason')
-      .setLabel('Reason')
-      .setPlaceholder('Explain your vote.')
-      .setStyle(TextInputStyle.Paragraph);
-   const reasonActionRow = new ActionRowBuilder().addComponents(reason);
-
-   modal.addComponents(optionsActionRow, reasonActionRow);
-   return modal;
-}

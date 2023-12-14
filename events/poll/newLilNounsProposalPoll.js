@@ -2,7 +2,7 @@
 const { EmbedBuilder, TextChannel } = require('discord.js');
 const { Types } = require('mongoose');
 
-const { initPollMessage } = require('../../helpers/poll/initPollMessage');
+const { generateInitialPollMessage } = require('../../views/embeds/polls');
 const PollChannel = require('../../db/schemas/PollChannel');
 const PollCount = require('../../db/schemas/ChannelPollCount');
 const Poll = require('../../db/schemas/Poll');
@@ -41,7 +41,6 @@ module.exports = {
          client,
          guildId,
          guild: {
-            channels: { cache },
             roles: {
                everyone: { id: everyoneId },
             },
@@ -51,7 +50,6 @@ module.exports = {
             user,
             user: { username, discriminator },
          },
-         // } = interaction;
       } = interaction;
 
       Logger.info('events/poll/newProposalPoll.js: Creating new proposal.', {
@@ -76,7 +74,7 @@ module.exports = {
          return;
       }
 
-      const { id: propId, description: desc } = proposal;
+      const { id: propId } = proposal;
 
       const title = 'Lil Nouns | ' + proposal.proposalTitle;
       const description = 'https://lilnouns.wtf/vote/' + propId;
@@ -102,7 +100,7 @@ module.exports = {
          allowedRoles: channelConfig.allowedRoles,
       });
 
-      const messageObject = await initPollMessage({
+      const messageObject = await generateInitialPollMessage({
          propId,
          title,
          description,
@@ -130,7 +128,6 @@ module.exports = {
             .then(fetchedMembers => {
                return fetchedMembers.filter(member => {
                   return (
-                     //    member.presence?.status === 'online' && //disabled not worrying about the online presence
                      !member.user.bot &&
                      member?.roles.cache.hasAny(...channelConfig.allowedRoles)
                   );
@@ -181,9 +178,7 @@ module.exports = {
             _id: new Types.ObjectId(),
             guildId,
             creatorId: user.id,
-            // messageId: message.id,
             messageId: interaction.id,
-            // config: config._id,
             config: channelConfig._id,
             pollData,
             votes: undefined,
@@ -199,7 +194,7 @@ module.exports = {
             .then(async poll => {
                await pollNumber.increment();
                poll.pollNumber = pollNumber.pollsCreated;
-               return await poll.save();
+               return poll.save();
             });
 
          const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
@@ -260,15 +255,6 @@ module.exports = {
          await Promise.all(updateVoterPromise);
 
          const updatedEmbed = new EmbedBuilder(messageObject.embeds[0]);
-
-         // const timeEndMilli = new Date(
-         //    newPoll.timeCreated.getTime() + durationMs
-
-         //    // !testing switching the time for testing purposes
-         //    // savedPoll.timeCreated.getTime() + 30000
-         // );
-         // newPoll.timeEnd = timeEndMilli.toISOString();
-         // await newPoll.save();
 
          updatedEmbed.setFooter({
             text: `Poll #${newPoll.pollNumber} submitted by ${

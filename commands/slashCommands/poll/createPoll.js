@@ -1,16 +1,10 @@
-const {
-   CommandInteraction,
-   ModalBuilder,
-   TextInputBuilder,
-   TextInputStyle,
-   ButtonStyle,
-   ActionRowBuilder,
-} = require('discord.js');
+const { CommandInteraction } = require('discord.js');
 
 const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 const Logger = require('../../../helpers/logger');
 const { authorizeInteraction } = require('../../../helpers/authorization');
+const { generatePollModal } = require('../../../views/modals');
 
 module.exports = {
    subCommand: 'nerman.create-poll',
@@ -30,12 +24,7 @@ module.exports = {
 
       const {
          channelId,
-         client,
          user: { id: userId },
-         member: {
-            roles: { cache: roleCache },
-         },
-         memberPermissions,
       } = interaction;
 
       const configExists = await PollChannel.configExists(channelId);
@@ -84,7 +73,7 @@ module.exports = {
          );
       }
 
-      const modal = createPollModal(channelConfig);
+      const modal = generatePollModal(channelConfig);
 
       await interaction.showModal(modal.toJSON());
 
@@ -112,68 +101,4 @@ async function needsAuthorization(channelConfig, interaction) {
       }
    }
    return true;
-}
-
-function createPollModal(channelConfig) {
-   const modal = new ModalBuilder()
-      .setCustomId('modal-create-poll')
-      .setTitle('Create Poll');
-
-   const actionRows = [];
-
-   const pollTitle = new TextInputBuilder()
-      .setCustomId('pollTitle')
-      .setLabel('Title')
-      .setPlaceholder('Poll title, or your main question.')
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(100)
-      .setRequired(true);
-   actionRows.push(new ActionRowBuilder().addComponents(pollTitle));
-
-   const pollDescription = new TextInputBuilder()
-      .setCustomId('pollDescription')
-      .setLabel('Description')
-      .setPlaceholder(
-         'Descriptive text, links, and any supporting details needed for users to decide on your poll.',
-      )
-      .setStyle(TextInputStyle.Paragraph)
-      .setMaxLength(2000)
-      .setRequired(false);
-   actionRows.push(new ActionRowBuilder().addComponents(pollDescription));
-
-   if (!channelConfig.forAgainst) {
-      const pollChoices = new TextInputBuilder()
-         .setCustomId('pollChoices')
-         .setLabel('Choices')
-         .setPlaceholder(
-            'Comma separated values. Minimum two options. eg) Yes, No, Abstain',
-         )
-         .setValue('Yes, No')
-         .setStyle(TextInputStyle.Short)
-         .setMaxLength(100)
-         .setRequired(true);
-
-      actionRows.push(new ActionRowBuilder().addComponents(pollChoices));
-   }
-
-   if (channelConfig.voteAllowance) {
-      const pollAllowance = new TextInputBuilder()
-         .setCustomId('voteAllowance')
-         .setLabel('Votes Per User')
-         .setPlaceholder('# of votes is a single user allowed.')
-         .setValue('1')
-         .setRequired(true)
-         .setMaxLength(2)
-         .setStyle(TextInputStyle.Short);
-
-      actionRows.push(new ActionRowBuilder().addComponents(pollAllowance));
-   }
-
-   modal.addComponents(actionRows);
-
-   Logger.info(
-      'commands/slashCommands/poll/createPoll.js: Finished creating poll modal.',
-   );
-
-   return modal;
 }

@@ -1,17 +1,13 @@
 const {
-   ModalBuilder,
-   EmbedBuilder,
    MessageContextMenuCommandInteraction,
-   TextInputBuilder,
    ContextMenuCommandBuilder,
    ApplicationCommandType,
-   TextInputStyle,
-   ActionRowBuilder,
 } = require('discord.js');
 
 const Poll = require('../../db/schemas/Poll');
 const Logger = require('../../helpers/logger');
 const { authorizeInteraction } = require('../../helpers/authorization');
+const { generateCancelConfirmationModal } = require('../../views/modals');
 
 module.exports = {
    data: new ContextMenuCommandBuilder()
@@ -32,13 +28,7 @@ module.exports = {
 
       try {
          // todo Maybe make sure that when participation is being calculated or regenerated for users, to check for poll.status === 'cancelled', as well as whether or not the users are simply included in the poll.allowedUsers Map?
-         const {
-            client,
-            targetId,
-            guildId,
-            memberPermissions,
-            user: { id: userId },
-         } = interaction;
+         const { targetId, guildId } = interaction;
 
          await authorizeInteraction(interaction, 2);
 
@@ -56,7 +46,7 @@ module.exports = {
             throw new Error(pollValidity.message);
          }
 
-         const confirmModal = createConfirmationModal(targetId);
+         const confirmModal = generateCancelConfirmationModal(targetId);
 
          await interaction.showModal(confirmModal.toJSON());
 
@@ -98,23 +88,4 @@ function checkPollValidity(targetPoll) {
       isValid: true,
       message: 'This poll is valid.',
    };
-}
-
-function createConfirmationModal(targetId) {
-   const confirmModal = new ModalBuilder()
-      .setCustomId(`cancel-modal-${targetId}`)
-      .setTitle('Cancel Poll?');
-
-   const confirmCancel = new TextInputBuilder()
-      .setCustomId('confirmCancel')
-      .setLabel(`Type 'confirm' (no quotes) then submit.`)
-      .setPlaceholder('confirm')
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(100)
-      .setRequired(true);
-
-   confirmModal.addComponents(
-      new ActionRowBuilder().addComponents(confirmCancel),
-   );
-   return confirmModal;
 }

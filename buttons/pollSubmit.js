@@ -5,7 +5,7 @@ const {
 } = require('discord.js');
 const { Types } = require('mongoose');
 
-const { initPollMessage } = require('../helpers/poll/initPollMessage');
+const { generateInitialPollMessage } = require('../views/embeds/polls');
 const ResultBar = require('../structures/ResultBar');
 const User = require('../db/schemas/User');
 const Poll = require('../db/schemas/Poll');
@@ -13,10 +13,7 @@ const PollChannel = require('../db/schemas/PollChannel');
 const PollCount = require('../db/schemas/ChannelPollCount');
 const Logger = require('../helpers/logger');
 
-const { drawBar, longestString } = require('../helpers/poll');
-const { logToObject, formatDate } = require('../utils/functions');
-
-// const { create}
+const { longestString } = require('../helpers/poll');
 
 module.exports = {
    id: 'modal-create-poll',
@@ -32,10 +29,7 @@ module.exports = {
 
       if (modal.customId !== 'modal-create-poll') return;
 
-      // console.log('pollSubmit.js -- modal', { modal });
-
       await modal.deferReply();
-      // await modal.deferReply({ ephemeral: true });
 
       const {
          client,
@@ -71,11 +65,6 @@ module.exports = {
          allowedRoles: channelConfig.allowedRoles,
       });
 
-      // return modal.editReply({
-      //    content: 'ABORT',
-      //    ephemeral: true,
-      // });
-
       // extract data from submitted modal
       const title = modal.fields.getTextInputValue('pollTitle');
       const description =
@@ -88,7 +77,6 @@ module.exports = {
          options = ['for', 'against'];
       } else {
          options = [
-            // const options = [
             ...new Set(
                modal.fields
                   .getTextInputValue('pollChoices')
@@ -116,22 +104,16 @@ module.exports = {
          voteAllowance = `${modal.fields.getTextInputValue('voteAllowance')}`;
       }
 
-      // return modal.editReply({ content: 'Return early', ephemeral: true });
-
       if (!intRegex.test(voteAllowance)) {
          modal.deleteReply();
 
          return modal.followUp({
-            // return modal.followUp({
             content: `***${voteAllowance}*** - is not a valid vote allowance number.\nPlease choose a whole number.`,
             ephemeral: true,
          });
       }
 
-      // ,, , Yes, No,Abstain,,, ,, , // <---- testing format string
-
       if (options.length < 2) {
-         // return modal.editReply({
          modal.deleteReply();
 
          return modal.followUp({
@@ -142,8 +124,6 @@ module.exports = {
       }
 
       if (voteAllowance > options.length) {
-         // return modal.editReply({
-         // return modal.deleteReply({
          modal.deleteReply();
 
          return modal.followUp({
@@ -151,32 +131,11 @@ module.exports = {
                'Currently we are unable to facilitate having more votes than options.',
             ephemeral: true,
          });
-
-         // return modal.deleteReply({
-         //    content:
-         //    'Currently we are unable to facilitate having more votes than options.',
-         //    // ephemeral: true,
-         // });
       }
 
-      // console.log({ options });
-
-      // console.log(type);
-      // This will change when I implement it in the actual nNouns Discord
-      // const pollingChannelID =
-      //    type === 'nouncil'
-      //       ? process.env.POLL_CHAN_ID_DEV
-      //       : process.env.POLL_CHAN_ID_DEV;
-
-      // const pollingChannelID =
-      //    type === 'nouncil'
-      //       ? process.env.POLL_CHAN_ID_DEV
-      //       : process.env.POLL_CHAN_ID_DEV;
-
-      // const channel = client.channels.cache.get(pollingChannelID);
       const channel = client.channels.cache.get(channelId);
 
-      const messageObject = await initPollMessage({
+      const messageObject = await generateInitialPollMessage({
          title,
          description,
          channelConfig,
@@ -210,16 +169,7 @@ module.exports = {
          });
       }
 
-      // let message = await channel.send({
-      //    content: mentions,
-      //    embeds: [embed],
-      //    components: [voteActionRow],
-      // });
-
       const { id } = message;
-      // const { channelId, guildId, id } = message;
-
-      // console.log({ message });
 
       const pollData = {
          title,
@@ -239,19 +189,11 @@ module.exports = {
                withPresences: true,
             })
             .then(fetchedMembers => {
-               // console.log(fetchedMembers);
                return fetchedMembers.filter(member => {
-                  // console.log(member);
                   return (
                      !member.user.bot &&
                      member?.roles.cache.hasAny(...channelConfig.allowedRoles)
                   );
-                  //disabled not worrying about the
-                  // return (
-                  //    member.presence?.status === 'online' &&
-                  //    !member.user.bot &&
-                  //    member?.roles.cache.hasAny(...channelConfig.allowedRoles)
-                  // );
                });
             });
 
@@ -272,10 +214,6 @@ module.exports = {
          });
       }
 
-      // todo decide if I really need this or can just stick with the use-case below
-      // const config = await PollChannel.findOne({ channelId }).exec();
-
-      //
       const { _id, durationMs, quorum } = await PollChannel.findOne({
          channelId,
       }).exec();
@@ -303,7 +241,6 @@ module.exports = {
             guildId,
             creatorId: user.id,
             messageId: id,
-            // config: config._id,
             config: _id,
             pollData,
             votes: undefined,
@@ -320,8 +257,6 @@ module.exports = {
                poll.pollNumber = pollNumber.pollsCreated;
                return await poll.save();
             });
-
-         // await newPoll.populate('pollNumber');
 
          // todo Make this updating eligible users channel map into a reusable function
 
@@ -350,8 +285,7 @@ module.exports = {
                }
 
                user.markModified('eligibleChannels');
-               return await user.save();
-               // return user;
+               return user.save();
             },
          );
 
@@ -385,7 +319,7 @@ module.exports = {
                newPoll.pollData.choices,
             ).length;
 
-            let resultsArray = newPoll.config.voteThreshold
+            const resultsArray = newPoll.config.voteThreshold
                ? [
                     `Threshold: ${newPoll.voteThreshold} ${
                        newPoll.voteThreshold > 1 ? 'votes' : 'vote'
@@ -396,9 +330,9 @@ module.exports = {
             let resultsOutput = [];
 
             const barWidth = 8;
-            let totalVotes = results.totalVotes;
+            const totalVotes = results.totalVotes;
 
-            let votesMap = new Map([
+            const votesMap = new Map([
                ['maxLength', barWidth],
                ['totalVotes', totalVotes],
             ]);
@@ -407,7 +341,7 @@ module.exports = {
                const label = key[0].toUpperCase() + key.substring(1);
                const votes = results.distribution[key];
                const room = longestOption - label.length;
-               let optionObj = new ResultBar(label, votes, room, votesMap);
+               const optionObj = new ResultBar(label, votes, room, votesMap);
 
                votesMap.set(label, optionObj);
                resultsArray.push(optionObj.completeBar);

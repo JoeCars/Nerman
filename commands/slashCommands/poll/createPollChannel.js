@@ -1,17 +1,9 @@
-const {
-   ModalBuilder,
-   CommandInteraction,
-   TextInputBuilder,
-   TextInputStyle,
-   ChannelType,
-   ActionRowBuilder,
-} = require('discord.js');
+const { CommandInteraction, ChannelType } = require('discord.js');
 
-const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
-const GuildConfig = require('../../../db/schemas/GuildConfig');
 const Logger = require('../../../helpers/logger');
 const { authorizeInteraction } = require('../../../helpers/authorization');
+const { generatePollChannelModal } = require('../../../views/modals');
 
 module.exports = {
    subCommand: 'nerman.create-poll-channel',
@@ -32,23 +24,8 @@ module.exports = {
       const {
          channelId,
          channel,
-         guild,
          client: { guildConfigs },
-         user: { id: userId },
-         member: {
-            permissions,
-            roles: { cache: roleCache },
-         },
-         guild: {
-            channels,
-            id: guildId,
-            roles: gRoles,
-            roles: {
-               cache: guildRoleCache,
-               everyone: { id: everyoneId },
-            },
-         },
-         memberPermissions,
+         guild: { id: guildId, roles: gRoles },
       } = interaction;
 
       await authorizeInteraction(interaction, 2);
@@ -103,7 +80,7 @@ module.exports = {
          });
       }
 
-      const modal = createPollChannelModal(roleOptions);
+      const modal = generatePollChannelModal(roleOptions);
 
       await interaction.showModal(modal.toJSON());
 
@@ -117,85 +94,3 @@ module.exports = {
       );
    },
 };
-
-function createPollChannelModal(roleOptions) {
-   let placeholder = [];
-   roleOptions.forEach(({ label }) => placeholder.push(label));
-
-   placeholder = placeholder.join(', ');
-
-   if (placeholder.length > 100) {
-      placeholder = placeholder.substring(0, 99);
-   }
-
-   const modal = new ModalBuilder()
-      .setCustomId('modal-create-poll-channel')
-      .setTitle('Create Polling Channel');
-
-   const votingRoles = new TextInputBuilder()
-      .setCustomId('votingRoles')
-      .setLabel('Choose Voting Roles')
-      .setPlaceholder(placeholder)
-      .setValue(placeholder)
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(100)
-      .setRequired(true);
-   const votingActionRow = new ActionRowBuilder().addComponents(votingRoles);
-
-   const pollDuration = new TextInputBuilder()
-      .setCustomId('pollDuration')
-      .setLabel('Poll Duration (hours)')
-      .setPlaceholder('Eg) 60')
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(4)
-      .setRequired(true);
-   const durationActionRow = new ActionRowBuilder().addComponents(pollDuration);
-
-   const maxProposals = new TextInputBuilder()
-      .setCustomId('maxProposals')
-      .setLabel('Max Active Polls Per User')
-      .setPlaceholder(
-         'Choose maximum number of active polls allowed per user with voting role.',
-      )
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(3)
-      .setRequired(true);
-   const maxPollsActionRow = new ActionRowBuilder().addComponents(maxProposals);
-
-   const pollQuorum = new TextInputBuilder()
-      .setCustomId('pollQuorumThreshold')
-      .setLabel('Choose Quorum %')
-      .setPlaceholder('Eg) 30.5')
-      .setValue('30.5')
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(15)
-      .setRequired(true);
-   const quorumActionRow = new ActionRowBuilder().addComponents(pollQuorum);
-
-   const pollChannelOptions = new TextInputBuilder()
-      .setCustomId('pollChannelOptions')
-      .setLabel('Choose Channel Options (if any)')
-      .setPlaceholder(
-         'anonymous-voting, live-results, vote-allowance, for-or-against, nouns-dao, lil-nouns',
-      )
-      .setValue('anonymous-voting, live-results, for-or-against, nouns-dao')
-      .setStyle(TextInputStyle.Short)
-      .setMaxLength(100);
-   const optionsActionRow = new ActionRowBuilder().addComponents(
-      pollChannelOptions,
-   );
-
-   modal.addComponents(
-      votingActionRow,
-      durationActionRow,
-      maxPollsActionRow,
-      quorumActionRow,
-      optionsActionRow,
-   );
-
-   Logger.info(
-      'commands/slashCommands/poll/createPollChannel.js: Created modal.',
-   );
-
-   return modal;
-}

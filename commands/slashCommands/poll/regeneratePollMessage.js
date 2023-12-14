@@ -9,12 +9,11 @@ const Poll = require('../../../db/schemas/Poll');
 const PollChannel = require('../../../db/schemas/PollChannel');
 
 const ResultBar = require('../../../structures/ResultBar');
-const { initPollMessage } = require('../../../helpers/poll/initPollMessage');
-const { drawBar, longestString } = require('../../../helpers/poll');
+const { generateInitialPollMessage } = require('../../../views/embeds/polls');
+const { longestString } = require('../../../helpers/poll');
 const { authorizeInteraction } = require('../../../helpers/authorization');
 
 const Logger = require('../../../helpers/logger');
-const { log: l } = console;
 
 module.exports = {
    subCommand: 'nerman.regenerate-poll-message',
@@ -35,11 +34,6 @@ module.exports = {
       const {
          channelId,
          channel,
-         client,
-         user: { id: userId },
-         member: {
-            roles: { cache: roleCache },
-         },
          guild: {
             members: { cache: memberCache },
             roles: {
@@ -67,7 +61,6 @@ module.exports = {
 
       // Test existence of channel configuration
       if (!configExists) {
-         // throw new Error('Testing this error throw nonsense');
          return interaction.reply({
             content:
                'There are no configurations registered to this channel. You may only register from a channel in which polling has been configured.',
@@ -136,7 +129,7 @@ module.exports = {
       }
 
       if (!embedOnly) {
-         const messageObject = await initPollMessage({
+         const messageObject = await generateInitialPollMessage({
             title,
             description,
             channelConfig,
@@ -394,8 +387,8 @@ module.exports = {
             const longestOption = longestString(
                associatedPoll.pollData.choices,
             ).length;
-            // let resultsArray = ['```', '```'];
-            let resultsArray = associatedPoll.config.voteThreshold
+
+            const resultsArray = associatedPoll.config.voteThreshold
                ? [
                     `Threshold: ${associatedPoll.voteThreshold} ${
                        associatedPoll.voteThreshold > 1 ? 'votes' : 'vote'

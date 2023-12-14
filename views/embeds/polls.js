@@ -6,22 +6,12 @@ const {
    ButtonStyle,
 } = require('discord.js');
 
-const Logger = require('../logger');
-
-const initPollMessage = async ({
-   // propId,
+exports.generateInitialPollMessage = async ({
    title,
    description,
    channelConfig,
    everyoneId,
 }) => {
-   Logger.info('helpers/poll/initPollMessage.js: Initializing poll message.', {
-      proposalTitle: title,
-      proposalDescription: description,
-      channelConfig: channelConfig,
-      everyoneId: everyoneId,
-   });
-
    const mentions = await channelConfig.allowedRoles
       .map(role => (role !== everyoneId ? roleMention(role) : '@everyone'))
       .join(' ');
@@ -49,11 +39,6 @@ const initPollMessage = async ({
       { name: 'Voting Closes', value: '...', inline: false },
    ];
 
-   Logger.debug('helpers/poll/initPollMessage.js: Checking embed fields.', {
-      proposalTitle: title,
-      embedFields: embedFields,
-   });
-
    const embed = new EmbedBuilder()
       .setColor('#ffffff')
       .setTitle(title)
@@ -61,18 +46,9 @@ const initPollMessage = async ({
       .addFields(embedFields)
       .setFooter({ text: 'Submitted by ...' });
 
-   Logger.debug(
-      'helpers/poll/initPollMessage.js: Finished initializing poll message.',
-      {
-         proposalTitle: title,
-      },
-   );
-
    return {
       content: mentions,
       embeds: [embed],
       components: [voteActionRow],
    };
 };
-
-module.exports = { initPollMessage };
