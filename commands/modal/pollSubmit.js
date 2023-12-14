@@ -16,7 +16,7 @@ const Logger = require('../../helpers/logger');
 const { longestString } = require('../../helpers/poll');
 
 module.exports = {
-   id: 'modal-create-poll',
+   name: 'modal-create-poll',
    /**
     * @param {ModalSubmitInteraction} modal
     */

@@ -23,7 +23,7 @@ const doppelId = process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
 const guildNouncilIds = [nouncilId, jtsNouncilId, doppelId];
 
 module.exports = {
-   id: 'vote-modal',
+   name: 'vote-modal',
    /**
     * @param {ModalSubmitInteraction} modal
     */

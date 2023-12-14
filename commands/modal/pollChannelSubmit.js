@@ -7,7 +7,7 @@ const Logger = require('../../helpers/logger');
 const events = require('../../utils/feedEvents');
 
 module.exports = {
-   id: 'modal-create-poll-channel',
+   name: 'modal-create-poll-channel',
    /**
     * @param {ModalSubmitInteraction} modal
     */

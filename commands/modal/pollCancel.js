@@ -4,7 +4,7 @@ const Poll = require('../../db/schemas/Poll');
 const Logger = require('../../helpers/logger');
 
 module.exports = {
-   id: 'cancel-modal',
+   name: 'cancel-modal',
    /**
     *
     * @param {ModalSubmitInteraction} modal
