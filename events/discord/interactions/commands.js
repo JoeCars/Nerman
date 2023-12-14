@@ -42,7 +42,7 @@ module.exports = {
          await command.execute(interaction);
 
          Logger.info(
-            'events/interactionCreate.js: Finished executing interaction command.',
+            'events/discord/commands.js: Finished executing interaction command.',
             {
                commandName: commandName,
                channelId: interaction.channelId,
@@ -52,7 +52,7 @@ module.exports = {
          );
       } catch (error) {
          Logger.warn(
-            'events/interactionCreate.js: Encountered an error. Attempting to defer.',
+            'events/discord/commands.js: Encountered an error. Attempting to defer.',
             {
                error: error,
             },

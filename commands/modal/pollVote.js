@@ -28,7 +28,7 @@ module.exports = {
     * @param {ModalSubmitInteraction} modal
     */
    async execute(modal) {
-      Logger.info('events/poll/pollVote.js: Attempting to submit vote.', {
+      Logger.info('commands/modal/pollVote.js: Attempting to submit vote.', {
          guildId: modal.guildId,
          channelId: modal.channelId,
          userId: modal.member.user.id,
@@ -80,7 +80,7 @@ module.exports = {
       );
 
       Logger.debug(
-         'events/poll/pollVote.js: Checking incorrect voting options.',
+         'commands/modal/pollVote.js: Checking incorrect voting options.',
          {
             guildId: modal.guildId,
             channelId: modal.channelId,
@@ -106,8 +106,6 @@ module.exports = {
          });
       }
 
-      // disabled until DJS SELECT MENUS Modal supported
-      // const voteArray = modal.getSelectMenuValues('votingSelect');
       const voteReason = modal.fields.getTextInputValue('voteReason');
 
       if (pollStatus.status === 'closed') {
@@ -127,9 +125,7 @@ module.exports = {
 
       const userVote = await Vote.create({
          _id: new Types.ObjectId(),
-         // poll: targetPoll._id,
          poll: pollStatus._id,
-         // user: pollOptions.anonymous ? undefined : userId,
          user:
             !guildNouncilIds.includes(channelId) && pollOptions.anonymous
                ? undefined
@@ -138,13 +134,11 @@ module.exports = {
          reason: voteReason || undefined,
       });
 
-      // await targetPoll.allowedUsers.set(userId, true);
-
       let votingUser = await User.findOne().byDiscordId(userId, guildId).exec();
 
       if (!votingUser) {
          Logger.warn(
-            'events/poll/pollVote.js: User cannot vote here. Attempting to find eligible voting channels.',
+            'commands/modal/pollVote.js: User cannot vote here. Attempting to find eligible voting channels.',
             {
                guildId: modal.guildId,
                channelId: modal.channelId,
@@ -165,31 +159,12 @@ module.exports = {
 
       votingUser.incParticipation(channelId);
 
-      /**
-       *
-       *
-       *
-       *
-       *
-       *
-       */
-
       // todo I need to extract this chunk into a module
 
       const results = updatedPoll.results;
       const longestOption = longestString(updatedPoll.pollData.choices).length;
 
-      console.log(
-         'events/poll/pollVote.js -- longestOption => ',
-         longestOption,
-      );
-
-      console.log(
-         'events/poll/pollVote.js -- updatedPoll.config => ',
-         updatedPoll.config,
-      );
-
-      let resultsArray = pollStatus.config.voteThreshold
+      const resultsArray = pollStatus.config.voteThreshold
          ? [
               `Threshold: ${updatedPoll.voteThreshold} ${
                  updatedPoll.voteThreshold > 1 ? 'votes' : 'vote'
@@ -200,54 +175,28 @@ module.exports = {
       let resultsOutput = [];
 
       const barWidth = 8;
-      let totalVotes = results.totalVotes;
-      // let totalVotes = updatedPoll.results.totalVotes;
+      const totalVotes = results.totalVotes;
 
-      let votesMap = new Map([
+      const votesMap = new Map([
          ['maxLength', barWidth],
          ['totalVotes', totalVotes],
       ]);
       for (const key in results.distribution) {
          const label = key[0].toUpperCase() + key.substring(1);
 
-         console.log('db/index.js -- label => ', label);
-         console.log('db/index.js -- label.length => ', label.length);
-         console.log(
-            'db/index.js -- logging :  longestOption - label.length => ',
-            longestOption - label.length,
-         );
          const votes = results.distribution[key];
          const room = longestOption - label.length;
-         let optionObj = new ResultBar(label, votes, room, votesMap);
-
-         console.log('optionObj => ', optionObj);
-         console.log('optionObj.completeBar => ', optionObj.completeBar);
+         const optionObj = new ResultBar(label, votes, room, votesMap);
 
          votesMap.set(label, optionObj);
-         // resultsArray.splice(-1, 0, optionObj.completeBar);
          resultsArray.push(optionObj.completeBar);
       }
 
       resultsArray.push(`\nAbstains: ${updatedPoll.abstains.size}`);
 
-      // console.log(votesMap);
-
-      // resultsOutput = resultsArray.join('\n');
       resultsOutput = codeBlock(resultsArray.join('\n'));
 
-      /**
-       *
-       *
-       *
-       *
-       *
-       *
-       *
-       *
-       *
-       */
-
-      let message = await client.channels.cache
+      const message = await client.channels.cache
          .get(channelId)
          .messages.fetch(messageId);
 
@@ -339,32 +288,12 @@ module.exports = {
                      `https://nouns.wtf/vote/${propId}`,
                   )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`,
                );
-            // .setDescription(
-            //    `${
-            //       !pollOptions.anonymous
-            //          ? userMention(userId)
-            //          : !guildNouncilIds.includes(channelId)
-            //          ? 'Anon'
-            //          : 'Anon Nouncillor'
-            //    } voted ${inlineCode(voteArray.join(' '))} on ${hyperlink(
-            //       propText,
-            //       `https://nouns.wtf/vote/${propId}`
-            //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
-            // );
-            // .setDescription(
-            //    `Anon Nouncillor voted ${inlineCode(
-            //       voteArray.join(' ')
-            //    )} on ${hyperlink(
-            //       propText,
-            //       `https://nouns.wtf/vote/${propId}`
-            //    )}.${!!voteReason ? `\n\n${voteReason.trim()}` : ``}`
-            // );
 
             const thread = await message.thread.fetch();
-            // await message.thread.fetch();
+
             await thread.send({ embeds: [threadEmbed] });
          } catch (error) {
-            Logger.error('events/poll/pollVote.js: Received an error.', {
+            Logger.error('commands/modal/pollVote.js: Received an error.', {
                error: error,
             });
          }
@@ -387,16 +316,16 @@ module.exports = {
                );
 
             const thread = await message.thread.fetch();
-            // await message.thread.fetch();
+
             await thread.send({ embeds: [threadEmbed] });
          } catch (error) {
-            Logger.error('events/poll/pollVote.js: Received an error.', {
+            Logger.error('commands/modal/pollVote.js: Received an error.', {
                error: error,
             });
          }
       }
 
-      Logger.info('events/poll/pollVote.js: Successfully submitted vote.', {
+      Logger.info('commands/modal/pollVote.js: Successfully submitted vote.', {
          guildId: modal.guildId,
          channelId: modal.channelId,
          userId: modal.member.user.id,

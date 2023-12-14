@@ -236,7 +236,7 @@ module.exports = {
                }
             } catch (error) {
                Logger.error(
-                  "events/discordEvents/client/ready.js: On DelegateChanged. There's been an error.",
+                  "events/ready.js: On DelegateChanged. There's been an error.",
                   {
                      error: error,
                   },
@@ -701,7 +701,7 @@ module.exports = {
                }
             } catch (error) {
                Logger.error(
-                  "events/discordEvents/client/ready.js: On ForkDelegateChanged. There's been an error.",
+                  "events/ready.js: On ForkDelegateChanged. There's been an error.",
                   {
                      error: error,
                   },

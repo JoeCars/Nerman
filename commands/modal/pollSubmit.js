@@ -21,11 +21,14 @@ module.exports = {
     * @param {ModalSubmitInteraction} modal
     */
    async execute(modal) {
-      Logger.info('events/poll/pollSubmit.js: Attempting to submit a poll.', {
-         channelId: modal.channelId,
-         guildId: modal.guildId,
-         user: modal.user.username,
-      });
+      Logger.info(
+         'commands/modal/pollSubmit.js: Attempting to submit a poll.',
+         {
+            channelId: modal.channelId,
+            guildId: modal.guildId,
+            user: modal.user.username,
+         },
+      );
 
       if (modal.customId !== 'modal-create-poll') return;
 
@@ -57,7 +60,7 @@ module.exports = {
 
       const intRegex = new RegExp(/^\d*$/);
 
-      Logger.debug('events/poll/pollSubmit.js: Checking permissions.', {
+      Logger.debug('commands/modal/pollSubmit.js: Checking permissions.', {
          channelId: modal.channelId,
          guildId: modal.guildId,
          user: modal.user.username,
@@ -92,7 +95,7 @@ module.exports = {
          voteAllowance = modal.fields.getTextInputValue('voteAllowance');
       }
 
-      Logger.debug('events/poll/pollSubmit.js: Checking vote options.', {
+      Logger.debug('commands/modal/pollSubmit.js: Checking vote options.', {
          channelId: modal.channelId,
          guildId: modal.guildId,
          user: modal.user.username,
@@ -142,7 +145,7 @@ module.exports = {
          everyoneId,
       });
 
-      Logger.debug('events/poll/pollSubmit.js: Checking vote options.', {
+      Logger.debug('commands/modal/pollSubmit.js: Checking vote options.', {
          channelId: modal.channelId,
          guildId: modal.guildId,
          user: modal.user.username,
@@ -153,7 +156,7 @@ module.exports = {
       try {
          message = await channel.send(messageObject);
       } catch (error) {
-         Logger.error('events/poll/pollSubmit.js: Received error.', {
+         Logger.error('commands/modal/pollSubmit.js: Received error.', {
             error: error,
          });
 
@@ -202,14 +205,14 @@ module.exports = {
             eligibleKeys.push(key);
          }
 
-         Logger.debug('events/poll/pollSubmit.js: Checking eligible keys.', {
+         Logger.debug('commands/modal/pollSubmit.js: Checking eligible keys.', {
             channelId: modal.channelId,
             guildId: modal.guildId,
             user: modal.user.username,
             eligibleKeys: eligibleKeys,
          });
       } catch (error) {
-         Logger.error('events/poll/pollSubmit.js: Received error.', {
+         Logger.error('commands/modal/pollSubmit.js: Received error.', {
             error: error,
          });
       }
@@ -230,11 +233,14 @@ module.exports = {
 
       try {
          // todo refactor this to use {new: true} and return the document perhaps, rather than this two part operation?
-         Logger.debug('events/poll/pollSubmit.js: Checking poll attributes.', {
-            guildId: guildId,
-            userId: user.id,
-            pollData: pollData,
-         });
+         Logger.debug(
+            'commands/modal/pollSubmit.js: Checking poll attributes.',
+            {
+               guildId: guildId,
+               userId: user.id,
+               pollData: pollData,
+            },
+         );
 
          const data = {
             _id: new Types.ObjectId(),
@@ -371,18 +377,21 @@ module.exports = {
          await message.thread.send(`Discussion:`);
          message.react('✅');
       } catch (error) {
-         Logger.error('events/poll/pollSubmit.js: Encountered an error.', {
+         Logger.error('commands/modal/pollSubmit.js: Encountered an error.', {
             error: error,
          });
       }
 
       // todo add button vomponents in AFTER initial DB commit of the poll
 
-      Logger.info('events/poll/pollSubmit.js: Successfully submitted poll.', {
-         channelId: modal.channelId,
-         guildId: modal.guildId,
-         user: modal.user.username,
-      });
+      Logger.info(
+         'commands/modal/pollSubmit.js: Successfully submitted poll.',
+         {
+            channelId: modal.channelId,
+            guildId: modal.guildId,
+            user: modal.user.username,
+         },
+      );
 
       await modal.followUp({
          content: 'Poll Submitted!',

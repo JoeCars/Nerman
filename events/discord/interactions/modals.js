@@ -12,15 +12,12 @@ module.exports = {
          return;
       }
 
-      Logger.info(
-         'events/interactions/modals.js: Handling a modal interaction.',
-         {
-            customId: interaction.customId,
-            guildId: interaction.guildId,
-            channelId: interaction.channelId,
-            userId: interaction.user.id,
-         },
-      );
+      Logger.info('events/discord/modals.js: Handling a modal interaction.', {
+         customId: interaction.customId,
+         guildId: interaction.guildId,
+         channelId: interaction.channelId,
+         userId: interaction.user.id,
+      });
 
       const { client, customId } = interaction;
 
@@ -33,7 +30,7 @@ module.exports = {
       modalCommand.execute(interaction);
 
       Logger.info(
-         'events/interactions/modals.js: Finished handling a modal interaction.',
+         'events/discord/modals.js: Finished handling a modal interaction.',
          {
             customId: interaction.customId,
             guildId: interaction.guildId,
