@@ -10,7 +10,7 @@ module.exports = {
     * @param {ModalSubmitInteraction} modal
     */
    async execute(modal) {
-      Logger.info('events/poll/pollCancel.js: Attempting to cancel poll.', {
+      Logger.info('commands/modal/pollCancel.js: Attempting to cancel poll.', {
          guildId: modal.guild.id,
       });
 
@@ -31,7 +31,7 @@ module.exports = {
             modal.fields.getTextInputValue('confirmCancel').toLowerCase() ===
             'confirm';
 
-         Logger.debug('events/poll/pollCancel.js: Checking confirmation.', {
+         Logger.debug('commands/modal/pollCancel.js: Checking confirmation.', {
             guildId: modal.guild.id,
             confirm: confirm,
          });
@@ -44,7 +44,7 @@ module.exports = {
 
          const messageId = modal.customId.substring(modal.customId.length - 19);
 
-         Logger.debug('events/poll/pollCanel.js: Checking message id.', {
+         Logger.debug('commands/modal/pollCancel.js: Checking message id.', {
             guildId: modal.guild.id,
             messageId: messageId,
          });
@@ -88,9 +88,12 @@ module.exports = {
             ephemeral: true,
          });
 
-         Logger.info('events/poll/pollCanel.js: Finished cancelling poll.', {
-            guildId: modal.guild.id,
-         });
+         Logger.info(
+            'commands/modal/pollCancel.js: Finished cancelling poll.',
+            {
+               guildId: modal.guild.id,
+            },
+         );
       } catch (error) {
          modal.editReply({ content: error.message });
          throw new Error(error.message);

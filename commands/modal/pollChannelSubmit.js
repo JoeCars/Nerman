@@ -13,7 +13,7 @@ module.exports = {
     */
    async execute(modal) {
       Logger.info(
-         'events/poll/pollChannelSubmit.js: Attempting to create a poll channel.',
+         'commands/modal/pollChannelSubmit.js: Attempting to create a poll channel.',
          {
             guildId: modal.guild.id,
             channelId: modal.channelId,
@@ -50,7 +50,7 @@ module.exports = {
             guildConfigs.get(guildId));
 
          Logger.debug(
-            'events/poll/pollChannelSubmit.js: Checking guild config.',
+            'commands/modal/pollChannelSubmit.js: Checking guild config.',
             {
                guildId: modal.guild.id,
                channelId: modal.channelId,
@@ -59,9 +59,7 @@ module.exports = {
          );
 
          const durRegex = new RegExp(/^\d{1,3}(\.\d{1,2})?$/, 'g');
-         // const quorRegex = new RegExp(/^\d{1,2}(\.\d{1,2})?$/, 'g');
 
-         // /^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/;
          const quorRegex = new RegExp(
             /^(^\d{1,2}(\.\d{1,2})?$)|(^100(\.00)?$)$/,
          );
@@ -69,12 +67,6 @@ module.exports = {
             /^(^vote-allowance$)?(^live-results$)?(^anonymous-voting$)?(^for-or-against$)?(^nouns-dao$)?(^lil-nouns$)?$/,
          );
 
-         // extract data from submitted modal
-         // const pollChannel = modal.getSelectMenuValues('pollChannel');
-         // const pollChannel = channelId;
-         // disabled until modals are supported
-         // const votingRoles = modal.getSelectMenuValues('votingRoles');
-         // !testing voting roles from text input
          const votingRoles = modal.fields
             .getTextInputValue('votingRoles')
             .split(',')
@@ -84,7 +76,7 @@ module.exports = {
          const maxProposals = parseInt(
             modal.fields.getTextInputValue('maxProposals'),
          );
-         // let pollQuorum = modal.fields.getTextInputValue('pollQuorumThreshold');
+
          let pollQuorumThreshold = modal.fields.getTextInputValue(
             'pollQuorumThreshold',
          );
@@ -131,7 +123,7 @@ module.exports = {
          let voteThreshold = pollQuorumThreshold[1] ?? 0;
 
          Logger.debug(
-            'events/poll/pollChannelSubmit.js: Checking poll options.',
+            'commands/modal/pollChannelSubmit.js: Checking poll options.',
             {
                guildId: modal.guild.id,
                channelId: modal.channelId,
@@ -144,9 +136,6 @@ module.exports = {
          );
 
          // map the ids of the guild channels that match the names of the user submitted roles
-         // const allowedRoles = roleCache
-         //    .filter(({ name }) => votingRoles.includes(name))
-         //    .map(({ id }) => id);
          const allowedRoles = await gRoleCache
             .fetch()
             .then(fetchedRoles =>
@@ -170,15 +159,14 @@ module.exports = {
             });
          }
 
-         //disabled until DJS supports Modal SelectMenus
-         // const pollChannelOptions =
-         // modal.getSelectMenuValues('pollChannelOptions');
-
-         Logger.debug('events/poll/pollChannelSubmit.js: Checking 0 Quorum', {
-            guildId: modal.guild.id,
-            channelId: modal.channelId,
-            quorum: Math.ceil(50 * (pollQuorum / 100)),
-         });
+         Logger.debug(
+            'commands/modal/pollChannelSubmit.js: Checking 0 Quorum',
+            {
+               guildId: modal.guild.id,
+               channelId: modal.channelId,
+               quorum: Math.ceil(50 * (pollQuorum / 100)),
+            },
+         );
 
          if (!durRegex.test(pollDuration)) {
             return modal.editReply({
@@ -210,7 +198,7 @@ module.exports = {
          pollQuorum = parseFloat(pollQuorum) > 0 ? parseFloat(pollQuorum) : 0;
 
          Logger.info(
-            'events/poll/pollChannelSubmit.js: Creating a new channel config document.',
+            'commands/modal/pollChannelSubmit.js: Creating a new channel config document.',
             {
                guildId: modal.guild.id,
                channelId: modal.channelId,
@@ -244,7 +232,7 @@ module.exports = {
          }
 
          Logger.info(
-            `events/poll/pollChannelSubmit.js: Repopulating channel configuration list, because channels belong to this guild config.`,
+            `commands/modal/pollChannelSubmit.js: Repopulating channel configuration list, because channels belong to this guild config.`,
             {
                guildId: modal.guild.id,
                channelId: modal.channelId,
@@ -256,7 +244,7 @@ module.exports = {
          await guildConfig.populate('pollChannels');
 
          Logger.info(
-            `events/poll/pollChannelSubmit.js: Configuration list has been repopulated!`,
+            `commands/modal/pollChannelSubmit.js: Configuration list has been repopulated!`,
             {
                guildId: modal.guild.id,
                channelId: modal.channelId,
@@ -265,7 +253,7 @@ module.exports = {
          );
 
          Logger.info(
-            'events/poll/pollChannelSubmit.js: Finished creating poll channel.',
+            'commands/modal/pollChannelSubmit.js: Finished creating poll channel.',
             {
                guildId: modal.guild.id,
                channelId: modal.channelId,
@@ -278,7 +266,7 @@ module.exports = {
          });
       } catch (error) {
          Logger.error(
-            'events/poll/pollChannelSubmit.js: Encountered an error.',
+            'commands/modal/pollChannelSubmit.js: Encountered an error.',
             { error: error },
          );
          return modal.editReply({
@@ -309,7 +297,7 @@ async function registerForPollEvents(guildId, channelId) {
       }
    } catch (error) {
       Logger.error(
-         'events/discordEvents/interaction/modal/pollChannelSubmit.js: Unable to register poll events.',
+         'commands/modal/pollChannelSubmit.js: Unable to register poll events.',
          {
             error: error,
          },
@@ -337,7 +325,7 @@ async function registerLilNounsPollEvents(guildId, channelId) {
       }
    } catch (error) {
       Logger.error(
-         'events/discordEvents/interaction/modal/pollChannelSubmit.js: Unable to register poll events.',
+         'commands/modal/pollChannelSubmit.js: Unable to register poll events.',
          {
             error: error,
          },

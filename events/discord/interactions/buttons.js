@@ -12,16 +12,13 @@ module.exports = {
          return;
       }
 
-      Logger.info(
-         'events/buttonInteraction.js: Handling a button interaction.',
-         {
-            customId: interaction.customId,
-            memberPermissions: interaction.member.permissions,
-            guildId: interaction.guildId,
-            channelId: interaction.channelId,
-            userId: interaction.user.id,
-         },
-      );
+      Logger.info('events/discord/buttons.js: Handling a button interaction.', {
+         customId: interaction.customId,
+         memberPermissions: interaction.member.permissions,
+         guildId: interaction.guildId,
+         channelId: interaction.channelId,
+         userId: interaction.user.id,
+      });
 
       const {
          client,
@@ -33,7 +30,7 @@ module.exports = {
 
       if (button.permission && !permissions.has(button.permission)) {
          Logger.warn(
-            'events/buttonInteraction.js: User does not have the permissions to interact with this button.',
+            'events/discord/buttons.js: User does not have the permissions to interact with this button.',
             {
                customId: interaction.customId,
                memberPermissions: interaction.member.permissions,
@@ -52,7 +49,7 @@ module.exports = {
       button.execute(interaction);
 
       Logger.info(
-         'events/buttonInteraction.js: Finished handling a button interaction.',
+         'events/discord/buttons.js: Finished handling a button interaction.',
          {
             customId: interaction.customId,
             memberPermissions: interaction.member.permissions,
