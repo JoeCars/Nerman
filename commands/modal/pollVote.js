@@ -8,13 +8,13 @@ const {
 } = require('discord.js');
 const { Types } = require('mongoose');
 
-const Poll = require('../db/schemas/Poll');
-const User = require('../db/schemas/User');
-const Vote = require('../db/schemas/Vote');
-const Logger = require('../helpers/logger');
+const Poll = require('../../db/schemas/Poll');
+const User = require('../../db/schemas/User');
+const Vote = require('../../db/schemas/Vote');
+const Logger = require('../../helpers/logger');
 
-const { longestString } = require('../helpers/poll');
-const ResultBar = require('../structures/ResultBar');
+const { longestString } = require('../../helpers/poll');
+const ResultBar = require('../../structures/ResultBar');
 
 const nouncilId = process.env.TESTNERMAN_NOUNCIL_CHAN_ID;
 const jtsNouncilId = process.env.JTS_NOUNCIL_ID;

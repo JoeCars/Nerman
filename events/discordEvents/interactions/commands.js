@@ -1,10 +1,9 @@
-const Logger = require('../../../../helpers/logger');
+const Logger = require('../../../helpers/logger');
 const { CommandInteraction } = require('discord.js');
 
 module.exports = {
    name: 'interactionCreate',
    /**
-    *
     * @param {CommandInteraction} interaction
     * @returns
     */

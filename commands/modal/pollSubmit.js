@@ -5,15 +5,15 @@ const {
 } = require('discord.js');
 const { Types } = require('mongoose');
 
-const { generateInitialPollMessage } = require('../views/embeds/polls');
-const ResultBar = require('../structures/ResultBar');
-const User = require('../db/schemas/User');
-const Poll = require('../db/schemas/Poll');
-const PollChannel = require('../db/schemas/PollChannel');
-const PollCount = require('../db/schemas/ChannelPollCount');
-const Logger = require('../helpers/logger');
+const { generateInitialPollMessage } = require('../../views/embeds/polls');
+const ResultBar = require('../../structures/ResultBar');
+const User = require('../../db/schemas/User');
+const Poll = require('../../db/schemas/Poll');
+const PollChannel = require('../../db/schemas/PollChannel');
+const PollCount = require('../../db/schemas/ChannelPollCount');
+const Logger = require('../../helpers/logger');
 
-const { longestString } = require('../helpers/poll');
+const { longestString } = require('../../helpers/poll');
 
 module.exports = {
    id: 'modal-create-poll',

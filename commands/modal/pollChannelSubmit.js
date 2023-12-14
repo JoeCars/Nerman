@@ -1,10 +1,10 @@
 const { ModalSubmitInteraction } = require('discord.js');
 const { Types } = require('mongoose');
 
-const PollChannel = require('../db/schemas/PollChannel');
-const FeedConfig = require('../db/schemas/FeedConfig');
-const Logger = require('../helpers/logger');
-const events = require('../utils/feedEvents');
+const PollChannel = require('../../db/schemas/PollChannel');
+const FeedConfig = require('../../db/schemas/FeedConfig');
+const Logger = require('../../helpers/logger');
+const events = require('../../utils/feedEvents');
 
 module.exports = {
    id: 'modal-create-poll-channel',

@@ -1,6 +1,6 @@
 const { ButtonInteraction } = require('discord.js');
 
-const Logger = require('../../../../helpers/logger');
+const Logger = require('../../../helpers/logger');
 
 module.exports = {
    name: 'interactionCreate',
@@ -8,7 +8,7 @@ module.exports = {
     * @param {ButtonInteraction} interaction
     */
    execute(interaction) {
-      if (!interaction.isModalSubmit() && !interaction.isButton()) {
+      if (!interaction.isButton()) {
          return;
       }
 
@@ -29,11 +29,7 @@ module.exports = {
          member: { permissions },
       } = interaction;
 
-      let buttonId = customId;
-      if (customId.includes('cancel-modal')) {
-         buttonId = 'cancel-modal';
-      }
-      const button = client.buttons.get(buttonId);
+      const button = client.buttons.get(customId);
 
       if (button.permission && !permissions.has(button.permission)) {
          Logger.warn(
