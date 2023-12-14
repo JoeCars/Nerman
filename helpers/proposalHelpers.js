@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 exports.getTitle = function (proposal) {
    return `Prop ${proposal.id}: ${proposal.description
@@ -20,7 +20,7 @@ exports.createNewProposalEmbed = function (
       .replaceAll(/^(#\s)|(\n+)$/g, '')}`;
    const descriptionUrl = propUrl + proposal.id;
 
-   const proposalEmbed = new MessageEmbed()
+   const proposalEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(`${description}\n\n${descriptionUrl}`);

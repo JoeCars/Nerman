@@ -1,7 +1,6 @@
 const Twit = require('twit');
 const fetch = require('node-fetch');
 const { UserManager } = require('discord.js');
-const mime = require('mime');
 let twitEnabled = true;
 
 const Logger = require('./logger');

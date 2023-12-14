@@ -1,5 +1,4 @@
-const { MessageEmbed } = require('discord.js');
-const { hyperlink, inlineCode } = require('@discordjs/builders');
+const { EmbedBuilder, hyperlink, inlineCode } = require('discord.js');
 
 const DEFAULT_MINT_ID = '0x0000000000000000000000000000000000000000';
 
@@ -34,7 +33,7 @@ exports.generateTransferForkNounEmbed = function (data, hasMarkdown = true) {
    }
    const description = `From ${fromWallet} to ${toWallet}`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)
@@ -64,7 +63,7 @@ exports.generateForkDelegateChangedEmbed = function (data, hasMarkdown = true) {
 
    const message = `${delegator} delegated ${voteCount} votes to ${newDelegate}.`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setTitle(title)
       .setColor('#00FFFF')
       .setDescription(message);
@@ -81,7 +80,7 @@ exports.generateForkNounCreatedEmbed = function (data) {
 
    const titleUrl = `https://nouns.wtf/noun/${data.id}`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setURL(titleUrl)

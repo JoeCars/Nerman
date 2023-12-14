@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const shortenAddress = require('./shortenAddress');
 const Logger = require('../logger');
 
@@ -85,7 +85,7 @@ module.exports = async (data, attachment) => {
    const links = `${nounsDao}, ${agora}, ${collective}`;
    const governance = `${delegate}\n${votePower}\n--\n${links}`;
 
-   const nounEmbed = new MessageEmbed().setColor('#00FFFF');
+   const nounEmbed = new EmbedBuilder().setColor('#00FFFF');
 
    if (bid) {
       // Auction
@@ -116,7 +116,7 @@ module.exports = async (data, attachment) => {
                value: `${heldBy}`,
             },
             { name: `**AUCTION**`, value: `${auction}` },
-            { name: `**GOVERNANCE**`, value: `${governance}` }
+            { name: `**GOVERNANCE**`, value: `${governance}` },
          )
          .setImage(attachment);
    } else {
@@ -126,7 +126,7 @@ module.exports = async (data, attachment) => {
                name: `**NOUN** ${id}`,
                value: `${heldBy}`,
             },
-            { name: `**GOVERNANCE**`, value: `${governance}` }
+            { name: `**GOVERNANCE**`, value: `${governance}` },
          )
          .setImage(attachment);
    }
@@ -140,7 +140,7 @@ module.exports = async (data, attachment) => {
          delegateEns: data.delegateEns,
          votingPower: data.votePower,
          bid: data.bid,
-      }
+      },
    );
 
    return nounEmbed;

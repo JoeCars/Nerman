@@ -1,8 +1,7 @@
-const { MessageEmbed } = require('discord.js');
-const { inlineCode, hyperlink } = require('@discordjs/builders');
+const { EmbedBuilder, inlineCode, hyperlink } = require('discord.js');
 
 exports.generateThreadStatusEmbed = function (status) {
-   const threadEmbed = new MessageEmbed()
+   const threadEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setDescription(`Proposal status changed to ${inlineCode(status)}`);
    return threadEmbed;
@@ -28,7 +27,7 @@ exports.generateThreadVoteEmbed = async function (vote, nouns) {
    );
 
    const supportEnum = ['AGAINST', 'FOR', 'ABSTAIN'];
-   const threadEmbed = new MessageEmbed()
+   const threadEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setDescription(
          `${voterHyperlink} voted ${inlineCode(

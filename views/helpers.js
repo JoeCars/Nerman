@@ -1,4 +1,4 @@
-const { hyperlink } = require('@discordjs/builders');
+const { hyperlink } = require('discord.js');
 
 const shortenAddress = require('../helpers/nouns/shortenAddress');
 

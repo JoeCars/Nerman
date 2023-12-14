@@ -1,11 +1,9 @@
-const { Collection } = require('discord.js');
+const { Collection, REST, Routes } = require('discord.js');
+
 const { getFiles } = require('../utils/functions');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
 const importNermanJS = require('../utils/nouns/importNerman');
 const Logger = require('../helpers/logger');
-// todo use for permissions validation later on
-// const { Perms } = require('../validation/permissions');
+
 const clientId = process.env.DISCORD_CLIENT_ID;
 const token = process.env.DISCORD_TOKEN;
 
@@ -13,7 +11,7 @@ module.exports = async client => {
    Logger.info('handlers/commands.js: Handling commands.');
 
    const Nouns = await importNermanJS();
-   // console.log(Nouns);
+
    const commandsArr = [];
 
    client.commands = new Collection();
@@ -24,41 +22,21 @@ module.exports = async client => {
 
    const commands = await getFiles('commands', '.js');
 
-   // console.log({ commands });
-
    if (commands.length === 0) throw 'No slash commands provided';
 
    commands.forEach(commandFile => {
-      // const command = require(`../commands/${commandFile}`);
-      // console.log({ commandFile });
-
-      if (
-         process.env.DEPLOY_STAGE !== 'development' &&
-         commandFile === 'commands/reload-test.js'
-      ) {
-         Logger.info('handlers/commands.js: Reloading test.', {
-            commandFile: commandFile,
-         });
-         return;
-      }
-
       const command = require(`../${commandFile}`);
 
       if (command.subCommand) {
          return client.subCommands.set(command.subCommand, command);
-      }
-
-      // console.log({ command });
-
-      if (command.data.name && typeof command.data.name === 'string') {
+      } else if (command.name) {
+         return client.commands.set(command.name, command);
+      } else if (command.data.name && typeof command.data.name === 'string') {
          commandsArr.push(command.data.toJSON());
          client.commands.set(command.data.name, command);
       } else {
-         throw new TypeError(
-            [
-               `The slash command: ${commandFile} failed to load`,
-               "because it doesn't have a name property`",
-            ].join(' '),
+         throw new Error(
+            `${commandFile} failed to load because it does not have a name.`,
          );
       }
    });
@@ -83,6 +61,4 @@ module.exports = async client => {
          });
       }
    })();
-
-   Logger.info('handlers/commands.js: Finished handling commands.');
 };

@@ -2,8 +2,7 @@ const Logger = require('./logger');
 const NounsProposalForum = require('../db/schemas/NounsProposalForum');
 const NounsCandidateForum = require('../db/schemas/NounsCandidateForum');
 const UrlConfig = require('../db/schemas/UrlConfig');
-const { TextChannel } = require('discord.js');
-const { hideLinkEmbed } = require('@discordjs/builders');
+const { TextChannel, hideLinkEmbed } = require('discord.js');
 
 const MAX_THREAD_NAME_LENGTH = 96;
 

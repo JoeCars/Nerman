@@ -1,4 +1,5 @@
-const { ButtonInteraction, MessageEmbed } = require('discord.js');
+const { ButtonInteraction, EmbedBuilder } = require('discord.js');
+
 const User = require('../db/schemas/User');
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
@@ -109,10 +110,10 @@ async function updateVoteEmbed(client, channelId, messageId, updatedPoll) {
       .get(channelId)
       .messages.fetch(messageId);
 
-   const updateEmbed = new MessageEmbed(message.embeds[0]);
+   const updateEmbed = new EmbedBuilder(message.embeds[0]);
 
    updateEmbed.spliceFields(
-      updateEmbed.fields.findIndex(({ name }) => name === 'Abstains'),
+      updateEmbed.data.fields.findIndex(({ name }) => name === 'Abstains'),
       1,
       {
          name: 'Abstains',
@@ -123,9 +124,9 @@ async function updateVoteEmbed(client, channelId, messageId, updatedPoll) {
 
    // NOTE: This is just to fix open polls without Voting Closes fields
    // todo remove later when I find out the specific root of this issue
-   if (!updateEmbed.fields.find(({ name }) => name === 'Voting Closes')) {
+   if (!updateEmbed.data.fields.find(({ name }) => name === 'Voting Closes')) {
       updateEmbed.spliceFields(
-         updateEmbed.fields.findIndex(({ name }) => name === 'Abstains') + 1,
+         updateEmbed.data.fields.findIndex(({ name }) => name === 'Abstains') + 1,
          0,
          {
             name: 'Voting Closes',
