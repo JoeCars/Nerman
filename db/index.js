@@ -356,27 +356,12 @@ module.exports = async client => {
                         resultsOutput = codeBlock(resultsArray.join('\n'));
 
                         let closedEmbed = new EmbedBuilder(message.embeds[0]);
-                        closedEmbed.setTitle(`${closedEmbed.title}`);
 
                         const votersValue = `Quorum: ${
                            closingPoll.voterQuorum
                         }\n\nParticipated: ${
                            closingPoll.countVoters + closingPoll.countAbstains
                         }\nEligible: ${eligibleVoters}`;
-
-                        // const votersValue = closingPoll.config.voteThreshold
-                        //    ? `Quorum: ${
-                        //         closingPoll.voterQuorum
-                        //      }\n\nParticipated: ${
-                        //         closingPoll.countVoters +
-                        //         closingPoll.countAbstains
-                        //      }\nEligible: ${eligibleVoters}`
-                        //    : `Quorum: ${
-                        //         closingPoll.voterQuorum
-                        //      }\n\nParticipated: ${
-                        //         closingPoll.countVoters +
-                        //         closingPoll.countAbstains
-                        //      }\nEligible: ${eligibleVoters}`;
 
                         const closedFields = [
                            {
