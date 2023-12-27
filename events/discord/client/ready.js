@@ -301,11 +301,6 @@ module.exports = {
                reason: vote.reason,
             });
 
-            if (vote.reason && vote.reason.length > REASON_LENGTH_LIMIT) {
-               vote.reason =
-                  vote.reason.substring(0, REASON_LENGTH_LIMIT) + '...';
-            }
-
             vote.proposalTitle = await fetchProposalTitle(vote.proposalId);
             vote.voter.name = await fetchAddressName(vote.voter.id, Nouns);
             vote.choice = ['AGAINST', 'FOR', 'ABSTAIN'][vote.supportDetailed];

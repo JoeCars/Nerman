@@ -1,5 +1,7 @@
 const { EmbedBuilder, inlineCode, hyperlink } = require('discord.js');
 
+const MAX_REASON_LENGTH = 1500;
+
 exports.generateThreadStatusEmbed = function (status) {
    const threadEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
@@ -7,35 +9,48 @@ exports.generateThreadStatusEmbed = function (status) {
    return threadEmbed;
 };
 
-const { findAccountENS } = require('../helpers');
+/**
+ * @param {{proposalId: string,
+ *    voter: {id: string, name: string},
+ *    choice: string,
+ *    proposalTitle: string,
+ *    votes: number,
+ *    supportDetailed: number,
+ *    reason: string,
+ *    event: {transactionHash: string
+ * }}} vote
+ * @param {string} proposalUrl
+ * @param {boolean} hasMarkdown
+ */
+exports.generateThreadVoteEmbed = function (vote, hasMarkdown = true) {
+   let voter = vote.voter.name;
+   let choice = vote.choice;
+   let votes = vote.votes;
+   let reason = vote.reason.trim();
 
-exports.generateThreadVoteEmbed = async function (vote, nouns) {
-   const {
-      proposalId,
-      voter: { id: voterId },
-      votes,
-      supportDetailed,
-      reason,
-   } = vote;
+   if (reason.length > MAX_REASON_LENGTH) {
+      reason = reason.substring(0, MAX_REASON_LENGTH).trim() + '...';
+      if (vote.event?.transactionHash) {
+         reason +=
+            '\n' +
+            hyperlink(
+               'read more',
+               `https://www.mmmogu.com/tx/${vote.event?.transactionHash}`,
+            );
+      }
+   }
 
-   const voter = await findAccountENS(nouns, voterId);
-   const voterUrl = `https://etherscan.io/address/${voterId}`;
-   const voterHyperlink = `[${voter}](${voterUrl})`;
-   const propHyperlink = hyperlink(
-      `Prop ${proposalId}`,
-      `https://nouns.wtf/vote/${proposalId}`,
-   );
+   if (hasMarkdown) {
+      voter = hyperlink(voter, `https://etherscan.io/address/${vote.voter.id}`);
+      choice = inlineCode(choice);
+      votes = inlineCode(votes);
+   }
 
-   const supportEnum = ['AGAINST', 'FOR', 'ABSTAIN'];
-   const threadEmbed = new EmbedBuilder()
+   const description = `${voter} voted ${choice} with ${votes} votes.\n\n${reason}`;
+
+   const voteEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
-      .setDescription(
-         `${voterHyperlink} voted ${inlineCode(
-            supportEnum[supportDetailed],
-         )} with ${inlineCode(Number(votes))} votes on ${propHyperlink}. ${
-            reason.trim() ? `\n\n${reason}` : ''
-         }`,
-      );
+      .setDescription(description);
 
-   return threadEmbed;
+   return voteEmbed;
 };

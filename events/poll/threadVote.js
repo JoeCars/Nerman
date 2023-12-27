@@ -10,10 +10,8 @@ module.exports = {
     * @param {TextChannel} channel
     */
    async execute(channel, vote) {
-      const Nouns = await channel.client.libraries.get('Nouns');
-
       try {
-         const threadEmbed = await generateThreadVoteEmbed(vote, Nouns);
+         const threadEmbed = await generateThreadVoteEmbed(vote);
          const pollMessage = await findPollMessage(channel, vote.proposalId);
          if (!pollMessage) {
             return;

@@ -6,7 +6,7 @@ const {
    hideLinkEmbed,
 } = require('discord.js');
 
-const PROPOSAL_REASON_LENGTH = 1500;
+const MAX_REASON_LENGTH = 1500;
 
 /**
  * @param {{forkId: number,
@@ -37,11 +37,9 @@ exports.generateEscrowedToForkEmbed = function (data) {
    if (data.reason.trim()) {
       escrowReason = '\n\n' + data.reason.trim();
    }
-   if (escrowReason.length > PROPOSAL_REASON_LENGTH) {
+   if (escrowReason.length > MAX_REASON_LENGTH) {
       escrowReason =
-         '\n\n' +
-         escrowReason.substring(0, PROPOSAL_REASON_LENGTH).trim() +
-         '...';
+         '\n\n' + escrowReason.substring(0, MAX_REASON_LENGTH).trim() + '...';
    }
    const description = escrowDescription + status + escrowReason;
 
@@ -84,8 +82,6 @@ exports.generateExecuteForkEmbed = function (data) {
    return embed;
 };
 
-const REASON_LENGTH = 1500;
-
 /**
  * @param {{forkId: number,
  * owner: {name: string, id: string},
@@ -108,8 +104,8 @@ exports.generateJoinForkEmbed = function (data) {
    const tokens = inlineCode(data.tokenIds.length);
 
    let reason = data.reason.trim();
-   if (reason.length > REASON_LENGTH) {
-      reason = reason.substring(0, REASON_LENGTH).trim() + '...';
+   if (reason.length > MAX_REASON_LENGTH) {
+      reason = reason.substring(0, MAX_REASON_LENGTH).trim() + '...';
    }
    if (reason) {
       reason = '\n\n' + reason;
@@ -157,14 +153,15 @@ exports.generatePropStatusChangeEmbed = function (data, url) {
 };
 
 /**
- *
  * @param {{proposalId: string,
  *    voter: {id: string, name: string},
  *    choice: string,
  *    proposalTitle: string,
  *    votes: number,
  *    supportDetailed: number,
- *    reason: string}} vote
+ *    reason: string,
+ *    event: {transactionHash: string
+ * }}} vote
  * @param {string} proposalUrl
  * @param {boolean} hasMarkdown
  */
@@ -176,7 +173,19 @@ exports.generatePropVoteCastEmbed = function (
    let voter = vote.voter.name;
    let choice = vote.choice;
    let votes = vote.votes;
-   const reason = vote.reason.trim();
+   let reason = vote.reason.trim();
+
+   if (reason.length > MAX_REASON_LENGTH) {
+      reason = reason.substring(0, MAX_REASON_LENGTH).trim() + '...';
+      if (vote.event?.transactionHash) {
+         reason +=
+            '\n' +
+            hyperlink(
+               'read more',
+               `https://www.mmmogu.com/tx/${vote.event?.transactionHash}`,
+            );
+      }
+   }
 
    if (hasMarkdown) {
       voter = hyperlink(voter, `https://etherscan.io/address/${vote.voter.id}`);
