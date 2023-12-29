@@ -11,7 +11,7 @@ const DEFAULT_ETH_AMOUNT = 42;
 const DEFAULT_WALLET = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 
 module.exports = {
-   subCommand: 'trigger-nouns-fork-auction-house.fork-auction-bid',
+   subCommand: 'trigger-nouns-fork.fork-auction-bid',
 
    /**
     * @param {CommandInteraction} interaction
@@ -26,7 +26,7 @@ module.exports = {
       const bidderAddress =
          interaction.options.getString('bidder-address') ?? DEFAULT_WALLET;
 
-      const nouns = interaction.client.libraries.get('NounsForkAuctionHouse');
+      const nouns = interaction.client.libraries.get('NounsFork');
       nouns.trigger('AuctionBid', {
          id: nounId,
          amount: ethereumAmount * ETH_TO_WEI_RATE,
