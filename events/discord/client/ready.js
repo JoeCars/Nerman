@@ -50,14 +50,6 @@ module.exports = {
          );
          client.libraries.set('FederationNounsPool', federationNounsPool);
 
-         const nounsForkToken = new nerman.NounsForkToken(Nouns.provider);
-         client.libraries.set('NounsForkToken', nounsForkToken);
-
-         const nounsForkAuctionHouse = new nerman.NounsForkAuctionHouse(
-            Nouns.provider,
-         );
-         client.libraries.set('NounsForkAuctionHouse', nounsForkAuctionHouse);
-
          const nounsFork = new nerman.NounsFork(Nouns.provider);
          client.libraries.set('NounsFork', nounsFork);
 
@@ -659,10 +651,10 @@ module.exports = {
          });
 
          // =============================================================
-         // Nouns Fork Tokens
+         // Nouns Fork
          // =============================================================
 
-         nounsForkToken.on('DelegateChanged', async data => {
+         nounsFork.on('DelegateChanged', async data => {
             Logger.info('ready.js: On ForkDelegateChanged', {
                delegator: data.delegator.id,
                fromDelegate: data.fromDelegate.id,
@@ -708,7 +700,7 @@ module.exports = {
             router.sendToFeed(data, 'forkDelegateChanged', 'nouns-fork-token');
          });
 
-         nounsForkToken.on('Transfer', async data => {
+         nounsFork.on('Transfer', async data => {
             Logger.info('ready.js: On ForkTransfer', {
                from: data.from.id,
                to: data.to.id,
@@ -722,7 +714,7 @@ module.exports = {
             router.sendToFeed(data, 'transferForkNoun', 'nouns-fork-token');
          });
 
-         nounsForkToken.on('NounCreated', async data => {
+         nounsFork.on('NounCreated', async data => {
             Logger.info('ready.js: On ForkNounCreated', {
                id: data.id,
             });
@@ -731,10 +723,7 @@ module.exports = {
             router.sendToFeed(data, 'forkNounCreated', 'nouns-fork-token');
          });
 
-         // =============================================================
-         // Nouns Fork Auction House
-         // =============================================================
-         nounsForkAuctionHouse.on('AuctionCreated', async auction => {
+         nounsFork.on('AuctionCreated', async auction => {
             Logger.info('events/ready.js: On ForkAuctionCreated.', {
                auctionId: `${auction.id}`,
                auctionStartTime: `${auction.startTime}`,
@@ -749,7 +738,7 @@ module.exports = {
             );
          });
 
-         nounsForkAuctionHouse.on('AuctionBid', async data => {
+         nounsFork.on('AuctionBid', async data => {
             Logger.info('events/ready.js: On ForkAuctionBid.', {
                nounId: `${data.id}`,
                walletAddress: `${data.bidder.id}`,
@@ -766,10 +755,6 @@ module.exports = {
                'nouns-fork-auction-house',
             );
          });
-
-         // =============================================================
-         // Nouns Fork
-         // =============================================================
 
          nounsFork.on('ProposalCreatedWithRequirements', async data => {
             data.description = data.description.substring(0, 500);

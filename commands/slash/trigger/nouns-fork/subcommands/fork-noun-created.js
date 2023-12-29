@@ -8,7 +8,7 @@ const {
 const DEFAULT_NOUN_ID = 117;
 
 module.exports = {
-   subCommand: 'trigger-nouns-fork-auction-house.fork-auction-created',
+   subCommand: 'trigger-nouns-fork.fork-noun-created',
 
    /**
     * @param {CommandInteraction} interaction
@@ -17,22 +17,20 @@ module.exports = {
       await authorizeInteraction(interaction, 4);
 
       const nounId =
-         interaction.options.getNumber('noun-number') ?? DEFAULT_NOUN_ID;
+         interaction.options.getNumber('noun-id') ?? DEFAULT_NOUN_ID;
 
-      const nounsForkAuctionHouse = interaction.client.libraries.get(
-         'NounsForkAuctionHouse',
-      );
-      nounsForkAuctionHouse.trigger('AuctionCreated', {
+      const Nouns = interaction.client.libraries.get('NounsFork');
+      Nouns.trigger('NounCreated', {
          id: nounId,
       });
 
       interaction.reply({
          ephemeral: true,
-         content: 'Triggered a ForkAuctionCreated event.',
+         content: 'Triggered a ForkNounCreated event.',
       });
 
       Logger.info(
-         'commands/trigger-nouns-fork-auction-house.fork-auction-created.js: Event triggered.',
+         'commands/trigger-nouns-fork-tokens.fork-noun-created.js: Event triggered.',
          {
             guildId: interaction.guildId,
             channelId: interaction.channelId,
