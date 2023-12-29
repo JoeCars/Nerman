@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 exports.generateInitialForumMessage = (proposalId, data, proposalUrl) => {
    const url = `${proposalUrl}${proposalId}`;
@@ -7,7 +7,7 @@ exports.generateInitialForumMessage = (proposalId, data, proposalUrl) => {
          return link.substring(4, link.length - 1);
       }) + '...';
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setDescription(description)
       .setURL(url)
       .setColor('#00FFFF');

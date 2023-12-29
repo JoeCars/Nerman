@@ -1,5 +1,5 @@
-const { MessageEmbed } = require('discord.js');
-const { hyperlink } = require('@discordjs/builders');
+const { EmbedBuilder, hyperlink } = require('discord.js');
+
 const { getNounsLink, getEthAmount } = require('../../helpers');
 
 /**
@@ -18,7 +18,7 @@ exports.generateAuctionBidEmbed = function (data) {
    const nounsLink = getNounsLink(data.id);
    const amount = getEthAmount(data.amount);
 
-   return new MessageEmbed()
+   return new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(`Auction Bid`)
       .setDescription(`${bidderLink} bid ${amount}Ξ on ${nounsLink}`);
@@ -35,7 +35,7 @@ exports.generateAuctionCreatedEmbed = function (data) {
       `https://www.nounoclock.app/`,
    );
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(`New Auction | Noun ${data.id}`)
       .setDescription(`${nounsWTF}\n${pronouns}\n${nounOClock}`)
@@ -55,7 +55,7 @@ exports.generateAuctionEndEmbed = (data, hasMarkdown = true) => {
    }
    const description = `Winner: ${bidder}`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)

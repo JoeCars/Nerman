@@ -1,5 +1,4 @@
-const { MessageEmbed } = require('discord.js');
-const { hyperlink, inlineCode } = require('@discordjs/builders');
+const { EmbedBuilder, hyperlink, inlineCode } = require('discord.js');
 
 const PROPOSAL_REASON_LENGTH = 1500;
 const DISCORD_TITLE_LIMIT = 250; // Actually 256 but leaving space for ellipses.
@@ -50,7 +49,7 @@ exports.generateCandidateFeedbackSentEmbed = function (data) {
       data.slug
    }`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)
@@ -90,7 +89,7 @@ exports.generateFeedbackSentEmbed = function (data, propUrl) {
 
    const url = `${propUrl}${data.proposalId}`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)
@@ -130,7 +129,7 @@ exports.generateProposalCandidateCanceledEmbed = function (proposal) {
       'CANCELED',
    )} their proposal candidate (${proposalName}).${reason}`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);
@@ -166,7 +165,7 @@ exports.generateProposalCandidateCreatedEmbed = function (proposal) {
       proposal.slug
    }`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)
@@ -206,7 +205,7 @@ exports.generateProposalCandidateUpdatedEmbed = function (proposal) {
       'UPDATED',
    )} their proposal candidate (${proposalName}).${reason}`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);
@@ -248,7 +247,7 @@ exports.generateSignatureAddedEmbed = function (data) {
       data.slug
    }`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description)

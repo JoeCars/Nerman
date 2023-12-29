@@ -1,14 +1,10 @@
-const {
-   Modal,
-   TextInputComponent,
-   SelectMenuComponent,
-   showModal,
-} = require('discord-modals');
 const { ButtonInteraction } = require('discord.js');
+
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
 const Logger = require('../helpers/logger');
 const { checkUserEligibility } = require('../helpers/buttonEligibility');
+const { generateVoteModal } = require('../views/modals');
 
 module.exports = {
    id: 'vote',
@@ -38,7 +34,7 @@ module.exports = {
          },
       } = interaction;
 
-      const { allowedRoles, anonymous: anon } = await PollChannel.findOne(
+      const { allowedRoles } = await PollChannel.findOne(
          { channelId },
          'allowedRoles',
       ).exec();
@@ -62,13 +58,10 @@ module.exports = {
          });
       }
 
-      const modal = createVoteModal(attachedPoll);
+      const modal = generateVoteModal(attachedPoll);
 
       try {
-         await showModal(modal, {
-            client: interaction.client,
-            interaction: interaction,
-         });
+         await interaction.showModal(modal.toJSON());
       } catch (error) {
          Logger.error('buttons/vote.js: Received an error.', {
             error: error,
@@ -83,30 +76,3 @@ module.exports = {
       });
    },
 };
-
-function createVoteModal(attachedPoll) {
-   const capitalizedOptions = attachedPoll.pollData.choices.map(
-      choice => choice[0].toUpperCase() + choice.substring(1),
-   );
-
-   const optionsString = capitalizedOptions.join(', ');
-   const modal = new Modal().setCustomId('vote-modal').setTitle('Vote');
-
-   const selectOptions = new TextInputComponent()
-      .setCustomId('votingSelect')
-      .setLabel(`Type ${attachedPoll.pollData.voteAllowance} Choice(s)`)
-      .setPlaceholder(optionsString)
-      .setDefaultValue(optionsString)
-      .setStyle('SHORT')
-      .setMaxLength(100)
-      .setRequired(true);
-
-   const reason = new TextInputComponent()
-      .setCustomId('voteReason')
-      .setLabel('Reason')
-      .setPlaceholder('Explain your vote.')
-      .setStyle('LONG');
-
-   modal.addComponents(selectOptions, reason);
-   return modal;
-}

@@ -1,5 +1,10 @@
-const { MessageEmbed } = require('discord.js');
-const { hyperlink, hideLinkEmbed, inlineCode } = require('@discordjs/builders');
+const {
+   EmbedBuilder,
+   hyperlink,
+   hideLinkEmbed,
+   inlineCode,
+} = require('discord.js');
+
 const { getEthAmount } = require('../../helpers');
 
 const DEFAULT_MINT_ID = '0x0000000000000000000000000000000000000000';
@@ -22,7 +27,7 @@ exports.generateAuctionBidEmbed = function (data) {
       `https://lilnouns.wtf/lilnoun/${data.id}`,
    );
 
-   return new MessageEmbed()
+   return new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(`Lil Nouns | Auction Bid`)
       .setDescription(`${bidderLink} bid ${amount}Ξ on ${lilNoun}`);
@@ -34,7 +39,7 @@ exports.generateAuctionCreatedEmbed = function (data) {
       `https://lilnouns.wtf/lilnoun/${data.id}`,
    );
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setDescription(lilNouns)
       .setTitle(`New Auction | Lil Noun ${data.id}`);
@@ -47,7 +52,7 @@ exports.generateProposalCreatedEmbed = function (proposal) {
    const proposalName = proposal.proposalTitle;
    const url = `https://lilnouns.wtf/vote/${proposal.id}`;
 
-   const proposalEmbed = new MessageEmbed()
+   const proposalEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(`\u200B\n${proposalName}\n\n${hideLinkEmbed(url)}`);
@@ -62,7 +67,7 @@ exports.generateProposalStatusChangeEmbed = function (data) {
    const title = `Lil Nouns | ${data.proposalTitle}`;
    const description = `https://lilnouns.wtf/vote/${data.id}\n${data.status}`;
 
-   const proposalEmbed = new MessageEmbed()
+   const proposalEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);
@@ -96,7 +101,7 @@ exports.generateVoteCastEmbed = function (vote, hasMarkdown = true) {
    const titleUrl = `https://lilnouns.wtf/vote/${vote.proposalId}`;
    const description = `${voter} voted ${choice} with ${votes} votes.\n\n${reason}`;
 
-   const voteEmbed = new MessageEmbed()
+   const voteEmbed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setURL(titleUrl)
@@ -134,7 +139,7 @@ exports.generateTransferEmbed = function (data, hasMarkdown = true) {
    }
    const description = `From ${fromWallet} to ${toWallet}`;
 
-   const embed = new MessageEmbed()
+   const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(description);

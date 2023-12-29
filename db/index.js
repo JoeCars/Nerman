@@ -1,5 +1,5 @@
 // Package Dependencies
-const { inlineCode, codeBlock } = require('@discordjs/builders');
+const { EmbedBuilder, inlineCode, codeBlock } = require('discord.js');
 require('dotenv').config();
 const mongoose = require('mongoose');
 // Personal Imports
@@ -355,29 +355,13 @@ module.exports = async client => {
                         );
                         resultsOutput = codeBlock(resultsArray.join('\n'));
 
-                        let closedEmbed = message.embeds[0];
-
-                        closedEmbed.setTitle(`${closedEmbed.title}`);
+                        let closedEmbed = new EmbedBuilder(message.embeds[0]);
 
                         const votersValue = `Quorum: ${
                            closingPoll.voterQuorum
                         }\n\nParticipated: ${
                            closingPoll.countVoters + closingPoll.countAbstains
                         }\nEligible: ${eligibleVoters}`;
-
-                        // const votersValue = closingPoll.config.voteThreshold
-                        //    ? `Quorum: ${
-                        //         closingPoll.voterQuorum
-                        //      }\n\nParticipated: ${
-                        //         closingPoll.countVoters +
-                        //         closingPoll.countAbstains
-                        //      }\nEligible: ${eligibleVoters}`
-                        //    : `Quorum: ${
-                        //         closingPoll.voterQuorum
-                        //      }\n\nParticipated: ${
-                        //         closingPoll.countVoters +
-                        //         closingPoll.countAbstains
-                        //      }\nEligible: ${eligibleVoters}`;
 
                         const closedFields = [
                            {
@@ -400,11 +384,11 @@ module.exports = async client => {
                         if (closingPoll.config.liveVisualFeed === true) {
                            console.log('REMOVING FIELDS');
                            console.log(closedEmbed);
-                           closedEmbed.spliceFields(1, 5, closedFields);
+                           closedEmbed.spliceFields(1, 5, ...closedFields);
                         } else {
                            console.log('NOT REMOVING FIELDS');
                            console.log(closedEmbed);
-                           closedEmbed.spliceFields(1, 4, closedFields);
+                           closedEmbed.spliceFields(1, 4, ...closedFields);
                         }
 
                         Logger.debug('db/index.js: Checking closed Embed.', {

@@ -1,5 +1,4 @@
-const { MessageEmbed } = require('discord.js');
-const { hyperlink, inlineCode } = require('@discordjs/builders');
+const { EmbedBuilder, hyperlink, inlineCode } = require('discord.js');
 const { getEthAmount } = require('../../helpers');
 
 /**
@@ -41,7 +40,7 @@ exports.generateFederationBidEmbed = function (
 
    const text = `${bidderLink} bid ${bidAmount} to vote ${vote} with ${voteNumber} votes.`;
 
-   return new MessageEmbed()
+   return new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(text)
@@ -92,7 +91,7 @@ exports.generateFederationVoteEmbed = function (
 
    const text = `Voted ${vote} with ${voteNumber} votes on ${proposal}.\nWinning bid: ${bidAmount} from ${bidderLink}`;
 
-   return new MessageEmbed()
+   return new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle(title)
       .setDescription(text)
