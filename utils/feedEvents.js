@@ -77,4 +77,10 @@ events.set('lilNounsTransfer', 'LilNouns.Transfer');
 // LilNounsPolls.
 events.set('newLilNounsProposalPoll', 'LilNounsPoll.NewProposalPoll');
 
+// PropHouse
+events.set('propHouseRoundCreated', 'PropHouse.RoundCreated');
+events.set('propHouseHouseCreated', 'PropHouse.HouseCreated');
+events.set('propHouseVoteCast', 'PropHouse.VoteCast');
+events.set('propHouseProposalSubmitted', 'PropHouse.ProposalSubmitted');
+
 module.exports = events;
