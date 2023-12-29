@@ -196,6 +196,7 @@ exports.generateVoteModal = attachedPoll => {
       .setCustomId('voteReason')
       .setLabel('Reason')
       .setPlaceholder('Explain your vote.')
+      .setRequired(false)
       .setStyle(TextInputStyle.Paragraph);
    const reasonActionRow = new ActionRowBuilder().addComponents(reason);
 
