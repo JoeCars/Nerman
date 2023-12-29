@@ -59,6 +59,9 @@ module.exports = {
          const lilNouns = new nerman.LilNouns(Nouns.provider);
          client.libraries.set('LilNouns', lilNouns);
 
+         const propHouse = new nerman.PropHouse(Nouns.provider);
+         client.libraries.set('PropHouse', propHouse);
+
          // =============================================================
          // Federation
          // =============================================================
@@ -1044,6 +1047,49 @@ module.exports = {
 
             data.eventName = 'LilNounsTransfer';
             router.sendToFeed(data, 'lilNounsTransfer', 'lil-nouns');
+         });
+
+         // =============================================================
+         // PropHouse
+         // =============================================================
+
+         propHouse.on('RoundCreated', async data => {
+            Logger.info('events/ready.js: On PropHouse RoundCreated.');
+
+            data.creator.name = await fetchAddressName(data.creator.id, Nouns);
+
+            data.eventName = 'PropHouseRoundCreated';
+            router.sendToFeed(data, 'propHouseRoundCreated', 'prop-house');
+         });
+
+         propHouse.on('HouseCreated', async data => {
+            Logger.info('events/ready.js: On PropHouse HouseCreated.');
+
+            data.creator.name = await fetchAddressName(data.creator.id, Nouns);
+
+            data.eventName = 'PropHouseHouseCreated';
+            router.sendToFeed(data, 'propHouseHouseCreated', 'prop-house');
+         });
+
+         propHouse.on('VoteCast', async data => {
+            Logger.info('events/ready.js: On PropHouse VoteCast.');
+
+            data.voter.name = await fetchAddressName(data.voter.id, Nouns);
+
+            data.eventName = 'PropHouseVoteCast';
+            router.sendToFeed(data, 'propHouseVoteCast', 'prop-house');
+         });
+
+         propHouse.on('ProposalSubmitted', async data => {
+            Logger.info('events/ready.js: On PropHouse ProposalSubmitted.');
+
+            data.proposer.name = await fetchAddressName(
+               data.proposer.id,
+               Nouns,
+            );
+
+            data.eventName = 'PropHouseProposalSubmitted';
+            router.sendToFeed(data, 'propHouseProposalSubmitted', 'prop-house');
          });
       }
 
