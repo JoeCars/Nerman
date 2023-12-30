@@ -1099,6 +1099,13 @@ module.exports = {
                Nouns,
             );
 
+            const round = await propHouse.prophouse.query.getRoundWithHouseInfo(
+               data.round.id,
+            );
+            data.round = { ...data.round, ...round };
+            data.house = round.house;
+            data.house.id = round.house.address;
+
             data.eventName = 'PropHouseProposalSubmitted';
             router.sendToFeed(data, 'propHouseProposalSubmitted', 'prop-house');
          });

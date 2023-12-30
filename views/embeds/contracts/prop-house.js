@@ -1,7 +1,6 @@
 const {
    EmbedBuilder,
    hyperlink,
-   hideLinkEmbed,
    inlineCode,
 } = require('discord.js');
 
@@ -94,26 +93,33 @@ exports.generateVoteCastEmbed = function (data) {
 
 /**
  * @param {{
- * 	  proposalId: number,
+ * 	proposalId: number,
  *    proposer: {id: string, name: string},
- * 	  round: {id: string },
+ * 	round: {  id: string, title: string },
+ *    house: { id: string, name?: string}
  *    title: string,
  *    description: string
  * }} data
  */
 exports.generateProposalSubmittedEmbed = function (data) {
-   const url = `https://prop.house/${data.round.id}/${data.proposalId}`;
    const proposer = hyperlink(
       data.proposer.name,
       `https://etherscan.io/address/${data.proposer.id}`,
    );
 
-   const description = `${proposer} created a new proposal!\n\n${data.title}`;
+   const proposalUrl = `https://prop.house/${data.round.id}/${data.proposalId}`;
+   const proposal = hyperlink(data.title, proposalUrl);
+   const roundUrl = `https://prop.house/${data.round.id}`;
+   const round = hyperlink(data.round.title, roundUrl);
+   const houseUrl = `https://prop.house/${data.house.id}`;
+   const house = hyperlink(data.house.name ?? data.house.id, houseUrl);
+
+   const description = `${proposer} created a new proposal in ${house}'s ${round}!\n\n${proposal}`;
 
    const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle('PropHouse | New Proposal Submitted!')
-      .setURL(url)
+      .setURL(proposalUrl)
       .setDescription(description);
 
    return embed;
