@@ -1076,6 +1076,17 @@ module.exports = {
 
             data.voter.name = await fetchAddressName(data.voter.id, Nouns);
 
+            data.proposal = await propHouse.prophouse.query.getProposal(
+               data.round.id,
+               data.proposalId,
+            );
+            const round = await propHouse.prophouse.query.getRoundWithHouseInfo(
+               data.round.id,
+            );
+            data.round = { ...data.round, ...round };
+            data.house = round.house;
+            data.house.id = round.house.address;
+
             data.eventName = 'PropHouseVoteCast';
             router.sendToFeed(data, 'propHouseVoteCast', 'prop-house');
          });
