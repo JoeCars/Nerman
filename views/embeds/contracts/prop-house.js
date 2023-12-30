@@ -81,7 +81,7 @@ exports.generateVoteCastEmbed = function (data) {
    const houseUrl = `https://prop.house/${data.house.id}`;
    const house = hyperlink(data.house.name ?? data.house.id, houseUrl);
 
-   const description = `${voter} cast ${votes} votes for ${proposal} in ${house} ${round}!`;
+   const description = `${voter} cast ${votes} votes for ${proposal} in ${house}'s ${round}!`;
 
    const embed = new EmbedBuilder()
       .setColor('#00FFFF')
