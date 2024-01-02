@@ -50,14 +50,6 @@ module.exports = {
          );
          client.libraries.set('FederationNounsPool', federationNounsPool);
 
-         const nounsForkToken = new nerman.NounsForkToken(Nouns.provider);
-         client.libraries.set('NounsForkToken', nounsForkToken);
-
-         const nounsForkAuctionHouse = new nerman.NounsForkAuctionHouse(
-            Nouns.provider,
-         );
-         client.libraries.set('NounsForkAuctionHouse', nounsForkAuctionHouse);
-
          const nounsFork = new nerman.NounsFork(Nouns.provider);
          client.libraries.set('NounsFork', nounsFork);
 
@@ -66,6 +58,9 @@ module.exports = {
 
          const lilNouns = new nerman.LilNouns(Nouns.provider);
          client.libraries.set('LilNouns', lilNouns);
+
+         const propHouse = new nerman.PropHouse(Nouns.provider);
+         client.libraries.set('PropHouse', propHouse);
 
          // =============================================================
          // Federation
@@ -659,10 +654,10 @@ module.exports = {
          });
 
          // =============================================================
-         // Nouns Fork Tokens
+         // Nouns Fork
          // =============================================================
 
-         nounsForkToken.on('DelegateChanged', async data => {
+         nounsFork.on('DelegateChanged', async data => {
             Logger.info('ready.js: On ForkDelegateChanged', {
                delegator: data.delegator.id,
                fromDelegate: data.fromDelegate.id,
@@ -708,7 +703,7 @@ module.exports = {
             router.sendToFeed(data, 'forkDelegateChanged', 'nouns-fork-token');
          });
 
-         nounsForkToken.on('Transfer', async data => {
+         nounsFork.on('Transfer', async data => {
             Logger.info('ready.js: On ForkTransfer', {
                from: data.from.id,
                to: data.to.id,
@@ -722,7 +717,7 @@ module.exports = {
             router.sendToFeed(data, 'transferForkNoun', 'nouns-fork-token');
          });
 
-         nounsForkToken.on('NounCreated', async data => {
+         nounsFork.on('NounCreated', async data => {
             Logger.info('ready.js: On ForkNounCreated', {
                id: data.id,
             });
@@ -731,10 +726,7 @@ module.exports = {
             router.sendToFeed(data, 'forkNounCreated', 'nouns-fork-token');
          });
 
-         // =============================================================
-         // Nouns Fork Auction House
-         // =============================================================
-         nounsForkAuctionHouse.on('AuctionCreated', async auction => {
+         nounsFork.on('AuctionCreated', async auction => {
             Logger.info('events/ready.js: On ForkAuctionCreated.', {
                auctionId: `${auction.id}`,
                auctionStartTime: `${auction.startTime}`,
@@ -749,7 +741,7 @@ module.exports = {
             );
          });
 
-         nounsForkAuctionHouse.on('AuctionBid', async data => {
+         nounsFork.on('AuctionBid', async data => {
             Logger.info('events/ready.js: On ForkAuctionBid.', {
                nounId: `${data.id}`,
                walletAddress: `${data.bidder.id}`,
@@ -766,10 +758,6 @@ module.exports = {
                'nouns-fork-auction-house',
             );
          });
-
-         // =============================================================
-         // Nouns Fork
-         // =============================================================
 
          nounsFork.on('ProposalCreatedWithRequirements', async data => {
             data.description = data.description.substring(0, 500);
@@ -1059,6 +1047,67 @@ module.exports = {
 
             data.eventName = 'LilNounsTransfer';
             router.sendToFeed(data, 'lilNounsTransfer', 'lil-nouns');
+         });
+
+         // =============================================================
+         // PropHouse
+         // =============================================================
+
+         propHouse.on('RoundCreated', async data => {
+            Logger.info('events/ready.js: On PropHouse RoundCreated.');
+
+            data.creator.name = await fetchAddressName(data.creator.id, Nouns);
+
+            data.eventName = 'PropHouseRoundCreated';
+            router.sendToFeed(data, 'propHouseRoundCreated', 'prop-house');
+         });
+
+         propHouse.on('HouseCreated', async data => {
+            Logger.info('events/ready.js: On PropHouse HouseCreated.');
+
+            data.creator.name = await fetchAddressName(data.creator.id, Nouns);
+
+            data.eventName = 'PropHouseHouseCreated';
+            router.sendToFeed(data, 'propHouseHouseCreated', 'prop-house');
+         });
+
+         propHouse.on('VoteCast', async data => {
+            Logger.info('events/ready.js: On PropHouse VoteCast.');
+
+            data.voter.name = await fetchAddressName(data.voter.id, Nouns);
+
+            data.proposal = await propHouse.prophouse.query.getProposal(
+               data.round.id,
+               data.proposalId,
+            );
+            const round = await propHouse.prophouse.query.getRoundWithHouseInfo(
+               data.round.id,
+            );
+            data.round = { ...data.round, ...round };
+            data.house = round.house;
+            data.house.id = round.house.address;
+
+            data.eventName = 'PropHouseVoteCast';
+            router.sendToFeed(data, 'propHouseVoteCast', 'prop-house');
+         });
+
+         propHouse.on('ProposalSubmitted', async data => {
+            Logger.info('events/ready.js: On PropHouse ProposalSubmitted.');
+
+            data.proposer.name = await fetchAddressName(
+               data.proposer.id,
+               Nouns,
+            );
+
+            const round = await propHouse.prophouse.query.getRoundWithHouseInfo(
+               data.round.id,
+            );
+            data.round = { ...data.round, ...round };
+            data.house = round.house;
+            data.house.id = round.house.address;
+
+            data.eventName = 'PropHouseProposalSubmitted';
+            router.sendToFeed(data, 'propHouseProposalSubmitted', 'prop-house');
          });
       }
 

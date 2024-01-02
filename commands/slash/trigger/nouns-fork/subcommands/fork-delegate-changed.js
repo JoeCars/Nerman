@@ -10,7 +10,7 @@ const DEFAULT_NEW_DELEGATE_ID = '0x281eC184E704CE57570614C33B3477Ec7Ff07243';
 const DEFAULT_NOUNS_TRANSFERRED = 42;
 
 module.exports = {
-   subCommand: 'trigger-nouns-fork-tokens.fork-delegate-changed',
+   subCommand: 'trigger-nouns-fork.fork-delegate-changed',
 
    /**
     * @param {CommandInteraction} interaction
@@ -31,7 +31,7 @@ module.exports = {
          128 - nounsTransferredHex.length,
       )}${nounsTransferredHex}`;
 
-      const Nouns = interaction.client.libraries.get('NounsForkToken');
+      const Nouns = interaction.client.libraries.get('NounsFork');
       Nouns.trigger('DelegateChanged', {
          delegator: {
             id: delegatorId,
