@@ -1,13 +1,9 @@
-const {
-   EmbedBuilder,
-   hyperlink,
-   inlineCode,
-} = require('discord.js');
+const { EmbedBuilder, hyperlink, inlineCode } = require('discord.js');
 
 /**
  * @param {{
  *    creator: {id: string, name: string},
- * 	house: {id: string },
+ * 	house: {id: string, name?: string },
  *    round: {id: string },
  *    kind: any,
  *    title: string,
@@ -15,18 +11,21 @@ const {
  * }} data
  */
 exports.generateRoundCreatedEmbed = function (data) {
-   const url = `https://prop.house/${data.round.id}`;
    const creator = hyperlink(
       data.creator.name,
       `https://etherscan.io/address/${data.creator.id}`,
    );
+   const houseUrl = `https://prop.house/${data.house.id}`;
+   const house = hyperlink(data.house.name ?? data.house.id, houseUrl);
+   const roundUrl = `https://prop.house/${data.round.id}`;
+   const round = hyperlink(data.title, roundUrl);
 
-   const description = `${creator} created a new round!.\n\n${data.title}`;
+   const description = `${creator} created a new round in ${house}!.\n\n${round}`;
 
    const embed = new EmbedBuilder()
       .setColor('#00FFFF')
       .setTitle('PropHouse | New Round Created!')
-      .setURL(url)
+      .setURL(roundUrl)
       .setDescription(description);
 
    return embed;
