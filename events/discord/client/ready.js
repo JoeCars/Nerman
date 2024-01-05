@@ -18,8 +18,9 @@ const LilNounsProposal = require('../../../db/schemas/LilNounsProposal');
 const { fetchAddressName } = require('../../../utils/nameCache');
 
 const REASON_LENGTH_LIMIT = 3000;
-
 const MAX_PROPOSAL_TITLE = 96;
+const PROPHOUSE_NOUNS_HOUSE_ADDRESS =
+   '0x5d75fd351e7b29a4ecad708d1e19d137c71c5404';
 
 module.exports = {
    name: 'ready',
@@ -1065,6 +1066,13 @@ module.exports = {
 
             data.eventName = 'PropHouseRoundCreated';
             router.sendToFeed(data, 'propHouseRoundCreated', 'prop-house');
+            if (data.house.id === PROPHOUSE_NOUNS_HOUSE_ADDRESS) {
+               router.sendToFeed(
+                  data,
+                  'propHouseNounsRoundCreated',
+                  'prop-house',
+               );
+            }
          });
 
          propHouse.on('HouseCreated', async data => {
@@ -1094,6 +1102,9 @@ module.exports = {
 
             data.eventName = 'PropHouseVoteCast';
             router.sendToFeed(data, 'propHouseVoteCast', 'prop-house');
+            if (data.house.id === PROPHOUSE_NOUNS_HOUSE_ADDRESS) {
+               router.sendToFeed(data, 'propHouseNounsVoteCast', 'prop-house');
+            }
          });
 
          propHouse.on('ProposalSubmitted', async data => {
@@ -1113,6 +1124,13 @@ module.exports = {
 
             data.eventName = 'PropHouseProposalSubmitted';
             router.sendToFeed(data, 'propHouseProposalSubmitted', 'prop-house');
+            if (data.house.id === PROPHOUSE_NOUNS_HOUSE_ADDRESS) {
+               router.sendToFeed(
+                  data,
+                  'propHouseNounsProposalSubmitted',
+                  'prop-house',
+               );
+            }
          });
       }
 

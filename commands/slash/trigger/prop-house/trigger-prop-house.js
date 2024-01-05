@@ -44,6 +44,12 @@ module.exports = {
                   .setName('title')
                   .setDescription('The round title.')
                   .setRequired(process.env.DEPLOY_STAGE !== 'development');
+            })
+            .addStringOption(option => {
+               return option
+                  .setName('house')
+                  .setDescription('The house address.')
+                  .setRequired(process.env.DEPLOY_STAGE !== 'development');
             });
       })
       .addSubcommand(subcommand => {

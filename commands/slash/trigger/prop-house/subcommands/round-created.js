@@ -22,6 +22,7 @@ module.exports = {
          interaction.options.getString('creator') ?? DEFAULT_CREATOR;
       const round = interaction.options.getString('round') ?? DEFAULT_ROUND;
       const title = interaction.options.getString('title') ?? DEFAULT_TITLE;
+      const house = interaction.options.getString('house') ?? DEFAULT_HOUSE;
 
       const propHouse = interaction.client.libraries.get('PropHouse');
       propHouse.trigger('RoundCreated', {
@@ -32,7 +33,7 @@ module.exports = {
             id: round,
          },
          house: {
-            id: DEFAULT_HOUSE,
+            id: house,
          },
          title,
       });
