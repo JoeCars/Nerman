@@ -1,4 +1,8 @@
-const { GuildMember, Permissions, BaseInteraction } = require('discord.js');
+const {
+   GuildMember,
+   BaseInteraction,
+   PermissionsBitField,
+} = require('discord.js');
 const Admin = require('../db/schemas/Admin');
 const Logger = require('./logger');
 
@@ -46,7 +50,7 @@ exports.isUserAuthorized = async function (authorizationLevel, user) {
  * @param {GuildMember} user
  */
 exports.isUserADiscordAdmin = function (user) {
-   return user.permissions.has(Permissions.FLAGS.MANAGE_GUILD);
+   return user.permissions.has(PermissionsBitField.Flags.ManageGuild);
 };
 
 /**
