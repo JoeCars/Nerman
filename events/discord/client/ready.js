@@ -1058,13 +1058,10 @@ module.exports = {
 
             data.creator.name = await fetchAddressName(data.creator.id, Nouns);
 
-            const house = (
-               await propHouse.prophouse.query.getRoundWithHouseInfo(
-                  data.round.id,
-               )
-            ).house;
+            const house = await propHouse.prophouse.query.getHouse(
+               data.house.id,
+            );
             data.house = { ...data.house, ...house };
-            data.house.id = house.address;
 
             data.eventName = 'PropHouseRoundCreated';
             router.sendToFeed(data, 'propHouseRoundCreated', 'prop-house');
