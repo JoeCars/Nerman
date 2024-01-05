@@ -36,6 +36,19 @@ function filterLilNounsEvents() {
       });
 }
 
+function filterPropHouseEvents() {
+   return [...events.entries()]
+      .filter(([key, value]) => {
+         const eventGroup = value.split('.')[0];
+         const isPropHouse = eventGroup === 'PropHouse';
+
+         return isPropHouse;
+      })
+      .map(([key, value]) => {
+         return { name: value, value: key };
+      });
+}
+
 function filterNounsOtherEvents() {
    return [...events.entries()]
       .filter(([key, value]) => {
@@ -45,13 +58,15 @@ function filterNounsOtherEvents() {
          const isNounsToken = eventGroup === 'NounsToken';
          const isNounsDAOData = eventGroup === 'NounsDAOData';
          const isLilNouns = eventGroup === 'LilNouns';
+         const isPropHouse = eventGroup === 'PropHouse';
 
          return !(
             isNounsDAO ||
             isNounsAuctionHouse ||
             isNounsToken ||
             isNounsDAOData ||
-            isLilNouns
+            isLilNouns ||
+            isPropHouse
          );
       })
       .map(([key, value]) => {
@@ -101,6 +116,27 @@ module.exports = {
                         .setDescription('The event to register.')
                         .setRequired(true)
                         .addChoices(...lilNounsEvents);
+                  })
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will receive the notifications.',
+                        )
+                        .setRequired(false);
+                  });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('prop-house')
+                  .setDescription('PropHouse events.')
+                  .addStringOption(option => {
+                     const propHouseEvents = filterPropHouseEvents();
+                     return option
+                        .setName('event')
+                        .setDescription('The event to register.')
+                        .setRequired(true)
+                        .addChoices(...propHouseEvents);
                   })
                   .addChannelOption(option => {
                      return option
