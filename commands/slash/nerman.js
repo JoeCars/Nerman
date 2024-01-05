@@ -73,19 +73,6 @@ module.exports = {
       )
       .addSubcommand(subcommand =>
          subcommand
-            .setName('admin-check-voters')
-            .setDescription(
-               'Admin only and temporary, for gathering the names of the voting role members',
-            )
-            .addStringOption(option =>
-               option
-                  .setName('role-name')
-                  .setDescription('Enter name of the role you wish to check')
-                  .setRequired(false),
-            ),
-      )
-      .addSubcommand(subcommand =>
-         subcommand
             .setName('regenerate-poll-message')
             .setDescription('ADMIN ONLY, regenerate poll message.')
             .addStringOption(option =>
@@ -109,21 +96,6 @@ module.exports = {
                      'Set to true if you are recreating a poll which has no existing message in the channel.',
                   )
                   .setRequired(false),
-            ),
-      )
-      .addSubcommand(subcommand =>
-         subcommand
-            .setName('create-test-poll')
-            .setDescription(
-               'Create a poll with a number of votes and reasons for testing purposes.',
-            )
-            .addIntegerOption(option =>
-               option
-                  .setName('number-of-votes')
-                  .setDescription(
-                     'The number of votes randomly dispersed into the poll.',
-                  )
-                  .setRequired(true),
             ),
       )
       .addSubcommand(subcommand => {

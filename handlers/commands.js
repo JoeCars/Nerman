@@ -32,6 +32,9 @@ module.exports = async client => {
       } else if (command.name) {
          return client.commands.set(command.name, command);
       } else if (command.data.name && typeof command.data.name === 'string') {
+         if (command.isHidden) {
+            return;
+         }
          commandsArr.push(command.data.toJSON());
          client.commands.set(command.data.name, command);
       } else {

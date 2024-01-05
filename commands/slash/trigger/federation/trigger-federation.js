@@ -90,4 +90,6 @@ module.exports = {
          'commands/trigger-federation.js: Executed Nerman trigger command.',
       );
    },
+
+   isHidden: process.env.DEPLOY_STAGE === 'production',
 };

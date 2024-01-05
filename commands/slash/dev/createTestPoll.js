@@ -11,7 +11,7 @@ const ResultBar = require('../../../structures/ResultBar');
 const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {
-   subCommand: 'nerman.create-test-poll',
+   subCommand: 'dev.create-test-poll',
    /**
     *
     * @param {CommandInteraction} interaction

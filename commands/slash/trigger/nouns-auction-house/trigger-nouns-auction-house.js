@@ -73,4 +73,6 @@ module.exports = {
          'commands/trigger-nouns-auction-house.js: Executed Nerman trigger command.',
       );
    },
+
+   isHidden: process.env.DEPLOY_STAGE === 'production',
 };

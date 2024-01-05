@@ -4,7 +4,7 @@ const Logger = require('../../../helpers/logger');
 const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {
-   subCommand: 'nerman.admin-check-voters',
+   subCommand: 'dev.admin-check-voters',
    /**
     *
     * @param {CommandInteraction} interaction
