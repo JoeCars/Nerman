@@ -5,63 +5,53 @@ const events = new Map();
 events.set('federationBidPlaced', 'Federation.BidPlaced');
 events.set('federationVoteCast', 'Federation.VoteCast');
 
-// NermanPoll.
-events.set('newProposalPoll', 'NermanPoll.NewProposalPoll');
-events.set('threadFeedbackSent', 'NermanPoll.ThreadFeedbackSent');
-events.set('threadStatusChange', 'NermanPoll.ThreadStatusChange');
-events.set('threadVote', 'NermanPoll.ThreadVote');
-events.set('threadFederationBidPlaced', 'NermanPoll.ThreadFederationBidPlaced');
-events.set('threadFederationVoteCast', 'NermanPoll.ThreadFederationVoteCast');
+// Nouns
+events.set('auctionBid', 'Nouns.AuctionHouse.AuctionBid');
+events.set('auctionCreated', 'Nouns.AuctionHouse.AuctionCreated');
+events.set('auctionEnd', 'Nouns.AuctionHouse.AuctionEnd');
 
-// NounsAuctionHouse.
-events.set('auctionBid', 'NounsAuctionHouse.AuctionBid');
-events.set('auctionCreated', 'NounsAuctionHouse.AuctionCreated');
-events.set('auctionEnd', 'NounsAuctionHouse.AuctionEnd');
+events.set('delegateChanged', 'Nouns.Token.DelegateChanged');
+events.set('delegateChangedNoZero', 'Nouns.Token.DelegateChangedNoZero');
+events.set('nounCreated', 'Nouns.Token.NounCreated');
+events.set('transferNoun', 'Nouns.Token.TransferNoun');
 
-// NounsToken.
-events.set('delegateChanged', 'NounsToken.DelegateChanged');
-events.set('delegateChangedNoZero', 'NounsToken.DelegateChangedNoZero');
-events.set('nounCreated', 'NounsToken.NounCreated');
-events.set('transferNoun', 'NounsToken.TransferNoun');
+events.set('propCreated', 'Nouns.DAO.PropCreated');
+events.set('propStatusChange', 'Nouns.DAO.PropStatusChange');
+events.set('propVoteCast', 'Nouns.DAO.PropVoteCastNoZero');
+events.set('propVoteCastOnlyZero', 'Nouns.DAO.PropVoteCastOnlyZero');
+events.set('escrowedToFork', 'Nouns.DAO.EscrowedToFork');
+events.set('executeFork', 'Nouns.DAO.ExecuteFork');
+events.set('joinFork', 'Nouns.DAO.JoinFork');
+events.set('withdrawNounsFromEscrow', 'Nouns.DAO.WithdrawNounsFromEscrow');
+
+events.set('candidateFeedbackSent', 'Nouns.DAOData.CandidateFeedbackSent');
+events.set(
+   'proposalCandidateCanceled',
+   'Nouns.DAOData.ProposalCandidateCanceled',
+);
+events.set(
+   'proposalCandidateCreated',
+   'Nouns.DAOData.ProposalCandidateCreated',
+);
+events.set('proposalCandidateUpdated', 'NounsDAOData.ProposalCandidateUpdated');
+events.set('signatureAdded', 'Nouns.DAOData.SignatureAdded');
+events.set('feedbackSent', 'Nouns.DAOData.FeedbackSent');
 
 // NounsNymz.
 events.set('newPost', 'NounsNymz.NewPost');
 
-// NounsDAO.
-events.set('propCreated', 'NounsDAO.PropCreated');
-events.set('propStatusChange', 'NounsDAO.PropStatusChange');
-events.set('propVoteCast', 'NounsDAO.PropVoteCastNoZero');
-events.set('propVoteCastOnlyZero', 'NounsDAO.PropVoteCastOnlyZero');
-events.set('escrowedToFork', 'NounsDAO.EscrowedToFork');
-events.set('executeFork', 'NounsDAO.ExecuteFork');
-events.set('joinFork', 'NounsDAO.JoinFork');
-events.set('withdrawNounsFromEscrow', 'NounsDAO.WithdrawNounsFromEscrow');
+// NounsFork
+events.set('forkAuctionCreated', 'NounsFork.AuctionHouse.ForkAuctionCreated');
+events.set('forkAuctionBid', 'NounsFork.AuctionHouse.ForkAuctionBid');
 
-// NounsDAOData.
-events.set('candidateFeedbackSent', 'NounsDAOData.CandidateFeedbackSent');
-events.set(
-   'proposalCandidateCanceled',
-   'NounsDAOData.ProposalCandidateCanceled',
-);
-events.set('proposalCandidateCreated', 'NounsDAOData.ProposalCandidateCreated');
-events.set('proposalCandidateUpdated', 'NounsDAOData.ProposalCandidateUpdated');
-events.set('signatureAdded', 'NounsDAOData.SignatureAdded');
-events.set('feedbackSent', 'NounsDAOData.FeedbackSent');
-
-// NounsForkAuctionHouse.
-events.set('forkAuctionCreated', 'NounsForkAuctionHouse.ForkAuctionCreated');
-events.set('forkAuctionBid', 'NounsForkAuctionHouse.ForkAuctionBid');
-
-// NounsFork.
 events.set('forkProposalCreated', 'NounsFork.ForkProposalCreated');
 events.set('forkProposalStatusChange', 'NounsFork.ForkProposalStatusChange');
 events.set('forkQuit', 'NounsFork.ForkQuit');
 events.set('forkVoteCast', 'NounsFork.ForkVoteCast');
 
-// NounsForkTokens.
-events.set('forkDelegateChanged', 'NounsForkTokens.ForkDelegateChanged');
-events.set('transferForkNoun', 'NounsForkTokens.TransferForkNoun');
-events.set('forkNounCreated', 'NounsForkTokens.ForkNounCreated');
+events.set('forkDelegateChanged', 'NounsFork.Tokens.ForkDelegateChanged');
+events.set('transferForkNoun', 'NounsFork.Tokens.TransferForkNoun');
+events.set('forkNounCreated', 'NounsFork.Tokens.ForkNounCreated');
 
 // Propdates.
 events.set('postUpdate', 'Propdates.PostUpdate');
@@ -74,9 +64,6 @@ events.set('lilNounsProposalStatusChange', 'LilNouns.ProposalStatusChange');
 events.set('lilNounsVoteCast', 'LilNouns.VoteCast');
 events.set('lilNounsTransfer', 'LilNouns.Transfer');
 
-// LilNounsPolls.
-events.set('newLilNounsProposalPoll', 'LilNounsPoll.NewProposalPoll');
-
 // PropHouse
 events.set('propHouseRoundCreated', 'PropHouse.RoundCreated');
 events.set('propHouseHouseCreated', 'PropHouse.HouseCreated');
@@ -88,5 +75,14 @@ events.set(
    'propHouseNounsProposalSubmitted',
    'PropHouse.Nouns.ProposalSubmitted',
 );
+
+// Polls.
+events.set('newProposalPoll', 'Polls.Nouns.NewProposalPoll');
+events.set('threadFeedbackSent', 'Polls.Nouns.ThreadFeedbackSent');
+events.set('threadStatusChange', 'Polls.Nouns.ThreadStatusChange');
+events.set('threadVote', 'Polls.Nouns.ThreadVote');
+events.set('threadFederationBidPlaced', 'Polls.Federation..ThreadBidPlaced');
+events.set('threadFederationVoteCast', 'Polls.Federation.ThreadVoteCast');
+events.set('newLilNounsProposalPoll', 'Polls.LilNouns.NewProposalPoll');
 
 module.exports = events;
