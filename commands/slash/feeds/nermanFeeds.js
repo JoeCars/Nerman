@@ -5,69 +5,17 @@ const events = require('../../../utils/feedEvents');
 
 // Note. Discord supports up to a maximum of 25 drop-down options.
 // Hence why we need to filter them.
-function filterNounsContractEvents() {
+/**
+ * @param {string} group
+ * @returns
+ */
+function filterEvents(group) {
    return [...events.entries()]
       .filter(([key, value]) => {
          const eventGroup = value.split('.')[0];
-         const isNounsDAO = eventGroup === 'NounsDAO';
-         const isNounsAuctionHouse = eventGroup === 'NounsAuctionHouse';
-         const isNounsToken = eventGroup === 'NounsToken';
-         const isNounsDAOData = eventGroup === 'NounsDAOData';
+         const isNouns = eventGroup === group;
 
-         return (
-            isNounsDAO || isNounsAuctionHouse || isNounsToken || isNounsDAOData
-         );
-      })
-      .map(([key, value]) => {
-         return { name: value, value: key };
-      });
-}
-
-function filterLilNounsEvents() {
-   return [...events.entries()]
-      .filter(([key, value]) => {
-         const eventGroup = value.split('.')[0];
-         const isLilNouns = eventGroup === 'LilNouns';
-
-         return isLilNouns;
-      })
-      .map(([key, value]) => {
-         return { name: value, value: key };
-      });
-}
-
-function filterPropHouseEvents() {
-   return [...events.entries()]
-      .filter(([key, value]) => {
-         const eventGroup = value.split('.')[0];
-         const isPropHouse = eventGroup === 'PropHouse';
-
-         return isPropHouse;
-      })
-      .map(([key, value]) => {
-         return { name: value, value: key };
-      });
-}
-
-function filterNounsOtherEvents() {
-   return [...events.entries()]
-      .filter(([key, value]) => {
-         const eventGroup = value.split('.')[0];
-         const isNounsDAO = eventGroup === 'NounsDAO';
-         const isNounsAuctionHouse = eventGroup === 'NounsAuctionHouse';
-         const isNounsToken = eventGroup === 'NounsToken';
-         const isNounsDAOData = eventGroup === 'NounsDAOData';
-         const isLilNouns = eventGroup === 'LilNouns';
-         const isPropHouse = eventGroup === 'PropHouse';
-
-         return !(
-            isNounsDAO ||
-            isNounsAuctionHouse ||
-            isNounsToken ||
-            isNounsDAOData ||
-            isLilNouns ||
-            isPropHouse
-         );
+         return isNouns;
       })
       .map(([key, value]) => {
          return { name: value, value: key };
@@ -86,10 +34,31 @@ module.exports = {
             .setDescription('Add an event configuration for the given channel.')
             .addSubcommand(subcommand => {
                return subcommand
-                  .setName('nouns-contracts')
+                  .setName('federation')
+                  .setDescription('Federation contract events.')
+                  .addStringOption(option => {
+                     const federationEvents = filterEvents('Federation');
+                     return option
+                        .setName('event')
+                        .setDescription('The event to register.')
+                        .setRequired(true)
+                        .addChoices(...federationEvents);
+                  })
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will receive the notifications.',
+                        )
+                        .setRequired(false);
+                  });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('nouns')
                   .setDescription('Nouns contract events.')
                   .addStringOption(option => {
-                     const nounsEvents = filterNounsContractEvents();
+                     const nounsEvents = filterEvents('Nouns');
                      return option
                         .setName('event')
                         .setDescription('The event to register.')
@@ -107,10 +76,73 @@ module.exports = {
             })
             .addSubcommand(subcommand => {
                return subcommand
+                  .setName('nouns-nymz')
+                  .setDescription('NounsNymz contract events.')
+                  .addStringOption(option => {
+                     const nounsNymzEvents = filterEvents('NounsNymz');
+                     return option
+                        .setName('event')
+                        .setDescription('The event to register.')
+                        .setRequired(true)
+                        .addChoices(...nounsNymzEvents);
+                  })
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will receive the notifications.',
+                        )
+                        .setRequired(false);
+                  });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('nouns-fork')
+                  .setDescription('NounsFork contract events.')
+                  .addStringOption(option => {
+                     const nounsForkEvents = filterEvents('NounsFork');
+                     return option
+                        .setName('event')
+                        .setDescription('The event to register.')
+                        .setRequired(true)
+                        .addChoices(...nounsForkEvents);
+                  })
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will receive the notifications.',
+                        )
+                        .setRequired(false);
+                  });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('propdates')
+                  .setDescription('NounsFork contract events.')
+                  .addStringOption(option => {
+                     const propdatesEvents = filterEvents('Propdates');
+                     return option
+                        .setName('event')
+                        .setDescription('The event to register.')
+                        .setRequired(true)
+                        .addChoices(...propdatesEvents);
+                  })
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will receive the notifications.',
+                        )
+                        .setRequired(false);
+                  });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
                   .setName('lil-nouns')
                   .setDescription('LilNouns events.')
                   .addStringOption(option => {
-                     const lilNounsEvents = filterLilNounsEvents();
+                     const lilNounsEvents = filterEvents('LilNouns');
                      return option
                         .setName('event')
                         .setDescription('The event to register.')
@@ -131,7 +163,7 @@ module.exports = {
                   .setName('prop-house')
                   .setDescription('PropHouse events.')
                   .addStringOption(option => {
-                     const propHouseEvents = filterPropHouseEvents();
+                     const propHouseEvents = filterEvents('PropHouse');
                      return option
                         .setName('event')
                         .setDescription('The event to register.')
@@ -149,15 +181,15 @@ module.exports = {
             })
             .addSubcommand(subcommand => {
                return subcommand
-                  .setName('nouns-others')
-                  .setDescription('General nouns events.')
+                  .setName('polls')
+                  .setDescription('Polls events. Still needs a poll channel.')
                   .addStringOption(option => {
-                     const generalEvents = filterNounsOtherEvents();
+                     const pollEvents = filterEvents('Polls');
                      return option
                         .setName('event')
                         .setDescription('The event to register.')
                         .setRequired(true)
-                        .addChoices(...generalEvents);
+                        .addChoices(...pollEvents);
                   })
                   .addChannelOption(option => {
                      return option
