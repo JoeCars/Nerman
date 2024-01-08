@@ -1,10 +1,10 @@
 const { CommandInteraction, codeBlock } = require('discord.js');
 const { Types } = require('mongoose');
 
-const FeedConfig = require('../../../db/schemas/FeedConfig');
-const Logger = require('../../../helpers/logger');
-const { authorizeInteraction } = require('../../../helpers/authorization');
-const events = require('../../../utils/feedEvents');
+const FeedConfig = require('../../../../db/schemas/FeedConfig');
+const Logger = require('../../../../helpers/logger');
+const { authorizeInteraction } = require('../../../../helpers/authorization');
+const events = require('../../../../utils/feedEvents');
 
 module.exports = {
    subCommand: 'nerman-feeds.display',

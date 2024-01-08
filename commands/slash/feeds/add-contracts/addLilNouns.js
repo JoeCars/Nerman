@@ -1,6 +1,6 @@
-const add = require('./add');
+const add = require('../subcommands/add');
 module.exports = {
-   subCommand: 'nerman-feeds.add.polls',
+   subCommand: 'nerman-feeds.add.lil-nouns',
    /**
     * @param {CommandInteraction} interaction
     */

@@ -1,9 +1,9 @@
 const { CommandInteraction, inlineCode } = require('discord.js');
 
-const FeedConfig = require('../../../db/schemas/FeedConfig');
-const Logger = require('../../../helpers/logger');
-const { authorizeInteraction } = require('../../../helpers/authorization');
-const events = require('../../../utils/feedEvents');
+const FeedConfig = require('../../../../db/schemas/FeedConfig');
+const Logger = require('../../../../helpers/logger');
+const { authorizeInteraction } = require('../../../../helpers/authorization');
+const events = require('../../../../utils/feedEvents');
 
 module.exports = {
    subCommand: 'nerman-feeds.add-all',
