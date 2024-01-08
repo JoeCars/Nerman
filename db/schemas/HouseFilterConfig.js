@@ -11,7 +11,7 @@ const HouseFilterConfigSchema = new Schema(
          type: String,
          required: true,
       },
-      filteredHouses: [
+      permittedHouses: [
          {
             type: [String],
             required: true,
