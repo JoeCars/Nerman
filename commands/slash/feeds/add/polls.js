@@ -1,4 +1,4 @@
-const add = require('../add');
+const add = require('./add');
 module.exports = {
    subCommand: 'nerman-feeds.add.polls',
    /**

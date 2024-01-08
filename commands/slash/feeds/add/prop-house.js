@@ -1,4 +1,4 @@
-const add = require('../subcommands/add');
+const add = require('./add');
 module.exports = {
    subCommand: 'nerman-feeds.add.prop-house',
    /**
