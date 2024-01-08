@@ -11,14 +11,14 @@ const ResultBar = require('../../../structures/ResultBar');
 const { authorizeInteraction } = require('../../../helpers/authorization');
 
 module.exports = {
-   subCommand: 'nerman.create-test-poll',
+   subCommand: 'dev.create-test-poll',
    /**
     *
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
       Logger.info(
-         'commands/slashCommands/poll/createPoll.js: Starting to create polls.',
+         'commands/slash/poll/createTestPoll.js: Starting to create polls.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -54,7 +54,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/slashCommands/poll/createPoll.j`s: Finished creating poll.',
+         'commands/slash/poll/createTestPoll.j`s: Finished creating poll.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,

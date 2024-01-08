@@ -39,4 +39,6 @@ module.exports = {
          'commands/trigger-propdates.js: Executed Nerman trigger command.',
       );
    },
+
+   isHidden: process.env.DEPLOY_STAGE === 'production',
 };
