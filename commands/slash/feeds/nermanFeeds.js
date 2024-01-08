@@ -267,6 +267,6 @@ module.exports = {
       }),
 
    async execute() {
-      Logger.info('commands/nermanAdmin.js: Executed Nerman Admin command.');
+      Logger.info('commands/nermanFeeds.js: Executed feeds command.');
    },
 };
