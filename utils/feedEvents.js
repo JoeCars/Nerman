@@ -69,12 +69,6 @@ events.set('propHouseRoundCreated', 'PropHouse.RoundCreated');
 events.set('propHouseHouseCreated', 'PropHouse.HouseCreated');
 events.set('propHouseVoteCast', 'PropHouse.VoteCast');
 events.set('propHouseProposalSubmitted', 'PropHouse.ProposalSubmitted');
-events.set('propHouseNounsRoundCreated', 'PropHouse.Nouns.RoundCreated');
-events.set('propHouseNounsVoteCast', 'PropHouse.Nouns.VoteCast');
-events.set(
-   'propHouseNounsProposalSubmitted',
-   'PropHouse.Nouns.ProposalSubmitted',
-);
 
 // Polls.
 events.set('newProposalPoll', 'Polls.Nouns.NewProposalPoll');

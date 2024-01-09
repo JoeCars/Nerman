@@ -1066,13 +1066,6 @@ module.exports = {
 
             data.eventName = 'PropHouseRoundCreated';
             router.sendToFeed(data, 'propHouseRoundCreated', 'prop-house');
-            if (data.house.id === PROPHOUSE_NOUNS_HOUSE_ADDRESS) {
-               router.sendToFeed(
-                  data,
-                  'propHouseNounsRoundCreated',
-                  'prop-house',
-               );
-            }
          });
 
          propHouse.on('HouseCreated', async data => {
@@ -1102,9 +1095,6 @@ module.exports = {
 
             data.eventName = 'PropHouseVoteCast';
             router.sendToFeed(data, 'propHouseVoteCast', 'prop-house');
-            if (data.house.id === PROPHOUSE_NOUNS_HOUSE_ADDRESS) {
-               router.sendToFeed(data, 'propHouseNounsVoteCast', 'prop-house');
-            }
          });
 
          propHouse.on('ProposalSubmitted', async data => {
@@ -1124,13 +1114,6 @@ module.exports = {
 
             data.eventName = 'PropHouseProposalSubmitted';
             router.sendToFeed(data, 'propHouseProposalSubmitted', 'prop-house');
-            if (data.house.id === PROPHOUSE_NOUNS_HOUSE_ADDRESS) {
-               router.sendToFeed(
-                  data,
-                  'propHouseNounsProposalSubmitted',
-                  'prop-house',
-               );
-            }
          });
       }
 
