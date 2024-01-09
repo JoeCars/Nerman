@@ -1128,6 +1128,7 @@ module.exports = {
                ...data,
             });
 
+            data.eventName = 'NounsCast';
             router.sendToFeed(data, 'nounsCast', 'farcaster');
          });
       }
