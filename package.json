@@ -27,7 +27,7 @@
       "graphql-request": "^4.3.0",
       "mongodb": "^4.2.2",
       "mongoose": "^6.2.7",
-      "nerman": "^0.0.32",
+      "nerman": "^0.0.33",
       "node-fetch": "^2.6.6",
       "twit": "^2.2.11"
    },
