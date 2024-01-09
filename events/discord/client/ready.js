@@ -63,6 +63,9 @@ module.exports = {
          const propHouse = new nerman.PropHouse(Nouns.provider);
          client.libraries.set('PropHouse', propHouse);
 
+         const farcaster = new nerman.Farcaster();
+         client.libraries.set('Farcaster', farcaster);
+
          // =============================================================
          // Federation
          // =============================================================
@@ -1114,6 +1117,18 @@ module.exports = {
 
             data.eventName = 'PropHouseProposalSubmitted';
             router.sendToFeed(data, 'propHouseProposalSubmitted', 'prop-house');
+         });
+
+         // =============================================================
+         // Farcaster
+         // =============================================================
+
+         farcaster.on('NounsCast', data => {
+            Logger.info('events/ready.js: On NounsCast.', {
+               ...data,
+            });
+
+            router.sendToFeed(data, 'nounsCast', 'farcaster');
          });
       }
 
