@@ -4,7 +4,7 @@ const Logger = require('../../../helpers/logger');
 const HouseFilterConfig = require('../../../db/schemas/HouseFilterConfig');
 
 module.exports = {
-   subCommand: 'nerman-url.remove',
+   subCommand: 'nerman-houses.remove',
    /**
     * @param {CommandInteraction} interaction
     */
