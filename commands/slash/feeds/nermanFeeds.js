@@ -199,6 +199,27 @@ module.exports = {
                         )
                         .setRequired(false);
                   });
+            })
+            .addSubcommand(subcommand => {
+               return subcommand
+                  .setName('farcaster')
+                  .setDescription('Farcaster events.')
+                  .addStringOption(option => {
+                     const farcasterEvents = filterEvents('Farcaster');
+                     return option
+                        .setName('event')
+                        .setDescription('The event to register.')
+                        .setRequired(true)
+                        .addChoices(...farcasterEvents);
+                  })
+                  .addChannelOption(option => {
+                     return option
+                        .setName('channel')
+                        .setDescription(
+                           'The channel that will receive the notifications.',
+                        )
+                        .setRequired(false);
+                  });
             });
       })
       .addSubcommand(subcommand => {
