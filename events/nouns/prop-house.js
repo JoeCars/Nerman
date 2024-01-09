@@ -21,10 +21,7 @@ module.exports = {
             channelId: channel.id,
          }).exec();
 
-         if (
-            houseFilter &&
-            !houseFilter.permittedHouses.includes(data.house.id)
-         ) {
+         if (houseFilter && !houseFilter.includes(data.house.id)) {
             return;
          }
 
