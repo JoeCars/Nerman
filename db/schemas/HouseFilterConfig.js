@@ -13,8 +13,18 @@ const HouseFilterConfigSchema = new Schema(
       },
       permittedHouses: [
          {
-            type: [String],
-            required: true,
+            address: {
+               type: String,
+               required: true,
+            },
+            name: {
+               type: String,
+               required: true,
+            },
+            url: {
+               type: String,
+               required: true,
+            },
          },
       ],
       isDeleted: {
@@ -28,6 +38,11 @@ const HouseFilterConfigSchema = new Schema(
          async softDelete() {
             this.isDeleted = true;
             return this.save();
+         },
+         includes(address) {
+            return this.permittedHouses
+               .map(house => house.address)
+               .includes(address);
          },
       },
    },
