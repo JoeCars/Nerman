@@ -39,7 +39,6 @@ events.set('newPost', 'NounsNymz.NewPost');
 // NounsFork
 events.set('forkAuctionCreated', 'NounsFork.AuctionHouse.ForkAuctionCreated');
 events.set('forkAuctionBid', 'NounsFork.AuctionHouse.ForkAuctionBid');
-
 events.set('forkProposalCreated', 'NounsFork.ForkProposalCreated');
 events.set('forkProposalStatusChange', 'NounsFork.ForkProposalStatusChange');
 events.set('forkQuit', 'NounsFork.ForkQuit');
