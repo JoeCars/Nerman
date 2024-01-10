@@ -53,7 +53,7 @@ async function addAllFeeds(interaction, channelId) {
    // Inserting events.
    for (const [eventKey, eventValue] of events.entries()) {
       const eventGroup = eventValue.split('.')[0];
-      if (eventGroup === 'NermanPoll') {
+      if (eventGroup === 'Poll') {
          continue;
       }
 
