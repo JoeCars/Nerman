@@ -67,11 +67,18 @@ module.exports = {
             embeds: [embed],
          })
          .catch(error => {
-            Logger.error('events/nounsForumUpdate.js: Cannot send embed.', {
-               error: error,
-               threadId: thread.id,
-               guildId: thread.guildId,
-            });
+            if (error.code === 50001) {
+               Logger.info('events/nounsForumUpdate.js: Missing permissions.', {
+                  threadId: thread.id,
+                  guildId: thread.guildId,
+               });
+            } else {
+               Logger.error('events/nounsForumUpdate.js: Cannot send embed.', {
+                  error: error,
+                  threadId: thread.id,
+                  guildId: thread.guildId,
+               });
+            }
          });
 
       Logger.info('Successfully sent forum embed.');

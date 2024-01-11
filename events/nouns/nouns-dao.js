@@ -67,12 +67,20 @@ module.exports = {
             guildId: channel.guildId,
          });
       } catch (error) {
-         Logger.error('events/nouns/nouns-dao.js: Received error.', {
-            error: error,
-            eventName: data.eventName,
-            channelId: channel.id,
-            guildId: channel.guildId,
-         });
+         if (error.code === 50001) {
+            Logger.debug('events/nouns/nouns-dao.js: Missing permissions.', {
+               eventName: data.eventName,
+               channelId: channel.id,
+               guildId: channel.guildId,
+            });
+         } else {
+            Logger.error('events/nouns/nouns-dao.js: Received error.', {
+               error: error,
+               eventName: data.eventName,
+               channelId: channel.id,
+               guildId: channel.guildId,
+            });
+         }
       }
    },
 };
