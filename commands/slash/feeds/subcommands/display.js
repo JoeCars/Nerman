@@ -1,4 +1,4 @@
-const { CommandInteraction, codeBlock } = require('discord.js');
+const { CommandInteraction, inlineCode, hyperlink } = require('discord.js');
 const { Types } = require('mongoose');
 
 const FeedConfig = require('../../../../db/schemas/FeedConfig');
@@ -51,7 +51,7 @@ module.exports = {
 
       await interaction.reply({
          ephemeral: true,
-         content: codeBlock(generateFeedDisplay(feedConfigs)),
+         content: generateFeedDisplay(feedConfigs),
       });
 
       Logger.info(
@@ -75,13 +75,13 @@ function generateFeedDisplay(feedConfigs) {
 
    return feedConfigs
       .map(config => {
-         let output = events.get(config.eventName);
+         let output = '- ' + inlineCode(events.get(config.eventName));
          if (config.options?.prophouse?.permittedHouses?.length > 0) {
             output +=
-               '(' +
+               ' (' +
                config.options.prophouse.permittedHouses
-                  .map(house => house.name)
-                  .join(',') +
+                  .map(house => hyperlink(house.name, house.url))
+                  .join(', ') +
                ')';
          }
          return output;
