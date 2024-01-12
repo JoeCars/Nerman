@@ -77,7 +77,7 @@ function formatResultMessage(eventResults, channel) {
             return inlineCode(events.get(result.event));
          })
          .join(', ');
-      resultMessage += failedEvents + ' were already registered.\n';
+      resultMessage += failedEvents + ' events were already registered.\n';
    }
    let successfulEvents = eventResults.filter(({ isDuplicate }) => {
       return !isDuplicate;
