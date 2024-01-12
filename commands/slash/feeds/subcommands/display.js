@@ -76,7 +76,7 @@ function generateFeedDisplay(feedConfigs) {
    return feedConfigs
       .map(config => {
          let output = events.get(config.eventName);
-         if (config.options?.prophouse?.permittedHouses) {
+         if (config.options?.prophouse?.permittedHouses?.length > 0) {
             output +=
                '(' +
                config.options.prophouse.permittedHouses

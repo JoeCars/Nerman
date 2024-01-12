@@ -98,7 +98,7 @@ const FeedConfigSchema = new Schema(
             return this.save();
          },
          async includesHouse(houseAddress) {
-            if (!this.options?.prophouse?.permittedHouses) {
+            if (!(this.options?.prophouse?.permittedHouses?.length > 0)) {
                return true; // All houses permitted if there are no options.
             }
 
