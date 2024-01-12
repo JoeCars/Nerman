@@ -1,5 +1,6 @@
 const { TextChannel } = require('discord.js');
 
+const FeedConfig = require('../../db/schemas/FeedConfig');
 const Logger = require('../../helpers/logger');
 const embeds = require('../../views/embeds/contracts/prop-house');
 
@@ -15,6 +16,19 @@ module.exports = {
     */
    async execute(channel, data) {
       try {
+         const camelCaseEventName =
+            data.eventName.substring(0, 1).toLowerCase() +
+            data.eventName.substring(1);
+         const houseFilter = await FeedConfig.findOne({
+            guildId: channel.guildId,
+            channelId: channel.id,
+            eventName: camelCaseEventName,
+         }).exec();
+
+         if (houseFilter && !houseFilter.includesHouse(data.house.id)) {
+            return;
+         }
+
          let embed;
 
          switch (data.eventName) {
