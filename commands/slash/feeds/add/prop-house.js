@@ -162,8 +162,12 @@ async function registerFeed(interaction, channel, event) {
             error: error,
          },
       );
-      throw new Error(
-         'Unable to add notification configuration due to a database issue.',
-      );
+      if (error.message.includes('House not found')) {
+         throw new Error(error.message);
+      } else {
+         throw new Error(
+            'Unable to add notification configuration due to a database issue.',
+         );
+      }
    }
 }
