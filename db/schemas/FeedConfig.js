@@ -22,6 +22,26 @@ const FeedConfigSchema = new Schema(
          required: false,
          default: false,
       },
+      options: {
+         prophouse: {
+            permittedHouses: [
+               {
+                  address: {
+                     type: String,
+                     required: true,
+                  },
+                  name: {
+                     type: String,
+                     required: true,
+                  },
+                  url: {
+                     type: String,
+                     required: true,
+                  },
+               },
+            ],
+         },
+      },
    },
    {
       statics: {
@@ -76,6 +96,15 @@ const FeedConfigSchema = new Schema(
          async softDelete() {
             this.isDeleted = true;
             return this.save();
+         },
+         async includesHouse(houseAddress) {
+            if (!this.options?.prophouse?.permittedHouses) {
+               return false;
+            }
+
+            return this.options.prophouse.permittedHouses
+               .map(house => house.address)
+               .includes(houseAddress);
          },
       },
    },
