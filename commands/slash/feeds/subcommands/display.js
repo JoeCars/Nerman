@@ -75,7 +75,16 @@ function generateFeedDisplay(feedConfigs) {
 
    return feedConfigs
       .map(config => {
-         return events.get(config.eventName);
+         let output = events.get(config.eventName);
+         if (config.options?.prophouse?.permittedHouses) {
+            output +=
+               '(' +
+               config.options.prophouse.permittedHouses
+                  .map(house => house.name)
+                  .join(',') +
+               ')';
+         }
+         return output;
       })
       .join('\n');
 }
