@@ -164,6 +164,10 @@ module.exports = {
                   .setDescription('PropHouse events.')
                   .addStringOption(option => {
                      const propHouseEvents = filterEvents('PropHouse');
+                     propHouseEvents.push({
+                        name: 'All',
+                        value: 'all',
+                     });
                      return option
                         .setName('event')
                         .setDescription('The event to register.')
@@ -175,6 +179,14 @@ module.exports = {
                         .setName('channel')
                         .setDescription(
                            'The channel that will receive the notifications.',
+                        )
+                        .setRequired(false);
+                  })
+                  .addStringOption(option => {
+                     return option
+                        .setName('house-addresses')
+                        .setDescription(
+                           'Permitted house addresses. Comma separated.',
                         )
                         .setRequired(false);
                   });
