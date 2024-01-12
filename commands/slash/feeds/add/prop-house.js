@@ -27,59 +27,32 @@ module.exports = {
          interaction.options.getChannel('channel') ?? interaction.channel;
       const event = interaction.options.getString('event');
 
-      if (!channel || !event) {
-         throw new Error('The channel and event were not supplied.');
-      }
-
-      try {
-         const numOfConfigs = await FeedConfig.countDocuments({
-            guildId: interaction.guildId,
-            channelId: channel.id,
-            eventName: event,
-            isDeleted: {
-               $ne: true,
-            },
-         });
-
-         if (numOfConfigs !== 0) {
-            return interaction.reply({
-               ephemeral: true,
-               content: 'This event is already registered to this channel.',
+      const eventResults = [];
+      if (event === 'all') {
+         const feedEvents = [...events.entries()];
+         const propHouseEvents = feedEvents
+            .filter(pair => {
+               const value = pair[1];
+               return value.split('.')[0] === 'PropHouse';
+            })
+            .map(pair => {
+               return pair[0];
             });
+
+         for (const feedEvent of propHouseEvents) {
+            const results = await registerFeed(interaction, channel, feedEvent);
+            eventResults.push(results);
          }
-
-         const permittedHouses = await fetchPermittedHouses(interaction);
-
-         await FeedConfig.create({
-            _id: new Types.ObjectId(),
-            guildId: interaction.guildId,
-            channelId: channel.id,
-            eventName: event,
-            options: {
-               prophouse: {
-                  permittedHouses: permittedHouses,
-               },
-            },
-         });
-      } catch (error) {
-         Logger.error(
-            'commands/slash/feeds/add/prop-house.js: Unable to save the configuration.',
-            {
-               error: error,
-            },
-         );
-         throw new Error(
-            'Unable to add notification configuration due to a database issue.',
-         );
+      } else {
+         const results = await registerFeed(interaction, channel, event);
+         eventResults.push(results);
       }
 
-      const eventName = events.get(event);
+      const resultMessage = formatResultMessage(eventResults, channel);
 
       await interaction.reply({
          ephemeral: true,
-         content: `You have successfully registered the ${inlineCode(
-            eventName,
-         )} event to channel ${inlineCode(channel.id)}.`,
+         content: resultMessage,
       });
 
       Logger.info(
@@ -92,6 +65,35 @@ module.exports = {
       );
    },
 };
+
+function formatResultMessage(eventResults, channel) {
+   let resultMessage = '';
+   let failedEvents = eventResults.filter(({ isDuplicate }) => {
+      return isDuplicate;
+   });
+   if (failedEvents.length > 0) {
+      failedEvents = failedEvents
+         .map(result => {
+            return inlineCode(events.get(result.event));
+         })
+         .split(', ');
+      resultMessage += failedEvents + ' were already registered.\n';
+   }
+   let successfulEvents = eventResults.filter(({ isDuplicate }) => {
+      return !isDuplicate;
+   });
+   if (successfulEvents.length > 0) {
+      successfulEvents = successfulEvents
+         .map(result => {
+            return inlineCode(events.get(result.event));
+         })
+         .split(', ');
+      resultMessage += `You have successfully registered ${successfulEvents} to channel ${inlineCode(
+         channel.id,
+      )}.`;
+   }
+   return resultMessage;
+}
 
 async function fetchPermittedHouses(interaction) {
    const houses = interaction.options.getString('house-addresses');
@@ -115,4 +117,53 @@ async function fetchPermittedHouses(interaction) {
    }
 
    return permittedHouses;
+}
+
+async function registerFeed(interaction, channel, event) {
+   try {
+      const numOfConfigs = await FeedConfig.countDocuments({
+         guildId: interaction.guildId,
+         channelId: channel.id,
+         eventName: event,
+         isDeleted: {
+            $ne: true,
+         },
+      });
+
+      if (numOfConfigs !== 0) {
+         return {
+            event: event,
+            isDuplicate: true,
+         };
+      }
+
+      const permittedHouses = await fetchPermittedHouses(interaction);
+
+      await FeedConfig.create({
+         _id: new Types.ObjectId(),
+         guildId: interaction.guildId,
+         channelId: channel.id,
+         eventName: event,
+         options: {
+            prophouse: {
+               permittedHouses: permittedHouses,
+            },
+         },
+      });
+
+      return {
+         event: event,
+         isDuplicate: false,
+      };
+   } catch (error) {
+      Logger.error(
+         'commands/slash/feeds/add/prop-house.js: Unable to save the configuration.',
+         {
+            error: error,
+         },
+      );
+      throw new Error(
+         'Unable to add notification configuration due to a database issue.',
+      );
+   }
 }
