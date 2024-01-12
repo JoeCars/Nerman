@@ -1,7 +1,6 @@
 const { TextChannel } = require('discord.js');
 
 const Logger = require('../../helpers/logger');
-const HouseFilterConfig = require('../../db/schemas/HouseFilterConfig');
 const embeds = require('../../views/embeds/contracts/prop-house');
 
 module.exports = {
@@ -16,15 +15,6 @@ module.exports = {
     */
    async execute(channel, data) {
       try {
-         const houseFilter = await HouseFilterConfig.findOne({
-            guildId: channel.guildId,
-            channelId: channel.id,
-         }).exec();
-
-         if (houseFilter && !houseFilter.includes(data.house.id)) {
-            return;
-         }
-
          let embed;
 
          switch (data.eventName) {
