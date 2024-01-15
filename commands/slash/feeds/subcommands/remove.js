@@ -6,13 +6,13 @@ const { authorizeInteraction } = require('../../../../helpers/authorization');
 const events = require('../../../../utils/feedEvents');
 
 module.exports = {
-   subCommand: 'nerman-feeds.remove',
+   subCommand: 'feeds.remove',
    /**
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
       Logger.info(
-         'commands/slashCommands/feeds/remove.js: Removing event configuration.',
+         'commands/slashF/feeds/remove.js: Removing event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -26,17 +26,10 @@ module.exports = {
          interaction.options.getChannel('channel') ?? interaction.channel;
       const event = interaction.options.getString('event');
 
-      if (!event) {
-         throw new Error('No event passed in.');
-      }
-      if (!channel) {
-         throw new Error('Could not retrieve channel for removal.');
-      }
-
       await removeFeed(interaction, channel.id, event);
 
       Logger.info(
-         'commands/slashCommands/feeds/remove.js: Finished removing event configuration.',
+         'commands/slash/feeds/remove.js: Finished removing event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -71,14 +64,12 @@ async function removeFeed(interaction, channelId, event) {
       });
    } catch (error) {
       Logger.error(
-         'commands/slashCommands/feeds/remove.js: Unable to remove the configuration.',
+         'commands/slash/feeds/remove.js: Unable to remove the feed.',
          {
             error: error,
          },
       );
-      throw new Error(
-         'Unable to remove notification configuration due to a database issue.',
-      );
+      throw new Error('Unable to remove the feed due to a database issue.');
    }
 
    if (!result) {
@@ -96,6 +87,7 @@ async function removeFeed(interaction, channelId, event) {
          )}. Please try a different event.`,
       });
    }
+   F;
 
    await interaction.reply({
       ephemeral: true,
