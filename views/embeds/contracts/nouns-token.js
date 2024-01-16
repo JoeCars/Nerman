@@ -4,7 +4,7 @@ const DEFAULT_MINT_ID = '0x0000000000000000000000000000000000000000';
 
 exports.generateDelegateChangedEmbed = function (data, hasMarkdown = true) {
    const title = 'Delegate Changed';
-   const titleUrl = `https://etherscan.io/tx/${data.event.transactionHash}`;
+   const titleUrl = `https://etherscan.io/tx/${data.event?.transactionHash}`;
 
    let delegator = data.delegator.name;
    let newDelegate = data.toDelegate.name;
