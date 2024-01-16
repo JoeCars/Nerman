@@ -1,5 +1,6 @@
 const { Schema, model, Types } = require('mongoose');
 const events = require('../../utils/feedEvents');
+const { filterEvents } = require('../../helpers/feeds');
 const Logger = require('../../helpers/logger');
 
 const FeedConfigSchema = new Schema(
@@ -133,6 +134,30 @@ const FeedConfigSchema = new Schema(
 
                throw new Error('Unable to register feed.');
             }
+         },
+         async registerAllProjectFeeds(
+            guildId,
+            channelId,
+            projectName,
+            options = {},
+         ) {
+            const eventResults = [];
+
+            const feedEvents = filterEvents(projectName).map(({ value }) => {
+               return value;
+            });
+
+            for (const feedEvent of feedEvents) {
+               const results = await this.registerFeed(
+                  guildId,
+                  channelId,
+                  feedEvent,
+                  options,
+               );
+               eventResults.push(results);
+            }
+
+            return eventResults;
          },
       },
       methods: {

@@ -36,19 +36,13 @@ module.exports = {
 
       const eventResults = [];
       if (event === 'all') {
-         const propHouseEvents = filterEvents('PropHouse').map(({ value }) => {
-            return value;
-         });
-
-         for (const feedEvent of propHouseEvents) {
-            const results = await FeedConfig.registerFeed(
-               interaction.guildId,
-               channel.id,
-               feedEvent,
-               options,
-            );
-            eventResults.push(results);
-         }
+         const results = await FeedConfig.registerAllProjectFeeds(
+            interaction.guildId,
+            channel.id,
+            event,
+            options,
+         );
+         eventResults.push(...results);
       } else {
          const results = await FeedConfig.registerFeed(
             interaction.guildId,
