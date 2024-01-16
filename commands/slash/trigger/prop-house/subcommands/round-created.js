@@ -34,6 +34,7 @@ module.exports = {
          },
          house: {
             id: house,
+            name: 'Nouns DAO JAPAN',
          },
          title,
       });

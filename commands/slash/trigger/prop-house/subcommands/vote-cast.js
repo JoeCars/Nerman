@@ -32,7 +32,13 @@ module.exports = {
          },
          round: {
             id: round,
+            title: 'Round 11 (Redo2)',
          },
+         house: {
+            id: '0x84ae050b4861c59f25be37352a66a3f1e0328aaf',
+            name: 'Nouns DAO JAPAN',
+         },
+         proposalTitle: 'Order 66',
          proposalId,
          votingPower: `${votingPower}`,
       });

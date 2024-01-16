@@ -20,6 +20,10 @@ module.exports = {
       const farcaster = interaction.client.libraries.get('Farcaster');
       farcaster.trigger('NounsCast', {
          text: text,
+         author: 'toadyhawk.eth',
+         event: {
+            hash: '0xd0d373a1',
+         },
       });
 
       interaction.reply({
