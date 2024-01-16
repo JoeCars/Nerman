@@ -1,12 +1,9 @@
-const { CommandInteraction } = require('discord.js');
-const add = require('./add');
+const add = require('../subcommands/add');
 const PollChannel = require('../../../../db/schemas/PollChannel');
 
 module.exports = {
-   subCommand: 'nerman-feeds.add.polls',
-   /**
-    * @param {CommandInteraction} interaction
-    */
+   subCommand: 'polls.add',
+
    async execute(interaction) {
       const channel =
          interaction.options.getChannel('channel') ?? interaction.channel;

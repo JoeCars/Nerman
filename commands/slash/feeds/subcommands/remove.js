@@ -12,7 +12,7 @@ module.exports = {
     */
    async execute(interaction) {
       Logger.info(
-         'commands/slashF/feeds/remove.js: Removing event configuration.',
+         'commands/slash/feeds/remove.js: Removing event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
