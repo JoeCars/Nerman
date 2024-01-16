@@ -4,6 +4,7 @@ const FeedConfig = require('../../../../db/schemas/FeedConfig');
 const Logger = require('../../../../helpers/logger');
 const { authorizeInteraction } = require('../../../../helpers/authorization');
 const { getKeyOfEvent } = require('../../../../helpers/feeds');
+const feedEvents = require('../../../../utils/feedEvents');
 
 module.exports = {
    subCommand: 'feeds.remove',
@@ -44,7 +45,7 @@ module.exports = {
  * @param {string} channelId
  */
 async function removeFeed(interaction, channelId, event) {
-   const eventKey = getKeyOfEvent(event);
+   const eventKey = feedEvents.get(event) ? event : getKeyOfEvent(event);
 
    let result;
    try {
@@ -73,10 +74,12 @@ async function removeFeed(interaction, channelId, event) {
       });
    }
 
+   const eventValue = feedEvents.get(eventKey);
+
    if (result.deletedCount === 0) {
       return interaction.reply({
          ephemeral: true,
-         content: `${inlineCode(event)} was not registered in ${inlineCode(
+         content: `${inlineCode(eventValue)} was not registered in ${inlineCode(
             channelId,
          )}. Please try a different event.`,
       });
@@ -85,7 +88,7 @@ async function removeFeed(interaction, channelId, event) {
    await interaction.reply({
       ephemeral: true,
       content: `You have successfully removed ${inlineCode(
-         event,
+         eventValue,
       )} events from channel ${inlineCode(channelId)}.`,
    });
 }
