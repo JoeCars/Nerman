@@ -6,33 +6,26 @@ const { authorizeInteraction } = require('../../../../helpers/authorization');
 const events = require('../../../../utils/feedEvents');
 
 module.exports = {
-   subCommand: 'nerman-feeds.add-all',
+   subCommand: 'feeds.add-all',
    /**
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
-      Logger.info(
-         'commands/slashCommands/feeds/addAll.js: Adding all event configuration.',
-         {
-            userId: interaction.user.id,
-            guildId: interaction.guildId,
-            channelId: interaction.channelId,
-         },
-      );
+      Logger.info('commands/slash/feeds/add-all.js: Adding all feeds.', {
+         userId: interaction.user.id,
+         guildId: interaction.guildId,
+         channelId: interaction.channelId,
+      });
 
       await authorizeInteraction(interaction, 2);
 
       const channel =
          interaction.options.getChannel('channel') ?? interaction.channel;
 
-      if (!channel) {
-         throw new Error('Could not retrieve channel to add events.');
-      }
-
       await addAllFeeds(interaction, channel.id);
 
       Logger.info(
-         'commands/slashCommands/feeds/addAll.js: Finished adding all event configuration.',
+         'commands/slash/feeds/add-all.js: Finished adding all feeds.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -53,6 +46,8 @@ async function addAllFeeds(interaction, channelId) {
    // Inserting events.
    for (const [eventKey, eventValue] of events.entries()) {
       const eventGroup = eventValue.split('.')[0];
+
+      // Polls require a poll channel, so keeping these event in would only cause errors.
       if (eventGroup === 'Poll') {
          continue;
       }
@@ -62,7 +57,7 @@ async function addAllFeeds(interaction, channelId) {
          numOfSuccesses++;
       } catch (error) {
          Logger.error(
-            'commands/slashCommands/feeds/add-all.js: Unable to add the configuration.',
+            'commands/slash/feeds/add-all.js: Unable to add feed.',
             {
                error: error,
                event: eventValue,

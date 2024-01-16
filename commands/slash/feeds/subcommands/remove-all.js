@@ -3,22 +3,18 @@ const { CommandInteraction, inlineCode } = require('discord.js');
 const FeedConfig = require('../../../../db/schemas/FeedConfig');
 const Logger = require('../../../../helpers/logger');
 const { authorizeInteraction } = require('../../../../helpers/authorization');
-const events = require('../../../../utils/feedEvents');
 
 module.exports = {
-   subCommand: 'nerman-feeds.remove-all',
+   subCommand: 'feeds.remove-all',
    /**
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
-      Logger.info(
-         'commands/slashCommands/feeds/removeAll.js: Removing all event configuration.',
-         {
-            userId: interaction.user.id,
-            guildId: interaction.guildId,
-            channelId: interaction.channelId,
-         },
-      );
+      Logger.info('commands/slash/feeds/remove-all.js: Removing all feeds.', {
+         userId: interaction.user.id,
+         guildId: interaction.guildId,
+         channelId: interaction.channelId,
+      });
 
       await authorizeInteraction(interaction, 2);
 
@@ -32,7 +28,7 @@ module.exports = {
       await removeAllFeeds(interaction, channel.id);
 
       Logger.info(
-         'commands/slashCommands/feeds/removeAll.js: Finished removing all event configuration.',
+         'commands/slash/feeds/remove-all.js: Finished removing all feeds.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -58,14 +54,12 @@ async function removeAllFeeds(interaction, channelId) {
       });
    } catch (error) {
       Logger.error(
-         'commands/slashCommands/feeds/remove.js: Unable to remove the configuration.',
+         'commands/slash/feeds/remove.js: Unable to remove the feeds.',
          {
             error: error,
          },
       );
-      throw new Error(
-         'Unable to remove notification configuration due to a database issue.',
-      );
+      throw new Error('Unable to remove feeds due to a database issue.');
    }
 
    if (!result) {

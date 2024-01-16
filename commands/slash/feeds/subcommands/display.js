@@ -1,5 +1,4 @@
 const { CommandInteraction, inlineCode, hyperlink } = require('discord.js');
-const { Types } = require('mongoose');
 
 const FeedConfig = require('../../../../db/schemas/FeedConfig');
 const Logger = require('../../../../helpers/logger');
@@ -7,28 +6,21 @@ const { authorizeInteraction } = require('../../../../helpers/authorization');
 const events = require('../../../../utils/feedEvents');
 
 module.exports = {
-   subCommand: 'nerman-feeds.display',
+   subCommand: 'feeds.display',
    /**
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
-      Logger.info(
-         'commands/slashCommands/feeds/display.js: Displaying event configuration.',
-         {
-            userId: interaction.user.id,
-            guildId: interaction.guildId,
-            channelId: interaction.channelId,
-         },
-      );
+      Logger.info('commands/slash/feeds/display.js: Displaying feeds.', {
+         userId: interaction.user.id,
+         guildId: interaction.guildId,
+         channelId: interaction.channelId,
+      });
 
       await authorizeInteraction(interaction, 1);
 
       const channel =
          interaction.options.getChannel('channel') ?? interaction.channel;
-
-      if (!channel) {
-         throw new Error('The channel was not supplied.');
-      }
 
       // Grabbing configuration.
       let feedConfigs;
@@ -39,14 +31,12 @@ module.exports = {
          );
       } catch (error) {
          Logger.error(
-            'commands/slashCommands/feeds/remove.js: Unable to find the configurations.',
+            'commands/slash/feeds/remove.js: Unable to find the feed.',
             {
                error: error,
             },
          );
-         throw new Error(
-            'Unable to find notification configurations due to a database issue.',
-         );
+         throw new Error('Unable to find feeds.');
       }
 
       await interaction.reply({
@@ -55,7 +45,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/slashCommands/feeds/display.js: Finished displaying new event configuration.',
+         'commands/slash/feeds/display.js: Finished displaying feeds.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -76,6 +66,7 @@ function generateFeedDisplay(feedConfigs) {
    return feedConfigs
       .map(config => {
          let output = '- ' + inlineCode(events.get(config.eventName));
+
          if (config.options?.prophouse?.permittedHouses?.length > 0) {
             output +=
                ' (' +
@@ -84,6 +75,7 @@ function generateFeedDisplay(feedConfigs) {
                   .join(', ') +
                ')';
          }
+
          return output;
       })
       .join('\n');
