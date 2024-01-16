@@ -23,6 +23,12 @@ module.exports = {
                   .setRequired(true)
                   .addChoices(...propHouseEvents);
             })
+            .addStringOption(option => {
+               return option
+                  .setName('house-addresses')
+                  .setDescription('Permitted House events.')
+                  .setRequired(false);
+            })
             .addChannelOption(option => {
                return option
                   .setName('channel')
