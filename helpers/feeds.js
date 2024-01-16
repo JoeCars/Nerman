@@ -49,3 +49,12 @@ exports.formatResultMessage = function (eventResults, channel) {
 
    return resultMessage;
 };
+
+exports.getKeyOfEvent = function (eventDisplayName) {
+   for (const [key, value] of events.entries()) {
+      if (value === eventDisplayName) {
+         return key;
+      }
+   }
+   throw new Error(`Unable to find feed corresponding to ${eventDisplayName}`);
+};

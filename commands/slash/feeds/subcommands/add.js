@@ -3,8 +3,8 @@ const { Types } = require('mongoose');
 
 const FeedConfig = require('../../../../db/schemas/FeedConfig');
 const Logger = require('../../../../helpers/logger');
+const { getKeyOfEvent } = require('../../../../helpers/feeds');
 const { authorizeInteraction } = require('../../../../helpers/authorization');
-const events = require('../../../../utils/feedEvents');
 
 module.exports = {
    subCommand: 'feeds.add',
@@ -26,11 +26,12 @@ module.exports = {
       const channel =
          interaction.options.getChannel('channel') ?? interaction.channel;
       const event = interaction.options.getString('event');
+      const eventKey = getKeyOfEvent(event);
 
       const result = await FeedConfig.registerFeed(
          interaction.guildId,
          channel.id,
-         event,
+         eventKey,
       );
 
       if (result.isDuplicate) {
@@ -39,11 +40,10 @@ module.exports = {
             content: 'This event is already registered to this channel.',
          });
       } else {
-         const eventName = events.get(event);
          return interaction.reply({
             ephemeral: true,
             content: `You have successfully registered the ${inlineCode(
-               eventName,
+               event,
             )} event to channel ${inlineCode(channel.id)}.`,
          });
       }
