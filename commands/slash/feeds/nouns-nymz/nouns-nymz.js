@@ -3,8 +3,6 @@ const { SlashCommandBuilder } = require('discord.js');
 const { filterEvents } = require('../../../../helpers/feeds');
 const Logger = require('../../../../helpers/logger');
 
-const nounsNymzEvents = filterEvents('NounsNymz');
-
 module.exports = {
    data: new SlashCommandBuilder()
       .setName('nouns-nymz')
@@ -14,6 +12,11 @@ module.exports = {
             .setName('add')
             .setDescription('Add NounsNymz events.')
             .addStringOption(option => {
+               const nounsNymzEvents = filterEvents('NounsNymz');
+               nounsNymzEvents.unshift({
+                  name: 'All',
+                  value: 'all',
+               });
                return option
                   .setName('event')
                   .setDescription('The event to register.')
@@ -32,6 +35,7 @@ module.exports = {
             .setName('remove')
             .setDescription('Remove NounsNymz events.')
             .addStringOption(option => {
+               const nounsNymzEvents = filterEvents('NounsNymz');
                return option
                   .setName('event')
                   .setDescription('The event to remove.')

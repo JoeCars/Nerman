@@ -3,8 +3,6 @@ const { SlashCommandBuilder } = require('discord.js');
 const { filterEvents } = require('../../../../helpers/feeds');
 const Logger = require('../../../../helpers/logger');
 
-const farcasterEvents = filterEvents('Farcaster');
-
 module.exports = {
    data: new SlashCommandBuilder()
       .setName('farcaster')
@@ -14,6 +12,11 @@ module.exports = {
             .setName('add')
             .setDescription('Add Farcaster events.')
             .addStringOption(option => {
+               const farcasterEvents = filterEvents('Farcaster');
+               farcasterEvents.unshift({
+                  name: 'All',
+                  value: 'all',
+               });
                return option
                   .setName('event')
                   .setDescription('The event to register.')
@@ -32,6 +35,7 @@ module.exports = {
             .setName('remove')
             .setDescription('Remove Farcaster events.')
             .addStringOption(option => {
+               const farcasterEvents = filterEvents('Farcaster');
                return option
                   .setName('event')
                   .setDescription('The event to remove.')

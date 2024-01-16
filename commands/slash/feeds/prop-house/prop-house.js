@@ -3,8 +3,6 @@ const { SlashCommandBuilder } = require('discord.js');
 const { filterEvents } = require('../../../../helpers/feeds');
 const Logger = require('../../../../helpers/logger');
 
-const propHouseEvents = filterEvents('PropHouse');
-
 module.exports = {
    data: new SlashCommandBuilder()
       .setName('prop-house')
@@ -14,6 +12,11 @@ module.exports = {
             .setName('add')
             .setDescription('Add PropHouse events.')
             .addStringOption(option => {
+               const propHouseEvents = filterEvents('PropHouse');
+               propHouseEvents.unshift({
+                  name: 'All',
+                  value: 'all',
+               });
                return option
                   .setName('event')
                   .setDescription('The event to register.')
@@ -32,6 +35,7 @@ module.exports = {
             .setName('remove')
             .setDescription('Remove PropHouse events.')
             .addStringOption(option => {
+               const propHouseEvents = filterEvents('PropHouse');
                return option
                   .setName('event')
                   .setDescription('The event to remove.')
@@ -47,6 +51,8 @@ module.exports = {
       }),
 
    async execute() {
-      Logger.info('commands/slash/feeds/prop-house.js: Executed feeds command.');
+      Logger.info(
+         'commands/slash/feeds/prop-house.js: Executed feeds command.',
+      );
    },
 };
