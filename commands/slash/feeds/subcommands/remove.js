@@ -3,7 +3,7 @@ const { CommandInteraction, inlineCode } = require('discord.js');
 const FeedConfig = require('../../../../db/schemas/FeedConfig');
 const Logger = require('../../../../helpers/logger');
 const { authorizeInteraction } = require('../../../../helpers/authorization');
-const events = require('../../../../utils/feedEvents');
+const { getKeyOfEvent } = require('../../../../helpers/feeds');
 
 module.exports = {
    subCommand: 'feeds.remove',
@@ -44,13 +44,7 @@ module.exports = {
  * @param {string} channelId
  */
 async function removeFeed(interaction, channelId, event) {
-   let eventKey = '';
-   for (const [key, value] of events) {
-      if (value === event) {
-         eventKey = key;
-         break;
-      }
-   }
+   const eventKey = getKeyOfEvent(event);
 
    let result;
    try {
@@ -87,7 +81,6 @@ async function removeFeed(interaction, channelId, event) {
          )}. Please try a different event.`,
       });
    }
-   F;
 
    await interaction.reply({
       ephemeral: true,
