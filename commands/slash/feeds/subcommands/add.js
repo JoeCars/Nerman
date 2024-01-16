@@ -27,46 +27,25 @@ module.exports = {
          interaction.options.getChannel('channel') ?? interaction.channel;
       const event = interaction.options.getString('event');
 
-      try {
-         const numOfConfigs = await FeedConfig.countDocuments({
-            guildId: interaction.guildId,
-            channelId: channel.id,
-            eventName: event,
-            isDeleted: {
-               $ne: true,
-            },
+      const result = await FeedConfig.registerFeed(
+         interaction.guildId,
+         channel.id,
+         event,
+      );
+
+      if (result.isDuplicate) {
+         return interaction.reply({
+            ephemeral: true,
+            content: 'This event is already registered to this channel.',
          });
-
-         if (numOfConfigs !== 0) {
-            return interaction.reply({
-               ephemeral: true,
-               content: 'This event is already registered to this channel.',
-            });
-         }
-
-         await FeedConfig.create({
-            _id: new Types.ObjectId(),
-            guildId: interaction.guildId,
-            channelId: channel.id,
-            eventName: event,
-         });
-
+      } else {
          const eventName = events.get(event);
-
-         return await interaction.reply({
+         return interaction.reply({
             ephemeral: true,
             content: `You have successfully registered the ${inlineCode(
                eventName,
             )} event to channel ${inlineCode(channel.id)}.`,
          });
-      } catch (error) {
-         Logger.error(
-            'commands/slash/feeds/add.js: Unable to save the configuration.',
-            {
-               error: error,
-            },
-         );
-         throw new Error('Unable to add feed due to a database issue.');
       }
    },
 };
