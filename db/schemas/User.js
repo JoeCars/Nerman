@@ -12,33 +12,6 @@ const userSchema = new Schema(
          type: String,
          required: true,
          unique: false,
-         validate: {
-            validator: async function (discordId) {
-               const userExists = await this.schema.statics.userExists(
-                  this.guildId,
-                  discordId,
-               );
-
-               Logger.debug(
-                  'db/schemas/User.js: In user Discord ID validation.',
-                  {
-                     discordId: discordId,
-                     thisEqualsUser: this.equals(userExists),
-                  },
-               );
-
-               if (userExists === null) {
-                  return true;
-               }
-
-               if (this.equals(userExists)) {
-                  return true;
-               } else {
-                  return false;
-               }
-            },
-            message: `User document with:\nguildId => ${this.guildId}\ndiscordId => ${this.discordId}\nAlready exists.`,
-         },
       },
       // todo I'm going to need to maybe add in a guildId to this to differentiate users... or perhaps change the eligible channels map to have guildId as parent keys and then channels as a sub-map to those keys
       nameHistory: {
