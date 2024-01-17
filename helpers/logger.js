@@ -73,7 +73,7 @@ class Logger {
          context = '';
       }
 
-      console.info(stringifyDate(), blue('[INFO]'), white(message), context);
+      console.info(blue('[INFO]'), white(message), context);
    }
 
    static debug(message, context = {}) {
@@ -81,7 +81,7 @@ class Logger {
          context = '';
       }
 
-      console.debug(stringifyDate(), green('[DEBUG]'), white(message), context);
+      console.debug(green('[DEBUG]'), white(message), context);
    }
 
    static warn(message, context = {}) {
@@ -89,7 +89,7 @@ class Logger {
          context = '';
       }
 
-      console.warn(stringifyDate(), yellow('[WARN]'), white(message), context);
+      console.warn(yellow('[WARN]'), white(message), context);
    }
 
    static error(message, context = {}) {
@@ -97,7 +97,7 @@ class Logger {
          context = '';
       }
 
-      console.error(stringifyDate(), red('[ERROR]'), white(message), context);
+      console.error(red('[ERROR]'), white(message), context);
    }
 
    static fatal(message, context = {}) {
@@ -105,7 +105,7 @@ class Logger {
          context = '';
       }
 
-      console.error(stringifyDate(), red('[FATAL]'), white(message), context);
+      console.error(red('[FATAL]'), white(message), context);
    }
 }
 
