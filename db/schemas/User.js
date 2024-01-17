@@ -12,33 +12,6 @@ const userSchema = new Schema(
          type: String,
          required: true,
          unique: false,
-         validate: {
-            validator: async function (discordId) {
-               const userExists = await this.schema.statics.userExists(
-                  this.guildId,
-                  discordId
-               );
-
-               Logger.debug(
-                  'db/schemas/User.js: In user Discord ID validation.',
-                  {
-                     discordId: discordId,
-                     thisEqualsUser: this.equals(userExists),
-                  }
-               );
-
-               if (userExists === null) {
-                  return true;
-               }
-
-               if (this.equals(userExists)) {
-                  return true;
-               } else {
-                  return false;
-               }
-            },
-            message: `User document with:\nguildId => ${this.guildId}\ndiscordId => ${this.discordId}\nAlready exists.`,
-         },
       },
       // todo I'm going to need to maybe add in a guildId to this to differentiate users... or perhaps change the eligible channels map to have guildId as parent keys and then channels as a sub-map to those keys
       nameHistory: {
@@ -77,7 +50,7 @@ const userSchema = new Schema(
                   const statsObject = {
                      eligiblePolls: polls.length,
                      participatedPolls: polls.filter(
-                        ({ allowedUsers }) => allowedUsers[voterId] === true
+                        ({ allowedUsers }) => allowedUsers[voterId] === true,
                      ).length,
                   };
 
@@ -88,7 +61,7 @@ const userSchema = new Schema(
                         voterId: voterId,
                         eligibleChannels: eligibleChannels,
                         statsObject: statsObject,
-                     }
+                     },
                   );
 
                   eligibleMap.set(channel.channelId, statsObject);
@@ -122,7 +95,7 @@ const userSchema = new Schema(
                   {
                      memberRolesKeys: [...memberRoles.keys()],
                      anon: anon,
-                  }
+                  },
                );
             }
             const eligibleChannels = await PollChannel.find({
@@ -151,7 +124,7 @@ const userSchema = new Schema(
                      anon: anon,
                      guildId: guildId,
                      discordId: discordId,
-                  }
+                  },
                );
             }
 
@@ -166,7 +139,7 @@ const userSchema = new Schema(
                   {
                      anon: anon,
                      userDoc: userDoc,
-                  }
+                  },
                );
             }
 
@@ -174,10 +147,55 @@ const userSchema = new Schema(
                'db/schemas/User.js: In User.userExists(). Check if a user doc was found.',
                {
                   hasFoundUserDoc: !!userDoc,
-               }
+               },
             );
 
             return userDoc;
+         },
+         async updateUserParticipation(newPoll, guildId) {
+            Logger.debug('db/schemas/User.js: Updating user participation.', {
+               guildId,
+               channelId: newPoll.config.channelId,
+            });
+
+            const discordUserIds = [...newPoll.allowedUsers.keys()];
+            return discordUserIds.map(async discordUserId => {
+               let user = await this.findOne({
+                  guildId: guildId,
+                  discordId: discordUserId,
+               });
+
+               if (!user) {
+                  Logger.debug('db/schemas/User.js: Creating missing user.', {
+                     guildId,
+                     channelId: newPoll.config.channelId,
+                  });
+
+                  user = new this({
+                     _id: new Types.ObjectId(),
+                     guildId: guildId,
+                     discordId: discordUserId,
+                     eligibleChannels: new Map(),
+                  });
+               }
+
+               if (!user.eligibleChannels) {
+                  user.eligibleChannels = new Map();
+               }
+
+               if (user.eligibleChannels.has(newPoll.config.channelId)) {
+                  user.eligibleChannels.get(newPoll.config.channelId)
+                     .eligiblePolls++;
+               } else {
+                  user.eligibleChannels.set(newPoll.config.channelId, {
+                     eligiblePolls: 1,
+                     participatedPolls: 0,
+                  });
+               }
+
+               user.markModified('eligibleChannels');
+               return user.save();
+            });
          },
       },
       methods: {
@@ -190,7 +208,7 @@ const userSchema = new Schema(
 
             // todo make sure that calculating -- IN THE FUTURE -- the participation leaves out polls that are not yet closed.
             const { eligiblePolls, participatedPolls } = eligibleChannels.get(
-               channelId
+               channelId,
             )
                ? eligibleChannels.get(channelId)
                : null;
@@ -200,9 +218,9 @@ const userSchema = new Schema(
                {
                   channelId: channelId,
                   participationPercentage: Math.round(
-                     (participatedPolls / eligiblePolls) * 100
+                     (participatedPolls / eligiblePolls) * 100,
                   ).toFixed(2),
-               }
+               },
             );
 
             if (eligiblePolls === 0)
@@ -210,7 +228,7 @@ const userSchema = new Schema(
             if (participatedPolls === 0) return '0%';
 
             return `${Math.round(
-               (participatedPolls / eligiblePolls) * 100
+               (participatedPolls / eligiblePolls) * 100,
             ).toFixed(2)}%`;
          },
          async incParticipation(channelId, configId, anon = false) {
@@ -229,7 +247,7 @@ const userSchema = new Schema(
                         channelId: channelId,
                         configId: configId,
                         anon: anon,
-                     }
+                     },
                   );
 
                   // if configId is not provided in the code, we find and return it with a query
@@ -254,7 +272,7 @@ const userSchema = new Schema(
                      eligiblePolls: eligiblePolls.length,
                      participatedPolls: eligiblePolls.filter(
                         ({ allowedUsers }) =>
-                           allowedUsers[this.discordId] === true
+                           allowedUsers[this.discordId] === true,
                      ).length,
                   };
 
@@ -266,7 +284,7 @@ const userSchema = new Schema(
                            configId: configId,
                            anon: anon,
                            participationObject: participationObject,
-                        }
+                        },
                      );
                   }
 
@@ -277,7 +295,7 @@ const userSchema = new Schema(
                               participationObject,
                         },
                      },
-                     { new: true }
+                     { new: true },
                   ).exec();
                } else {
                   const newParticipation = this.eligibleChannels.get(channelId);
@@ -290,7 +308,7 @@ const userSchema = new Schema(
                            configId: configId,
                            anon: anon,
                            participationObject: newParticipation,
-                        }
+                        },
                      );
                   }
 
@@ -303,7 +321,7 @@ const userSchema = new Schema(
                            [`eligibleChannels.${channelId}`]: newParticipation,
                         },
                      },
-                     { new: true }
+                     { new: true },
                   ).exec();
 
                   if (!anon) {
@@ -315,7 +333,7 @@ const userSchema = new Schema(
                            anon: anon,
                            participationObject:
                               this.eligibleChannels.get(channelId),
-                        }
+                        },
                      );
                   }
                }
@@ -339,12 +357,12 @@ const userSchema = new Schema(
                   error: error,
                });
                throw new Error(
-                  `Unable to fulfill member lookup:\n INFO:\n${error.message}`
+                  `Unable to fulfill member lookup:\n INFO:\n${error.message}`,
                );
             }
          },
       },
-   }
+   },
 );
 
 // userSchema.virtual('getVotes', {
