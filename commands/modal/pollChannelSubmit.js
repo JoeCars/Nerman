@@ -280,7 +280,7 @@ module.exports = {
 async function registerForPollEvents(guildId, channelId) {
    const pollEvents = [...events.entries()]
       .filter(([key, value]) => {
-         return value.split('.')[0] === 'NermanPoll';
+         return value.includes('Polls.Nouns');
       })
       .map(([key, value]) => {
          return key;
@@ -308,7 +308,7 @@ async function registerForPollEvents(guildId, channelId) {
 async function registerLilNounsPollEvents(guildId, channelId) {
    const pollEvents = [...events.entries()]
       .filter(([key, value]) => {
-         return value.split('.')[0] === 'LilNounsPoll';
+         return value.includes('Polls.LilNouns');
       })
       .map(([key, value]) => {
          return key;
