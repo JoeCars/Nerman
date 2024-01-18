@@ -3,9 +3,6 @@ const { Collection, Client, Channel, TextChannel } = require('discord.js');
 const GuildConfig = require('../../../db/schemas/GuildConfig');
 const Logger = require('../../../helpers/logger');
 const Router = require('../../../helpers/router');
-const {
-   extractVoteChange,
-} = require('../../../views/embeds/contracts/nouns-token');
 const NounsProposalForum = require('../../../db/schemas/NounsProposalForum');
 const NounsCandidateForum = require('../../../db/schemas/NounsCandidateForum');
 const {
@@ -19,8 +16,6 @@ const { fetchAddressName } = require('../../../utils/nameCache');
 
 const REASON_LENGTH_LIMIT = 3000;
 const MAX_PROPOSAL_TITLE = 96;
-const PROPHOUSE_NOUNS_HOUSE_ADDRESS =
-   '0x5d75fd351e7b29a4ecad708d1e19d137c71c5404';
 
 module.exports = {
    name: 'ready',
@@ -62,6 +57,9 @@ module.exports = {
 
          const propHouse = new nerman.PropHouse(Nouns.provider);
          client.libraries.set('PropHouse', propHouse);
+
+         const farcaster = new nerman.Farcaster();
+         client.libraries.set('Farcaster', farcaster);
 
          // =============================================================
          // Federation
@@ -202,6 +200,7 @@ module.exports = {
                delegator: data.delegator.id,
                oldDelegate: data.fromDelegate.id,
                newDelegate: data.toDelegate.id,
+               numOfVotesChanged: data.numOfVotesChanged,
                event: data.event,
             });
 
@@ -218,30 +217,8 @@ module.exports = {
                Nouns,
             );
 
-            let numOfVotesChanged = 0;
-            try {
-               // The number of votes being changes is stored in receipt logs index 1 and 2.
-               // It is formatted as a single hex, where the first 64 digits after 0x is the previous vote count.
-               // And the second 64 digits after 0x is the new vote count of the delegate.
-               // To see this in detail, follow the link of the delegate changed event and check the receipt logs.
-               const event = data.event;
-               const receipt = await event.getTransactionReceipt();
-               if (receipt.logs[1]) {
-                  const hexData = receipt.logs[1].data;
-                  numOfVotesChanged = extractVoteChange(hexData);
-               }
-            } catch (error) {
-               Logger.error(
-                  "events/ready.js: On DelegateChanged. There's been an error.",
-                  {
-                     error: error,
-                  },
-               );
-            }
-            data.numOfVotesChanged = numOfVotesChanged;
-
             data.eventName = 'DelegateChanged';
-            if (numOfVotesChanged !== 0) {
+            if (data.numOfVotesChanged !== 0) {
                router.sendToFeed(data, 'delegateChangedNoZero', 'nouns-token');
             }
             router.sendToFeed(data, 'delegateChanged', 'nouns-token');
@@ -678,28 +655,6 @@ module.exports = {
                Nouns,
             );
 
-            let numOfVotesChanged = 0;
-            try {
-               // The number of votes being changes is stored in receipt logs index 1 and 2.
-               // It is formatted as a single hex, where the first 64 digits after 0x is the previous vote count.
-               // And the second 64 digits after 0x is the new vote count of the delegate.
-               // To see this in detail, follow the link of the delegate changed event and check the receipt logs.
-               const event = data.event;
-               const receipt = await event.getTransactionReceipt();
-               if (receipt.logs[1]) {
-                  const hexData = receipt.logs[1].data;
-                  numOfVotesChanged = extractVoteChange(hexData);
-               }
-            } catch (error) {
-               Logger.error(
-                  "events/ready.js: On ForkDelegateChanged. There's been an error.",
-                  {
-                     error: error,
-                  },
-               );
-            }
-            data.numOfVotesChanged = numOfVotesChanged;
-
             data.eventName = 'ForkDelegateChanged';
             router.sendToFeed(data, 'forkDelegateChanged', 'nouns-fork-token');
          });
@@ -1055,28 +1010,20 @@ module.exports = {
          // =============================================================
 
          propHouse.on('RoundCreated', async data => {
-            Logger.info('events/ready.js: On PropHouse RoundCreated.');
+            Logger.info('events/ready.js: On PropHouse RoundCreated.', {
+               ...data,
+            });
 
             data.creator.name = await fetchAddressName(data.creator.id, Nouns);
 
-            const house = await propHouse.prophouse.query.getHouse(
-               data.house.id,
-            );
-            data.house = { ...data.house, ...house };
-
             data.eventName = 'PropHouseRoundCreated';
             router.sendToFeed(data, 'propHouseRoundCreated', 'prop-house');
-            if (data.house.id === PROPHOUSE_NOUNS_HOUSE_ADDRESS) {
-               router.sendToFeed(
-                  data,
-                  'propHouseNounsRoundCreated',
-                  'prop-house',
-               );
-            }
          });
 
          propHouse.on('HouseCreated', async data => {
-            Logger.info('events/ready.js: On PropHouse HouseCreated.');
+            Logger.info('events/ready.js: On PropHouse HouseCreated.', {
+               ...data,
+            });
 
             data.creator.name = await fetchAddressName(data.creator.id, Nouns);
 
@@ -1085,52 +1032,39 @@ module.exports = {
          });
 
          propHouse.on('VoteCast', async data => {
-            Logger.info('events/ready.js: On PropHouse VoteCast.');
+            Logger.info('events/ready.js: On PropHouse VoteCast.', { ...data });
 
             data.voter.name = await fetchAddressName(data.voter.id, Nouns);
 
-            data.proposal = await propHouse.prophouse.query.getProposal(
-               data.round.id,
-               data.proposalId,
-            );
-            const round = await propHouse.prophouse.query.getRoundWithHouseInfo(
-               data.round.id,
-            );
-            data.round = { ...data.round, ...round };
-            data.house = round.house;
-            data.house.id = round.house.address;
-
             data.eventName = 'PropHouseVoteCast';
             router.sendToFeed(data, 'propHouseVoteCast', 'prop-house');
-            if (data.house.id === PROPHOUSE_NOUNS_HOUSE_ADDRESS) {
-               router.sendToFeed(data, 'propHouseNounsVoteCast', 'prop-house');
-            }
          });
 
          propHouse.on('ProposalSubmitted', async data => {
-            Logger.info('events/ready.js: On PropHouse ProposalSubmitted.');
+            Logger.info('events/ready.js: On PropHouse ProposalSubmitted.', {
+               ...data,
+            });
 
             data.proposer.name = await fetchAddressName(
                data.proposer.id,
                Nouns,
             );
 
-            const round = await propHouse.prophouse.query.getRoundWithHouseInfo(
-               data.round.id,
-            );
-            data.round = { ...data.round, ...round };
-            data.house = round.house;
-            data.house.id = round.house.address;
-
             data.eventName = 'PropHouseProposalSubmitted';
             router.sendToFeed(data, 'propHouseProposalSubmitted', 'prop-house');
-            if (data.house.id === PROPHOUSE_NOUNS_HOUSE_ADDRESS) {
-               router.sendToFeed(
-                  data,
-                  'propHouseNounsProposalSubmitted',
-                  'prop-house',
-               );
-            }
+         });
+
+         // =============================================================
+         // Farcaster
+         // =============================================================
+
+         farcaster.on('NounsCast', data => {
+            Logger.info('events/ready.js: On NounsCast.', {
+               ...data,
+            });
+
+            data.eventName = 'NounsCast';
+            router.sendToFeed(data, 'nounsCast', 'farcaster');
          });
       }
 

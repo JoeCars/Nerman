@@ -11,7 +11,7 @@ module.exports = {
     */
    async execute(interaction) {
       Logger.info(
-         'commands/nerman/info/adminCheckVoter.js: Attempting to check voters.',
+         'commands/slash/dev/adminCheckVoter.js: Attempting to check voters.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -42,7 +42,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/nerman/info/adminCheckVoter.js: Finished checking voters.',
+         'commands/slash/dev/adminCheckVoter.js: Finished checking voters.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,

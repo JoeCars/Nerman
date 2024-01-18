@@ -201,7 +201,7 @@ module.exports = async client => {
                                  .get(closingPoll.config.channelId)
                                  .messages.fetch(closingPoll.messageId));
                         } catch (error) {
-                           Logger.error(
+                           Logger.debug(
                               'db/index.js: Error. Unable to find the message.',
                               {
                                  error: error,

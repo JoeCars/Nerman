@@ -18,7 +18,7 @@ module.exports = {
     */
    async execute(interaction) {
       Logger.info(
-         'commands/slash/poll/createTestPoll.js: Starting to create polls.',
+         'commands/slash/dev/createTestPoll.js: Starting to create polls.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -54,7 +54,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/slash/poll/createTestPoll.j`s: Finished creating poll.',
+         'commands/slash/dev/createTestPoll.js: Finished creating poll.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,

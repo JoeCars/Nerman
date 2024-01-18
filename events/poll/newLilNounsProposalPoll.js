@@ -197,62 +197,7 @@ module.exports = {
                return poll.save();
             });
 
-         const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
-            async key => {
-               let user = await User.findOne({
-                  guildId: guildId,
-                  discordId: key,
-               }).exec();
-
-               if (!user) {
-                  Logger.warn(
-                     'events/poll/newProposalPoll.js: User does not exist yet. Creating new user.',
-                  );
-
-                  const {
-                     roles: { cache: userRoleCache },
-                  } = allowedUsers.get(key);
-
-                  const eligibleChannels = await User.findEligibleChannels(
-                     userRoleCache,
-                  );
-
-                  user = await User.createUser(guildId, key, eligibleChannels);
-
-                  Logger.debug(
-                     'events/poll/newProposalPoll.js: Successfully created new user.',
-                     { user: user },
-                  );
-               } else if (
-                  user.eligibleChannels !== null &&
-                  user.eligibleChannels.has(newPoll.config.channelId)
-               ) {
-                  Logger.debug(
-                     'events/poll/newProposalPoll.js: User exists and has channel key!',
-                  );
-
-                  user.eligibleChannels.get(newPoll.config.channelId)
-                     .eligiblePolls++;
-               } else {
-                  Logger.warn(
-                     'events/poll/newProposalPoll.js: User did not have the appropriate key. Attempting to set key.',
-                     {
-                        key: newPoll.config.channelId,
-                     },
-                  );
-
-                  user.eligibleChannels.set(newPoll.config.channelId, {
-                     eligiblePolls: 1,
-                     participatedPolls: 0,
-                  });
-               }
-
-               user.markModified('eligibleChannels');
-               return await user.save();
-            },
-         );
-
-         await Promise.all(updateVoterPromise);
+         User.updateUserParticipation(newPoll, guildId);
 
          const updatedEmbed = new EmbedBuilder(messageObject.embeds[0]);
 

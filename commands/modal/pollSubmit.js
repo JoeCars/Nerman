@@ -264,38 +264,7 @@ module.exports = {
                return await poll.save();
             });
 
-         // todo Make this updating eligible users channel map into a reusable function
-
-         const updateVoterPromise = [...newPoll.allowedUsers.keys()].map(
-            async key => {
-               // todo I need to add in a proper check for if these people exist
-               let user = await User.findOne().byDiscordId(key, guildId).exec();
-
-               if (user && user.eligibleChannels.has(channelId)) {
-                  user.eligibleChannels.get(channelId).eligiblePolls++;
-               } else if (user && !user.eligibleChannels.has(channelId)) {
-                  // todo maybe use the method to construct the paerticipation object by aggregating all docs accounting for Polls with the allowed user, just to be a bit more thorough
-                  user.eligibleChannels.set(newPoll.config.channelId, {
-                     eligiblePolls: 1,
-                     participatedPolls: 0,
-                  });
-               } else {
-                  const member = memberCache.get(key);
-                  const memberRoles = member.roles.cache;
-                  const eligibleChannels = await User.findEligibleChannels(
-                     memberRoles,
-                  );
-                  user = await User.createUser(guildId, key, eligibleChannels);
-
-                  return user;
-               }
-
-               user.markModified('eligibleChannels');
-               return user.save();
-            },
-         );
-
-         await Promise.all(updateVoterPromise);
+         User.updateUserParticipation(newPoll, guildId);
 
          const updatedEmbed = new EmbedBuilder(messageObject.embeds[0].data);
 

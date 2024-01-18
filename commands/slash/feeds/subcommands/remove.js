@@ -1,18 +1,19 @@
 const { CommandInteraction, inlineCode } = require('discord.js');
 
-const FeedConfig = require('../../../db/schemas/FeedConfig');
-const Logger = require('../../../helpers/logger');
-const { authorizeInteraction } = require('../../../helpers/authorization');
-const events = require('../../../utils/feedEvents');
+const FeedConfig = require('../../../../db/schemas/FeedConfig');
+const Logger = require('../../../../helpers/logger');
+const { authorizeInteraction } = require('../../../../helpers/authorization');
+const { getKeyOfEvent } = require('../../../../helpers/feeds');
+const feedEvents = require('../../../../utils/feedEvents');
 
 module.exports = {
-   subCommand: 'nerman-feeds.remove-all',
+   subCommand: 'feeds.remove',
    /**
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
       Logger.info(
-         'commands/slashCommands/feeds/removeAll.js: Removing all event configuration.',
+         'commands/slash/feeds/remove.js: Removing event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -24,15 +25,12 @@ module.exports = {
 
       const channel =
          interaction.options.getChannel('channel') ?? interaction.channel;
+      const event = interaction.options.getString('event');
 
-      if (!channel) {
-         throw new Error('Could not retrieve channel for removal.');
-      }
-
-      await removeAllFeeds(interaction, channel.id);
+      await removeFeed(interaction, channel.id, event);
 
       Logger.info(
-         'commands/slashCommands/feeds/removeAll.js: Finished removing all event configuration.',
+         'commands/slash/feeds/remove.js: Finished removing event configuration.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,
@@ -46,26 +44,27 @@ module.exports = {
  * @param {CommandInteraction} interaction
  * @param {string} channelId
  */
-async function removeAllFeeds(interaction, channelId) {
+async function removeFeed(interaction, channelId, event) {
+   const eventKey = feedEvents.get(event) ? event : getKeyOfEvent(event);
+
    let result;
    try {
-      result = await FeedConfig.deleteMany({
+      result = await FeedConfig.deleteOne({
          guildId: interaction.guildId,
          channelId: channelId,
+         eventName: eventKey,
          isDeleted: {
             $ne: true,
          },
       });
    } catch (error) {
       Logger.error(
-         'commands/slashCommands/feeds/remove.js: Unable to remove the configuration.',
+         'commands/slash/feeds/remove.js: Unable to remove the feed.',
          {
             error: error,
          },
       );
-      throw new Error(
-         'Unable to remove notification configuration due to a database issue.',
-      );
+      throw new Error('Unable to remove the feed due to a database issue.');
    }
 
    if (!result) {
@@ -75,10 +74,21 @@ async function removeAllFeeds(interaction, channelId) {
       });
    }
 
+   const eventValue = feedEvents.get(eventKey);
+
+   if (result.deletedCount === 0) {
+      return interaction.reply({
+         ephemeral: true,
+         content: `${inlineCode(eventValue)} was not registered in ${inlineCode(
+            channelId,
+         )}. Please try a different event.`,
+      });
+   }
+
    await interaction.reply({
       ephemeral: true,
       content: `You have successfully removed ${inlineCode(
-         result.deletedCount,
+         eventValue,
       )} events from channel ${inlineCode(channelId)}.`,
    });
 }

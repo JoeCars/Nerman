@@ -43,7 +43,7 @@ exports.generateTransferForkNounEmbed = function (data, hasMarkdown = true) {
 
 exports.generateForkDelegateChangedEmbed = function (data, hasMarkdown = true) {
    const title = 'Fork 0 | Delegate Changed';
-   const titleUrl = `https://etherscan.io/tx/${data.event.transactionHash}`;
+   const titleUrl = `https://etherscan.io/tx/${data.event?.transactionHash}`;
 
    let delegator = data.delegator.name;
    let newDelegate = data.toDelegate.name;

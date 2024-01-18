@@ -73,7 +73,7 @@ exports.generateVoteCastEmbed = function (data) {
    );
    const votes = inlineCode(data.votingPower);
    const proposalUrl = `https://prop.house/${data.round.id}/${data.proposalId}`;
-   const proposal = hyperlink(data.proposal.title, proposalUrl);
+   const proposal = hyperlink(data.proposalTitle, proposalUrl);
    const roundUrl = `https://prop.house/${data.round.id}`;
    const round = hyperlink(data.round.title, roundUrl);
    const houseUrl = `https://prop.house/${data.house.id}`;

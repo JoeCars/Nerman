@@ -25,10 +25,6 @@ module.exports = {
       const nounsTransferred =
          interaction.options.getNumber('nouns-transferred') ??
          DEFAULT_NOUNS_TRANSFERRED;
-      let nounsTransferredHex = nounsTransferred.toString(16);
-      nounsTransferredHex = `0x${'0'.repeat(
-         128 - nounsTransferredHex.length,
-      )}${nounsTransferredHex}`;
 
       const Nouns = interaction.client.libraries.get('Nouns');
       Nouns.trigger('DelegateChanged', {
@@ -41,18 +37,7 @@ module.exports = {
          fromDelegate: {
             id: DEFAULT_DELEGATOR_ID,
          },
-         event: {
-            getTransactionReceipt() {
-               return {
-                  logs: [
-                     {},
-                     {
-                        data: nounsTransferredHex,
-                     },
-                  ],
-               };
-            },
-         },
+         numOfVotesChanged: nounsTransferred,
       });
 
       interaction.reply({

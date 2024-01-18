@@ -20,7 +20,7 @@ class Router {
             const channel = await this.client.channels.fetch(feed.channelId);
             this.client.emit(eventName, channel, data);
          } catch (error) {
-            Logger.error(
+            Logger.debug(
                'helpers/router.js: Unable to retrieve feed channel.',
                {
                   channelId: feed.channelId,
