@@ -6,12 +6,12 @@ const { authorizeInteraction } = require('../../../../helpers/authorization');
 const { formatResultMessage } = require('../../../../helpers/feeds');
 
 module.exports = {
-   subCommand: 'prop-house.add',
+   subCommand: 'prophouse.add',
    /**
     * @param {CommandInteraction} interaction
     */
    async execute(interaction) {
-      Logger.info('commands/slash/feeds/prop-house.js: Adding new feed.', {
+      Logger.info('commands/slash/feeds/prophouse.js: Adding new feed.', {
          userId: interaction.user.id,
          guildId: interaction.guildId,
          channelId: interaction.channelId,
@@ -55,7 +55,7 @@ module.exports = {
       });
 
       Logger.info(
-         'commands/slash/feeds/prop-house.js: Finished adding new feed.',
+         'commands/slash/feeds/prophouse.js: Finished adding new feed.',
          {
             userId: interaction.user.id,
             guildId: interaction.guildId,

@@ -1,7 +1,7 @@
 const remove = require('../subcommands/remove');
 
 module.exports = {
-   subCommand: 'prop-house.remove',
+   subCommand: 'prophouse.remove',
 
    async execute(interaction) {
       remove.execute(interaction);

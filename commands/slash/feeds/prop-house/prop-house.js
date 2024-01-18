@@ -5,7 +5,7 @@ const Logger = require('../../../../helpers/logger');
 
 module.exports = {
    data: new SlashCommandBuilder()
-      .setName('prop-house')
+      .setName('prophouse')
       .setDescription('Commands to add and remove PropHouse feeds.')
       .addSubcommand(subcommand => {
          return subcommand
@@ -58,7 +58,7 @@ module.exports = {
 
    async execute() {
       Logger.info(
-         'commands/slash/feeds/prop-house.js: Executed feeds command.',
+         'commands/slash/feeds/prophouse.js: Executed feeds command.',
       );
    },
 };
