@@ -24,8 +24,6 @@ module.exports = async client => {
 
    // create empty options object
    const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       heartbeatFrequencyMS: 10000,
    };
 
