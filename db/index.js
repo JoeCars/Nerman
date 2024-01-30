@@ -33,8 +33,6 @@ module.exports = async client => {
       process.env.DEPLOY_STAGE === 'staging'
    ) {
       options.autoIndex = false;
-      options.keepAlive = true; // this is true by default since v5.2.0 but keeping it as a reminder
-      options.keepAliveInitialDelay = 300000;
    }
    Logger.info('db/index.js: Checking options.', {
       options: options,
