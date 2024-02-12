@@ -42,15 +42,30 @@ const fetchPoll = async interaction => {
    return targetPoll;
 };
 
+/**
+ * @param {import('discord.js').Interaction} interaction
+ */
 const attachUsernames = async (interaction, targetPoll) => {
    for (let i = 0; i < targetPoll.getVotes.length; ++i) {
       if (targetPoll.config.anonymous) {
          targetPoll.getVotes[i].username = 'anonymous';
       } else {
-         const guildUser = await interaction.guild.members.fetch(
-            targetPoll.getVotes[i].user,
-         );
-         targetPoll.getVotes[i].username = guildUser.user.username;
+         try {
+            const guildUser = await interaction.guild.members.fetch(
+               targetPoll.getVotes[i].user,
+            );
+            targetPoll.getVotes[i].username = guildUser.user.username;
+         } catch (error) {
+            Logger.warn(
+               'commands/context/exportPollReasons.js: Unable to retrieve guild user.',
+               {
+                  userId: targetPoll.getVotes[i].user,
+                  guildId: interaction.guildId,
+                  error: error,
+               },
+            );
+            targetPoll.getVotes[i].username = targetPoll.getVotes[i].user;
+         }
       }
    }
 };
