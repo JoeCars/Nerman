@@ -1,12 +1,15 @@
 const {
    ContextMenuCommandBuilder,
    ApplicationCommandType,
+   MessageContextMenuCommandInteraction,
    codeBlock,
 } = require('discord.js');
 
 const Poll = require('../../db/schemas/Poll');
 const Vote = require('../../db/schemas/Vote');
 const Logger = require('../../helpers/logger');
+
+const MAX_MESSAGE_LENGTH = 1990; // Actually 2000, but leaving extra room.
 
 const fetchPoll = async interaction => {
    let targetPoll;
@@ -133,6 +136,9 @@ module.exports = {
       .setName('Export Poll Reasons')
       .setType(ApplicationCommandType.Message),
 
+   /**
+    * @param {MessageContextMenuCommandInteraction} interaction
+    */
    async execute(interaction) {
       Logger.info(
          'commands/context/exportPollReasons.js: Attempting to export poll reasons.',
@@ -149,10 +155,20 @@ module.exports = {
       const pollResults = await extractPollResults(targetPoll);
       const markdown = generatePollExport(pollResults);
 
-      interaction.reply({
-         content: codeBlock(markdown),
+      await interaction.reply({
+         content: codeBlock(markdown.substring(0, MAX_MESSAGE_LENGTH)),
          ephemeral: true,
       });
+      let remainingMessage = markdown.substring(MAX_MESSAGE_LENGTH);
+      while (remainingMessage.length > 0) {
+         await interaction.followUp({
+            content: codeBlock(
+               remainingMessage.substring(0, MAX_MESSAGE_LENGTH),
+            ),
+            ephemeral: true,
+         });
+         remainingMessage = remainingMessage.substring(MAX_MESSAGE_LENGTH);
+      }
 
       Logger.info(
          'commands/context/exportPollReasons.js: Successfully exported poll reasons.',
