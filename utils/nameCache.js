@@ -1,4 +1,5 @@
 const shortenAddress = require('../helpers/nouns/shortenAddress');
+const Logger = require('../helpers/logger');
 
 const nameCache = new Map();
 
@@ -8,7 +9,17 @@ exports.fetchAddressName = async (address, nouns) => {
       return name;
    }
 
-   name = await nouns.ensReverseLookup(address);
+   try {
+      name = await nouns.ensReverseLookup(address);
+   } catch (error) {
+      Logger.warn(
+         'utils/nameCache.js: Unable fetch address. Shortening address instead.',
+         {
+            error,
+         },
+      );
+      name = null;
+   }
    if (!name) {
       name = shortenAddress(address);
    }
