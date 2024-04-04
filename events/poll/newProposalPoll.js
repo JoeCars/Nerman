@@ -9,7 +9,9 @@ const Poll = require('../../db/schemas/Poll');
 const User = require('../../db/schemas/User');
 const UrlConfig = require('../../db/schemas/UrlConfig');
 const Logger = require('../../helpers/logger');
-const { createNewProposalEmbed } = require('../../helpers/proposalHelpers');
+const {
+   generatePropCreatedEmbed,
+} = require('../../views/embeds/contracts/nouns-dao');
 
 module.exports = {
    name: 'newProposalPoll',
@@ -35,7 +37,7 @@ module.exports = {
 
       const interaction = await channel.send({
          content: null,
-         embeds: [createNewProposalEmbed(proposal, propUrl)],
+         embeds: [generatePropCreatedEmbed(proposal, propUrl)],
       });
 
       const {
