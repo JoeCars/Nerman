@@ -44,7 +44,7 @@ module.exports = {
 
       // 993371424662224986 nerman-dev-jr
       const voterId =
-         interaction.options.getString('discord-id') ??
+         interaction.options.getUser('discord-user')?.id ??
          interaction.member.user.id;
 
       const response = await createParticipationStats(
