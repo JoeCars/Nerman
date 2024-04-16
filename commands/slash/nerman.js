@@ -62,11 +62,11 @@ module.exports = {
             .setDescription(
                'Check user voting participation in current channel.',
             )
-            .addStringOption(option =>
+            .addUserOption(option =>
                option
-                  .setName('discord-id')
+                  .setName('discord-user')
                   .setDescription(
-                     "Enter user's Discord ID. Checks your own participation, if left blank.",
+                     "The user's stats to check. Checks your own participation, if left blank.",
                   )
                   .setRequired(false),
             ),
