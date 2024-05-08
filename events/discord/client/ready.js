@@ -290,7 +290,7 @@ module.exports = {
             sendToNounsForum(vote.proposalId, vote, client);
          });
 
-         Nouns.on('ProposalCreatedWithRequirements', async data => {
+         Nouns.on('ProposalCreated', async data => {
             data.description = data.description.substring(0, 500);
 
             try {
@@ -301,22 +301,17 @@ module.exports = {
                });
             }
 
-            Logger.info(
-               'events/ready.js: On ProposalCreatedWithRequirements.',
-               {
-                  id: `${data.id}`,
-                  proposer: `${data.proposer.id}`,
-                  startBlock: data.startBlock,
-                  endBlock: data.endBlock,
-                  quorumVotes: `${data.quorumVotes}`,
-                  proposalThreshold: `${data.proposalThreshold}`,
-                  description: data.description,
-                  targets: `${data.targets}`,
-                  values: `${data.values}`,
-                  signatures: `${data.signatures}`,
-                  calldatas: `${data.calldatas}`,
-               },
-            );
+            Logger.info('events/ready.js: On ProposalCreated.', {
+               id: `${data.id}`,
+               proposer: `${data.proposer.id}`,
+               targets: `${data.targets}`,
+               values: `${data.values}`,
+               signatures: `${data.signatures}`,
+               calldatas: `${data.calldatas}`,
+               startBlock: data.startBlock,
+               endBlock: data.endBlock,
+               description: data.description,
+            });
 
             data.proposalTitle = await fetchProposalTitle(data.id);
             data.eventName = 'PropCreated';

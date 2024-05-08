@@ -32,7 +32,7 @@ module.exports = {
          DEFAULT_PROPOSAL_DESCRIPTION;
 
       const Nouns = interaction.client.libraries.get('Nouns');
-      Nouns.trigger('ProposalCreatedWithRequirements', {
+      Nouns.trigger('ProposalCreated', {
          id: proposalNumber,
          description: `# ${proposalTitle} \n ${proposalDescription}`,
          proposer: { id: proposerWallet },
