@@ -69,8 +69,6 @@ const ProposalSchema = new Schema(
                proposerId: data.proposer.id,
                startBlock: data.startBlock,
                endBlock: data.endBlock,
-               quorumVotes: data.quorumVotes,
-               proposalThreshold: data.proposalThreshold,
                title: title,
                description: description,
             });

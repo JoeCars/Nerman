@@ -201,5 +201,5 @@ module.exports = {
       );
    },
 
-   isHidden: process.env.DEPLOY_STAGE === 'production',
+   isHidden: false,
 };
