@@ -30,14 +30,14 @@ exports.generateThreadVoteEmbed = function (vote, hasMarkdown = true) {
 
    if (reason.length > MAX_REASON_LENGTH) {
       reason = reason.substring(0, MAX_REASON_LENGTH).trim() + '...';
-      if (vote.event?.transactionHash) {
-         reason +=
-            '\n' +
-            hyperlink(
-               'read more',
-               `https://www.mmmogu.com/tx/${vote.event?.transactionHash}`,
-            );
-      }
+      reason +=
+         '\n' +
+         hyperlink(
+            'read more',
+            `https://www.nouns.camp/proposals/${
+               vote.proposalId
+            }#${vote.voter.id.toLowerCase()}-${vote.proposalId}`,
+         );
    }
 
    if (hasMarkdown) {
