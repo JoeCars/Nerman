@@ -21,9 +21,9 @@ exports.checkUserEligibility = async function checkUserEligibility(
 
    if (!attachedPoll.allowedUsers.has(userId)) {
       return {
-         message: `You are not eligible to participate in polls posted before your arrival:\nPoll posted on: <t:${Math.round(
+         message: `You are not eligible to participate in this poll. You were either absent from the Discord server, or lacked an appropriate role, when the poll was created.\nPoll posted on: <t:${Math.round(
             Date.parse(attachedPoll.timeCreated) / 1000,
-         )}:F>\nDate you joined: <t:${Math.round(joinedTimestamp / 1000)}>`,
+         )}:F>`,
          isEligible: false,
       };
    }
