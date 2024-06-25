@@ -29,7 +29,10 @@ events.set(
    'proposalCandidateCreated',
    'Nouns.DAOData.ProposalCandidateCreated',
 );
-events.set('proposalCandidateUpdated', 'NounsDAOData.ProposalCandidateUpdated');
+events.set(
+   'proposalCandidateUpdated',
+   'Nouns.DAOData.ProposalCandidateUpdated',
+);
 events.set('signatureAdded', 'Nouns.DAOData.SignatureAdded');
 events.set('feedbackSent', 'Nouns.DAOData.FeedbackSent');
 
