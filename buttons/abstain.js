@@ -43,7 +43,10 @@ module.exports = {
          'allowedRoles',
       ).exec();
 
-      const pollStatus = await Poll.findOne({ messageId });
+      const pollStatus = await Poll.findOne(
+         { messageId },
+         'status allowedUsers',
+      );
 
       const eligibility = await checkUserEligibility(
          roleCache,
@@ -123,8 +126,7 @@ async function updateVoteEmbed(client, channelId, messageId, updatedPoll) {
    // todo remove later when I find out the specific root of this issue
    if (!updateEmbed.data.fields.find(({ name }) => name === 'Voting Closes')) {
       updateEmbed.spliceFields(
-         updateEmbed.data.fields.findIndex(({ name }) => name === 'Abstains') +
-            1,
+         updateEmbed.data.fields.findIndex(({ name }) => name === 'Abstains') + 1,
          0,
          {
             name: 'Voting Closes',
