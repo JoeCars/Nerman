@@ -19,10 +19,11 @@ exports.checkUserEligibility = async function checkUserEligibility(
       };
    }
 
-   if (!attachedPoll.allowedUsers.has(userId)) {
+   const pollCreationTimestamp = Date.parse(attachedPoll.timeCreated);
+   if (joinedTimestamp > pollCreationTimestamp) {
       return {
          message: `You are not eligible to participate in polls posted before your arrival:\nPoll posted on: <t:${Math.round(
-            Date.parse(attachedPoll.timeCreated) / 1000,
+            pollCreationTimestamp / 1000,
          )}:F>\nDate you joined: <t:${Math.round(joinedTimestamp / 1000)}>`,
          isEligible: false,
       };
