@@ -124,6 +124,12 @@ exports.generateProposalCandidateCanceledEmbed = function (proposal) {
       proposal.slug
    }`;
    const proposalName = hyperlink(proposalTitle, proposalUrl);
+
+   if (proposal.reason && proposal.reason.length > PROPOSAL_REASON_LENGTH) {
+      proposal.reason =
+         proposal.reason.substring(0, PROPOSAL_REASON_LENGTH).trim() + '...';
+   }
+
    const reason = proposal.reason ? `\n\n${proposal.reason}` : '';
    const description = `${proposer} has ${inlineCode(
       'CANCELED',
@@ -200,6 +206,12 @@ exports.generateProposalCandidateUpdatedEmbed = function (proposal) {
       proposal.slug
    }`;
    const proposalName = hyperlink(proposalTitle, proposalUrl);
+
+   if (proposal.reason && proposal.reason.length > PROPOSAL_REASON_LENGTH) {
+      proposal.reason =
+         proposal.reason.substring(0, PROPOSAL_REASON_LENGTH).trim() + '...';
+   }
+
    const reason = proposal.reason ? `\n\n${proposal.reason}` : '';
    const description = `${proposer} has ${inlineCode(
       'UPDATED',
@@ -240,6 +252,12 @@ exports.generateSignatureAddedEmbed = function (data) {
       `https://etherscan.io/address/${data.signer.id}`,
    );
    const votes = inlineCode(data.votes);
+
+   if (data.reason && data.reason.length > PROPOSAL_REASON_LENGTH) {
+      data.reason =
+         data.reason.substring(0, PROPOSAL_REASON_LENGTH).trim() + '...';
+   }
+
    const reason = data.reason ? `\n\n${data.reason}` : '';
    const description = `${signer} signed ${proposer}'s proposal with ${votes} vote(s).${reason}`;
 
