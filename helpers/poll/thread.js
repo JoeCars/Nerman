@@ -44,7 +44,7 @@ exports.findPollMessage = async function (channel, proposalId) {
       pollMessage = await (channel.messages.cache.get(targetPoll.messageId) ??
          channel.messages.fetch(targetPoll.messageId));
    } catch (error) {
-      Poll.findOneAndRemove({ _id: targetPoll._id })
+      Poll.findOneAndDelete({ _id: targetPoll._id })
          .exec()
          .then(() => {
             Logger.info('helpers/poll/thread.js: Deleted unused poll.', {
