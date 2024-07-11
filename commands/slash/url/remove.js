@@ -47,7 +47,7 @@ module.exports = {
       }
 
       try {
-         await UrlConfig.findOneAndRemove({
+         await UrlConfig.findOneAndDelete({
             _id: oldConfig._id,
             guildId: oldConfig.guildId,
          }).exec();
