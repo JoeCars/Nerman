@@ -25,6 +25,7 @@ module.exports = async client => {
    // create empty options object
    const options = {
       heartbeatFrequencyMS: 10000,
+      readPreference: 'primaryPreferred',
    };
 
    // Turn off auto indexing in production, because it's expensive on performance
