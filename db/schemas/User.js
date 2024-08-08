@@ -28,6 +28,10 @@ const userSchema = new Schema(
          enum: ['active', 'inactive', 'warning'],
          default: 'active',
       },
+      username: {
+         type: Schema.Types.String,
+         required: false,
+      },
    },
    {
       // comment
