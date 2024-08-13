@@ -2,6 +2,7 @@ const { ButtonInteraction } = require('discord.js');
 
 const Poll = require('../db/schemas/Poll');
 const PollChannel = require('../db/schemas/PollChannel');
+const User = require('../db/schemas/User');
 const Logger = require('../helpers/logger');
 const { checkUserEligibility } = require('../helpers/buttonEligibility');
 const { generateVoteModal } = require('../views/modals');
@@ -33,6 +34,21 @@ module.exports = {
             roles: { cache: roleCache },
          },
       } = interaction;
+
+      try {
+         await User.updateName(
+            interaction.guildId,
+            userId,
+            interaction.user.username,
+         );
+      } catch (error) {
+         Logger.error('abstain: Unable to update username.', {
+            guildId: interaction.guildId,
+            userId,
+            username: interaction.user.username,
+            error,
+         });
+      }
 
       const { allowedRoles } = await PollChannel.findOne(
          { channelId },

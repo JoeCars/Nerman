@@ -7,36 +7,52 @@ const Logger = require('../../helpers/logger');
 const userSchema = new Schema(
    {
       _id: Schema.Types.ObjectId,
-      guildId: { type: String, required: true },
+      guildId: { type: Schema.Types.String, required: true },
       discordId: {
-         type: String,
+         type: Schema.Types.String,
          required: true,
          unique: false,
       },
-      // todo I'm going to need to maybe add in a guildId to this to differentiate users... or perhaps change the eligible channels map to have guildId as parent keys and then channels as a sub-map to those keys
       nameHistory: {
-         type: [String],
+         type: [Schema.Types.String],
       },
       eligibleChannels: {
          type: Map,
          of: Schema.Types.Mixed,
          default: new Map(),
       },
-      // todo add a way to have user's status change to inactive when they leave the Discord server
       status: {
-         type: String,
+         type: Schema.Types.String,
          enum: ['active', 'inactive', 'warning'],
          default: 'active',
       },
-      username: {
-         type: Schema.Types.String,
-         required: false,
-      },
    },
    {
-      // comment
       timestamps: { createdAt: 'timeCreated', updatedAt: 'modified' },
       statics: {
+         async updateName(guildId, discordId, username) {
+            const user = await this.findOne({
+               guildId: guildId,
+               discordId: discordId,
+            }).exec();
+            if (!user) {
+               Logger.error('User: Unable to find User to update name.', {
+                  guildId,
+                  discordId,
+                  username,
+               });
+               return;
+            }
+
+            // Checking if the newest name is already saved.
+            const newestName = user.nameHistory[user.nameHistory.length - 1];
+            if (newestName === username) {
+               return;
+            }
+
+            user.nameHistory.push(username);
+            await user.save();
+         },
          async createUser(guildId, voterId, eligibleChannels) {
             try {
                const eligibleMap = new Map();

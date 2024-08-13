@@ -38,6 +38,17 @@ module.exports = {
          },
       } = interaction;
 
+      try {
+         await User.updateName(guildId, userId, interaction.user.username);
+      } catch (error) {
+         Logger.error('abstain: Unable to update username.', {
+            guildId,
+            userId,
+            username: interaction.user.username,
+            error,
+         });
+      }
+
       const { allowedRoles, anonymous: anon } = await PollChannel.findOne(
          { channelId },
          'allowedRoles',
