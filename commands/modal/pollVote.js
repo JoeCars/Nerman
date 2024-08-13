@@ -22,25 +22,6 @@ const doppelId = process.env.DEVNERMAN_NOUNCIL_CHAN_ID;
 
 const guildNouncilIds = [nouncilId, jtsNouncilId, doppelId];
 
-/**
- * @param {string} username
- * @param {string} userId
- */
-async function registerUsername(username, userId) {
-   try {
-      await User.updateOne(
-         { discordId: userId },
-         { username: username },
-      ).exec();
-   } catch (error) {
-      Logger.error('commands/modal/pollVote.js: Unable to register username.', {
-         username,
-         userId,
-         error,
-      });
-   }
-}
-
 module.exports = {
    name: 'vote-modal',
    /**
@@ -177,7 +158,6 @@ module.exports = {
       const updatedPoll = await Poll.findAndSetVoted(messageId, userId);
 
       votingUser.incParticipation(channelId);
-      await registerUsername(modal.user.username, modal.user.id);
 
       // todo I need to extract this chunk into a module
 
