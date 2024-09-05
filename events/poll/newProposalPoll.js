@@ -12,34 +12,10 @@ const Logger = require('../../helpers/logger');
 const {
    generatePropCreatedEmbed,
 } = require('../../views/embeds/contracts/nouns-dao');
-const Nouncillor = require('../../db/schemas/Nouncillor');
-
-/**
- * @param {TextChannel} channel
- */
-function isNouncilChannel(channel) {
-   return channel.id === process.env.NOUNCIL_CHANNEL_ID;
-}
-
-/**
- * @param {string[]} nouncillorDiscordIds
- */
-async function updateNouncillorDateJoined(nouncillorDiscordIds) {
-   for (const discordId of nouncillorDiscordIds) {
-      let nouncillor = await Nouncillor.findOne({
-         discordId: discordId,
-      }).exec();
-
-      if (!nouncillor) {
-         nouncillor = new Nouncillor({ discordId });
-      }
-
-      if (!nouncillor.dateJoined) {
-         nouncillor.dateJoined = new Date();
-         await nouncillor.save();
-      }
-   }
-}
+const {
+   isNouncilChannel,
+   updateNouncillorDateJoined,
+} = require('../../helpers/nouncillor');
 
 module.exports = {
    name: 'newProposalPoll',
@@ -176,7 +152,7 @@ module.exports = {
          });
       }
 
-      if (isNouncilChannel(channel)) {
+      if (isNouncilChannel(channel.id)) {
          await updateNouncillorDateJoined([...snapshotMap.keys()]);
       }
 
