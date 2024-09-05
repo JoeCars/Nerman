@@ -222,7 +222,11 @@ module.exports = {
       }
 
       if (isNouncilChannel(channelId)) {
-         await updateNouncillorDateJoined([...snapshotMap.keys()]);
+         try {
+            await updateNouncillorDateJoined([...snapshotMap.keys()]);
+         } catch (error) {
+            Logger.error('pollSubmit: error', { error, channelId });
+         }
       }
 
       const { _id, durationMs, quorum } = await PollChannel.findOne({

@@ -153,7 +153,14 @@ module.exports = {
       }
 
       if (isNouncilChannel(channel.id)) {
-         await updateNouncillorDateJoined([...snapshotMap.keys()]);
+         try {
+            await updateNouncillorDateJoined([...snapshotMap.keys()]);
+         } catch (error) {
+            Logger.error('newProposalPoll: error', {
+               error,
+               channelId: channel.id,
+            });
+         }
       }
 
       const countExists = await PollCount.checkExists(channel.id);
