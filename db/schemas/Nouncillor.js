@@ -7,15 +7,15 @@ const nouncillorSchema = new Schema({
 	},
 	walletAddress: {
 		type: Schema.Types.String,
-		required: true
+		required: false
 	},
 	twitterAddress: {
 		type: Schema.Types.String,
-		required: true
+		required: false
 	},
 	farcasterAddress: {
 		type: Schema.Types.String,
-		required: true
+		required: false
 	},
 	dateJoined: {
 		type: Schema.Types.Date,
