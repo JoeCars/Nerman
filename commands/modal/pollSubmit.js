@@ -14,6 +14,10 @@ const PollCount = require('../../db/schemas/ChannelPollCount');
 const Logger = require('../../helpers/logger');
 
 const { longestString } = require('../../helpers/poll');
+const {
+   isNouncilChannel,
+   updateNouncillorDateJoined,
+} = require('../../helpers/nouncillor');
 
 module.exports = {
    name: 'modal-create-poll',
@@ -215,6 +219,14 @@ module.exports = {
          Logger.error('commands/modal/pollSubmit.js: Received error.', {
             error: error,
          });
+      }
+
+      if (isNouncilChannel(channelId)) {
+         try {
+            await updateNouncillorDateJoined([...snapshotMap.keys()]);
+         } catch (error) {
+            Logger.error('pollSubmit: error', { error, channelId });
+         }
       }
 
       const { _id, durationMs, quorum } = await PollChannel.findOne({

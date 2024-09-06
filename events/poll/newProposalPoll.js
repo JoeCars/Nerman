@@ -12,6 +12,10 @@ const Logger = require('../../helpers/logger');
 const {
    generatePropCreatedEmbed,
 } = require('../../views/embeds/contracts/nouns-dao');
+const {
+   isNouncilChannel,
+   updateNouncillorDateJoined,
+} = require('../../helpers/nouncillor');
 
 module.exports = {
    name: 'newProposalPoll',
@@ -146,6 +150,17 @@ module.exports = {
          Logger.error('events/poll/newProposalPoll.js: Error.', {
             error: error,
          });
+      }
+
+      if (isNouncilChannel(channel.id)) {
+         try {
+            await updateNouncillorDateJoined([...snapshotMap.keys()]);
+         } catch (error) {
+            Logger.error('newProposalPoll: error', {
+               error,
+               channelId: channel.id,
+            });
+         }
       }
 
       const countExists = await PollCount.checkExists(channel.id);
