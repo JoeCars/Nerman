@@ -17,7 +17,7 @@ exports.updateNouncillorDateJoined = async function updateNouncillorDateJoined(
 ) {
    await addNouncillorDateJoined(nouncillorDiscordIds);
 
-   const oldAllowedDiscordIds = await fetchAllowedUsersFromNewestNouncilPoll();
+   const oldAllowedDiscordIds = await fetchAllCurrentlyEligibleNouncillorIds();
    const newlyIneligibleDiscordIds = await findNewlyIneligibleDiscordIds(
       oldAllowedDiscordIds,
       nouncillorDiscordIds,
@@ -45,6 +45,18 @@ async function addNouncillorDateJoined(nouncillorDiscordIds) {
          await nouncillor.save();
       }
    }
+}
+
+async function fetchAllCurrentlyEligibleNouncillorIds() {
+   const eligibleNouncillors = await Nouncillor.find({
+      dateJoined: { $ne: null },
+   })
+      .lean()
+      .exec();
+   const discordIds = eligibleNouncillors.map(
+      nouncillor => nouncillor.discordId,
+   );
+   return discordIds;
 }
 
 async function fetchAllowedUsersFromNewestNouncilPoll() {
