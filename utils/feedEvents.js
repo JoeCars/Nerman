@@ -61,12 +61,6 @@ events.set('lilNounsProposalStatusChange', 'LilNouns.ProposalStatusChange');
 events.set('lilNounsVoteCast', 'LilNouns.VoteCast');
 events.set('lilNounsTransfer', 'LilNouns.Transfer');
 
-// PropHouse
-events.set('propHouseRoundCreated', 'PropHouse.RoundCreated');
-events.set('propHouseHouseCreated', 'PropHouse.HouseCreated');
-events.set('propHouseVoteCast', 'PropHouse.VoteCast');
-events.set('propHouseProposalSubmitted', 'PropHouse.ProposalSubmitted');
-
 // Polls.
 events.set('newProposalPoll', 'Polls.Nouns.NewProposalPoll');
 events.set('threadFeedbackSent', 'Polls.Nouns.ThreadFeedbackSent');
