@@ -24,26 +24,7 @@ const FeedConfigSchema = new Schema(
          required: false,
          default: false,
       },
-      options: {
-         prophouse: {
-            permittedHouses: [
-               {
-                  address: {
-                     type: String,
-                     required: true,
-                  },
-                  name: {
-                     type: String,
-                     required: true,
-                  },
-                  url: {
-                     type: String,
-                     required: true,
-                  },
-               },
-            ],
-         },
-      },
+      options: {},
    },
    {
       statics: {
@@ -164,15 +145,6 @@ const FeedConfigSchema = new Schema(
          async softDelete() {
             this.isDeleted = true;
             return this.save();
-         },
-         includesHouse(houseAddress) {
-            if (!(this.options?.prophouse?.permittedHouses?.length > 0)) {
-               return true; // All houses permitted if there are no options.
-            }
-
-            return this.options.prophouse.permittedHouses
-               .map(house => house.address)
-               .includes(houseAddress);
          },
       },
    },
