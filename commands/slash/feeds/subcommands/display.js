@@ -66,16 +66,6 @@ function generateFeedDisplay(feedConfigs) {
    return feedConfigs
       .map(config => {
          let output = '- ' + inlineCode(events.get(config.eventName));
-
-         if (config.options?.prophouse?.permittedHouses?.length > 0) {
-            output +=
-               ' (' +
-               config.options.prophouse.permittedHouses
-                  .map(house => hyperlink(house.name, house.url))
-                  .join(', ') +
-               ')';
-         }
-
          return output;
       })
       .join('\n');
